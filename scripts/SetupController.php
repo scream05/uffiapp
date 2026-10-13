@@ -1002,6 +1002,26 @@ class SetupController extends Controller
     }
 
     /**
+     * Einladen nur durch Admins: setup/einladen
+     * Mitglieder können weder per E-Mail noch per Link einladen (die Knöpfe blendet designwahl aus).
+     * Admins und Gruppen mit „Benutzer/Gruppen verwalten“ dürfen laut HumHub weiter einladen. Idempotent.
+     */
+    public function actionEinladen()
+    {
+        $user = Yii::$app->getModule('user')->settings;
+        $user->set('auth.internalUsersCanInviteByEmail', 0);
+        $user->set('auth.internalUsersCanInviteByLink', 0);
+        $this->stdout("Einladen für Mitglieder aus (E-Mail und Link)\n");
+        // In Spaces einladen: nur noch Space-Inhaber/-Admins/-Moderatoren (neue Spaces: Aktion erneut ausführen)
+        foreach (Space::find()->all() as $space) {
+            $space->permissionManager->setGroupState(Space::USERGROUP_MEMBER,
+                new \humhub\modules\space\permissions\InviteUsers(), \humhub\libs\BasePermission::STATE_DENY);
+            $this->stdout("{$space->url}: Mitglieder dürfen nicht einladen\n");
+        }
+        return ExitCode::OK;
+    }
+
+    /**
      * Lesen ohne Anmeldung: setup/gastzugang
      * Gastzugang an, Registrierung ohne Admin-Freigabe, alle Spaces „für alle sichtbar“. Inhalte der Stadt-/Admin-Konten
      * werden öffentlich, neue Inhalte dort standardmäßig auch – außer im Mängelmelder (Meldungen bleiben privat,
