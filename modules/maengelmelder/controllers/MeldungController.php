@@ -9,7 +9,7 @@ use humhub\modules\maengelmelder\models\MaengelStatus;
 use humhub\modules\maengelmelder\models\Mangel;
 use humhub\modules\maengelmelder\Module;
 use humhub\modules\post\models\Post;
-use humhub\modules\post\permissions\CreatePost;
+use humhub\modules\maengelmelder\permissions\MangelMelden;
 use Yii;
 use yii\helpers\Url;
 use yii\web\ForbiddenHttpException;
@@ -31,7 +31,8 @@ class MeldungController extends ContentContainerController
     public function actionCreate()
     {
         $space = $this->contentContainer;
-        $canPost = $space->permissionManager->can(CreatePost::class);
+        // Eigenes Recht statt „Beitrag erstellen“: Mitglieder melden, schreiben aber nicht frei in den Stream
+        $canPost = $space->permissionManager->can(MangelMelden::class);
         $data = ['kategorie' => '', 'beschreibung' => '', 'lat' => '', 'lng' => ''];
         $errors = [];
 

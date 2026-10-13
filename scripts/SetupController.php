@@ -1002,8 +1002,8 @@ class SetupController extends Controller
     }
 
     /**
-     * Keine Beiträge von Mitgliedern im Stream: setup/keine-beitraege [url1,url2] (Standard: veranstaltungen)
-     * Space-Inhaber/-Admins/-Moderatoren dürfen weiter schreiben; Kommentare und Termine regeln eigene Rechte. Idempotent.
+     * Keine Beiträge, Umfragen oder Fragen von Mitgliedern im Stream: setup/keine-beitraege [url1,url2] (Standard: veranstaltungen)
+     * Space-Inhaber/-Admins/-Moderatoren dürfen weiter; Kommentare, Termine und Mängelmeldungen (eigenes Recht) bleiben. Idempotent.
      */
     public function actionKeineBeitraege($urls = 'veranstaltungen')
     {
@@ -1013,11 +1013,18 @@ class SetupController extends Controller
                 $this->stderr("Space $url nicht gefunden\n");
                 return ExitCode::DATAERR;
             }
+            // Beiträge, Umfragen, Fragen – alles, was Mitglieder sonst in den Stream stellen könnten
+            $rechte = array_filter([
+                \humhub\modules\post\permissions\CreatePost::class,
+                'humhub\modules\polls\permissions\CreatePoll',
+                'humhub\modules\questions\permissions\CreateQuestion',
+            ], 'class_exists');
             foreach ([Space::USERGROUP_MEMBER, Space::USERGROUP_USER] as $group) {
-                $space->permissionManager->setGroupState($group, new \humhub\modules\post\permissions\CreatePost(),
-                    \humhub\libs\BasePermission::STATE_DENY);
+                foreach ($rechte as $recht) {
+                    $space->permissionManager->setGroupState($group, new $recht(), \humhub\libs\BasePermission::STATE_DENY);
+                }
             }
-            $this->stdout("$url: Mitglieder und andere Nutzer schreiben keine Beiträge\n");
+            $this->stdout("$url: Mitglieder und andere Nutzer stellen nichts in den Stream (" . count($rechte) . " Rechte)\n");
         }
         return ExitCode::OK;
     }

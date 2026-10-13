@@ -64,7 +64,10 @@ class Module extends ContentContainerModule
     /** Globales Recht „Mängelstatus bearbeiten“ (an Gruppen vergeben) */
     public function getPermissions($contentContainer = null)
     {
-        return $contentContainer === null ? [new permissions\ManageStatus()] : [];
+        if ($contentContainer === null) {
+            return [new permissions\ManageStatus()];
+        }
+        return $contentContainer instanceof \humhub\modules\space\models\Space ? [new permissions\MangelMelden()] : [];
     }
 
     public function inBounds(float $lat, float $lng): bool
