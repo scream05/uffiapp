@@ -1004,7 +1004,7 @@ class SetupController extends Controller
     /**
      * Minimale Profildaten: setup/profil-minimal [1=Probelauf]
      * Alle ausgeblendeten Profilfelder (außer Vor-/Nachname) nicht durchsuchbar und nicht bearbeitbar, Inhalte bei allen
-     * Konten leeren (Datenminimierung, Datenschutzerklärung Abschnitt 5). Idempotent.
+     * Konten leeren, Online-Status ausblenden (Datenminimierung, Datenschutzerklärung Abschnitt 5). Idempotent.
      */
     public function actionProfilMinimal($probelauf = 0)
     {
@@ -1030,6 +1030,9 @@ class SetupController extends Controller
             $befuellt += (int)(new \yii\db\Query())->from('profile')->where(['not', [$s => null]])->andWhere(['<>', $s, ''])->count();
         }
         $this->stdout(count($felder) . " ausgeblendete Felder, $befuellt befüllte Werte" . ($probelauf ? " (Probelauf)\n" : "\n"));
+        if (!$probelauf) {
+            Yii::$app->getModule('user')->settings->set('auth.hideOnlineStatus', 1); // Online-Status für niemanden sichtbar
+        }
         if (!$probelauf && $spalten) {
             $n = \humhub\modules\user\models\Profile::updateAll(array_fill_keys($spalten, null));
             $this->stdout("Geleert in $n Profilen; Felder nicht durchsuchbar/bearbeitbar\n");
