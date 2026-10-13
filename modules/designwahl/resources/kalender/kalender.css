@@ -1,0 +1,68 @@
+/* Teilnahme-Knöpfe an Terminen (Teilnehmen / Vielleicht / Absagen) – beide Designs, Stadtfarben wie Mängelstatus */
+.calendar-wall-entry .event-participation-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 18px 0 8px;
+}
+.calendar-wall-entry .event-participation-buttons .text-warning { flex-basis: 100%; }
+
+.event-participation-buttons .btn.cal-antwort {
+    --ca-farbe: #446e88;
+    --ca-grund: #e3edf3;
+    --ca-text: #2b4a5f;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    padding: 5px 14px;
+    border: 1.5px solid color-mix(in srgb, var(--ca-farbe) 45%, transparent);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ca-text);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.4;
+    box-shadow: none;
+    transition: background-color .15s, border-color .15s;
+}
+.event-participation-buttons .btn.cal-antwort::before {
+    font-family: FontAwesome;
+    font-weight: normal;
+    font-size: 12px;
+    color: var(--ca-farbe);
+}
+.event-participation-buttons .btn.cal-antwort > i { display: none; } /* Häkchen des Moduls, wir zeigen ein eigenes Symbol */
+.event-participation-buttons .cal-antwort-ja { --ca-farbe: #6a8f0c; --ca-grund: #eef5d9; --ca-text: #3f5606; }
+.event-participation-buttons .cal-antwort-ja::before { content: "\f00c"; }
+.event-participation-buttons .cal-antwort-vielleicht { --ca-farbe: #b98a00; --ca-grund: #fbf0cc; --ca-text: #6b5000; }
+.event-participation-buttons .cal-antwort-vielleicht::before { content: "\f128"; }
+.event-participation-buttons .cal-antwort-nein { --ca-farbe: #7c1922; --ca-grund: #f6e4e5; --ca-text: #5e131a; }
+.event-participation-buttons .cal-antwort-nein::before { content: "\f00d"; }
+
+.event-participation-buttons .btn.cal-antwort.btn-outline-accent.active { background: transparent; color: var(--ca-text); }
+.event-participation-buttons .btn.cal-antwort:hover,
+.event-participation-buttons .btn.cal-antwort:focus-visible {
+    background: var(--ca-grund);
+    border-color: var(--ca-farbe);
+    color: var(--ca-text);
+}
+/* Gewählte Antwort: gefüllt (das Modul gibt ihr btn-accent, den übrigen btn-outline-accent) */
+.event-participation-buttons .btn.cal-antwort.btn-accent {
+    background: var(--ca-farbe);
+    border-color: var(--ca-farbe);
+    color: #fff;
+}
+.event-participation-buttons .btn.cal-antwort.btn-accent::before { color: #fff; }
+.event-participation-buttons .cal-antwort-vielleicht.btn-accent { --ca-farbe: #a37900; }
+/* Vergangene Termine: nur anzeigen (das Modul setzt dort bei allen Knöpfen „active“) */
+.event-participation-buttons .btn.cal-antwort.btn-outline-accent.fc-disabled-cursor { opacity: .5; }
+.event-participation-buttons .btn.cal-antwort.btn-outline-accent.fc-disabled-cursor:hover { background: transparent; }
+
+[data-bs-theme="dark"] .event-participation-buttons .btn.cal-antwort { --ca-grund: rgba(255, 255, 255, .08); --ca-text: #e6edf2; }
+[data-bs-theme="dark"] .event-participation-buttons .cal-antwort-ja { --ca-farbe: #a6cf2a; }
+[data-bs-theme="dark"] .event-participation-buttons .cal-antwort-vielleicht { --ca-farbe: #e0b030; }
+[data-bs-theme="dark"] .event-participation-buttons .cal-antwort-nein { --ca-farbe: #e07a84; }
+[data-bs-theme="dark"] .event-participation-buttons .btn.cal-antwort.btn-accent { color: #1f2a33; }
+[data-bs-theme="dark"] .event-participation-buttons .btn.cal-antwort.btn-accent::before { color: #1f2a33; }

@@ -133,6 +133,7 @@ class Events
             }
             if (!Yii::$app->user->isGuest) {
                 assets\TextfeldAsset::register(Yii::$app->view);
+                assets\KalenderAsset::register(Yii::$app->view);
             } else {
                 self::abbrechenKnopf();
             }
@@ -202,6 +203,7 @@ JS, \yii\web\View::POS_END);
         '@mail/views/mail' => '@designwahl/views/mail',
         '@questions/views/question' => '@designwahl/views/questions/question',
         '@questions/widgets/views' => '@designwahl/views/questions/widgets',
+        '@calendar/widgets/views' => '@designwahl/views/calendar/widgets', // nur wallEntry.php (Teilnahme-Knöpfe), Rest Original
     ];
 
     /** Aktionen, deren Formulardaten nur Text sein dürfen (Controller-ID => Aktionen) */
