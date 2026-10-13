@@ -30,6 +30,12 @@ class Events
         }
     }
 
+    /** Space-Kopf ohne Beitragszähler (widgets/SpaceZaehler) */
+    public static function onBeforeRequest($event)
+    {
+        Yii::$container->set(\humhub\modules\space\widgets\HeaderCounterSet::class, widgets\SpaceZaehler::class);
+    }
+
     /** Fußzeile (beide Designs, auch Anmeldeseite): Link zum öffentlichen Quellcode (AGPL-3.0 § 13), nach den Rechtstexten */
     public static function onFooterMenuInit($event)
     {

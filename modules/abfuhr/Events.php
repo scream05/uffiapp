@@ -60,7 +60,7 @@ class Events
         return $space !== null && $space->url === Yii::$app->getModule('abfuhr')->spaceUrl;
     }
 
-    /** Abfall-Space ist nur Kalender: kein Menüpunkt „Stream“, kein Beitragszähler im Kopf */
+    /** Abfall-Space ist nur Kalender: kein Menüpunkt „Stream“ (Beitragszähler fehlt in allen Spaces, designwahl) */
     public static function onSpaceMenuRun($event)
     {
         try {
@@ -74,7 +74,6 @@ class Events
                     $menu->removeEntry($entry);
                 }
             }
-            Yii::$app->view->registerCss('.panel-profile-controls .statistics { display: none; }');
         } catch (\Throwable $e) {
             Yii::error($e);
         }
