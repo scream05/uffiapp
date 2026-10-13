@@ -1002,6 +1002,27 @@ class SetupController extends Controller
     }
 
     /**
+     * Keine Beiträge von Mitgliedern im Stream: setup/keine-beitraege [url1,url2] (Standard: veranstaltungen)
+     * Space-Inhaber/-Admins/-Moderatoren dürfen weiter schreiben; Kommentare und Termine regeln eigene Rechte. Idempotent.
+     */
+    public function actionKeineBeitraege($urls = 'veranstaltungen')
+    {
+        foreach (array_filter(array_map('trim', explode(',', $urls))) as $url) {
+            $space = Space::findOne(['url' => $url]);
+            if ($space === null) {
+                $this->stderr("Space $url nicht gefunden\n");
+                return ExitCode::DATAERR;
+            }
+            foreach ([Space::USERGROUP_MEMBER, Space::USERGROUP_USER] as $group) {
+                $space->permissionManager->setGroupState($group, new \humhub\modules\post\permissions\CreatePost(),
+                    \humhub\libs\BasePermission::STATE_DENY);
+            }
+            $this->stdout("$url: Mitglieder und andere Nutzer schreiben keine Beiträge\n");
+        }
+        return ExitCode::OK;
+    }
+
+    /**
      * Einladen nur durch Admins: setup/einladen
      * Mitglieder können weder per E-Mail noch per Link einladen (die Knöpfe blendet designwahl aus).
      * Admins und Gruppen mit „Benutzer/Gruppen verwalten“ dürfen laut HumHub weiter einladen. Idempotent.
