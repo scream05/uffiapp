@@ -30,10 +30,16 @@ class Events
         }
     }
 
-    /** Ersatz-Widgets: Space-Kopf ohne Beitragszähler und ohne „Einladen“, Mitgliederseite ohne „Neue Leute einladen“ */
+    /**
+     * Ersatz-Widgets: Space-Kopf ohne Zähler und ohne „Einladen“, Mitgliederkasten und Space-Verzeichnis ohne
+     * Mitgliederzahl, Profilkopf ohne Follower/Folgt, Mitgliederseite ohne „Neue Leute einladen“
+     */
     public static function onBeforeRequest($event)
     {
         Yii::$container->set(\humhub\modules\space\widgets\HeaderCounterSet::class, widgets\SpaceZaehler::class);
+        Yii::$container->set(\humhub\modules\space\widgets\Members::class, widgets\SpaceMitglieder::class);
+        Yii::$container->set(\humhub\modules\space\widgets\SpaceDirectoryIcons::class, widgets\SpaceVerzeichnisSymbole::class);
+        Yii::$container->set(\humhub\modules\user\widgets\ProfileHeaderCounterSet::class, widgets\ProfilZaehler::class);
         Yii::$container->set(\humhub\modules\space\widgets\InviteButton::class, widgets\OhneEinladen::class);
         Yii::$container->set(\humhub\modules\user\widgets\PeopleHeadingButtons::class, widgets\PersonenKnoepfe::class);
     }
