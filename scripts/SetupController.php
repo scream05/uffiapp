@@ -1002,6 +1002,42 @@ class SetupController extends Controller
     }
 
     /**
+     * Minimale Profildaten: setup/profil-minimal [1=Probelauf]
+     * Alle ausgeblendeten Profilfelder (außer Vor-/Nachname) nicht durchsuchbar und nicht bearbeitbar, Inhalte bei allen
+     * Konten leeren (Datenminimierung, Datenschutzerklärung Abschnitt 5). Idempotent.
+     */
+    public function actionProfilMinimal($probelauf = 0)
+    {
+        $felder = \humhub\modules\user\models\ProfileField::find()->where(['visible' => 0])
+            ->andWhere(['not in', 'internal_name', ['firstname', 'lastname']])->all();
+        $spalten = [];
+        foreach ($felder as $feld) {
+            if (!$probelauf && ($feld->searchable || $feld->editable)) {
+                $feld->searchable = 0;
+                $feld->editable = 0;
+                $feld->save(false);
+            }
+            if (Yii::$app->db->getTableSchema('profile')->getColumn($feld->internal_name) !== null) {
+                $spalten[] = $feld->internal_name;
+            }
+        }
+        // Zusatzspalte des Geburtstagsfelds
+        if (Yii::$app->db->getTableSchema('profile')->getColumn('birthday_hide_year') !== null) {
+            $spalten[] = 'birthday_hide_year';
+        }
+        $befuellt = 0;
+        foreach ($spalten as $s) {
+            $befuellt += (int)(new \yii\db\Query())->from('profile')->where(['not', [$s => null]])->andWhere(['<>', $s, ''])->count();
+        }
+        $this->stdout(count($felder) . " ausgeblendete Felder, $befuellt befüllte Werte" . ($probelauf ? " (Probelauf)\n" : "\n"));
+        if (!$probelauf && $spalten) {
+            $n = \humhub\modules\user\models\Profile::updateAll(array_fill_keys($spalten, null));
+            $this->stdout("Geleert in $n Profilen; Felder nicht durchsuchbar/bearbeitbar\n");
+        }
+        return ExitCode::OK;
+    }
+
+    /**
      * Keine Beiträge, Umfragen oder Fragen von Mitgliedern im Stream: setup/keine-beitraege [url1,url2] (Standard: veranstaltungen)
      * Space-Inhaber/-Admins/-Moderatoren dürfen weiter; Kommentare, Termine und Mängelmeldungen (eigenes Recht) bleiben. Idempotent.
      */
