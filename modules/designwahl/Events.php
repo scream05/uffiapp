@@ -30,10 +30,12 @@ class Events
         }
     }
 
-    /** Space-Kopf ohne Beitragszähler (widgets/SpaceZaehler) */
+    /** Ersatz-Widgets: Space-Kopf ohne Beitragszähler und ohne „Einladen“, Mitgliederseite ohne „Neue Leute einladen“ */
     public static function onBeforeRequest($event)
     {
         Yii::$container->set(\humhub\modules\space\widgets\HeaderCounterSet::class, widgets\SpaceZaehler::class);
+        Yii::$container->set(\humhub\modules\space\widgets\InviteButton::class, widgets\OhneEinladen::class);
+        Yii::$container->set(\humhub\modules\user\widgets\PeopleHeadingButtons::class, widgets\PersonenKnoepfe::class);
     }
 
     /** Fußzeile (beide Designs, auch Anmeldeseite): Link zum öffentlichen Quellcode (AGPL-3.0 § 13), nach den Rechtstexten */
