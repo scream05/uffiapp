@@ -14,7 +14,7 @@ use Yii;
 class Module extends ContentContainerModule
 {
     /** Space mit dem gemeinsamen Kalender (dort Menü „WhatsApp-Eingang“) */
-    public string $calendarSpace = 'Veranstaltungen';
+    public string $calendarSpaceUrl = 'veranstaltungen'; // URL des Space, bleibt beim Umbenennen gleich
 
     /** Version der Graph-API von Meta */
     public string $graphVersion = 'v23.0';
@@ -50,7 +50,7 @@ class Module extends ContentContainerModule
 
     public function getCalendarSpace(): ?Space
     {
-        return Space::findOne(['name' => $this->calendarSpace]);
+        return Space::findOne(['url' => $this->calendarSpaceUrl]);
     }
 
     /**

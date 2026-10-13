@@ -16,7 +16,7 @@ class Module extends ContentContainerModule
     public $resourcesPath = 'resources';
 
     /** Space mit dem gemeinsamen Kalender */
-    public string $calendarSpace = 'Veranstaltungen';
+    public string $calendarSpaceUrl = 'veranstaltungen'; // URL des Space, bleibt beim Umbenennen gleich
     /** Kalender-Kategorie für Vereinstermine (dieselbe wie beim Import von uffenheim.de) */
     public string $calendarType = 'Vereinsveranstaltungen, JHV, Sommerfeste, Jubiläen usw.';
 
@@ -68,7 +68,7 @@ class Module extends ContentContainerModule
 
     public function getCalendarSpace(): ?Space
     {
-        return Space::findOne(['name' => $this->calendarSpace]);
+        return Space::findOne(['url' => $this->calendarSpaceUrl]);
     }
 
     /** Space, in dem das Verzeichnis läuft (für Links aus dem Kalender) */

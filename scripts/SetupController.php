@@ -15,6 +15,7 @@ class SetupController extends Controller
     private const SPACES = [
         [
             'name' => 'Rathaus Uffenheim',
+            'url' => 'rathaus-uffenheim',
             'description' => 'Offizielle Informationen, Bekanntmachungen und Neuigkeiten der Stadt.',
             'color' => '#1f5f8b',
             'auto_add' => true,
@@ -29,6 +30,7 @@ class SetupController extends Controller
         ],
         [
             'name' => 'Veranstaltungen',
+            'url' => 'veranstaltungen',
             'description' => 'Feste, Märkte, Vereinsabende und Termine in und um Uffenheim.',
             'color' => '#7b3fa0',
             'auto_add' => true,
@@ -43,6 +45,7 @@ class SetupController extends Controller
         ],
         [
             'name' => 'Mängelmelder',
+            'url' => 'mangelmelder',
             'description' => 'Schlagloch, defekte Laterne, wilder Müll? Hier mit Foto und Ort melden.',
             'color' => '#c0392b',
             'auto_add' => false,
@@ -50,6 +53,7 @@ class SetupController extends Controller
         ],
         [
             'name' => 'Vereine & Ehrenamt',
+            'url' => 'vereine-and-ehrenamt',
             'description' => 'Vereinsverzeichnis mit Vorstellungsseiten; Vereinstermine stehen im gemeinsamen Kalender unter „Veranstaltungen“.',
             'color' => '#d4a017',
             'auto_add' => false,
@@ -290,6 +294,8 @@ class SetupController extends Controller
         \humhub\modules\external_calendar\Events::registerAutoloader();
         // Abfuhrtermine nur im Kalender, nicht jeder einzeln im Stream (gilt modulweit)
         Yii::$app->getModule('external_calendar')->settings->set('autopost_entries', 0);
+        // … und die Kalender selbst nicht (sonst kommt „Ein neuer Kalender …“ bei jedem Speichern wieder in den Stream)
+        Yii::$app->getModule('external_calendar')->settings->set('autopost_calendar', 0);
         // Je Tonnenart ein eigener Kalender, weil External Calendar die Farbe nur je Kalender kennt
         // (Dateien von scripts/abfall-kalender.py; lokal abrufen, damit der Abgleich nicht über den Proxy läuft)
         $calClass = \humhub\modules\external_calendar\models\ExternalCalendar::class;
@@ -333,16 +339,19 @@ class SetupController extends Controller
         }
         // Früher (autopost an) angelegte Termine aus Stream und Aktivitäten nehmen
         $entryClass = \humhub\modules\external_calendar\models\ExternalCalendarEntry::class;
-        // (auch die Beiträge „Ein neuer Kalender wurde hinzugefügt“: der Space zeigt nur den Kalender)
+        // (auch die Beiträge „Ein neuer Kalender wurde hinzugefügt“ und normale Beiträge: der Space zeigt nur den Kalender)
+        $postClass = \humhub\modules\post\models\Post::class;
         $n = \humhub\modules\content\models\Content::updateAll(['stream_channel' => null],
-            ['object_model' => [$entryClass, $calClass], 'stream_channel' => 'default', 'contentcontainer_id' => $space->contentcontainer_id]);
+            ['object_model' => [$entryClass, $calClass, $postClass], 'stream_channel' => 'default', 'contentcontainer_id' => $space->contentcontainer_id]);
         $a = 0;
-        foreach (\humhub\modules\activity\models\Activity::find()->where(['object_model' => [$entryClass, $calClass]])->all() as $activity) {
+        foreach (\humhub\modules\activity\models\Activity::find()->where(['object_model' => [$entryClass, $calClass]])
+            ->orWhere(['object_model' => $postClass, 'object_id' => \humhub\modules\content\models\Content::find()->select('object_id')
+                ->where(['object_model' => $postClass, 'contentcontainer_id' => $space->contentcontainer_id])])->all() as $activity) {
             $activity->hardDelete();
             $a++;
         }
         if ($n || $a) {
-            $this->stdout("Aus dem Stream genommen: $n Termine/Kalender, $a Aktivitäten\n");
+            $this->stdout("Aus dem Stream genommen: $n Termine/Kalender/Beiträge, $a Aktivitäten\n");
         }
 
         // Info-Beitrag anlegen bzw. aktualisieren; erkannt an der Abo-Adresse im Text
@@ -427,15 +436,15 @@ class SetupController extends Controller
         Yii::$app->getModule('activity')->settings->user($user)->set('mailSummaryInterval', 0);
 
         $spaceIds = [];
-        foreach (['Rathaus Uffenheim', 'Veranstaltungen'] as $name) {
-            $s = Space::findOne(['name' => $name]);
+        foreach (['rathaus-uffenheim', 'veranstaltungen'] as $url) {
+            $s = Space::findOne(['url' => $url]);
             $spaceIds[] = $s->id;
             if (!$s->isMember($user->id)) {
                 $s->addMember($user->id, 1, false);
                 $this->stdout("+ Mitglied in {$s->name}\n");
             }
         }
-        $space = Space::findOne(['name' => 'Rathaus Uffenheim']);
+        $space = Space::findOne(['url' => 'rathaus-uffenheim']);
         // Neue Konten landen automatisch in mehreren Spaces; das Konto gehört nur ins Rathaus und
         // zu den Veranstaltungen. Mitgliedschaft direkt löschen und die „ist beigetreten“-Aktivitäten entfernen.
         foreach (\humhub\modules\space\models\Membership::find()->where(['user_id' => $user->id])
@@ -479,7 +488,7 @@ class SetupController extends Controller
             return ExitCode::DATAERR;
         }
         Yii::$app->user->switchIdentity($owner);
-        $space = Space::findOne(['name' => 'Rathaus Uffenheim']);
+        $space = Space::findOne(['url' => 'rathaus-uffenheim']);
         if ($space === null) {
             $this->stderr("Space fehlt, zuerst setup/spaces ausführen\n");
             return ExitCode::DATAERR;
@@ -579,7 +588,7 @@ class SetupController extends Controller
             return ExitCode::DATAERR;
         }
         Yii::$app->user->switchIdentity($owner);
-        $space = Space::findOne(['name' => 'Veranstaltungen']);
+        $space = Space::findOne(['url' => 'veranstaltungen']);
         if ($space === null || !$space->isMember($owner->id)) {
             $this->stderr("Space fehlt oder Konto ist kein Mitglied, zuerst setup/rssuser ausführen\n");
             return ExitCode::DATAERR;
@@ -867,7 +876,7 @@ class SetupController extends Controller
     public function actionRathausTermin()
     {
         Yii::$app->user->switchIdentity(User::findOne(['username' => 'admin']));
-        $space = Space::findOne(['name' => 'Rathaus Uffenheim']);
+        $space = Space::findOne(['url' => 'rathaus-uffenheim']);
         if ($space === null) {
             $this->stderr("Space Rathaus Uffenheim fehlt\n");
             return ExitCode::DATAERR;
@@ -931,7 +940,7 @@ class SetupController extends Controller
             return ExitCode::OK;
         }
         $admin = User::findOne(['username' => 'admin']);
-        $space = Space::findOne(['name' => 'Rathaus Uffenheim']);
+        $space = Space::findOne(['url' => 'rathaus-uffenheim']);
         Yii::$app->user->switchIdentity($admin);
         $vorhanden = \humhub\modules\post\models\Post::find()->contentContainer($space)
             ->andWhere(['like', 'post.message', 'Neu in der App: das Mitteilungsblatt'])->exists();
@@ -1014,7 +1023,7 @@ class SetupController extends Controller
             \humhub\modules\custom_pages\models\CustomPage::class,
         ];
         foreach (Space::find()->all() as $space) {
-            $privat = $space->name === 'Mängelmelder';
+            $privat = $space->url === 'mangelmelder';
             $space->visibility = Space::VISIBILITY_ALL;
             $space->default_content_visibility = $privat ? 0 : 1;
             $space->save(false);
@@ -1038,13 +1047,13 @@ class SetupController extends Controller
     }
 
     /**
-     * Modul in einem Space ein-/ausschalten: setup/space-modul Veranstaltungen gallery 0
+     * Modul in einem Space ein-/ausschalten: setup/space-modul veranstaltungen gallery 0 (URL oder Name des Space)
      * Ausschalten entfernt den Menüpunkt; Inhalte des Moduls im Space (z. B. die automatische
      * Galerie „Posted pictures“) löscht HumHub dabei mit, Bilder an Beiträgen/Terminen bleiben.
      */
     public function actionSpaceModul($spaceName, $modulId, $an = 0)
     {
-        $space = Space::findOne(['name' => $spaceName]);
+        $space = Space::findOne(['url' => $spaceName]) ?? Space::findOne(['name' => $spaceName]);
         if ($space === null) {
             $this->stderr("Space $spaceName nicht gefunden\n");
             return ExitCode::DATAERR;
@@ -1089,7 +1098,7 @@ class SetupController extends Controller
      */
     public function actionWhatsapp()
     {
-        $space = Space::findOne(['name' => 'Veranstaltungen']);
+        $space = Space::findOne(['url' => 'veranstaltungen']);
         if ($space === null || !Yii::$app->hasModule('whatsapp')) {
             $this->stderr("Space Veranstaltungen fehlt oder Modul whatsapp nicht aktiv\n");
             return ExitCode::DATAERR;
@@ -1104,7 +1113,7 @@ class SetupController extends Controller
     /** Mängelmelder-Karte im Space „Mängelmelder“ aktivieren: setup/maengelmelder */
     public function actionMaengelmelder()
     {
-        $space = Space::findOne(['name' => 'Mängelmelder']);
+        $space = Space::findOne(['url' => 'mangelmelder']);
         if ($space === null) {
             $this->stderr("Space Mängelmelder fehlt\n");
             return ExitCode::DATAERR;
@@ -1143,8 +1152,8 @@ class SetupController extends Controller
      */
     public function actionVereine()
     {
-        $space = Space::findOne(['name' => 'Vereine & Ehrenamt']);
-        $calendarSpace = Space::findOne(['name' => 'Veranstaltungen']);
+        $space = Space::findOne(['url' => 'vereine-and-ehrenamt']);
+        $calendarSpace = Space::findOne(['url' => 'veranstaltungen']);
         if ($space === null || $calendarSpace === null) {
             $this->stderr("Space Vereine & Ehrenamt oder Veranstaltungen fehlt\n");
             return ExitCode::DATAERR;

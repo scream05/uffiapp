@@ -70,7 +70,7 @@ class FacebookController extends Controller
         }
         Yii::$app->getModule('activity')->settings->user($user)->set('mailSummaryInterval', 0);
 
-        $space = Space::findOne(['name' => $m->space]);
+        $space = Space::findOne(['url' => $m->space]);
         if (!$space->isMember($user->id)) {
             $space->addMember($user->id, 1, false);
             $this->stdout("+ Mitglied in {$space->name}\n");

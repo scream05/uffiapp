@@ -33,7 +33,7 @@ class Import
      */
     public function uebernehmen(array $beitraege, bool $probelauf = false): array
     {
-        $space = Space::findOne(['name' => $this->module->space]) ?? throw new \RuntimeException("Space {$this->module->space} fehlt");
+        $space = Space::findOne(['url' => $this->module->space]) ?? throw new \RuntimeException("Space {$this->module->space} fehlt");
         $konto = User::findOne(['username' => $this->module->konto]);
         if ($konto === null && !$probelauf) {
             throw new \RuntimeException("Konto {$this->module->konto} fehlt, zuerst /app/yii facebook/konto ausführen");

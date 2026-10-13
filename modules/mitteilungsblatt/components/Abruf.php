@@ -324,7 +324,7 @@ class Abruf
     /** Beitrag im Space mit Titelbild, Verfasser wie beim Website-Import */
     public function beitrag(Ausgabe $a): void
     {
-        $space = Space::findOne(['name' => $this->module->space]);
+        $space = Space::findOne(['url' => $this->module->space]);
         $konto = User::findOne(['username' => $this->module->konto]);
         if ($space === null || $konto === null) {
             ($this->log)("! Beitrag: Space {$this->module->space} oder Konto {$this->module->konto} fehlt\n");

@@ -16,7 +16,7 @@ class Module extends \humhub\components\Module
     public string $quelle = 'https://www.uffenheim.de/rathaus-buergerservice/service/mitteilungsblatt';
 
     /** Space mit Menüpunkt und Beitrag zu jeder neuen Ausgabe, Verfasser wie beim Website-Import */
-    public string $space = 'Rathaus Uffenheim';
+    public string $space = 'rathaus-uffenheim'; // URL des Space, bleibt beim Umbenennen gleich
     public string $konto = 'stadt-uffenheim';
 
     /** Ablage für PDF und Titelbild (humhub-data/mitteilungsblatt; nicht in der täglichen Sicherung, die nimmt nur config/modules/themes/uploads) */

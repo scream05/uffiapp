@@ -22,7 +22,7 @@ class Events
     public static function onSpaceMenuInit($event)
     {
         try {
-            if ($event->sender->space->name !== Yii::$app->getModule('notdienst')->spaceName) {
+            if ($event->sender->space->url !== Yii::$app->getModule('notdienst')->spaceUrl) {
                 return;
             }
             $event->sender->addItem([

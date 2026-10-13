@@ -13,7 +13,7 @@ class Module extends \humhub\components\Module
     public string $graphVersion = 'v23.0';
 
     /** Ziel-Space und Konto, unter dem die Beiträge erscheinen */
-    public string $space = 'Rathaus Uffenheim';
+    public string $space = 'rathaus-uffenheim'; // URL des Space, bleibt beim Umbenennen gleich
     public string $konto = 'stadt-uffenheim-fb';
 
     /** Beim ersten Abruf nur Beiträge der letzten so vielen Tage übernehmen */

@@ -5,7 +5,7 @@ namespace humhub\modules\notdienst;
 class Module extends \humhub\components\Module
 {
     /** Space, in dessen Menü die Notdienst-Seite verlinkt wird */
-    public string $spaceName = 'Rathaus Uffenheim';
+    public string $spaceUrl = 'rathaus-uffenheim'; // URL des Space, bleibt beim Umbenennen gleich
 
     /** Notrufnummern oben auf der Seite und für den KI-Assistenten: [Bezeichnung, Nummer, Hinweis] */
     public array $notrufe = [

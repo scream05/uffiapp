@@ -55,7 +55,7 @@ class Context
             $parts[] = \humhub\modules\notdienst\components\Notdienst::forAssistant();
         }
 
-        $space = Space::findOne(['name' => 'Veranstaltungen']);
+        $space = Space::findOne(['url' => 'veranstaltungen']);
         if ($space !== null) {
             $lines = [];
             $entries = CalendarEntry::find()->contentContainer($space)
@@ -75,7 +75,7 @@ class Context
                 . ($lines ? implode("\n", $lines) : '(keine Termine)');
         }
 
-        $space = Space::findOne(['name' => 'Rathaus Uffenheim']);
+        $space = Space::findOne(['url' => 'rathaus-uffenheim']);
         if ($space !== null) {
             $lines = [];
             $posts = Post::find()->contentContainer($space)

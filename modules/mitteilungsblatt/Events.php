@@ -13,7 +13,7 @@ class Events
         try {
             /** @var Module $module */
             $module = Yii::$app->getModule('mitteilungsblatt');
-            if ($event->sender->space->name !== $module->space || !$module->darfLesen()) {
+            if ($event->sender->space->url !== $module->space || !$module->darfLesen()) {
                 return;
             }
             $event->sender->addItem([
