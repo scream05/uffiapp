@@ -30,6 +30,21 @@ class Events
         }
     }
 
+    /** Fußzeile (beide Designs, auch Anmeldeseite): Link zum öffentlichen Quellcode (AGPL-3.0 § 13), nach den Rechtstexten */
+    public static function onFooterMenuInit($event)
+    {
+        try {
+            $event->sender->addEntry(new MenuLink([
+                'label' => 'Quellcode',
+                'url' => 'https://github.com/scream05/uffiapp',
+                'sortOrder' => 900,
+                'htmlOptions' => ['target' => '_blank', 'rel' => 'noopener'],
+            ]));
+        } catch (\Throwable $e) {
+            Yii::error($e);
+        }
+    }
+
     /**
      * Neues Design: Hauptmenü (Handy: Leiste unten) = Übersicht, Termine, Abfuhr, Mangel melden, Mehr.
      * Alle übrigen Punkte (Kalender, Spaces, Uffi …) wandern ins Fach „Mehr“ (widgets/DesignNeu).
