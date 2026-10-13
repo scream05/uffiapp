@@ -111,6 +111,68 @@ class Bauhof
         }
     }
 
+    /**
+     * Meldung wurde bearbeitet: Ist der Auftrag einem Mitarbeiter zugewiesen und noch offen, bekommt er die Änderung
+     * (Ort, Kategorie, Beschreibung) per WhatsApp – im offenen Fenster zusätzlich den neuen Standort als Kartenpunkt,
+     * sonst per Vorlage „Neue Nachricht“, der Text folgt beim Antippen (Kartenlink im Text).
+     * @return string|null Fehlermeldung beim Senden
+     */
+    public static function sendeAenderung(Mangel $alt, Mangel $neu, User $user): ?string
+    {
+        $id = $neu->getContentId();
+        $auftrag = Auftrag::findOne($id);
+        $m = $auftrag?->mitarbeiter;
+        $status = MaengelStatus::forContent($neu->post->content);
+        if (!$m || !$m->aktiv || in_array($status->status, MaengelStatus::CLOSED, true)) {
+            return null;
+        }
+        if (($aenderung = self::aenderung($alt, $neu)) === null) {
+            return null;
+        }
+        [$text, $was, $ortNeu] = $aenderung;
+        try {
+            if ($ortNeu && $m->isFensterOffen()) {
+                $teil = self::neueAusgehende($m, $id, 'teil', null, null);
+                $teil->wamid = Api::sendeStandort($m->telefon, $neu->lat, $neu->lng, "Auftrag Nr. $id – neuer Ort", $neu->adresse);
+                $teil->zustellung = 'gesendet';
+                $teil->save(false);
+            }
+        } catch (\Throwable $e) {
+            Yii::warning("Standort Auftrag $id an {$m->name}: {$e->getMessage()}", 'maengelmelder');
+        }
+        $fehler = self::nachricht($m, $id, $text, $user, 'system');
+        self::vermerk($id, $m->id, $user, $fehler ? "Änderung ($was) an {$m->name}: WhatsApp-Versand fehlgeschlagen: $fehler"
+            : "Änderung ($was) an {$m->name} geschickt");
+        return $fehler;
+    }
+
+    /**
+     * Was hat sich an der Meldung geändert? @return array{0:string,1:string,2:bool}|null [WhatsApp-Text, „Ort, Kategorie …“, Ort verschoben]
+     */
+    public static function aenderung(Mangel $alt, Mangel $neu): ?array
+    {
+        $id = $neu->getContentId();
+        $ortNeu = $neu->lat && (abs($neu->lat - (float)$alt->lat) > 1e-6 || abs($neu->lng - (float)$alt->lng) > 1e-6);
+        $katNeu = $neu->kategorie !== $alt->kategorie;
+        $textNeu = trim($neu->beschreibung) !== trim($alt->beschreibung);
+        $teile = [];
+        if ($ortNeu) {
+            $teile[] = "📍 *Neuer Ort:* " . $neu->getOrt()
+                . sprintf("\nhttps://www.openstreetmap.org/?mlat=%.6f&mlon=%.6f#map=18/%.6f/%.6f", $neu->lat, $neu->lng, $neu->lat, $neu->lng);
+        }
+        if ($katNeu) {
+            $teile[] = "🏷️ *Kategorie:* {$neu->kategorie} (vorher {$alt->kategorie})";
+        }
+        if ($textNeu) {
+            $teile[] = "📝 *Neue Beschreibung:*\n" . mb_substr($neu->beschreibung, 0, 600);
+        }
+        if (!$teile) {
+            return null;
+        }
+        $was = implode(', ', array_filter([$ortNeu ? 'Ort' : null, $katNeu ? 'Kategorie' : null, $textNeu ? 'Beschreibung' : null]));
+        return ["✏️ Auftrag Nr. $id wurde geändert:\n\n" . implode("\n\n", $teile), $was, $ortNeu];
+    }
+
     /** Auftrag mit Fotos, Standort und Status-Knöpfen (nur im offenen Fenster) */
     public static function sendeDetails(Mitarbeiter $m, Mangel $mangel, ?Auftrag $auftrag = null): void
     {

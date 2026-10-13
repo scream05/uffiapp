@@ -4,6 +4,7 @@ namespace humhub\modules\maengelmelder\controllers;
 
 use humhub\modules\content\components\ContentContainerController;
 use humhub\modules\content\models\Content;
+use humhub\modules\maengelmelder\components\Bauhof;
 use humhub\modules\maengelmelder\models\MaengelAuch;
 use humhub\modules\maengelmelder\models\MaengelStatus;
 use humhub\modules\maengelmelder\models\Mangel;
@@ -128,7 +129,10 @@ class MeldungController extends ContentContainerController
                     $gleicherOrt ? $mangel->adresse : null);
                 if ($post->save()) {
                     $post->fileManager->attach(Yii::$app->request->post('fileList'));
-                    $this->view->saved();
+                    // Zugewiesener Mitarbeiter erfährt Ort-, Kategorie- und Textänderungen per WhatsApp
+                    $neu = Mangel::fromContent($content);
+                    $fehler = $neu ? Bauhof::sendeAenderung($mangel, $neu, Yii::$app->user->getIdentity()) : null;
+                    $fehler ? $this->view->error('Gespeichert, aber WhatsApp an den Mitarbeiter fehlgeschlagen: ' . $fehler) : $this->view->saved();
                     return $this->redirect($space->createUrl('/maengelmelder/bauhof/mangel', ['id' => $content->id]));
                 }
                 $errors = array_merge(...array_values($post->getErrors()));
