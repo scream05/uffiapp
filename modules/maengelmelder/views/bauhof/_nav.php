@@ -20,6 +20,7 @@ $ungelesen = BauhofNachricht::ungelesen();
     <?= Html::a('<i class="fa fa-plus"></i> Neuer Mangel', $space->createUrl('/maengelmelder/meldung/create', ['bauhof' => 1]),
         ['class' => 'btn btn-sm btn-light']) ?>
 </div>
+<?php \humhub\modules\maengelmelder\assets\StatusAsset::register($this) ?>
 <?php $this->registerCss(<<<'CSS'
 .bauhof-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; color: #fff; font-size: 12px; font-weight: 600; white-space: nowrap; }
 .bauhof-zeile { cursor: pointer; }

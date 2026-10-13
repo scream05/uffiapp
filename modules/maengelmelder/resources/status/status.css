@@ -1,0 +1,54 @@
+/* Status-Etikett einer Mängelmeldung (Meldung, Bauhof, Karte) – Farben aus dem Design „Uffi frisch“ (Stadtfarben) */
+.mm-status {
+    --mm-farbe: #446e88;
+    --mm-grund: #e3edf3;
+    --mm-text: #2b4a5f;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 11px;
+    border-radius: 999px;
+    background: var(--mm-grund);
+    color: var(--mm-text);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.5;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+.mm-status .fa { font-size: 12px; color: var(--mm-farbe); }
+.mm-status-gemeldet { --mm-farbe: #446e88; --mm-grund: #e3edf3; --mm-text: #2b4a5f; }
+.mm-status-pruefung { --mm-farbe: #b98a00; --mm-grund: #fbf0cc; --mm-text: #6b5000; }
+.mm-status-arbeit { --mm-farbe: #0f7a9e; --mm-grund: #dcf0f7; --mm-text: #0a5470; }
+.mm-status-erledigt { --mm-farbe: #6a8f0c; --mm-grund: #eef5d9; --mm-text: #3f5606; }
+.mm-status-abgelehnt { --mm-farbe: #7f8c8d; --mm-grund: #eceff1; --mm-text: #4a5459; }
+
+[data-bs-theme="dark"] .mm-status { --mm-grund: rgba(255, 255, 255, .08); --mm-text: #e6edf2; }
+[data-bs-theme="dark"] .mm-status-pruefung { --mm-farbe: #e0b030; }
+[data-bs-theme="dark"] .mm-status-erledigt { --mm-farbe: #a6cf2a; }
+[data-bs-theme="dark"] .mm-status-gemeldet { --mm-farbe: #7fa9c4; }
+[data-bs-theme="dark"] .mm-status-arbeit { --mm-farbe: #4fb3d6; }
+
+/* Zeile unter der Meldung: Etikett, seit wann, Betroffene, Aktionen */
+.mm-statuszeile {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    margin: 10px 0 4px;
+}
+.mm-statuszeile .mm-seit,
+.mm-statuszeile .mm-auch-zahl { color: var(--hh-text-color-soft, #6c757d); font-size: 13px; }
+.mm-statuszeile form { display: inline; margin: 0; }
+.mm-statuszeile .mm-auch-knopf { padding: 2px 12px; border-radius: 999px; font-size: 13px; }
+.mm-statuszeile .mm-aendern { font-size: 13px; }
+.mm-statusformular { flex-basis: 100%; display: none; margin-top: 4px; padding: 12px; border-radius: 16px;
+    background: var(--hh-background-color-secondary, #f8f9fa); }
+.mm-statusformular.offen { display: block; }
+.mm-statusformular .form-select,
+.mm-statusformular .form-control { margin-bottom: 8px; }
+
+/* Kartenlegende */
+.mm-legende { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 10px; }
+.mm-legende label { margin: 0 0 0 6px; font-weight: normal; white-space: nowrap; }
+.leaflet-popup-content .mm-status { margin: 4px 0 2px; }

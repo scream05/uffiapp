@@ -10,19 +10,17 @@ use humhub\modules\maengelmelder\assets\MapAsset;
 use humhub\modules\maengelmelder\models\MaengelStatus;
 
 MapAsset::register($this);
+\humhub\modules\maengelmelder\assets\StatusAsset::register($this);
 ?>
 <div class="panel panel-default">
     <div class="panel-heading"><strong>Karte der Mängelmeldungen</strong>
         <span class="text-muted">(<?= count($markers) ?>)</span></div>
     <div class="panel-body">
-        <div style="margin-bottom:8px">
-            <?php foreach (MaengelStatus::STATUSES as [$label, $color]): ?>
-                <span style="display:inline-block;margin-right:12px;white-space:nowrap">
-                    <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:<?= $color ?>;vertical-align:-1px"></span>
-                    <?= Html::encode($label) ?></span>
+        <div class="mm-legende">
+            <?php foreach (array_keys(MaengelStatus::STATUSES) as $key): ?>
+                <?= MaengelStatus::etikett($key) ?>
             <?php endforeach ?>
-            <label style="font-weight:normal;margin-left:8px;white-space:nowrap">
-                <input type="checkbox" id="maengel-erledigt"> Erledigte und abgelehnte zeigen</label>
+            <label><input type="checkbox" id="maengel-erledigt"> Erledigte und abgelehnte zeigen</label>
         </div>
         <div id="maengel-karte" style="height:70vh;min-height:400px;border-radius:4px"></div>
     </div>
@@ -44,7 +42,7 @@ maengelReady(function () {
     markers.forEach(function (m) {
         var isFocus = focus && Math.abs(m.lat - focus[0]) < 1e-6 && Math.abs(m.lng - focus[1]) < 1e-6;
         var mk = L.circleMarker([m.lat, m.lng], {radius: 9, color: '#fff', weight: 2, fillColor: m.farbe, fillOpacity: 0.9})
-            .bindPopup('<strong>' + esc(m.titel) + '</strong><br>' + esc(m.statusLabel) + ' · gemeldet ' + esc(m.datum)
+            .bindPopup('<strong>' + esc(m.titel) + '</strong><br><span class="mm-status mm-status-' + esc(m.status) + '">' + esc(m.statusLabel) + '</span> · gemeldet ' + esc(m.datum)
                 + (m.auch ? '<br>' + (m.auch === 1 ? '1 weitere Person' : m.auch + ' weitere Personen') + ' betroffen' : '')
                 + (m.url ? '<br><a href="' + esc(m.url) + '">Zur Meldung</a>' : '<br><a href="' + esc(loginUrl) + '">Anmelden für Details</a>'));
         var isClosed = m.status === 'erledigt' || m.status === 'abgelehnt';

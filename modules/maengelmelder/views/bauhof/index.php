@@ -79,7 +79,7 @@ $fmt = Yii::$app->formatter;
                                 <?= $z['bilder'] ? ' · <i class="fa fa-camera"></i> ' . $z['bilder'] : '' ?>
                                 <?= $z['auch'] ? ' · <i class="fa fa-users"></i> +' . $z['auch'] : '' ?></small>
                         </td>
-                        <td><span class="bauhof-badge" style="background:<?= Html::encode($z['status']->getColor()) ?>"><?= Html::encode($z['status']->getLabel()) ?></span></td>
+                        <td><?= $z['status']->getEtikett() ?></td>
                         <td><?= $a?->mitarbeiter ? Html::encode($a->mitarbeiter->name) : '<span class="text-muted">–</span>' ?></td>
                         <td>
                             <?php if ($a && $a->prioritaet !== 'normal'): ?>
@@ -104,7 +104,7 @@ $fmt = Yii::$app->formatter;
                         <div class="d-flex justify-content-between gap-2">
                             <strong>Nr. <?= $m->getContentId() ?> · <?= Html::encode($m->kategorie) ?>
                                 <?php if ($z['ungelesen']): ?><span class="bauhof-neu"><?= $z['ungelesen'] ?></span><?php endif ?></strong>
-                            <span class="bauhof-badge" style="background:<?= Html::encode($z['status']->getColor()) ?>"><?= Html::encode($z['status']->getLabel()) ?></span>
+                            <?= $z['status']->getEtikett() ?>
                         </div>
                         <small><?= Html::encode($m->getAuszug(100)) ?></small><br>
                         <small class="text-muted"><i class="fa fa-map-marker"></i> <?= Html::encode($m->getOrt()) ?></small><br>

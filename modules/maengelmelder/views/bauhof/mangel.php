@@ -29,7 +29,7 @@ if ($m && !isset($mitarbeiter[$m->id])) {
         <?= $this->render('_nav', ['space' => $space, 'aktiv' => 'mangel']) ?>
         <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
             <h2 class="h5 m-0 me-auto">Nr. <?= $id ?> · <?= Html::encode($mangel->kategorie) ?>
-                <span class="bauhof-badge" style="background:<?= Html::encode($status->getColor()) ?>"><?= Html::encode($status->getLabel()) ?></span></h2>
+                <?= $status->getEtikett() ?></h2>
             <?= Html::a('<i class="fa fa-pencil"></i> Bearbeiten', $space->createUrl('/maengelmelder/meldung/bearbeiten', ['id' => $id]), ['class' => 'btn btn-sm btn-light']) ?>
             <?= Html::a('<i class="fa fa-external-link"></i> Beitrag', $post->content->getUrl(), ['class' => 'btn btn-sm btn-light']) ?>
             <?= Html::beginForm($space->createUrl('/maengelmelder/bauhof/loeschen', ['id' => $id]), 'post', ['class' => 'd-inline', 'id' => 'bauhof-loeschen']) ?>

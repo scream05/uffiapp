@@ -19,13 +19,13 @@ use Yii;
  */
 class MaengelStatus extends ActiveRecord
 {
-    /** Schlüssel => [Bezeichnung, Farbe] */
+    /** Schlüssel => [Bezeichnung, Farbe (Kartenpunkt, Stadtfarben wie resources/status/status.css), Symbol] */
     public const STATUSES = [
-        'gemeldet' => ['Gemeldet', '#1f78b4'],
-        'pruefung' => ['In Prüfung', '#e08e0b'],
-        'arbeit' => ['In Bearbeitung', '#d35400'],
-        'erledigt' => ['Erledigt', '#2e8b57'],
-        'abgelehnt' => ['Nicht zuständig / abgelehnt', '#7f8c8d'],
+        'gemeldet' => ['Gemeldet', '#446e88', 'flag'],
+        'pruefung' => ['In Prüfung', '#b98a00', 'search'],
+        'arbeit' => ['In Bearbeitung', '#0f7a9e', 'wrench'],
+        'erledigt' => ['Erledigt', '#6a8f0c', 'check'],
+        'abgelehnt' => ['Nicht zuständig / abgelehnt', '#7f8c8d', 'ban'],
     ];
 
     /** Abgeschlossen: nicht mehr als „schon gemeldet“ vorschlagen */
@@ -56,6 +56,19 @@ class MaengelStatus extends ActiveRecord
     public function getColor(): string
     {
         return self::STATUSES[$this->status][1] ?? '#777';
+    }
+
+    /** Etikett (HTML) für einen Status-Schlüssel; Gestaltung in StatusAsset */
+    public static function etikett(string $status): string
+    {
+        [$label, , $icon] = self::STATUSES[$status] ?? [$status, null, 'circle'];
+        return '<span class="mm-status mm-status-' . \humhub\helpers\Html::encode($status) . '">'
+            . '<i class="fa fa-' . $icon . '" aria-hidden="true"></i>' . \humhub\helpers\Html::encode($label) . '</span>';
+    }
+
+    public function getEtikett(): string
+    {
+        return self::etikett($this->status);
     }
 
     public function getEditor()
