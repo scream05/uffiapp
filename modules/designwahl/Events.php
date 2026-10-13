@@ -211,6 +211,7 @@ JS, \yii\web\View::POS_END);
         '@questions/views/question' => '@designwahl/views/questions/question',
         '@questions/widgets/views' => '@designwahl/views/questions/widgets',
         '@calendar/widgets/views' => '@designwahl/views/calendar/widgets', // nur wallEntry.php (Teilnahme-Knöpfe), Rest Original
+        '@calendar/views/common' => '@designwahl/views/calendar/common', // nur defaultConfig.php (ohne Reiter „Erinnerung“)
     ];
 
     /** Aktionen, deren Formulardaten nur Text sein dürfen (Controller-ID => Aktionen) */
