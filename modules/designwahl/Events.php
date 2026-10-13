@@ -200,6 +200,7 @@ JS, \yii\web\View::POS_END);
     public static function onControllerBeforeAction($event)
     {
         try {
+            self::gastSprache();
             $theme = Yii::$app->view->theme;
             if ($theme !== null) {
                 $theme->applyTo(''); // füllt die Standard-pathMap des Themes, bevor wir ergänzen
@@ -216,6 +217,21 @@ JS, \yii\web\View::POS_END);
         } catch (\Throwable $e) {
             Yii::error($e);
         }
+    }
+
+    /**
+     * Gäste: Standardsprache (Deutsch) statt Browsersprache – HumHub nimmt sonst die Browsersprache und
+     * ohne Angabe die erste erlaubte (Englisch). Eine selbst gewählte Sprache (Auswahl auf der Anmeldeseite,
+     * Cookie „language“) bleibt.
+     */
+    private static function gastSprache()
+    {
+        $request = Yii::$app->request;
+        if (!Yii::$app->user->isGuest || !$request instanceof \yii\web\Request
+            || isset($request->cookies['language']) || $request->post('ChooseLanguage') !== null) {
+            return;
+        }
+        Yii::$app->i18n->setDefaultLocale();
     }
 
     /**

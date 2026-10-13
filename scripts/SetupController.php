@@ -196,6 +196,7 @@ class SetupController extends Controller
             }
             $this->stdout("$key gespeichert\n");
         }
+        Yii::$app->settings->set('defaultLanguage', 'de'); // Systemsprache (Gäste: designwahl)
         $settings = Yii::$app->getModule('legal')->settings;
         $settings->set('defaultLanguage', 'de');
         $settings->set('enabledPages', implode(',', array_keys($pages)));
