@@ -1,0 +1,131 @@
+# HumHub für community.rundumuffni.de
+# Basis: offizielles Image https://github.com/humhub/docker
+# Das humhub-Image startet per supervisord Webserver (FrankenPHP/Caddy inkl. HTTPS),
+# Scheduler (Cron) und Queue-Worker in einem Container.
+
+services:
+  humhub:
+    image: humhub/humhub:${HUMHUB_VERSION:-1.18}
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./humhub-data:/data
+      # Abfallkalender (scripts/abfall-kalender.py), öffentlich unter /abfall/abfall.ics
+      - ./abfall:/app/public/abfall:ro
+      # Schrift Nunito Sans (design/fonts), öffentlich unter /fonts – statt Google Fonts
+      - ./design/fonts:/app/public/fonts:ro
+      - ./design/robots.txt:/app/public/robots.txt:ro
+      # Eigenes Modul aus diesem Repo (KI-Assistent, Claude)
+      - ./modules/ki-assistent:/data/modules/ki-assistent:ro
+      - ./modules/maengelmelder:/data/modules/maengelmelder:ro
+      - ./modules/vereine:/data/modules/vereine:ro
+      - ./modules/abfuhr:/data/modules/abfuhr:ro
+      - ./modules/notdienst:/data/modules/notdienst:ro
+      - ./modules/whatsapp:/data/modules/whatsapp:ro
+      - ./modules/designwahl:/data/modules/designwahl:ro
+      - ./modules/facebook:/data/modules/facebook:ro
+      - ./modules/mitteilungsblatt:/data/modules/mitteilungsblatt:ro
+      # Stadtwissen von uffenheim.de (scripts/stadtwissen.py)
+      - ./wissen:/srv/wissen:ro
+    secrets:
+      - anthropic_api_key
+      - blak_notdienst_url
+      - whatsapp
+      - facebook
+    environment:
+      - HUMHUB_DEBUG=${HUMHUB_DEBUG:-false}
+      - SERVER_NAME=${SERVER_NAME}
+      - HUMHUB_CONFIG__COMPONENTS__DB__DSN=mysql:host=db;dbname=${DB_NAME}
+      - HUMHUB_CONFIG__COMPONENTS__DB__USERNAME=${DB_USER}
+      - HUMHUB_CONFIG__COMPONENTS__DB__PASSWORD=${DB_PASSWORD}
+      - HUMHUB_DOCKER__MERCURE_ENABLE=true
+      # TLS terminiert der Nginx Proxy Manager im LAN: dessen X-Forwarded-* Headern vertrauen
+      - 'HUMHUB_WEB_CONFIG__COMPONENTS__REQUEST__TRUSTED_HOSTS=["192.168.178.0/24"]'
+      - HUMHUB_WEB_CONFIG__COMPONENTS__REQUEST__SECURE_PORT=443
+      - CLAUDE_MODEL=${CLAUDE_MODEL:-claude-haiku-5-5}
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      # Offizieller Check prüft nur https://localhost; Fallback auf HTTP, solange SERVER_NAME=:80
+      test: ["CMD-SHELL", "/app/bin/humhub-simple-healthcheck.sh || curl -fs -o /dev/null --max-time 3 http://localhost/user/auth/login"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Lokale Embeddings für die Stadtwissen-Suche (embeddings/server.py): Fragen gehen dafür an keinen Cloud-Dienst.
+  # Nur im Docker-Netz (humhub → http://embeddings:8000) und für scripts/stadtwissen.py auf 127.0.0.1:8095.
+  embeddings:
+    build: ./embeddings
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8095:8000"
+    volumes:
+      - ./embeddings/cache:/cache
+    environment:
+      - EMBED_MODEL=jinaai/jina-embeddings-v2-base-de
+      - EMBED_THREADS=2
+    mem_limit: 1500m
+    logging:
+      driver: json-file
+      options:
+        max-size: "1m"
+        max-file: "2"
+
+  db:
+    image: mariadb:11.8
+    restart: unless-stopped
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --innodb-buffer-pool-size=256M
+    volumes:
+      - ./mysql-data:/var/lib/mysql
+    environment:
+      - MARIADB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MARIADB_DATABASE=${DB_NAME}
+      - MARIADB_USER=${DB_USER}
+      - MARIADB_PASSWORD=${DB_PASSWORD}
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Manuell / per Cron: docker compose run --rm backup
+  backup:
+    extends:
+      service: humhub
+    profiles: ["manual"]
+    restart: "no"
+    ports: !reset []
+    depends_on: !reset []
+    command: /app/bin/humhub-backup.sh
+    user: root
+    volumes:
+      - ./backups:/backup
+    environment:
+      - HUMHUB_DOCKER__BACKUP_MERGE_ARCHIVES=true
+
+secrets:
+  # Claude-API-Schlüssel (Anthropic) für den KI-Assistenten (Datei nicht im Git, Verzeichnis secrets/ chmod 700)
+  anthropic_api_key:
+    file: ./secrets/anthropic_api_key
+  # Schnittstellen-Link der Bayerischen Landesapothekerkammer (Apotheken-Notdienst), an die Registrierung der BLU gebunden
+  blak_notdienst_url:
+    file: ./secrets/blak_notdienst_url
+  # WhatsApp Cloud API (Termin-Nummer): token, app_secret, phone_number_id, waba_id, verify_token
+  whatsapp:
+    file: ./secrets/whatsapp.json
+  # Facebook-Seite der Stadt (Modul facebook): page_id, token (Seiten- oder Systemnutzer-Token)
+  facebook:
+    file: ./secrets/facebook.json

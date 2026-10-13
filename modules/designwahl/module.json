@@ -1,0 +1,10 @@
+{
+  "id": "designwahl",
+  "name": "Designwahl",
+  "description": "Umschalten zwischen dem klassischen und dem neuen Design „Uffi frisch“ je Konto (Profilmenü).",
+  "keywords": ["design", "theme"],
+  "version": "0.1.0",
+  "humhub": {
+    "minVersion": "1.18"
+  }
+}

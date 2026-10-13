@@ -1,0 +1,7 @@
+.env
+secrets/
+__pycache__/
+embeddings/cache/
+modules/ki-assistent/vendor/
+modules/mitteilungsblatt/pdfjs/
+modules/ki-assistent/data/formulare/*.pdf

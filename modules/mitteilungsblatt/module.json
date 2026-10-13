@@ -1,0 +1,10 @@
+{
+  "id": "mitteilungsblatt",
+  "name": "Mitteilungsblatt",
+  "description": "Mitteilungsblatt (Amtsblatt) der Stadt Uffenheim: Ausgaben von uffenheim.de, Archiv mit Volltextsuche und Reader in der App.",
+  "keywords": ["mitteilungsblatt", "amtsblatt", "pdf"],
+  "version": "0.1.0",
+  "humhub": {
+    "minVersion": "1.18"
+  }
+}

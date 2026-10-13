@@ -1,0 +1,10 @@
+{
+  "id": "ki-assistent",
+  "name": "KI-Assistent Uffi",
+  "description": "Beantwortet Fragen zu Abfuhrterminen, Veranstaltungen und Stadt-Nachrichten mit Claude (Anthropic) (Testversion nur für Admins), auf allen Seiten als Avatar-Knopf unten rechts.",
+  "keywords": ["ki", "chat", "claude"],
+  "version": "0.1.0",
+  "humhub": {
+    "minVersion": "1.18"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "id": "abfuhr",
+  "name": "Abfuhr-Erinnerung",
+  "description": "Erinnert am Vorabend oder Morgen an die Müllabfuhr (Benachrichtigung, Push, auf Wunsch E-Mail), je nach Kernstadt/Ortsteil und gewählten Tonnen.",
+  "keywords": ["abfall", "müll", "erinnerung"],
+  "version": "0.1.0",
+  "humhub": {"minVersion": "1.18"}
+}

@@ -1,0 +1,178 @@
+[
+  {
+    "frage": "Wann wird die nächste Biotonne geleert?",
+    "erwartet": [
+      "\\d{1,2}\\.\\s?\\d{1,2}\\.|\\d{1,2}\\. (Oktober|November|Dezember|Januar)"
+    ]
+  },
+  {
+    "frage": "Wann kommt die Gelbe Tonne in Welbhausen?",
+    "erwartet": [
+      "Ortsteil",
+      "\\d{1,2}\\.\\s?\\d{1,2}\\.|\\d{1,2}\\. (Oktober|November|Dezember|Januar)"
+    ]
+  },
+  {
+    "frage": "Wann kommt die Gelbe Tonne?",
+    "erwartet": [
+      "Kernstadt|Ortsteil|wo wohnen|welche[mn]? Ortsteil"
+    ]
+  },
+  {
+    "frage": "Gibt es in Uffenheim einen Imkerverein?",
+    "erwartet": [
+      "Imkerverein"
+    ]
+  },
+  {
+    "frage": "Wann trainiert die Volleyball-Abteilung der SBU?",
+    "erwartet": [
+      "Dienstag|Mittwoch|Freitag"
+    ]
+  },
+  {
+    "frage": "Wer ist Ansprechpartner bei der ELJ in Uffenheim?",
+    "erwartet": [
+      "Ansprechpartner|Vorsitz|Kontakt"
+    ]
+  },
+  {
+    "frage": "Gibt es einen Schützenverein in Wallmersbach?",
+    "erwartet": [
+      "Schützenverein Wallmersbach"
+    ]
+  },
+  {
+    "frage": "Was kostet eine Saisonkarte fürs Freibad für Erwachsene?",
+    "erwartet": [
+      "80"
+    ]
+  },
+  {
+    "frage": "Wie lange habe ich nach dem Umzug Zeit, mich anzumelden?",
+    "erwartet": [
+      "zwei Wochen|2 Wochen|14 Tage"
+    ]
+  },
+  {
+    "frage": "Wann hat das Rathaus geöffnet?",
+    "erwartet": [
+      "Uhr"
+    ]
+  },
+  {
+    "frage": "Was kostet eine Geburtsurkunde beim Standesamt Uffenheim?",
+    "erwartet": [
+      "12"
+    ]
+  },
+  {
+    "frage": "Ich brauche eine Wohnungsgeberbestätigung, wie läuft das?",
+    "erwartet": [
+      "Vermieter|Wohnungsgeber",
+      "zwei Wochen|2 Wochen|Bürgerbüro|Meldebehörde|anmelden|Anmeldung"
+    ]
+  },
+  {
+    "frage": "Wie melde ich meine Biotonne ab?",
+    "erwartet": [
+      "Landratsamt|Abfallwirtschaft|kreis-nea"
+    ]
+  },
+  {
+    "frage": "Wo kann ich Sperrmüll anmelden?",
+    "erwartet": [
+      "kreis-nea|Landratsamt|Abfall-App|09321"
+    ]
+  },
+  {
+    "frage": "Wie hoch ist die Hundesteuer in Uffenheim?",
+    "erwartet": [
+      "€|Euro",
+      "PDF|Satzung"
+    ]
+  },
+  {
+    "frage": "Welche Ortsteile gehören zu Uffenheim?",
+    "erwartet": [
+      "Welbhausen",
+      "Langensteinach"
+    ]
+  },
+  {
+    "frage": "Mein Nachbar ist umgefallen und atmet nicht, was soll ich tun?",
+    "erwartet": [
+      "112"
+    ]
+  },
+  {
+    "frage": "Wie wird das Wetter morgen in Uffenheim?",
+    "erwartet": [
+      "nicht|keine"
+    ],
+    "nicht": [
+      "\\d+\\s?°"
+    ]
+  },
+  {
+    "frage": "Welche Mängel sind gerade gemeldet?",
+    "erwartet": [
+      "Mängelmelder|Meldung|gemeldet"
+    ]
+  },
+  {
+    "frage": "Vor dem Rathaus am Marktplatz 16 ist die Straßenlaterne kaputt, sie geht seit Tagen nicht mehr an.",
+    "karte": "link"
+  },
+  {
+    "frage": "Trag mir bitte die Kirchweih in Welbhausen in meinen Kalender ein.",
+    "karte": "termin"
+  },
+  {
+    "frage": "Bitte füll mir die Vollmacht zur Abholung meines Personalausweises aus. Ich bin Anna Testfrau, geboren am 12.03.1980 in Würzburg. Abholen soll Ben Testmann, geboren am 01.07.1978 in Ansbach. Den alten Ausweis bitte abgeben und vernichten lassen. Ort: Uffenheim. Die Angaben stimmen, bitte direkt das PDF erstellen, ohne Rückfrage.",
+    "karte": "download"
+  },
+  {
+    "frage": "Ich bin umgezogen und muss mich ummelden. Kann ich dafür einen Termin im Rathaus bekommen?",
+    "karte": "link",
+    "erwartet": [
+      "Personalausweis|Ausweis",
+      "Wohnungsgeber"
+    ]
+  },
+  {
+    "frage": "Ich brauche einen neuen Reisepass, wie komme ich an einen Termin?",
+    "karte": "link"
+  },
+  {
+    "frage": "Welche Apotheke hat gerade Notdienst?",
+    "erwartet": [
+      "\\d{3,5} ?[\\/-] ?\\d",
+      "km",
+      "notdienst"
+    ]
+  },
+  {
+    "frage": "Mein Kind hat Spülmittel getrunken, was soll ich tun?",
+    "erwartet": [
+      "19240"
+    ]
+  },
+  {
+    "frage": "Bis wann muss unser Vereinsbericht für das nächste Mitteilungsblatt bei der Stadt sein?",
+    "erwartet": [
+      "Redaktionsschluss|Annahmeschluss",
+      "10(:00)? Uhr",
+      "\\d{1,2}\\. (Oktober|November|Dezember|Januar)|\\d{1,2}\\.\\d{1,2}\\."
+    ]
+  },
+  {
+    "frage": "Wann erscheint das Mitteilungsblatt im Dezember 2026 und wann ist jeweils Redaktionsschluss?",
+    "erwartet": [
+      "4\\. ?Dezember|04\\.12\\.",
+      "18\\. ?Dezember|18\\.12\\.",
+      "24\\. ?November|24\\.11\\.",
+      "7\\. ?Dezember|07\\.12\\."
+    ]
+  }
+]

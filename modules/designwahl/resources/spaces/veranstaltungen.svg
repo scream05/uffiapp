@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Veranstaltungen">
+  <!-- Space-Symbol im Design „Uffi frisch“ (eigene Zeichnung) -->
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#c0475a"/>
+      <stop offset="1" stop-color="#5e0f19"/>
+    </linearGradient>
+    <radialGradient id="l" cx=".25" cy=".15" r=".8">
+      <stop offset="0" stop-color="#fff" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="128" height="128" fill="url(#g)"/>
+  <rect width="128" height="128" fill="url(#l)"/>
+  <path d="M0 104 C24 94 44 110 70 102 S108 90 128 98 V128 H0 Z" fill="#fff" opacity=".14"/>
+  <path d="M0 114 C30 104 52 120 82 112 S116 104 128 110 V128 H0 Z" fill="#fff" opacity=".12"/>
+  <g fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="28" y="34" width="72" height="60" rx="12"/>
+    <path d="M28 50 H100"/>
+    <path d="M46 26 V40 M82 26 V40"/>
+    <path d="M64 58 l4.4 9 9.8 1.4 -7.1 6.9 1.7 9.8 -8.8-4.6 -8.8 4.6 1.7-9.8 -7.1-6.9 9.8-1.4 z" fill="#fff" stroke-width="3"/>
+  </g>
+</svg>

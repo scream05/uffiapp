@@ -1,0 +1,1120 @@
+/*
+ * Design „Uffi frisch“ für community.rundumuffni.de – Alternative zum klassischen Design (design/ios.scss).
+ * Wird nur zusätzlich geladen, wenn ein Konto „Design: Uffi frisch“ gewählt hat (Modul designwahl), und greift
+ * nur unter html.design-neu. Stadtfarben bleiben (Stahlblau führend), dazu warme Sandtöne, kräftige Rundungen,
+ * farbige Symbolkreise, Kopfleiste in Stahlblau, am Handy eine schwebende Tab-Leiste.
+ * Wichtig: kein transform/filter/backdrop-filter/overflow auf #topbar – die Tab-Leiste (#top-menu-nav,
+ * position: fixed) hängt sonst am Kopf statt am unteren Rand.
+ */
+
+/* ---------- Farben und Maße ---------- */
+html.design-neu {
+    --dn-blau: #446e88;
+    --dn-blau-tief: #2b4a5f;
+    --dn-blau-zart: #e3edf3;
+    --dn-gruen: #91b80f;
+    --dn-gruen-tief: #4f6c08;
+    --dn-gruen-zart: #eef5d9;
+    --dn-bordeaux: #7c1922;
+    --dn-bordeaux-zart: #f6e4e5;
+    --dn-gold: #b98a00;
+    --dn-gold-zart: #fbf0cc;
+    --dn-tuerkis: #0f7a9e;
+    --dn-tuerkis-zart: #dcf0f7;
+    --dn-rot: #c62828;
+    --dn-rot-zart: #fbe3e3;
+
+    --dn-sand: #f5f1ea;
+    --dn-karte: #ffffff;
+    --dn-linie: rgba(43, 74, 95, .1);
+    --dn-feld: #f3efe7;
+    --dn-text: #1f2a33;
+    --dn-text-leise: #5f6b75;
+
+    --dn-r-xl: 28px;
+    --dn-r-l: 22px;
+    --dn-r-m: 16px;
+    --dn-r-s: 12px;
+    --dn-schatten: 0 1px 2px rgba(43, 74, 95, .05), 0 6px 20px rgba(43, 74, 95, .07);
+    --dn-schatten-hoch: 0 2px 6px rgba(43, 74, 95, .08), 0 16px 36px rgba(43, 74, 95, .14);
+    --dn-schatten-farbig: 0 6px 18px rgba(68, 110, 136, .35);
+
+    /* Clean-Theme-Variablen umstellen */
+    --hh-background-color-page: var(--dn-sand);
+    --hh-background-color-main: var(--dn-karte);
+    --hh-background-color-secondary: #faf8f4;
+    --hh-background-color-highlight: var(--dn-blau-zart);
+    --hh-background-color-highlight-soft: #f0f5f8;
+    --hh-text-color-main: var(--dn-text);
+    --hh-text-color-default: #34414c;
+    --hh-text-color-soft: var(--dn-text-leise);
+    --hh-ct-panel-border-radius: var(--dn-r-l);
+    --hh-ct-panel-box-shadow: var(--dn-schatten);
+    --hh-ct-top-menu-background-color: var(--dn-blau);
+    --hh-ct-top-menu-text-color: rgba(255, 255, 255, .82);
+    --hh-ct-top-menu-button-hover-background-color: rgba(255, 255, 255, .14);
+    --hh-ct-top-menu-button-hover-text-color: #fff;
+    --hh-ct-bottom-menu-background-color: transparent;
+    --hh-ct-bottom-menu-text-color: #6b7782;
+    --ios-fill: rgba(43, 74, 95, .07);
+    --ios-fill-strong: rgba(43, 74, 95, .13);
+    --ios-separator: var(--dn-linie);
+    --ios-glass: rgba(255, 255, 255, .86);
+}
+
+html.design-neu[data-bs-theme="dark"] {
+    --dn-blau-zart: rgba(120, 165, 195, .18);
+    --dn-gruen-zart: rgba(145, 184, 15, .16);
+    --dn-bordeaux-zart: rgba(220, 90, 100, .16);
+    --dn-gold-zart: rgba(230, 180, 30, .16);
+    --dn-tuerkis-zart: rgba(40, 170, 210, .16);
+    --dn-rot-zart: rgba(240, 80, 80, .16);
+    --dn-gruen-tief: #b5d94a;
+    --dn-gold: #e8bd3a;
+    --dn-tuerkis: #4cc3e6;
+    --dn-rot: #ff6b6b;
+    --dn-sand: #111417;
+    --dn-karte: #1c2126;
+    --dn-feld: #262c33;
+    --dn-linie: rgba(255, 255, 255, .09);
+    --dn-text: #eef1f4;
+    --dn-text-leise: #9aa6b1;
+    --dn-schatten: 0 1px 2px rgba(0, 0, 0, .4), 0 6px 20px rgba(0, 0, 0, .25);
+    --dn-schatten-hoch: 0 2px 6px rgba(0, 0, 0, .45), 0 16px 36px rgba(0, 0, 0, .35);
+    --hh-background-color-secondary: #20262c;
+    --hh-background-color-highlight-soft: #1f2a33;
+    --hh-text-color-default: #d5dce2;
+    --hh-ct-top-menu-background-color: #1f3647;
+    --hh-ct-bottom-menu-text-color: #9aa6b1;
+    --ios-glass: rgba(28, 33, 38, .86);
+}
+
+/* ---------- Grundlage ---------- */
+html.design-neu body {
+    background-color: var(--dn-sand);
+    color: var(--dn-text);
+}
+
+/* Weiche Farbwolken im Hintergrund (fest, scrollt nicht mit) */
+html.design-neu body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        radial-gradient(38rem 26rem at 8% -4%, rgba(68, 110, 136, .16), transparent 70%),
+        radial-gradient(30rem 22rem at 100% 8%, rgba(145, 184, 15, .14), transparent 70%),
+        radial-gradient(34rem 26rem at 70% 110%, rgba(124, 25, 34, .07), transparent 70%);
+}
+
+html.design-neu h1,
+html.design-neu h2,
+html.design-neu h3,
+html.design-neu .panel-heading,
+html.design-neu .modal-title {
+    font-weight: 800;
+    letter-spacing: -.025em;
+}
+
+html.design-neu a:not(.btn):not(.dropdown-item):not(.list-group-item):not(.nav-link) {
+    text-underline-offset: 3px;
+}
+
+html.design-neu ::selection {
+    background: rgba(145, 184, 15, .35);
+}
+
+/* ---------- Kopfleiste: Stahlblau mit runder Unterkante ---------- */
+html.design-neu #topbar {
+    background: linear-gradient(120deg, var(--dn-blau-tief) 0%, var(--dn-blau) 55%, #55819c 100%) !important;
+    border: 0 !important;
+    border-radius: 0 0 var(--dn-r-l) var(--dn-r-l);
+    box-shadow: 0 6px 24px rgba(43, 74, 95, .25);
+}
+
+html.design-neu #topbar::before,
+html.design-neu #topbar::after {
+    display: none !important;
+}
+
+html.design-neu #topbar > .container a.navbar-brand-text,
+html.design-neu #topbar > .container #text-logo {
+    color: #fff !important;
+    font-weight: 800;
+    font-size: 19px;
+    letter-spacing: -.03em;
+}
+
+/* Logo-Text mit grünem Punkt */
+html.design-neu #topbar > .container #text-logo::after {
+    content: "";
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin-left: 3px;
+    border-radius: 50%;
+    background: var(--dn-gruen);
+    vertical-align: baseline;
+}
+
+/* Glocke, Nachrichten, Suche: helle Kreise auf Blau */
+html.design-neu #topbar > .container .notifications .btn-group > a,
+html.design-neu #topbar > .container #search-menu {
+    background-color: rgba(255, 255, 255, .14) !important;
+    color: #fff !important;
+}
+
+html.design-neu #topbar > .container .notifications .btn-group > a:hover,
+html.design-neu #topbar > .container #search-menu:hover {
+    background-color: rgba(255, 255, 255, .24) !important;
+}
+
+html.design-neu #topbar > .container .notifications .btn-group > .badge {
+    background-color: var(--dn-gruen) !important;
+    color: #1f2a00 !important;
+    border-color: var(--dn-blau) !important;
+    font-weight: 800;
+}
+
+html.design-neu #topbar #user-account-image {
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, .85);
+}
+
+html.design-neu #topbar .user-title,
+html.design-neu #topbar .user-title strong {
+    color: #fff;
+}
+
+/* Menüpunkte am Computer: helle Schrift, aktiver Punkt als weiße Pille */
+@media (min-width: 576px) {
+    html.design-neu #topbar > .container > #top-menu-nav > li > a {
+        color: rgba(255, 255, 255, .82) !important;
+        border-radius: var(--dn-r-m) !important;
+        margin: 6px 2px !important;
+        height: calc(var(--hh-ct-top-bar-height) - 12px) !important;
+        padding-top: 4px !important;
+    }
+
+    html.design-neu #topbar > .container > #top-menu-nav > li > a:not(.active):hover {
+        background-color: rgba(255, 255, 255, .14) !important;
+        color: #fff !important;
+    }
+
+    html.design-neu #topbar > .container > #top-menu-nav > li > a.active,
+    html.design-neu #topbar > .container > #top-menu-nav > li > a.active:hover {
+        background-color: #fff !important;
+        color: var(--dn-blau-tief) !important;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, .15);
+    }
+}
+
+/* ---------- Handy: schwebende Tab-Leiste ---------- */
+@media (max-width: 575.98px) {
+    html.design-neu #topbar {
+        border-radius: 0 0 var(--dn-r-m) var(--dn-r-m);
+    }
+
+    html.design-neu body #topbar > .container > #top-menu-nav {
+        left: 10px !important;
+        right: 10px !important;
+        bottom: calc(8px + var(--hh-mobile-app-safe-area-inset-bottom, env(safe-area-inset-bottom))) !important;
+        height: var(--hh-ct-top-bar-height) !important;
+        width: auto !important;
+        padding: 0 6px !important;
+        border: 0 !important;
+        border-radius: 999px !important;
+        background: var(--ios-glass) !important;
+        -webkit-backdrop-filter: saturate(180%) blur(20px);
+        backdrop-filter: saturate(180%) blur(20px);
+        box-shadow: 0 10px 30px rgba(43, 74, 95, .22), 0 0 0 1px var(--dn-linie) !important;
+    }
+
+    html.design-neu body #topbar > .container > #top-menu-nav > li > a {
+        background: transparent !important;
+        color: var(--hh-ct-bottom-menu-text-color) !important;
+        font-weight: 700;
+    }
+
+    /* Aktiver Reiter: Symbol in einer farbigen Pille */
+    html.design-neu body #topbar > .container > #top-menu-nav > li > a i {
+        display: inline-block;
+        width: 46px;
+        border-radius: 999px;
+        transition: background-color .2s ease, color .2s ease;
+    }
+
+    html.design-neu body #topbar > .container > #top-menu-nav > li > a.active {
+        color: var(--dn-blau) !important;
+    }
+
+    html.design-neu body #topbar > .container > #top-menu-nav > li > a.active i {
+        background-color: var(--dn-blau-zart);
+        color: var(--dn-blau);
+    }
+
+    html.design-neu[data-bs-theme="dark"] body #topbar > .container > #top-menu-nav > li > a.active,
+    html.design-neu[data-bs-theme="dark"] body #topbar > .container > #top-menu-nav > li > a.active i {
+        color: #9cc3dc !important;
+    }
+
+    /* Platz unten, damit nichts hinter der schwebenden Leiste verschwindet */
+    html.design-neu body {
+        padding-bottom: calc(var(--hh-ct-top-bar-height) + 24px + env(safe-area-inset-bottom)) !important;
+    }
+
+    /* Uffi-Knopf über der schwebenden Leiste */
+    html.design-neu .ki-fab {
+        bottom: calc(var(--hh-ct-top-bar-height) + 20px + var(--hh-mobile-app-safe-area-inset-bottom, env(safe-area-inset-bottom))) !important;
+    }
+}
+
+/* ---------- Karten ---------- */
+html.design-neu .panel {
+    border: 0 !important;
+    border-radius: var(--dn-r-l) !important;
+    box-shadow: var(--dn-schatten) !important;
+    background-color: var(--dn-karte);
+}
+
+html.design-neu .panel .panel-heading {
+    font-size: 17px;
+    padding: 18px 20px 6px !important;
+    color: var(--dn-text);
+}
+
+/* Kleine grüne Marke vor Kartentiteln in der Seitenleiste */
+html.design-neu .layout-sidebar-container .panel > .panel-heading::before {
+    content: "";
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-right: 8px;
+    border-radius: 50%;
+    background: var(--dn-gruen);
+    box-shadow: 0 0 0 4px var(--dn-gruen-zart);
+    vertical-align: 1px;
+}
+
+html.design-neu .panel .panel-body {
+    padding: 14px 20px 20px !important;
+}
+
+/* Beiträge im Stream: etwas Luft und sanftes Anheben */
+html.design-neu .wall-entry {
+    transition: box-shadow .2s ease;
+}
+
+html.design-neu .wall-entry:hover {
+    box-shadow: var(--dn-schatten-hoch) !important;
+}
+
+html.design-neu .wall-entry .wall-entry-header {
+    padding-bottom: 6px;
+}
+
+html.design-neu .wall-entry-header-image img,
+html.design-neu .media img.rounded-circle,
+html.design-neu img.img-profile-header-background + * img {
+    box-shadow: 0 0 0 3px var(--dn-karte), 0 0 0 5px var(--dn-blau-zart);
+}
+
+html.design-neu .wall-entry-content img,
+html.design-neu .wall-entry-body img:not(.rounded-circle):not([class*="emoji"]) {
+    border-radius: var(--dn-r-m);
+}
+
+html.design-neu .wall-entry-controls a {
+    border-radius: 999px;
+    padding: 4px 10px;
+    transition: background-color .15s;
+}
+
+html.design-neu .wall-entry-controls a:hover {
+    background-color: var(--dn-blau-zart);
+    text-decoration: none;
+}
+
+html.design-neu .comment-container {
+    border-radius: var(--dn-r-m);
+    background-color: var(--hh-background-color-secondary);
+}
+
+/* ---------- Knöpfe ---------- */
+html.design-neu .btn {
+    border-radius: 999px;
+    font-weight: 700;
+    letter-spacing: .005em;
+    transition: transform .12s ease, box-shadow .2s ease, filter .15s;
+}
+
+html.design-neu .btn-primary {
+    background: linear-gradient(135deg, #5583a0, var(--dn-blau) 55%, var(--dn-blau-tief));
+    border: 0;
+    box-shadow: var(--dn-schatten-farbig) !important;
+}
+
+html.design-neu .btn-primary:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.06);
+}
+
+html.design-neu .btn-primary:active {
+    transform: scale(.97);
+}
+
+/* Gewählter Knopf in Gruppen (z. B. Monat/Woche/Liste im Kalender): hell mit blauer
+   Schrift – sonst setzt Clean blaue Schrift auf unseren blauen Verlauf */
+html.design-neu .btn-primary.active,
+html.design-neu .btn-primary.show {
+    background: var(--dn-karte);
+    color: var(--dn-blau-tief);
+    box-shadow: inset 0 0 0 2px var(--dn-blau) !important;
+}
+
+html.design-neu[data-bs-theme="dark"] .btn-primary.active,
+html.design-neu[data-bs-theme="dark"] .btn-primary.show {
+    color: #cfe1ec;
+}
+
+html.design-neu .btn-light,
+html.design-neu .btn-secondary {
+    background-color: var(--dn-blau-zart);
+    color: var(--dn-blau-tief);
+}
+
+html.design-neu[data-bs-theme="dark"] .btn-light,
+html.design-neu[data-bs-theme="dark"] .btn-secondary {
+    color: #cfe1ec;
+}
+
+html.design-neu .btn-success {
+    background-color: var(--dn-gruen-tief);
+    border: 0;
+}
+
+html.design-neu .input-group > .btn,
+html.design-neu .btn-group > .btn:not(:only-child),
+html.design-neu .btn-icon-only {
+    border-radius: var(--dn-r-s);
+}
+
+/* ---------- Formulare ---------- */
+html.design-neu .form-control,
+html.design-neu .form-select {
+    border-radius: var(--dn-r-m);
+    background-color: var(--dn-feld);
+    border: 1.5px solid transparent;
+    min-height: 44px;
+}
+
+html.design-neu .form-control:focus,
+html.design-neu .form-select:focus {
+    background-color: var(--dn-karte);
+    border-color: var(--dn-blau);
+    box-shadow: 0 0 0 4px rgba(68, 110, 136, .18) !important;
+}
+
+html.design-neu .form-check-input:checked {
+    background-color: var(--dn-blau);
+    border-color: var(--dn-blau);
+}
+
+html.design-neu .form-switch .form-check-input:checked {
+    background-color: var(--dn-gruen-tief);
+}
+
+/* Beitrag schreiben */
+html.design-neu #contentFormBody .ProsemirrorEditor,
+html.design-neu #contentFormBody .humhub-ui-richtext {
+    border-radius: var(--dn-r-m);
+}
+
+/* ---------- Menüs links (Space, Konto): Symbole in farbigen Kreisen ---------- */
+html.design-neu .left-navigation .list-group {
+    gap: 2px;
+    padding: 4px 6px 8px;
+}
+
+html.design-neu .left-navigation .list-group-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 0 !important;
+    border-radius: var(--dn-r-m) !important;
+    margin: 0 !important;
+    padding: 7px 10px !important;
+    font-weight: 600;
+    color: var(--dn-text);
+    background: transparent;
+    transition: background-color .15s;
+}
+
+html.design-neu .left-navigation .list-group-item > i,
+html.design-neu .left-navigation .list-group-item > .fa {
+    flex: 0 0 34px;
+    width: 34px;
+    height: 34px;
+    line-height: 34px;
+    text-align: center;
+    border-radius: 50%;
+    margin: 0 !important;
+    background-color: var(--dn-blau-zart);
+    color: var(--dn-blau);
+    transition: background-color .15s, color .15s, transform .15s;
+}
+
+/* Abwechselnde Stadtfarben für die Symbolkreise */
+html.design-neu .left-navigation .list-group-item:nth-child(5n+2) > i { background-color: var(--dn-gruen-zart); color: var(--dn-gruen-tief); }
+html.design-neu .left-navigation .list-group-item:nth-child(5n+3) > i { background-color: var(--dn-gold-zart); color: var(--dn-gold); }
+html.design-neu .left-navigation .list-group-item:nth-child(5n+4) > i { background-color: var(--dn-tuerkis-zart); color: var(--dn-tuerkis); }
+html.design-neu .left-navigation .list-group-item:nth-child(5n+5) > i { background-color: var(--dn-bordeaux-zart); color: var(--dn-bordeaux); }
+
+html.design-neu .left-navigation .list-group-item:hover {
+    background-color: var(--hh-background-color-highlight-soft);
+}
+
+html.design-neu .left-navigation .list-group-item:hover > i {
+    transform: scale(1.06);
+}
+
+html.design-neu .left-navigation .list-group-item.active {
+    background-color: var(--dn-blau) !important;
+    color: #fff !important;
+    box-shadow: var(--dn-schatten-farbig);
+}
+
+html.design-neu .left-navigation .list-group-item.active > i {
+    background-color: rgba(255, 255, 255, .2) !important;
+    color: #fff !important;
+}
+
+/* Am Handy liegt das Space-Menü waagerecht: als scrollbare Chips */
+@media (max-width: 991.98px) {
+    html.design-neu .left-navigation .list-group {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scrollbar-width: none;
+        gap: 6px;
+        padding: 8px;
+    }
+
+    html.design-neu .left-navigation .list-group::-webkit-scrollbar {
+        display: none;
+    }
+
+    html.design-neu .left-navigation .list-group-item {
+        flex: 0 0 auto;
+        white-space: nowrap;
+        padding: 5px 14px 5px 5px !important;
+        border-radius: 999px !important;
+        background-color: var(--hh-background-color-secondary);
+    }
+
+    html.design-neu .left-navigation .list-group-item > i {
+        flex-basis: 28px;
+        width: 28px;
+        height: 28px;
+        line-height: 28px;
+        font-size: 13px;
+    }
+}
+
+/* ---------- Reiter ---------- */
+html.design-neu .nav-tabs {
+    background-color: var(--dn-feld);
+    border-radius: 999px;
+    padding: 4px;
+}
+
+html.design-neu .nav-tabs .nav-link {
+    border-radius: 999px !important;
+    font-weight: 700;
+}
+
+html.design-neu .nav-tabs .nav-link.active {
+    background-color: var(--dn-karte) !important;
+    color: var(--dn-blau-tief);
+    box-shadow: 0 2px 8px rgba(43, 74, 95, .14);
+}
+
+/* ---------- Dropdowns, Dialoge ---------- */
+html.design-neu .dropdown-menu {
+    border-radius: var(--dn-r-l);
+    padding: 6px;
+    box-shadow: var(--dn-schatten-hoch), 0 0 0 1px var(--dn-linie);
+}
+
+/* „li a.dropdown-item“ zusätzlich: das Clean-Theme stylt „.nav-pills .dropdown-menu li a.link“ (z. B. Anheften,
+   Themen, Melden im Beitragsmenü) spezifischer und gewänne sonst gegen ".dropdown-menu .dropdown-item" */
+html.design-neu .dropdown-menu .dropdown-item,
+html.design-neu .dropdown-menu li a.dropdown-item {
+    border-radius: var(--dn-r-s);
+    padding: 8px 12px;
+    font-weight: 600;
+}
+
+html.design-neu .dropdown-menu .dropdown-item:hover,
+html.design-neu .dropdown-menu .dropdown-item:focus,
+html.design-neu .dropdown-menu li a.dropdown-item:hover,
+html.design-neu .dropdown-menu li a.dropdown-item:focus {
+    background-color: var(--dn-blau-zart);
+    color: var(--dn-blau-tief);
+}
+
+html.design-neu .modal-content {
+    border-radius: var(--dn-r-xl);
+    box-shadow: 0 30px 80px rgba(20, 35, 45, .3);
+}
+
+html.design-neu .modal-header {
+    border-bottom: 0;
+    padding: 20px 24px 8px;
+}
+
+html.design-neu .modal-footer {
+    border-top: 0;
+    padding: 8px 24px 20px;
+}
+
+/* ---------- Kleinkram ---------- */
+html.design-neu .badge {
+    border-radius: 999px;
+    font-weight: 800;
+}
+
+html.design-neu .alert {
+    border-radius: var(--dn-r-m);
+    border: 0;
+}
+
+html.design-neu .alert-info {
+    background-color: var(--dn-blau-zart);
+    color: var(--dn-blau-tief);
+}
+
+html.design-neu .alert-success {
+    background-color: var(--dn-gruen-zart);
+    color: var(--dn-gruen-tief);
+}
+
+html.design-neu .space-acronym,
+html.design-neu img.img-rounded:not(.rounded-circle) {
+    border-radius: var(--dn-r-m) !important;
+}
+
+html.design-neu .profile-user-photo,
+html.design-neu .profile-user-photo-container img {
+    border-radius: var(--dn-r-l) !important;
+    box-shadow: 0 0 0 4px var(--dn-karte), var(--dn-schatten-hoch);
+}
+
+html.design-neu .img-profile-header-background {
+    border-radius: var(--dn-r-xl) var(--dn-r-xl) 0 0 !important;
+}
+
+/* nur das Banner runden und abschneiden – das Profil-/Space-Bild ragt darüber hinaus und bleibt ganz sichtbar */
+html.design-neu .panel-profile .panel-profile-header {
+    border-radius: var(--dn-r-xl) var(--dn-r-xl) 0 0;
+}
+
+html.design-neu .panel-profile .profile-banner-image-container {
+    border-radius: var(--dn-r-xl) var(--dn-r-xl) 0 0;
+    overflow: hidden;
+}
+
+html.design-neu .panel-profile .profile-user-photo-container {
+    overflow: visible;
+}
+
+/* Spaces: Symbol sitzt ganz im blauen Banner (feste Bannerhöhe), Titel daneben, Zahlen darunter ohne Einrückung */
+html.design-neu #layout-content .panel-profile-header:has(.space-acronym) {
+    --dn-banner: 100px;
+    --dn-symbol-rand: 12px;
+    --dn-symbol: calc(var(--dn-banner) - 2 * var(--dn-symbol-rand));
+}
+
+html.design-neu #layout-content .panel-profile-header:has(.space-acronym) .profile-banner-image-container > .img-profile-header-background {
+    height: var(--dn-banner) !important;
+    min-height: 0 !important;
+    max-height: none;
+    object-fit: cover;
+}
+
+html.design-neu #layout-content .panel-profile-header:has(.space-acronym) .profile-user-photo-container {
+    top: var(--dn-symbol-rand);
+    bottom: auto;
+    left: 16px;
+    width: var(--dn-symbol) !important;
+    height: var(--dn-symbol) !important;
+}
+
+html.design-neu #layout-content .panel-profile-header:has(.space-acronym) .profile-user-photo-container .profile-user-photo {
+    width: var(--dn-symbol) !important;
+    height: var(--dn-symbol) !important;
+    min-height: 0 !important;
+    border-width: 2px;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, .85), 0 4px 12px rgba(0, 0, 0, .2);
+}
+
+html.design-neu #layout-content .panel-profile-header:has(.space-acronym) .img-profile-data {
+    top: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 0 !important;
+    padding-left: calc(16px + var(--dn-symbol) + 18px);
+    padding-right: 16px;
+}
+
+html.design-neu #layout-content .panel-profile-header:has(.space-acronym) .img-profile-data h2 {
+    margin-bottom: 0;
+}
+
+html.design-neu .panel-profile:has(.space-acronym) .panel-profile-controls {
+    padding-left: 16px !important;
+    padding-top: 0 !important;
+}
+
+html.design-neu .panel-profile:has(.space-acronym) .panel-profile-controls > .container {
+    padding-left: 0;
+}
+
+html.design-neu #layout-content .panel-profile:has(.space-acronym) .statistics .entry:first-child {
+    margin-left: 0;
+}
+
+@media (max-width: 575.98px) {
+    html.design-neu #layout-content .panel-profile-header:has(.space-acronym) {
+        --dn-banner: 76px;
+        --dn-symbol-rand: 10px;
+    }
+
+    html.design-neu #layout-content .panel-profile-header:has(.space-acronym) .profile-user-photo-container {
+        left: 12px;
+    }
+
+    html.design-neu #layout-content .panel-profile-header:has(.space-acronym) .img-profile-data {
+        padding-left: calc(12px + var(--dn-symbol) + 12px);
+    }
+}
+
+/* Kalender (FullCalendar): runde Termine */
+html.design-neu .fc-event {
+    border-radius: 8px;
+    border: 0;
+}
+
+/* Fokus für Tastatur sichtbar und rund */
+html.design-neu :focus-visible {
+    outline: 3px solid rgba(145, 184, 15, .75);
+    outline-offset: 2px;
+    border-radius: 8px;
+}
+
+/* ---------- Startseite: Begrüßungskarte und Schnellzugriffe ---------- */
+html.design-neu .dn-hero {
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 14px;
+    padding: 24px 26px 46px;
+    border-radius: var(--dn-r-xl);
+    color: #fff;
+    background:
+        radial-gradient(18rem 12rem at 92% 0%, rgba(145, 184, 15, .45), transparent 70%),
+        linear-gradient(130deg, var(--dn-blau-tief), var(--dn-blau) 60%, #5d8aa6);
+    box-shadow: 0 12px 34px rgba(43, 74, 95, .3);
+}
+
+html.design-neu .dn-hero-zeile {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 6px;
+}
+
+/* Wetter rechts neben dem Datum */
+html.design-neu .dn-wetter {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    padding: 4px 12px 4px 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .16);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .18);
+    white-space: nowrap;
+    cursor: default;
+}
+
+html.design-neu .dn-wetter[hidden] {
+    display: none;
+}
+
+html.design-neu .dn-wetter svg {
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+html.design-neu .dn-wetter-grad {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -.02em;
+}
+
+html.design-neu .dn-wetter-text {
+    font-size: 13px;
+    font-weight: 600;
+    opacity: .85;
+}
+
+html.design-neu .dn-hero-datum {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    opacity: .8;
+}
+
+html.design-neu .dn-hero-titel {
+    margin: 0;
+    font-size: clamp(26px, 6vw, 34px);
+    line-height: 1.1;
+    color: #fff;
+    letter-spacing: -.035em;
+}
+
+html.design-neu .dn-hero-gruss {
+    font-weight: 300;
+}
+
+html.design-neu .dn-hero-titel strong {
+    font-weight: 900;
+}
+
+/* Gäste: Hinweis auf das Konto und Knöpfe in der Begrüßungskarte */
+html.design-neu .dn-hero-gast {
+    position: relative;
+    max-width: 36em;
+    margin: 10px 0 0;
+    font-size: 15px;
+    line-height: 1.45;
+    opacity: .92;
+}
+
+html.design-neu .dn-hero-kopf {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+html.design-neu .dn-hero-klapp {
+    position: relative;
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .16);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .3);
+    color: #fff;
+    cursor: pointer;
+}
+
+html.design-neu .dn-hero-klapp:hover {
+    background: rgba(255, 255, 255, .26);
+}
+
+html.design-neu .dn-hero-klapp .fa {
+    transition: transform .2s ease;
+}
+
+html.design-neu .dn-hero-zu .dn-hero-klapp .fa {
+    transform: rotate(180deg);
+}
+
+html.design-neu .dn-hero-zu .dn-hero-mehr {
+    display: none;
+}
+
+/* eingeklappt: weniger Platz unter dem Titel, Welle flacher */
+html.design-neu .dn-hero.dn-hero-zu {
+    padding-bottom: 30px;
+}
+
+html.design-neu .dn-hero-zu .dn-hero-welle {
+    height: 26px;
+}
+
+html.design-neu .dn-hero-knoepfe {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 14px 0 0;
+}
+
+html.design-neu .dn-hero-klein {
+    position: relative;
+    margin: 12px 0 0;
+    font-size: 12px;
+    opacity: .75;
+}
+
+html.design-neu .dn-hero-knopf {
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: #fff;
+    color: var(--dn-blau-tief);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+html.design-neu .dn-hero-knopf-hell {
+    background: rgba(255, 255, 255, .16);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .35);
+    color: #fff;
+}
+
+html.design-neu .dn-hero-knopf:hover,
+html.design-neu .dn-hero-knopf:focus {
+    text-decoration: none;
+    filter: brightness(.95);
+}
+
+html.design-neu .dn-hero-welle {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 44px;
+    color: #fff;
+}
+
+html.design-neu .dn-ziel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 8px 12px;
+    border-radius: var(--dn-r-l);
+    background: var(--dn-karte);
+    box-shadow: var(--dn-schatten);
+    color: var(--dn-text);
+    font-weight: 700;
+    font-size: 13px;
+    text-align: center;
+    text-decoration: none !important;
+    hyphens: none;
+    line-height: 1.2;
+    transition: transform .15s ease, box-shadow .2s ease;
+}
+
+html.design-neu .dn-ziel:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--dn-schatten-hoch);
+    color: var(--dn-text);
+}
+
+html.design-neu .dn-ziel:active {
+    transform: scale(.97);
+}
+
+html.design-neu .dn-ziel-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    font-size: 19px;
+}
+
+html.design-neu .dn-blau .dn-ziel-icon { background: var(--dn-blau-zart); color: var(--dn-blau); }
+html.design-neu .dn-gruen .dn-ziel-icon { background: var(--dn-gruen-zart); color: var(--dn-gruen-tief); }
+html.design-neu .dn-gold .dn-ziel-icon { background: var(--dn-gold-zart); color: var(--dn-gold); }
+html.design-neu .dn-tuerkis .dn-ziel-icon { background: var(--dn-tuerkis-zart); color: var(--dn-tuerkis); }
+html.design-neu .dn-bordeaux .dn-ziel-icon { background: var(--dn-bordeaux-zart); color: var(--dn-bordeaux); }
+html.design-neu .dn-rot .dn-ziel-icon { background: var(--dn-rot-zart); color: var(--dn-rot); }
+
+html.design-neu[data-bs-theme="dark"] .dn-blau .dn-ziel-icon { color: #9cc3dc; }
+html.design-neu[data-bs-theme="dark"] .dn-bordeaux .dn-ziel-icon { color: #f08a93; }
+
+@media (max-width: 575.98px) {
+    html.design-neu .dn-hero {
+        padding: 20px 20px 42px;
+        border-radius: var(--dn-r-l);
+    }
+
+    html.design-neu .dn-hero.dn-hero-zu {
+        padding-bottom: 28px;
+    }
+
+    html.design-neu .dn-wetter-text {
+        display: none;
+    }
+
+}
+
+/* ---------- Hauptmenü: „Meine Spaces“ steckt im Fach „Mehr“ ---------- */
+html.design-neu #top-menu-nav > li:has(> #space-menu) {
+    display: none !important;
+}
+
+/* ---------- Fach „Mehr“ ---------- */
+html.design-neu .dn-mehr {
+    position: fixed;
+    inset: 0;
+    z-index: 1045;
+}
+
+html.design-neu .dn-mehr[hidden] {
+    display: none;
+}
+
+html.design-neu .dn-mehr-hinter {
+    position: absolute;
+    inset: 0;
+    background: rgba(20, 32, 42, .35);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+    animation: dn-ein .2s ease;
+}
+
+html.design-neu .dn-mehr-fach {
+    position: absolute;
+    top: calc(var(--hh-ct-top-bar-height) + 12px);
+    left: 50%;
+    width: min(460px, calc(100vw - 24px));
+    max-height: calc(100vh - var(--hh-ct-top-bar-height) - 36px);
+    overflow-y: auto;
+    transform: translateX(-50%);
+    padding: 8px 18px 20px;
+    border-radius: var(--dn-r-xl);
+    background: var(--dn-karte);
+    box-shadow: 0 30px 80px rgba(20, 35, 45, .3);
+    animation: dn-auf .22s cubic-bezier(.2, .9, .3, 1.1);
+}
+
+html.design-neu .dn-mehr-griff {
+    display: none;
+}
+
+html.design-neu .dn-mehr-kopf {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0 12px;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+html.design-neu .dn-mehr-kopf strong {
+    font-weight: 800;
+}
+
+/* „Mehr“ in der Leiste hervorheben, solange das Fach offen ist */
+html.design-neu.dn-mehr-offen #top-menu-nav > li > a[data-dn-mehr] {
+    color: var(--dn-blau) !important;
+}
+
+@media (min-width: 576px) {
+    html.design-neu.dn-mehr-offen #topbar > .container > #top-menu-nav > li > a[data-dn-mehr] {
+        background-color: #fff !important;
+        color: var(--dn-blau-tief) !important;
+    }
+}
+
+@media (max-width: 575.98px) {
+    html.design-neu.dn-mehr-offen body #topbar > .container > #top-menu-nav > li > a[data-dn-mehr] i {
+        background-color: var(--dn-blau-zart);
+    }
+}
+
+html.design-neu .dn-mehr-zu {
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--dn-feld);
+    color: var(--dn-text-leise);
+}
+
+html.design-neu .dn-mehr-ziele {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+html.design-neu .dn-mehr .dn-ziel {
+    background: var(--hh-background-color-secondary);
+    box-shadow: none;
+}
+
+html.design-neu .dn-mehr .dn-ziel:hover {
+    box-shadow: var(--dn-schatten);
+}
+
+html.design-neu .dn-ziel-icon i {
+    line-height: 1;
+}
+
+@keyframes dn-ein { from { opacity: 0; } }
+@keyframes dn-auf { from { opacity: 0; transform: translateX(-50%) translateY(-8px) scale(.98); } }
+@keyframes dn-hoch { from { transform: translateY(100%); } }
+
+/* Handy: Fach kommt von unten und liegt über der Leiste */
+@media (max-width: 575.98px) {
+    html.design-neu .dn-mehr {
+        z-index: 1050;
+    }
+
+    html.design-neu .dn-mehr-fach {
+        top: auto;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        max-height: 85vh;
+        transform: none;
+        padding: 6px 16px calc(20px + var(--hh-mobile-app-safe-area-inset-bottom, env(safe-area-inset-bottom)));
+        border-radius: var(--dn-r-xl) var(--dn-r-xl) 0 0;
+        animation: dn-hoch .25s cubic-bezier(.2, .9, .3, 1);
+    }
+
+    html.design-neu .dn-mehr-griff {
+        display: block;
+        width: 40px;
+        height: 5px;
+        margin: 4px auto 0;
+        border-radius: 999px;
+        background: var(--dn-linie);
+    }
+
+    html.design-neu.dn-mehr-offen body {
+        overflow: hidden;
+    }
+}
+
+/* ---------- Bewegung reduzieren, wenn gewünscht ---------- */
+@media (prefers-reduced-motion: reduce) {
+    html.design-neu *,
+    html.design-neu *::before,
+    html.design-neu *::after {
+        transition: none !important;
+        animation: none !important;
+    }
+}

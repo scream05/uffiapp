@@ -1,0 +1,10 @@
+{
+  "id": "facebook",
+  "name": "Facebook-Beiträge der Stadt",
+  "description": "Übernimmt die Beiträge der Facebook-Seite der Stadt Uffenheim (mit deren Zustimmung) in den Space „Rathaus Uffenheim“.",
+  "keywords": ["facebook", "stadt", "import"],
+  "version": "0.1.0",
+  "humhub": {
+    "minVersion": "1.18"
+  }
+}

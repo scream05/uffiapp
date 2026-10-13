@@ -1,0 +1,10 @@
+{
+  "id": "notdienst",
+  "name": "Notdienste",
+  "description": "Notrufnummern und aktueller Apotheken-Notdienst rund um Uffenheim (Daten: Bayerische Landesapothekerkammer).",
+  "keywords": ["notdienst", "apotheke", "notruf"],
+  "version": "0.1.0",
+  "humhub": {
+    "minVersion": "1.18"
+  }
+}

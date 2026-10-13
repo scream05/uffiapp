@@ -1,0 +1,252 @@
+{
+  "id": "urkunden",
+  "titel": "Urkundenanforderung beim Standesamt Uffenheim",
+  "zweck": "Geburts-, Heirats- oder Sterbeurkunde bzw. beglaubigten Registerauszug schriftlich beim Standesamt Uffenheim anfordern",
+  "ablauf": "Nur möglich, wenn der Eintrag beim Standesamt Uffenheim geführt wird (Geburt/Heirat/Tod in Uffenheim). Berechtigt sind die Person selbst, Ehegatten, Vorfahren und Nachkommen; andere Personen müssen ein rechtliches Interesse glaubhaft machen. Gebühr: 12 Euro je Urkunde (auch mehrsprachig) bzw. je beglaubigtem Registerauszug; für Rentenzwecke gebührenfrei. Zahlung per Überweisung vorab (IBAN DE42 7625 1020 0620 0091 00, Verwendungszweck „Standesamt“) oder auf Rechnung. Das ausgedruckte Formular unterschreiben, eine Kopie von Personalausweis oder Reisepass beilegen (ggf. Überweisungsbeleg) und senden an: Standesamt Uffenheim, Marktplatz 16, 97215 Uffenheim. Alternativ online: https://formular.komuna.net/intelliform/forms/uffenheim/verwaltung/pool/urkundenbestellung/index",
+  "quelle": "https://www.uffenheim.de/rathaus-buergerservice/buergerservice/leistungen-a-z/leistung/geburtsurkunde-beantragung-63162",
+  "vorlage": "urkunden.pdf",
+  "dateiname": "Urkundenanforderung",
+  "felder": [
+    {
+      "name": "name",
+      "label": "Name (Familienname) der antragstellenden Person",
+      "pflicht": true
+    },
+    {
+      "name": "vorname",
+      "label": "Vorname der antragstellenden Person",
+      "pflicht": true
+    },
+    {
+      "name": "strasse",
+      "label": "Straße und Hausnummer",
+      "pflicht": true
+    },
+    {
+      "name": "plz_ort",
+      "label": "PLZ und Ort",
+      "pflicht": true
+    },
+    {
+      "name": "urkunden",
+      "label": "Welche Urkunde(n)?",
+      "typ": "mehrfach",
+      "pflicht": true,
+      "optionen": [
+        "Geburtsurkunde",
+        "Heiratsurkunde",
+        "Sterbeurkunde",
+        "Geburtsregister-Auszug",
+        "Heiratsregister-Auszug",
+        "Sterberegister-Auszug",
+        "Geburtsurkunde international",
+        "Heiratsurkunde international",
+        "Sterbeurkunde international"
+      ],
+      "hinweis": "Registerauszug = beglaubigter Ausdruck mit allen Einträgen; international = mehrsprachig"
+    },
+    {
+      "name": "ereignis_ort",
+      "label": "Ort der Geburt / Heirat / des Todes",
+      "pflicht": true
+    },
+    {
+      "name": "ereignis_datum",
+      "label": "Datum der Geburt / Heirat / des Todes",
+      "typ": "datum",
+      "pflicht": true
+    },
+    {
+      "name": "anzahl",
+      "label": "Anzahl der Exemplare",
+      "typ": "zahl",
+      "hinweis": "Standard 1"
+    },
+    {
+      "name": "zahlung",
+      "label": "Zahlung",
+      "typ": "auswahl",
+      "optionen": [
+        "Überweisung vorab",
+        "Rechnung",
+        "gebührenfrei für Rentenzwecke"
+      ],
+      "pflicht": true
+    }
+  ],
+  "druck": [
+    {
+      "feld": "name",
+      "seite": 1,
+      "x": 106,
+      "y": 87,
+      "breite": 136
+    },
+    {
+      "feld": "vorname",
+      "seite": 1,
+      "x": 299,
+      "y": 87,
+      "breite": 220
+    },
+    {
+      "feld": "strasse",
+      "seite": 1,
+      "x": 149,
+      "y": 114.5,
+      "breite": 95
+    },
+    {
+      "feld": "plz_ort",
+      "seite": 1,
+      "x": 290,
+      "y": 114.5,
+      "breite": 230
+    },
+    {
+      "feld": "urkunden",
+      "wert": "Geburtsurkunde",
+      "seite": 1,
+      "x": 73.5,
+      "y": 167.5
+    },
+    {
+      "feld": "urkunden",
+      "wert": "Heiratsurkunde",
+      "seite": 1,
+      "x": 179.7,
+      "y": 167.5
+    },
+    {
+      "feld": "urkunden",
+      "wert": "Sterbeurkunde",
+      "seite": 1,
+      "x": 285.9,
+      "y": 167.5
+    },
+    {
+      "feld": "urkunden",
+      "wert": "Geburtsregister-Auszug",
+      "seite": 1,
+      "x": 234.1,
+      "y": 199.7
+    },
+    {
+      "feld": "urkunden",
+      "wert": "Heiratsregister-Auszug",
+      "seite": 1,
+      "x": 312.6,
+      "y": 199.7
+    },
+    {
+      "feld": "urkunden",
+      "wert": "Sterberegister-Auszug",
+      "seite": 1,
+      "x": 383,
+      "y": 199.7
+    },
+    {
+      "feld": "urkunden",
+      "wert": "Geburtsurkunde international",
+      "seite": 1,
+      "x": 120.1,
+      "y": 231.9
+    },
+    {
+      "feld": "urkunden",
+      "wert": "Heiratsurkunde international",
+      "seite": 1,
+      "x": 190.6,
+      "y": 231.9
+    },
+    {
+      "feld": "urkunden",
+      "wert": "Sterbeurkunde international",
+      "seite": 1,
+      "x": 258.5,
+      "y": 231.9
+    },
+    {
+      "feld": "ereignis_ort",
+      "seite": 1,
+      "x": 222,
+      "y": 261.5,
+      "breite": 300
+    },
+    {
+      "feld": "ereignis_datum",
+      "seite": 1,
+      "x": 237,
+      "y": 289.5,
+      "breite": 150
+    },
+    {
+      "feld": "zahlung",
+      "wert": "Überweisung vorab",
+      "seite": 1,
+      "x": 73.5,
+      "y": 328.5
+    },
+    {
+      "feld": "zahlung",
+      "wert": "Rechnung",
+      "seite": 1,
+      "x": 73.5,
+      "y": 419.5
+    },
+    {
+      "feld": "zahlung",
+      "wert": "gebührenfrei für Rentenzwecke",
+      "seite": 1,
+      "x": 73.5,
+      "y": 447
+    },
+    {
+      "feld": "urk_urkunde",
+      "wert": "ja",
+      "seite": 1,
+      "x": 73.5,
+      "y": 359.5
+    },
+    {
+      "feld": "urk_auszug",
+      "wert": "ja",
+      "seite": 1,
+      "x": 73.5,
+      "y": 387.5
+    },
+    {
+      "text": "Anzahl: {anzahl}",
+      "seite": 1,
+      "x": 475,
+      "y": 360,
+      "breite": 60,
+      "groesse": 9
+    }
+  ],
+  "ableiten": [
+    {
+      "name": "urk_urkunde",
+      "wenn": {
+        "urkunden": [
+          "Geburtsurkunde",
+          "Heiratsurkunde",
+          "Sterbeurkunde",
+          "Geburtsurkunde international",
+          "Heiratsurkunde international",
+          "Sterbeurkunde international"
+        ]
+      }
+    },
+    {
+      "name": "urk_auszug",
+      "wenn": {
+        "urkunden": [
+          "Geburtsregister-Auszug",
+          "Heiratsregister-Auszug",
+          "Sterberegister-Auszug"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "id": "vollmacht-ausweis",
+  "titel": "Vollmacht zur Abholung des Ausweisdokuments",
+  "zweck": "Eine andere Person darf den neuen Personalausweis oder Reisepass im Bürgerbüro abholen",
+  "ablauf": "Die Vollmacht unterschreibt die Person, deren Ausweis abgeholt wird. Die bevollmächtigte Person bringt zur Abholung mit: ihr eigenes gültiges Ausweisdokument, diese unterschriebene Vollmacht und das bisherige Ausweisdokument der Vollmacht gebenden Person (sofern vorhanden). Alternativ online: https://formular.komuna.net/intelliform/forms/uffenheim/verwaltung/pool/vollmacht_ausweisdokument/index . Den Bearbeitungsstand kann man hier abfragen: https://serviceportal.komuna.net/uffenheim/rsp/papass/start?x=5628233",
+  "quelle": "https://www.uffenheim.de/rathaus-buergerservice/buergerservice/leistungen-a-z/leistung/personalausweis-beantragung-63118",
+  "vorlage": "vollmacht-ausweis.pdf",
+  "dateiname": "Vollmacht-Ausweisabholung",
+  "felder": [
+    {"name": "geber_name", "label": "Vollmachtgeber: Vorname, Familienname, ggf. Geburtsname", "pflicht": true},
+    {"name": "geber_geburtsdatum", "label": "Vollmachtgeber: Geburtsdatum", "typ": "datum", "pflicht": true},
+    {"name": "geber_geburtsort", "label": "Vollmachtgeber: Geburtsort", "pflicht": true},
+    {"name": "bev_name", "label": "Bevollmächtigte Person: Vorname, Familienname, ggf. Geburtsname", "pflicht": true},
+    {"name": "bev_geburtsdatum", "label": "Bevollmächtigte Person: Geburtsdatum", "typ": "datum", "pflicht": true},
+    {"name": "bev_geburtsort", "label": "Bevollmächtigte Person: Geburtsort", "pflicht": true},
+    {"name": "dokument", "label": "Welches Dokument wird abgeholt?", "typ": "mehrfach", "optionen": ["Personalausweis", "Reisepass"], "pflicht": true},
+    {"name": "altes_dokument", "label": "Was soll mit dem bisherigen Ausweisdokument geschehen?", "typ": "auswahl", "optionen": ["entwerten und zurückgeben", "abgeben und vernichten"], "pflicht": true},
+    {"name": "ort", "label": "Ort der Unterschrift", "pflicht": true, "hinweis": "z. B. Uffenheim"}
+  ],
+  "druck": [
+    {"feld": "geber_name", "seite": 1, "x": 73, "y": 179, "breite": 378},
+    {"feld": "geber_geburtsdatum", "seite": 1, "x": 73, "y": 228.5, "breite": 128},
+    {"feld": "geber_geburtsort", "seite": 1, "x": 257, "y": 228.5, "breite": 195},
+    {"feld": "bev_name", "seite": 1, "x": 123, "y": 317, "breite": 396},
+    {"feld": "bev_geburtsdatum", "seite": 1, "x": 123, "y": 367, "breite": 145},
+    {"feld": "bev_geburtsort", "seite": 1, "x": 314, "y": 367, "breite": 205},
+    {"feld": "dokument", "wert": "Personalausweis", "seite": 1, "x": 116, "y": 548.5},
+    {"feld": "dokument", "wert": "Reisepass", "seite": 1, "x": 265, "y": 548.5},
+    {"feld": "altes_dokument", "wert": "entwerten und zurückgeben", "seite": 1, "x": 116.5, "y": 615.5},
+    {"feld": "altes_dokument", "wert": "abgeben und vernichten", "seite": 1, "x": 116.5, "y": 652},
+    {"feld": "ort", "seite": 1, "x": 73, "y": 727.5, "breite": 92},
+    {"text": "{heute}", "seite": 1, "x": 207, "y": 727.5, "breite": 80}
+  ]
+}

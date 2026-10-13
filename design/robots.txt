@@ -1,0 +1,9 @@
+# community.rundumuffni.de – öffentliche Seiten dürfen in Suchmaschinen.
+# Vereinsseiten und Mitteilungsblatt sind lesbar, tragen aber „X-Robots-Tag: noindex“
+# (deshalb hier nicht gesperrt – sonst sieht die Suchmaschine das noindex nicht).
+User-agent: *
+Disallow: /ki-assistent/
+Disallow: /maengelmelder/tile
+Disallow: /user/
+Disallow: /search
+Disallow: /mitteilungsblatt/index/pdf

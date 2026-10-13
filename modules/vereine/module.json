@@ -1,0 +1,10 @@
+{
+  "id": "vereine",
+  "name": "Vereine",
+  "description": "Vereinsverzeichnis mit Vorstellungsseiten; Vereinsverwalter tragen Termine in den gemeinsamen Kalender ein.",
+  "keywords": ["vereine", "kalender", "verzeichnis"],
+  "version": "0.1.0",
+  "humhub": {
+    "minVersion": "1.18"
+  }
+}

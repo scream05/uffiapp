@@ -1,0 +1,43 @@
+{
+  "id": "wohnungsgeber",
+  "titel": "Wohnungsgeberbestätigung",
+  "zweck": "Bestätigung des Vermieters/Wohnungsgebers über Ein- oder Auszug, nötig für die An- oder Abmeldung beim Einwohnermeldeamt",
+  "ablauf": "Die Bestätigung stellt der Wohnungsgeber (Vermieter oder eine von ihm beauftragte Person) aus und unterschreibt sie. Die umziehende Person legt sie bei der Anmeldung im Bürgerbüro der Verwaltungsgemeinschaft Uffenheim vor, zusammen mit Personalausweis/Reisepass aller anzumeldenden Personen. Frist: Anmeldung innerhalb von zwei Wochen nach dem Einzug (sonst Bußgeld bis 1.000 Euro). Alternativ online: Voranmeldung eines Zuzugs mit integriertem Wohnungsgeberformular unter https://serviceportal.komuna.net/uffenheim/rsp/zuzug/start?x=5628233",
+  "quelle": "https://www.uffenheim.de/rathaus-buergerservice/buergerservice/leistungen-a-z/leistung/wohnsitz-anmeldung-63179",
+  "vorlage": "wohnungsgeber.pdf",
+  "dateiname": "Wohnungsgeberbestaetigung",
+  "felder": [
+    {"name": "wg_name", "label": "Wohnungsgeber: Familienname, Vorname (oder Firma)", "pflicht": true},
+    {"name": "wg_plz_ort", "label": "Wohnungsgeber: PLZ und Ort", "pflicht": true},
+    {"name": "wg_strasse", "label": "Wohnungsgeber: Straße und Hausnummer", "pflicht": true},
+    {"name": "eigentuemer", "label": "Ist der Wohnungsgeber auch Eigentümer der Wohnung?", "typ": "auswahl", "optionen": ["ja", "nein"], "pflicht": true},
+    {"name": "eig_name", "label": "Eigentümer: Familienname, Vorname (oder Firma)", "pflicht": true, "nur_wenn": {"eigentuemer": "nein"}},
+    {"name": "eig_plz_ort", "label": "Eigentümer: PLZ und Ort", "pflicht": true, "nur_wenn": {"eigentuemer": "nein"}},
+    {"name": "eig_strasse", "label": "Eigentümer: Straße und Hausnummer", "pflicht": true, "nur_wenn": {"eigentuemer": "nein"}},
+    {"name": "whg_plz_ort", "label": "Wohnung: PLZ und Ort", "pflicht": true, "hinweis": "meist 97215 Uffenheim"},
+    {"name": "whg_strasse", "label": "Wohnung: Straße und Hausnummer", "pflicht": true},
+    {"name": "whg_zusatz", "label": "Wohnung: Zusatzangaben (z. B. Stockwerk, Wohnungsnummer)"},
+    {"name": "art", "label": "Einzug oder Auszug?", "typ": "auswahl", "optionen": ["eingezogen", "ausgezogen"], "pflicht": true},
+    {"name": "datum", "label": "Datum des Ein- bzw. Auszugs", "typ": "datum", "pflicht": true},
+    {"name": "personen", "label": "Ein-/ausgezogene Personen", "pflicht": true, "max": 600, "hinweis": "Format: Familienname, Vorname; Familienname, Vorname (höchstens 6 Personen)"}
+  ],
+  "druck": [
+    {"feld": "wg_name", "seite": 1, "x": 248, "y": 124.5, "breite": 305},
+    {"feld": "wg_plz_ort", "seite": 1, "x": 248, "y": 145, "breite": 305},
+    {"feld": "wg_strasse", "seite": 1, "x": 248, "y": 165.5, "breite": 305},
+    {"feld": "eigentuemer", "wert": "ja", "seite": 1, "x": 53.5, "y": 195.5},
+    {"feld": "eigentuemer", "wert": "nein", "seite": 1, "x": 53.5, "y": 215.5},
+    {"feld": "eig_name", "seite": 1, "x": 248, "y": 244, "breite": 305},
+    {"feld": "eig_plz_ort", "seite": 1, "x": 248, "y": 264.5, "breite": 305},
+    {"feld": "eig_strasse", "seite": 1, "x": 248, "y": 285, "breite": 305},
+    {"feld": "whg_plz_ort", "seite": 1, "x": 248, "y": 331, "breite": 305},
+    {"feld": "whg_strasse", "seite": 1, "x": 248, "y": 351.5, "breite": 305},
+    {"feld": "whg_zusatz", "seite": 1, "x": 248, "y": 372, "breite": 305},
+    {"feld": "datum", "seite": 1, "x": 260, "y": 400, "breite": 90},
+    {"feld": "art", "wert": "eingezogen", "seite": 1, "x": 449.5, "y": 400.5},
+    {"feld": "art", "wert": "ausgezogen", "seite": 1, "x": 449.5, "y": 420},
+    {"feld": "personen", "seite": 1, "zeilen": [467.5, 489, 511, 533, 554.5, 576.5],
+      "spalten": [{"x": 121, "breite": 228}, {"x": 405, "breite": 150}]},
+    {"text": "{heute}", "seite": 1, "x": 80, "y": 756, "breite": 80}
+  ]
+}

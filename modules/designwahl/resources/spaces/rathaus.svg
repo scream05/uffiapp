@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Rathaus Uffenheim">
+  <!-- Space-Symbol im Design „Uffi frisch“ (eigene Zeichnung) -->
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5d8aa6"/>
+      <stop offset="1" stop-color="#24435a"/>
+    </linearGradient>
+    <radialGradient id="l" cx=".25" cy=".15" r=".8">
+      <stop offset="0" stop-color="#fff" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="128" height="128" fill="url(#g)"/>
+  <rect width="128" height="128" fill="url(#l)"/>
+  <path d="M0 104 C24 94 44 110 70 102 S108 90 128 98 V128 H0 Z" fill="#fff" opacity=".14"/>
+  <path d="M0 114 C30 104 52 120 82 112 S116 104 128 110 V128 H0 Z" fill="#fff" opacity=".12"/>
+  <g fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M30 92 V60 H98 V92"/>
+    <path d="M24 92 H104"/>
+    <path d="M50 60 V44 L64 30 L78 44 V60"/>
+    <path d="M64 30 V22"/>
+    <circle cx="64" cy="48" r="5" fill="#fff" stroke="none"/>
+    <path d="M57 92 V80 a7 7 0 0 1 14 0 V92"/>
+    <path d="M38 70 V78 M90 70 V78"/>
+  </g>
+</svg>

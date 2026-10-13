@@ -1,0 +1,602 @@
+[
+ {
+  "name": "AC Uffenheim e. V. im ADAC",
+  "kategorie": "Sport",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "ASB Regionalverband Bad Windsheim e. V.",
+  "kategorie": "Feuerwehr & Rettung",
+  "ortsteil": "Region",
+  "website": "https://www.asb-die-samariter.de"
+ },
+ {
+  "name": "ASF Uffenheim",
+  "kategorie": "Politik",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "AWO Ortsverein Uffenheim",
+  "kategorie": "Kirche & Soziales",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Bayerischer Bauernverband",
+  "kategorie": "Sonstiges",
+  "ortsteil": "Region",
+  "website": "https://www.bayerischerbauernverband.de/neustadt-uffenheim"
+ },
+ {
+  "name": "Bayerisches Rotes Kreuz – Bereitschaft Uffenheim",
+  "kategorie": "Feuerwehr & Rettung",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Böllerschützen des Trachtenverein Uffenheim 2011 e. V.",
+  "kategorie": "Schützen & Tradition",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Bund Naturschutz",
+  "kategorie": "Natur, Garten & Tiere",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Bündnis 90 / Die Grünen OV Uffenheim",
+  "kategorie": "Politik",
+  "ortsteil": "Uffenheim",
+  "website": "https://www.gruene-neustadt-aisch.de/ortsverbaende/ov-uffenheim/"
+ },
+ {
+  "name": "Bündnis gg. Rechtsextremismus – für Demokratie und Toleranz",
+  "kategorie": "Sonstiges",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Bürgerliste Uffenheim e. V.",
+  "kategorie": "Politik",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "CjB Uffenheim",
+  "kategorie": "Jugend",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Collegium vocale Uffenheim",
+  "kategorie": "Musik & Gesang",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "CSU Ortsverband Uffenheim",
+  "kategorie": "Politik",
+  "ortsteil": "Uffenheim",
+  "website": "https://www.csu.de/verbaende/ov/uffenheim/"
+ },
+ {
+  "name": "1. DC \"Sligo Power\" Uffenheim e. V. (Steeldart)",
+  "kategorie": "Sport",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Deutsch-Italienischer-Verein e. V.",
+  "kategorie": "Partnerschaft & Begegnung",
+  "ortsteil": "Uffenheim",
+  "website": "http://www.div-uffenheim.de"
+ },
+ {
+  "name": "Deutsch Polnischer Partnerschaftsverein",
+  "kategorie": "Partnerschaft & Begegnung",
+  "ortsteil": "Uffenheim",
+  "website": "http://www.dppv-uffenheim.de"
+ },
+ {
+  "name": "DPSG-Pfadfinderstamm Uffenheim",
+  "kategorie": "Jugend",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "ELJ – Kreisverband Uffenheim",
+  "kategorie": "Jugend",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Evang. Kantorei Uffenheim",
+  "kategorie": "Musik & Gesang",
+  "ortsteil": "Uffenheim",
+  "website": "https://www.dekanat-uffenheim.de/musik/evang-kantorei-uffenheim"
+ },
+ {
+  "name": "Evangelische Jugend Uffenheim",
+  "kategorie": "Jugend",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Fischereiverein Uffenheim",
+  "kategorie": "Natur, Garten & Tiere",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Förderverein des 1. FV Uffenheim",
+  "kategorie": "Förderverein",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Freiwillige Feuerwehr Brackenlohr",
+  "kategorie": "Feuerwehr & Rettung",
+  "ortsteil": "Brackenlohr",
+  "website": ""
+ },
+ {
+  "name": "Freiwillige Feuerwehr Custenlohr",
+  "kategorie": "Feuerwehr & Rettung",
+  "ortsteil": "Custenlohr",
+  "website": ""
+ },
+ {
+  "name": "Freiwillige Feuerwehr Langensteinach",
+  "kategorie": "Feuerwehr & Rettung",
+  "ortsteil": "Langensteinach",
+  "website": ""
+ },
+ {
+  "name": "Freiwillige Feuerwehr Rudolzhofen",
+  "kategorie": "Feuerwehr & Rettung",
+  "ortsteil": "Rudolzhofen",
+  "website": ""
+ },
+ {
+  "name": "Freiwillige Feuerwehr Uffenheim",
+  "kategorie": "Feuerwehr & Rettung",
+  "ortsteil": "Uffenheim",
+  "website": "https://www.ffw-uffenheim.de"
+ },
+ {
+  "name": "Freiwillige Feuerwehr Uttenhofen",
+  "kategorie": "Feuerwehr & Rettung",
+  "ortsteil": "Uttenhofen",
+  "website": ""
+ },
+ {
+  "name": "Freiwillige Feuerwehr Vorderpfeinach",
+  "kategorie": "Feuerwehr & Rettung",
+  "ortsteil": "Custenlohr",
+  "website": ""
+ },
+ {
+  "name": "Freiwillige Feuerwehr Wallmersbach",
+  "kategorie": "Feuerwehr & Rettung",
+  "ortsteil": "Wallmersbach",
+  "website": ""
+ },
+ {
+  "name": "Freiwillige Feuerwehr Welbhausen",
+  "kategorie": "Feuerwehr & Rettung",
+  "ortsteil": "Welbhausen",
+  "website": ""
+ },
+ {
+  "name": "1. FV Uffenheim – Tischtennisabteilung",
+  "kategorie": "Sport",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "1. FV Uffenheim 1926 e. V.",
+  "kategorie": "Sport",
+  "ortsteil": "Uffenheim",
+  "website": "http://www.fv-uffenheim.de"
+ },
+ {
+  "name": "Gewerbeverein Uffenheim",
+  "kategorie": "Sonstiges",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Gollachgau Musikanten",
+  "kategorie": "Musik & Gesang",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Heimat- u. Museumsverein Uffenheim und Umgebung e. V.",
+  "kategorie": "Kultur & Heimat",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Hospizverein Uffenheim e. V.",
+  "kategorie": "Kirche & Soziales",
+  "ortsteil": "Uffenheim",
+  "website": "http://www.hospizverein-uffenheim.de"
+ },
+ {
+  "name": "Imkerverein Uffenheim",
+  "kategorie": "Natur, Garten & Tiere",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Jagdschutz- und Jägerverein",
+  "kategorie": "Natur, Garten & Tiere",
+  "ortsteil": "Uffenheim",
+  "website": "http://www.jägerverein-uffenheim.de"
+ },
+ {
+  "name": "Kleintierzüchterverein Uffenheim e. V.",
+  "kategorie": "Natur, Garten & Tiere",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Komitee für die Städtepartnerschaft Egletons-Uffenheim",
+  "kategorie": "Partnerschaft & Begegnung",
+  "ortsteil": "Uffenheim",
+  "website": "https://egletons-uffenheim.de"
+ },
+ {
+  "name": "Königlich-privilegierte Schützengesellschaft 1604 Uffenheim",
+  "kategorie": "Schützen & Tradition",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Landesbund für Vogel- und Naturschutz (LBV) – Kreisverband",
+  "kategorie": "Natur, Garten & Tiere",
+  "ortsteil": "Region",
+  "website": "https://www.lbv.de/aktiv-werden/termine"
+ },
+ {
+  "name": "Landesbund für Vogel- und Naturschutz (LBV) – Ortsgruppe Uffenheim",
+  "kategorie": "Natur, Garten & Tiere",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Landjugend Langensteinach",
+  "kategorie": "Jugend",
+  "ortsteil": "Langensteinach",
+  "website": ""
+ },
+ {
+  "name": "Landjugend Rudolzhofen",
+  "kategorie": "Jugend",
+  "ortsteil": "Rudolzhofen",
+  "website": ""
+ },
+ {
+  "name": "Landjugend Uttenhofen",
+  "kategorie": "Jugend",
+  "ortsteil": "Uttenhofen",
+  "website": ""
+ },
+ {
+  "name": "Landjugend Wallmersbach",
+  "kategorie": "Jugend",
+  "ortsteil": "Wallmersbach",
+  "website": ""
+ },
+ {
+  "name": "Landjugend Welbhausen",
+  "kategorie": "Jugend",
+  "ortsteil": "Welbhausen",
+  "website": ""
+ },
+ {
+  "name": "Liederkranz Uffenheim",
+  "kategorie": "Musik & Gesang",
+  "ortsteil": "Uffenheim",
+  "website": "http://www.liederkranz1838uffenheim.de"
+ },
+ {
+  "name": "Lionsclub Uffenheim-Rothenburg",
+  "kategorie": "Kirche & Soziales",
+  "ortsteil": "Region",
+  "website": "https://www.lionsclub-rothenburg.de/"
+ },
+ {
+  "name": "Löwen Fanclub",
+  "kategorie": "Sonstiges",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Motorradclub Uffenheim e. V.",
+  "kategorie": "Sonstiges",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Obst- und Gartenbauverein Brackenlohr",
+  "kategorie": "Natur, Garten & Tiere",
+  "ortsteil": "Brackenlohr",
+  "website": ""
+ },
+ {
+  "name": "Obst- und Gartenbauverein Custenlohr-Pfeinach",
+  "kategorie": "Natur, Garten & Tiere",
+  "ortsteil": "Custenlohr",
+  "website": ""
+ },
+ {
+  "name": "Obst- und Gartenbauverein Langensteinach",
+  "kategorie": "Natur, Garten & Tiere",
+  "ortsteil": "Langensteinach",
+  "website": ""
+ },
+ {
+  "name": "Obst- und Gartenbauverein Rudolzhofen",
+  "kategorie": "Natur, Garten & Tiere",
+  "ortsteil": "Rudolzhofen",
+  "website": ""
+ },
+ {
+  "name": "Obst- und Gartenbauverein Uffenheim",
+  "kategorie": "Natur, Garten & Tiere",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Obst- und Gartenbauverein Uttenhofen",
+  "kategorie": "Natur, Garten & Tiere",
+  "ortsteil": "Uttenhofen",
+  "website": ""
+ },
+ {
+  "name": "Obst- und Gartenbauverein Wallmersbach",
+  "kategorie": "Natur, Garten & Tiere",
+  "ortsteil": "Wallmersbach",
+  "website": ""
+ },
+ {
+  "name": "Obst- und Gartenbauverein Welbhausen",
+  "kategorie": "Natur, Garten & Tiere",
+  "ortsteil": "Welbhausen",
+  "website": ""
+ },
+ {
+  "name": "Oldtimerfreunde Uffenheim",
+  "kategorie": "Sonstiges",
+  "ortsteil": "Uffenheim",
+  "website": "http://www.oldie-uff.de"
+ },
+ {
+  "name": "Posaunenchor Langensteinach",
+  "kategorie": "Musik & Gesang",
+  "ortsteil": "Langensteinach",
+  "website": ""
+ },
+ {
+  "name": "Posaunenchor Uffenheim",
+  "kategorie": "Musik & Gesang",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Reginswind e. V.",
+  "kategorie": "Sonstiges",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Reha-Vital-Sport-Gemeinschaft Uffenheim",
+  "kategorie": "Sport",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Reit- und Fahrverein Uffenheim e. V.",
+  "kategorie": "Sport",
+  "ortsteil": "Uffenheim",
+  "website": "https://www.reitundfahrvereinuffenheim.de"
+ },
+ {
+  "name": "Rotary Club Uffenheim",
+  "kategorie": "Kirche & Soziales",
+  "ortsteil": "Uffenheim",
+  "website": "https://uffenheim.rotary.de/"
+ },
+ {
+  "name": "Sängerkranz Wallmersbach",
+  "kategorie": "Musik & Gesang",
+  "ortsteil": "Wallmersbach",
+  "website": ""
+ },
+ {
+  "name": "SBU Uffenheim",
+  "kategorie": "Sport",
+  "ortsteil": "Uffenheim",
+  "website": "http://www.sbu-uffenheim.org/"
+ },
+ {
+  "name": "SBU Abteilung Badminton",
+  "kategorie": "Sport",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "SBU Abteilung Basketball",
+  "kategorie": "Sport",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "SBU Abteilung Moderner Fünfkampf",
+  "kategorie": "Sport",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "SBU Abteilung Radsport",
+  "kategorie": "Sport",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "SBU Abteilung Schwimmen",
+  "kategorie": "Sport",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "SBU Abteilung Turnen",
+  "kategorie": "Sport",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "SBU Abteilung Volleyball",
+  "kategorie": "Sport",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Schützenverein 1954 Langensteinach e. V.",
+  "kategorie": "Schützen & Tradition",
+  "ortsteil": "Langensteinach",
+  "website": ""
+ },
+ {
+  "name": "Schützenverein Custenlohr",
+  "kategorie": "Schützen & Tradition",
+  "ortsteil": "Custenlohr",
+  "website": ""
+ },
+ {
+  "name": "Schützenverein Rudolzhofen",
+  "kategorie": "Schützen & Tradition",
+  "ortsteil": "Rudolzhofen",
+  "website": ""
+ },
+ {
+  "name": "Schützenverein Wallmersbach e. V.",
+  "kategorie": "Schützen & Tradition",
+  "ortsteil": "Wallmersbach",
+  "website": ""
+ },
+ {
+  "name": "Segelflugverein e. V. Uffenheim",
+  "kategorie": "Sport",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Skatclub Hohenlohe",
+  "kategorie": "Sonstiges",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Soldatenkameradschaft Custenlohr",
+  "kategorie": "Schützen & Tradition",
+  "ortsteil": "Custenlohr",
+  "website": ""
+ },
+ {
+  "name": "Soldatenkameradschaft Langensteinach",
+  "kategorie": "Schützen & Tradition",
+  "ortsteil": "Langensteinach",
+  "website": ""
+ },
+ {
+  "name": "Sportschützenverein Welbhausen",
+  "kategorie": "Schützen & Tradition",
+  "ortsteil": "Welbhausen",
+  "website": "http://www.welbhausen.de"
+ },
+ {
+  "name": "Steigerwaldclub – Zweigverein Uffenheim",
+  "kategorie": "Kultur & Heimat",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Tanzsportclub Uffenheim e. V.",
+  "kategorie": "Sport",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Tennisclub Uffenheim e. V.",
+  "kategorie": "Sport",
+  "ortsteil": "Uffenheim",
+  "website": "https://www.tc-uffenheim.de"
+ },
+ {
+  "name": "Trachtenverein Uffenheim e. V.",
+  "kategorie": "Schützen & Tradition",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Turnverein 1875 e. V. Uffenheim",
+  "kategorie": "Sport",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Verband der Siebenbürger Sachsen e. V. – Ortsverband Uffenheim",
+  "kategorie": "Partnerschaft & Begegnung",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Verein der Freunde Christian-von-Bomhard-Schule",
+  "kategorie": "Förderverein",
+  "ortsteil": "Uffenheim",
+  "website": "http://www.bomhardfreunde.de"
+ },
+ {
+  "name": "Verein der Freunde und Förderer der Volksschule Uffenheim",
+  "kategorie": "Förderverein",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Verein \"Freunde der Kammermusik\"",
+  "kategorie": "Musik & Gesang",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Verein für Deutsche Schäferhunde",
+  "kategorie": "Natur, Garten & Tiere",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Verein für Zivil- und Wehrtechnik e. V.",
+  "kategorie": "Kultur & Heimat",
+  "ortsteil": "Uffenheim",
+  "website": "http://www.zivilundwehrtechnik.de"
+ },
+ {
+  "name": "Verein zur Förderung des Modernen Fünfkampf e. V.",
+  "kategorie": "Förderverein",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ },
+ {
+  "name": "Versicherungsverein für Brandfälle Uffenheim",
+  "kategorie": "Sonstiges",
+  "ortsteil": "Uffenheim",
+  "website": ""
+ }
+]

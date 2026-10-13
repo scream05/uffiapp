@@ -1,0 +1,98 @@
+<?php
+
+use humhub\helpers\Html;
+use humhub\modules\mitteilungsblatt\assets\PdfjsAsset;
+use yii\helpers\Url;
+
+/** @var \humhub\modules\mitteilungsblatt\models\Ausgabe $ausgabe */
+/** @var int|null $seite */
+/** @var string|null $q */
+
+$this->title = 'Mitteilungsblatt ' . $ausgabe->titel;
+$hash = array_filter(['page' => $seite, 'search' => $q]);
+$viewer = PdfjsAsset::register($this)->baseUrl . '/web/viewer.html?file='
+    . rawurlencode(Url::to(['/mitteilungsblatt/index/pdf', 'id' => $ausgabe->id]))
+    . ($hash ? '#' . http_build_query($hash, '', '&', PHP_QUERY_RFC3986) : '');
+?>
+<style <?= Html::nonce() ?>>
+    .mb-kopf { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-bottom: 10px; }
+    .mb-kopf h1 { font-size: 1.25rem; margin: 0; flex: 1 1 auto; }
+    .mb-kopf h1 small { font-size: .8em; font-weight: normal; color: var(--hh-text-color-soft, #777); }
+    .mb-kopf .btn { white-space: nowrap; }
+    #mb-reader { position: relative; height: 70vh; min-height: 360px; border-radius: 8px; overflow: hidden;
+        box-shadow: 0 0 0 1px var(--hh-border-color, #ddd); background: #525659; }
+    #mb-reader iframe { width: 100%; height: 100%; border: 0; display: block; }
+    #mb-reader .mb-schliessen { display: none; }
+    #mb-reader.mb-vollbild { position: fixed; inset: 0; z-index: 2000; height: auto !important; border-radius: 0;
+        padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+    #mb-reader.mb-vollbild .mb-schliessen { display: block; position: absolute; right: 10px; bottom: calc(14px + env(safe-area-inset-bottom));
+        z-index: 1; border-radius: 999px; box-shadow: 0 4px 14px rgba(0, 0, 0, .35); }
+    body.mb-vollbild-offen { overflow: hidden; }
+    @media (max-width: 575.98px) { .mb-kopf .mb-text { display: none; } }
+</style>
+<div class="container">
+    <div class="mb-kopf">
+        <?= Html::a('<i class="fa fa-arrow-left"></i><span class="mb-text"> Alle Ausgaben</span>', ['/mitteilungsblatt/index'],
+            ['class' => 'btn btn-light', 'title' => 'Alle Ausgaben']) ?>
+        <h1>Mitteilungsblatt <?= Html::encode($ausgabe->titel) ?> <small><?= Html::encode($ausgabe->datumText) ?></small></h1>
+        <button type="button" class="btn btn-light" id="mb-vollbild" title="Vollbild">
+            <i class="fa fa-expand"></i><span class="mb-text"> Vollbild</span></button>
+        <?= Html::a('<i class="fa fa-download"></i><span class="mb-text"> Herunterladen</span>',
+            ['/mitteilungsblatt/index/pdf', 'id' => $ausgabe->id, 'download' => 1],
+            ['class' => 'btn btn-light', 'title' => 'Herunterladen', 'data-pjax-prevent' => 1]) ?>
+    </div>
+    <div id="mb-reader" data-src="<?= Html::encode($viewer) ?>">
+        <iframe title="Mitteilungsblatt <?= Html::encode($ausgabe->titel) ?>" allow="fullscreen"></iframe>
+        <button type="button" class="btn btn-primary mb-schliessen"><i class="fa fa-compress"></i> Schließen</button>
+    </div>
+    <p class="text-muted" style="margin-top:8px;font-size:.85em">
+        Herausgeberin: Stadt Uffenheim. <?= Html::a('Original auf uffenheim.de', $ausgabe->quelle_url, ['target' => '_blank', 'rel' => 'noopener']) ?>
+    </p>
+</div>
+<script <?= Html::nonce() ?>>
+(function () {
+    var reader = document.getElementById('mb-reader');
+    var frame = reader.querySelector('iframe');
+
+    // pdf.js meldet sich vor dem Start beim umgebenden Fenster: hier die Einstellungen setzen
+    if (!window.mbViewerHook) {
+        window.mbViewerHook = true;
+        document.addEventListener('webviewerloaded', function (e) {
+            var w = e.detail && e.detail.source;
+            if (!w || !w.PDFViewerApplicationOptions) return;
+            var o = w.PDFViewerApplicationOptions;
+            o.set('disablePreferences', true);
+            o.set('localeProperties', {lang: 'de'});
+            o.set('annotationEditorMode', -1); // nur lesen, keine Zeichen-/Notizwerkzeuge
+            o.set('enableSignatureEditor', false);
+            o.set('enableComment', false);
+            o.set('disableHistory', true); // sonst landet jedes Blättern im Zurück-Verlauf des Browsers
+            o.set('sidebarViewOnLoad', 0);
+            var css = w.document.createElement('style');
+            css.textContent = '#secondaryOpenFile,#viewBookmark,#editorModeButtons,#editorModeSeparator{display:none!important}';
+            w.document.head.appendChild(css);
+        });
+    }
+    frame.src = reader.dataset.src;
+
+    // Reader bis knapp über den unteren Rand (bzw. die Tab-Leiste am Handy)
+    function hoehe() {
+        if (!document.body.contains(reader)) {
+            window.removeEventListener('resize', hoehe);
+            return;
+        }
+        var unten = parseFloat(getComputedStyle(document.body).paddingBottom) || 0;
+        var h = window.innerHeight - reader.getBoundingClientRect().top - unten - 12;
+        reader.style.height = Math.max(360, h) + 'px';
+    }
+    hoehe();
+    window.addEventListener('resize', hoehe);
+
+    function vollbild(an) {
+        reader.classList.toggle('mb-vollbild', an);
+        document.body.classList.toggle('mb-vollbild-offen', an);
+    }
+    document.getElementById('mb-vollbild').addEventListener('click', function () { vollbild(true); });
+    reader.querySelector('.mb-schliessen').addEventListener('click', function () { vollbild(false); });
+})();
+</script>

@@ -1,0 +1,13 @@
+{
+    "name": "blu/ki-assistent",
+    "description": "Abhängigkeiten des KI-Assistenten (Claude-API). Installieren: scripts/run-setup.sh ki-composer",
+    "require": {
+        "php": "^8.4",
+        "anthropic-ai/sdk": "^0.57.0",
+        "guzzlehttp/guzzle": "^7.9"
+    },
+    "config": {
+        "platform": {"php": "8.4.25"},
+        "allow-plugins": {"php-http/discovery": false}
+    }
+}

@@ -1,0 +1,107 @@
+/* Nachrichten (Chat-Seite und Chatfenster) */
+.ki-msg { margin: 8px 0; padding: 8px 12px; border-radius: 12px; max-width: 85%; overflow-wrap: anywhere; }
+.ki-msg-user { margin-left: auto; background: var(--bs-primary, #446e88); color: #fff; }
+.ki-msg-model { background: var(--hh-background-3, #f3f3f3); }
+.ki-card { margin-top: 10px; padding: 10px 12px; border-radius: 10px; background: var(--hh-background-color-main, #fff); border: 1px solid rgba(0, 0, 0, .08); }
+.ki-card .btn { margin: 6px 6px 0 0; }
+.ki-rate { margin-top: 6px; font-size: .85em; color: var(--hh-text-color-soft, #777); }
+.ki-rate a { margin-right: 8px; text-decoration: none; }
+.ki-rate .input-group { margin-top: 4px; }
+
+/* --- Avatar-Knopf unten rechts --- */
+.ki-fab {
+    position: fixed;
+    right: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    z-index: 1040;
+    width: 62px;
+    height: 62px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .22);
+    cursor: pointer;
+    transition: transform .15s ease;
+    touch-action: none; /* verschiebbar per Finger, ohne dass die Seite mitscrollt */
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+}
+.ki-fab:hover { transform: scale(1.06); }
+.ki-fab-dragging, .ki-fab-dragging:hover { cursor: grabbing; transform: scale(1.12); box-shadow: 0 8px 22px rgba(0, 0, 0, .3); }
+.ki-fab img { pointer-events: none; -webkit-user-drag: none; }
+.ki-fab:focus-visible { outline: 3px solid var(--bs-primary, #446e88); outline-offset: 3px; }
+.ki-fab img { display: block; width: 100%; height: 100%; }
+.ki-fab-open .ki-fab { display: none; }
+
+/* Auf der Chat-Seite selbst keinen zweiten Chat anbieten */
+body:has(.ki-page) .ki-fab,
+body:has(.ki-page) .ki-panel { display: none !important; }
+
+/* --- Chatfenster --- */
+.ki-panel {
+    position: fixed;
+    right: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    z-index: 1040;
+    width: 390px;
+    height: min(600px, calc(100vh - 110px));
+    display: none;
+    flex-direction: column;
+    background: var(--hh-background-color-main, #fff);
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, .25);
+    overflow: hidden;
+}
+.ki-fab-open .ki-panel { display: flex; }
+.ki-panel-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--bs-primary, #446e88);
+    color: #fff;
+}
+.ki-panel-head img { width: 38px; height: 38px; border-radius: 50%; background: #fff; }
+.ki-panel-head .ki-title { flex: 1; line-height: 1.2; }
+.ki-panel-head .ki-title small { display: block; opacity: .85; font-size: .78em; }
+.ki-panel-head a, .ki-panel-head button { color: #fff; background: none; border: 0; padding: 6px; font-size: 18px; line-height: 1; opacity: .9; }
+.ki-panel-head a:hover, .ki-panel-head button:hover { opacity: 1; }
+.ki-panel .ki-messages { flex: 1; overflow-y: auto; padding: 4px 12px; overscroll-behavior: contain; }
+.ki-panel .ki-hello { color: var(--hh-text-color-soft, #777); font-size: .9em; margin: 10px 0; }
+.ki-panel .ki-age { padding: 10px 12px; font-size: .9em; border-top: 1px solid rgba(0, 0, 0, .08); }
+.ki-panel-foot { padding: 8px 12px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid rgba(0, 0, 0, .08); }
+.ki-panel-foot .ki-links { margin-top: 6px; font-size: .78em; color: var(--hh-text-color-soft, #777); }
+
+/* Handy: Knopf über der Tab-Leiste, Fenster über den ganzen Bildschirm */
+@media (max-width: 575.98px) {
+    .ki-fab {
+        width: 54px;
+        height: 54px;
+        right: 12px;
+        bottom: calc(var(--hh-ct-top-bar-height, 50px) + var(--hh-mobile-app-safe-area-inset-bottom, env(safe-area-inset-bottom)) + 12px);
+    }
+    .ki-panel {
+        inset: 0;
+        width: auto;
+        height: 100vh;
+        height: 100dvh;
+        border-radius: 0;
+        z-index: 1050;
+    }
+    .ki-panel-head { padding-top: calc(10px + env(safe-area-inset-top)); }
+    /* Eingabe oben unter dem Kopf: Tastatur und ihre Vorschlagsleiste verdecken sie so nicht */
+    .ki-panel-foot { order: 1; padding: 8px 12px; border-top: 0; border-bottom: 1px solid rgba(0, 0, 0, .08); }
+    .ki-panel .ki-age { order: 2; border-top: 0; border-bottom: 1px solid rgba(0, 0, 0, .08); }
+    .ki-panel .ki-messages { order: 3; padding-bottom: calc(12px + var(--hh-mobile-app-safe-area-inset-bottom, env(safe-area-inset-bottom))); }
+    /* Begrüßung nur, solange das Gespräch leer ist – Platz für Antworten über der Tastatur */
+    .ki-panel .ki-messages:has(.ki-msg) .ki-hello { display: none; }
+    /* iOS zoomt sonst beim Antippen ins Eingabefeld */
+    .ki-panel .ki-input { font-size: 16px; }
+    body.ki-fab-open { overflow: hidden; }
+}
+
+@media print {
+    .ki-fab, .ki-panel { display: none !important; }
+}

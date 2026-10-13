@@ -1,0 +1,10 @@
+{
+  "id": "maengelmelder",
+  "name": "Mängelmelder",
+  "description": "Mängel mit Ort auf der Karte melden (OpenStreetMap über eigenen Server) und alle Meldungen auf einer Karte anzeigen.",
+  "keywords": ["mängel", "karte", "osm"],
+  "version": "0.1.0",
+  "humhub": {
+    "minVersion": "1.18"
+  }
+}

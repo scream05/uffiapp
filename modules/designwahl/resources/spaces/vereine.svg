@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Vereine und Ehrenamt">
+  <!-- Space-Symbol im Design „Uffi frisch“ (eigene Zeichnung) -->
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2fb0d6"/>
+      <stop offset="1" stop-color="#0a5873"/>
+    </linearGradient>
+    <radialGradient id="l" cx=".25" cy=".15" r=".8">
+      <stop offset="0" stop-color="#fff" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="128" height="128" fill="url(#g)"/>
+  <rect width="128" height="128" fill="url(#l)"/>
+  <path d="M0 104 C24 94 44 110 70 102 S108 90 128 98 V128 H0 Z" fill="#fff" opacity=".14"/>
+  <path d="M0 114 C30 104 52 120 82 112 S116 104 128 110 V128 H0 Z" fill="#fff" opacity=".12"/>
+  <g fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="64" cy="44" r="11"/>
+    <path d="M42 90 v-6 a22 22 0 0 1 44 0 v6"/>
+    <circle cx="35" cy="54" r="8"/>
+    <path d="M20 88 v-3 a15 15 0 0 1 18-14.7"/>
+    <circle cx="93" cy="54" r="8"/>
+    <path d="M108 88 v-3 a15 15 0 0 0 -18-14.7"/>
+  </g>
+</svg>

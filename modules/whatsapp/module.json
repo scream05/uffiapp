@@ -1,0 +1,10 @@
+{
+  "id": "whatsapp",
+  "name": "WhatsApp-Termine",
+  "description": "Veranstaltungen aus der WhatsApp-Community: an die Termin-Nummer weitergeleitete Plakate werden ausgelesen und nach Freigabe in den Kalender übernommen.",
+  "keywords": ["whatsapp", "kalender", "veranstaltungen"],
+  "version": "0.1.0",
+  "humhub": {
+    "minVersion": "1.18"
+  }
+}

@@ -1,0 +1,822 @@
+{
+  "id": "muelltonnen",
+  "titel": "Antrag auf An-, Abmeldung sowie Änderung von Mülltonnen",
+  "zweck": "Restmüll-, Bio- und Papiertonne beim Landkreis an-, ab- oder ummelden (z. B. bei Neubau, Eigentümerwechsel, anderer Tonnengröße)",
+  "ablauf": "Zuständig ist die Abfallwirtschaft des Landratsamts Neustadt a.d.Aisch-Bad Windsheim, nicht die Stadt. Den Antrag stellt der Grundstückseigentümer und unterschreibt ihn. Senden an: Landratsamt, Abfallwirtschaft, Konrad-Adenauer-Str. 1, 91413 Neustadt a.d.Aisch, Fax 09161/92-90340, E-Mail abfall@kreis-nea.de, Telefon 09161 92-3411. Anmeldungen für das laufende Jahr sind bis 15.12. möglich. Für jede nötige Anfahrt (Anlieferung/Abholung von Tonnen) wird eine Pauschale erhoben. Abgemeldete Tonnen nach der letzten Leerung leer und sauber an der Grundstücksgrenze bereitstellen. Die Gelbe Tonne gehört nicht dazu: dafür Knettenbrech + Gurdulic, Telefon 09321/9394-11, Abfuhr-NEA@knettenbrech-gurdulic.de. Windeltonne und Müllgemeinschaft sind in diesem Assistenten nicht enthalten (Seite 2 bzw. 3 des Formulars von Hand ausfüllen). Die Gebührentabelle im Formular hat den Stand 2019; aktuelle Gebühren beim Landratsamt erfragen.",
+  "quelle": "https://www.uffenheim.de/rathaus-buergerservice/ver-und-entsorgung/abfall-wertstoffe",
+  "vorlage": "muelltonnen.pdf",
+  "dateiname": "Antrag-Muelltonnen",
+  "felder": [
+    {
+      "name": "art",
+      "label": "Neuanmeldung, Änderung oder Abmeldung?",
+      "typ": "auswahl",
+      "optionen": [
+        "Neuanmeldung",
+        "Änderung",
+        "Abmeldung"
+      ],
+      "pflicht": true
+    },
+    {
+      "name": "abmeldegrund",
+      "label": "Grund der Abmeldung",
+      "typ": "auswahl",
+      "optionen": [
+        "Eigentümerwechsel",
+        "leerstehendes Objekt",
+        "Müllgemeinschaft"
+      ],
+      "pflicht": true,
+      "nur_wenn": {
+        "art": "Abmeldung"
+      }
+    },
+    {
+      "name": "kundenkonto",
+      "label": "Kundenkonto laut Gebührenbescheid (falls vorhanden)",
+      "hinweis": "steht auf dem Gebührenbescheid des Landratsamts; im Formular sind vorne und in der Mitte schon „00“ vorgedruckt: nur die 5 Ziffern dazwischen und ggf. die letzte Ziffer angeben",
+      "muster": "\\d{5,6}",
+      "muster_hinweis": "bitte die 5 Ziffern zwischen den vorgedruckten „00“ und ggf. die letzte Ziffer dahinter angeben (5 oder 6 Ziffern)"
+    },
+    {
+      "name": "nachname",
+      "label": "Grundstückseigentümer: Nachname oder Firma",
+      "pflicht": true
+    },
+    {
+      "name": "vorname",
+      "label": "Grundstückseigentümer: Vorname bzw. Geschäftsführer"
+    },
+    {
+      "name": "strasse",
+      "label": "Eigentümer: Straße und Hausnummer (bei Wegzug die neue Anschrift)",
+      "pflicht": true
+    },
+    {
+      "name": "plz",
+      "label": "Eigentümer: Postleitzahl",
+      "typ": "plz",
+      "pflicht": true
+    },
+    {
+      "name": "ort",
+      "label": "Eigentümer: Ort",
+      "pflicht": true
+    },
+    {
+      "name": "ortsteil",
+      "label": "Eigentümer: Ortsteil"
+    },
+    {
+      "name": "telefon",
+      "label": "Telefon tagsüber"
+    },
+    {
+      "name": "email",
+      "label": "E-Mail"
+    },
+    {
+      "name": "be_name",
+      "label": "Abweichender Bescheidempfänger oder neuer Eigentümer: Nachname/Firma",
+      "hinweis": "nur bei Hausverwaltung/Betreuer oder Eigentümerwechsel"
+    },
+    {
+      "name": "be_vorname",
+      "label": "Bescheidempfänger/neuer Eigentümer: Vorname",
+      "nur_wenn_gesetzt": "be_name"
+    },
+    {
+      "name": "be_ab",
+      "label": "Bescheidempfänger/neuer Eigentümer: ab Datum",
+      "typ": "datum"
+    },
+    {
+      "name": "be_strasse",
+      "label": "Bescheidempfänger/neuer Eigentümer: Straße und Hausnummer"
+    },
+    {
+      "name": "be_plz",
+      "label": "Bescheidempfänger/neuer Eigentümer: PLZ",
+      "typ": "plz"
+    },
+    {
+      "name": "be_ort",
+      "label": "Bescheidempfänger/neuer Eigentümer: Ort"
+    },
+    {
+      "name": "be_telefon",
+      "label": "Bescheidempfänger/neuer Eigentümer: Telefon"
+    },
+    {
+      "name": "be_email",
+      "label": "Bescheidempfänger/neuer Eigentümer: E-Mail"
+    },
+    {
+      "name": "gs_strasse",
+      "label": "Grundstück (nur wenn abweichend von der Eigentümeranschrift): Straße und Hausnummer"
+    },
+    {
+      "name": "gs_plz",
+      "label": "Grundstück: PLZ",
+      "typ": "plz"
+    },
+    {
+      "name": "gs_ort",
+      "label": "Grundstück: Ort"
+    },
+    {
+      "name": "gs_ortsteil",
+      "label": "Grundstück: Ortsteil"
+    },
+    {
+      "name": "nutzung",
+      "label": "Das Grundstück wird genutzt",
+      "typ": "auswahl",
+      "optionen": [
+        "privat",
+        "gewerblich",
+        "privat und gewerblich"
+      ],
+      "pflicht": true
+    },
+    {
+      "name": "personen",
+      "label": "Anzahl aller Personen im Haushalt bzw. der Beschäftigten",
+      "typ": "zahl",
+      "pflicht": true
+    },
+    {
+      "name": "rm_groesse",
+      "label": "Restmülltonne: Größe",
+      "typ": "auswahl",
+      "optionen": [
+        "80 l",
+        "120 l",
+        "240 l",
+        "1100 l"
+      ],
+      "hinweis": "80 l für bis 5 Personen, 120 l bis 8, 240 l bis 16, 1100 l bis 73; leer lassen, wenn sich an der Restmülltonne nichts ändert"
+    },
+    {
+      "name": "rm_bisher",
+      "label": "Restmülltonnen dieser Größe bisher vorhanden (Anzahl)",
+      "typ": "zahl",
+      "nur_wenn_gesetzt": "rm_groesse"
+    },
+    {
+      "name": "rm_kuenftig",
+      "label": "Restmülltonnen dieser Größe künftig benötigt (Anzahl)",
+      "typ": "zahl",
+      "nur_wenn_gesetzt": "rm_groesse"
+    },
+    {
+      "name": "rm_behaelter",
+      "label": "Restmüll: Behälternummer (bei Abmeldung/Änderung, steht auf der Tonne)",
+      "nur_wenn_gesetzt": "rm_groesse"
+    },
+    {
+      "name": "rm_datum",
+      "label": "Restmüll: an- bzw. abmelden zum (Datum)",
+      "typ": "datum",
+      "nur_wenn_gesetzt": "rm_groesse"
+    },
+    {
+      "name": "bio",
+      "label": "Biotonne",
+      "typ": "auswahl",
+      "optionen": [
+        "keine Änderung",
+        "anmelden",
+        "abmelden",
+        "keine Biotonne (Eigenkompostierung)"
+      ],
+      "pflicht": true,
+      "hinweis": "Biotonne kostet 3,80 €/Monat; ohne Biotonne muss alles organische Material selbst kompostiert werden"
+    },
+    {
+      "name": "bio_anzahl",
+      "label": "Biotonne: Anzahl",
+      "typ": "zahl",
+      "nur_wenn": {
+        "bio": "anmelden"
+      },
+      "pflicht": true
+    },
+    {
+      "name": "bio_ab",
+      "label": "Biotonne: neu ab dem (Datum)",
+      "typ": "datum",
+      "nur_wenn": {
+        "bio": "anmelden"
+      },
+      "pflicht": true
+    },
+    {
+      "name": "bio_behaelter",
+      "label": "Biotonne: Behälternummer",
+      "nur_wenn": {
+        "bio": "abmelden"
+      }
+    },
+    {
+      "name": "bio_abmelden_zum",
+      "label": "Biotonne: abmelden zum (Datum)",
+      "typ": "datum",
+      "nur_wenn": {
+        "bio": "abmelden"
+      },
+      "pflicht": true
+    },
+    {
+      "name": "papier",
+      "label": "Papiertonne",
+      "typ": "auswahl",
+      "optionen": [
+        "keine Änderung",
+        "anmelden",
+        "abmelden",
+        "keine Papiertonne"
+      ],
+      "pflicht": true
+    },
+    {
+      "name": "papier_groesse",
+      "label": "Papiertonne: Größe",
+      "typ": "auswahl",
+      "optionen": [
+        "240 l",
+        "1100 l"
+      ],
+      "nur_wenn": {
+        "papier": [
+          "anmelden",
+          "abmelden"
+        ]
+      },
+      "pflicht": true
+    },
+    {
+      "name": "papier_anzahl",
+      "label": "Papiertonne: Anzahl",
+      "typ": "zahl",
+      "nur_wenn": {
+        "papier": "anmelden"
+      },
+      "pflicht": true
+    },
+    {
+      "name": "papier_ab",
+      "label": "Papiertonne: neu ab dem (Datum)",
+      "typ": "datum",
+      "nur_wenn": {
+        "papier": "anmelden"
+      },
+      "pflicht": true
+    },
+    {
+      "name": "papier_behaelter",
+      "label": "Papiertonne: Behälternummer",
+      "nur_wenn": {
+        "papier": "abmelden"
+      }
+    },
+    {
+      "name": "papier_abmelden_zum",
+      "label": "Papiertonne: abmelden zum (Datum)",
+      "typ": "datum",
+      "nur_wenn": {
+        "papier": "abmelden"
+      },
+      "pflicht": true
+    },
+    {
+      "name": "ort_unterschrift",
+      "label": "Ort der Unterschrift",
+      "pflicht": true,
+      "hinweis": "z. B. Uffenheim"
+    }
+  ],
+  "druck": [
+    {
+      "feld": "art",
+      "wert": "Neuanmeldung",
+      "seite": 1,
+      "x": 288.5,
+      "y": 253.5
+    },
+    {
+      "feld": "art",
+      "wert": "Änderung",
+      "seite": 1,
+      "x": 288.5,
+      "y": 269.5
+    },
+    {
+      "feld": "art",
+      "wert": "Abmeldung",
+      "seite": 1,
+      "x": 288.5,
+      "y": 285.5
+    },
+    {
+      "feld": "abmeldegrund",
+      "wert": "Eigentümerwechsel",
+      "seite": 1,
+      "x": 465.6,
+      "y": 284.6,
+      "groesse": 9
+    },
+    {
+      "feld": "abmeldegrund",
+      "wert": "leerstehendes Objekt",
+      "seite": 1,
+      "x": 465.6,
+      "y": 296.6,
+      "groesse": 9
+    },
+    {
+      "feld": "abmeldegrund",
+      "wert": "Müllgemeinschaft",
+      "seite": 1,
+      "x": 465.6,
+      "y": 308.2,
+      "groesse": 9
+    },
+    {
+      "feld": "kundenkonto",
+      "seite": 1,
+      "x": 248,
+      "y": 326,
+      "abstand": 17.4,
+      "von": 0,
+      "laenge": 5
+    },
+    {
+      "feld": "kundenkonto",
+      "von": 5,
+      "laenge": 1,
+      "seite": 1,
+      "x": 373,
+      "y": 326,
+      "abstand": 17.4
+    },
+    {
+      "feld": "nachname",
+      "seite": 1,
+      "x": 145,
+      "y": 369.5,
+      "breite": 400
+    },
+    {
+      "feld": "vorname",
+      "seite": 1,
+      "x": 145,
+      "y": 388,
+      "breite": 400
+    },
+    {
+      "feld": "strasse",
+      "seite": 1,
+      "x": 145,
+      "y": 409.5,
+      "breite": 400
+    },
+    {
+      "feld": "plz",
+      "seite": 1,
+      "x": 87,
+      "y": 431,
+      "breite": 60
+    },
+    {
+      "feld": "ort",
+      "seite": 1,
+      "x": 170,
+      "y": 431,
+      "breite": 195
+    },
+    {
+      "feld": "ortsteil",
+      "seite": 1,
+      "x": 402,
+      "y": 431,
+      "breite": 150
+    },
+    {
+      "feld": "telefon",
+      "seite": 1,
+      "x": 106,
+      "y": 452.5,
+      "breite": 115
+    },
+    {
+      "feld": "email",
+      "seite": 1,
+      "x": 254,
+      "y": 452.5,
+      "breite": 295
+    },
+    {
+      "feld": "be_name",
+      "seite": 1,
+      "x": 145,
+      "y": 497.5,
+      "breite": 315
+    },
+    {
+      "feld": "be_ab",
+      "seite": 1,
+      "x": 506,
+      "y": 497.5,
+      "breite": 50
+    },
+    {
+      "feld": "be_vorname",
+      "seite": 1,
+      "x": 145,
+      "y": 515.5,
+      "breite": 400
+    },
+    {
+      "feld": "be_strasse",
+      "seite": 1,
+      "x": 145,
+      "y": 536.5,
+      "breite": 400
+    },
+    {
+      "feld": "be_plz",
+      "seite": 1,
+      "x": 87,
+      "y": 558,
+      "breite": 60
+    },
+    {
+      "feld": "be_ort",
+      "seite": 1,
+      "x": 170,
+      "y": 558,
+      "breite": 195
+    },
+    {
+      "feld": "be_telefon",
+      "seite": 1,
+      "x": 106,
+      "y": 579,
+      "breite": 115
+    },
+    {
+      "feld": "be_email",
+      "seite": 1,
+      "x": 254,
+      "y": 579,
+      "breite": 295
+    },
+    {
+      "feld": "gs_strasse",
+      "seite": 1,
+      "x": 145,
+      "y": 619,
+      "breite": 400
+    },
+    {
+      "feld": "gs_plz",
+      "seite": 1,
+      "x": 87,
+      "y": 643,
+      "breite": 60
+    },
+    {
+      "feld": "gs_ort",
+      "seite": 1,
+      "x": 170,
+      "y": 643,
+      "breite": 195
+    },
+    {
+      "feld": "gs_ortsteil",
+      "seite": 1,
+      "x": 402,
+      "y": 643,
+      "breite": 150
+    },
+    {
+      "feld": "nutzung",
+      "wert": "privat",
+      "seite": 1,
+      "x": 128.7,
+      "y": 666
+    },
+    {
+      "feld": "nutzung",
+      "wert": "gewerblich",
+      "seite": 1,
+      "x": 172.4,
+      "y": 666
+    },
+    {
+      "feld": "nutzung",
+      "wert": "privat und gewerblich",
+      "seite": 1,
+      "x": 235.7,
+      "y": 666
+    },
+    {
+      "feld": "personen",
+      "seite": 1,
+      "x": 522,
+      "y": 670,
+      "breite": 35
+    },
+    {
+      "feld": "rm_behaelter",
+      "wenn": {
+        "rm_groesse": "80 l"
+      },
+      "seite": 2,
+      "x": 163,
+      "y": 146,
+      "breite": 72
+    },
+    {
+      "feld": "rm_bisher",
+      "wenn": {
+        "rm_groesse": "80 l"
+      },
+      "seite": 2,
+      "x": 270,
+      "y": 146,
+      "breite": 40
+    },
+    {
+      "feld": "rm_kuenftig",
+      "wenn": {
+        "rm_groesse": "80 l"
+      },
+      "seite": 2,
+      "x": 345,
+      "y": 146,
+      "breite": 25
+    },
+    {
+      "feld": "rm_datum",
+      "wenn": {
+        "rm_groesse": "80 l"
+      },
+      "seite": 2,
+      "x": 389,
+      "y": 146,
+      "breite": 62
+    },
+    {
+      "feld": "rm_behaelter",
+      "wenn": {
+        "rm_groesse": "120 l"
+      },
+      "seite": 2,
+      "x": 163,
+      "y": 165.5,
+      "breite": 72
+    },
+    {
+      "feld": "rm_bisher",
+      "wenn": {
+        "rm_groesse": "120 l"
+      },
+      "seite": 2,
+      "x": 270,
+      "y": 165.5,
+      "breite": 40
+    },
+    {
+      "feld": "rm_kuenftig",
+      "wenn": {
+        "rm_groesse": "120 l"
+      },
+      "seite": 2,
+      "x": 345,
+      "y": 165.5,
+      "breite": 25
+    },
+    {
+      "feld": "rm_datum",
+      "wenn": {
+        "rm_groesse": "120 l"
+      },
+      "seite": 2,
+      "x": 389,
+      "y": 165.5,
+      "breite": 62
+    },
+    {
+      "feld": "rm_behaelter",
+      "wenn": {
+        "rm_groesse": "240 l"
+      },
+      "seite": 2,
+      "x": 163,
+      "y": 187,
+      "breite": 72
+    },
+    {
+      "feld": "rm_bisher",
+      "wenn": {
+        "rm_groesse": "240 l"
+      },
+      "seite": 2,
+      "x": 270,
+      "y": 187,
+      "breite": 40
+    },
+    {
+      "feld": "rm_kuenftig",
+      "wenn": {
+        "rm_groesse": "240 l"
+      },
+      "seite": 2,
+      "x": 345,
+      "y": 187,
+      "breite": 25
+    },
+    {
+      "feld": "rm_datum",
+      "wenn": {
+        "rm_groesse": "240 l"
+      },
+      "seite": 2,
+      "x": 389,
+      "y": 187,
+      "breite": 62
+    },
+    {
+      "feld": "rm_behaelter",
+      "wenn": {
+        "rm_groesse": "1100 l"
+      },
+      "seite": 2,
+      "x": 163,
+      "y": 208.5,
+      "breite": 72
+    },
+    {
+      "feld": "rm_bisher",
+      "wenn": {
+        "rm_groesse": "1100 l"
+      },
+      "seite": 2,
+      "x": 270,
+      "y": 208.5,
+      "breite": 40
+    },
+    {
+      "feld": "rm_kuenftig",
+      "wenn": {
+        "rm_groesse": "1100 l"
+      },
+      "seite": 2,
+      "x": 345,
+      "y": 208.5,
+      "breite": 25
+    },
+    {
+      "feld": "rm_datum",
+      "wenn": {
+        "rm_groesse": "1100 l"
+      },
+      "seite": 2,
+      "x": 389,
+      "y": 208.5,
+      "breite": 62
+    },
+    {
+      "feld": "bio",
+      "wert": "keine Biotonne (Eigenkompostierung)",
+      "seite": 2,
+      "x": 45,
+      "y": 362
+    },
+    {
+      "feld": "bio_anzahl",
+      "seite": 2,
+      "x": 60,
+      "y": 410.5,
+      "breite": 55
+    },
+    {
+      "feld": "bio_ab",
+      "seite": 2,
+      "x": 154,
+      "y": 410.5,
+      "breite": 76
+    },
+    {
+      "feld": "bio_behaelter",
+      "seite": 2,
+      "x": 250,
+      "y": 410.5,
+      "breite": 96
+    },
+    {
+      "feld": "bio_abmelden_zum",
+      "seite": 2,
+      "x": 365,
+      "y": 410.5,
+      "breite": 76
+    },
+    {
+      "feld": "papier",
+      "wert": "keine Papiertonne",
+      "seite": 2,
+      "x": 45,
+      "y": 518.5
+    },
+    {
+      "feld": "papier_anzahl",
+      "wenn": {
+        "papier_groesse": "240 l"
+      },
+      "seite": 2,
+      "x": 118,
+      "y": 560.5,
+      "breite": 30
+    },
+    {
+      "feld": "papier_ab",
+      "wenn": {
+        "papier_groesse": "240 l"
+      },
+      "seite": 2,
+      "x": 175,
+      "y": 560.5,
+      "breite": 57
+    },
+    {
+      "feld": "papier_behaelter",
+      "wenn": {
+        "papier_groesse": "240 l"
+      },
+      "seite": 2,
+      "x": 256,
+      "y": 560.5,
+      "breite": 86
+    },
+    {
+      "feld": "papier_abmelden_zum",
+      "wenn": {
+        "papier_groesse": "240 l"
+      },
+      "seite": 2,
+      "x": 364,
+      "y": 560.5,
+      "breite": 76
+    },
+    {
+      "feld": "papier_anzahl",
+      "wenn": {
+        "papier_groesse": "1100 l"
+      },
+      "seite": 2,
+      "x": 118,
+      "y": 581.5,
+      "breite": 30
+    },
+    {
+      "feld": "papier_ab",
+      "wenn": {
+        "papier_groesse": "1100 l"
+      },
+      "seite": 2,
+      "x": 176,
+      "y": 581.5,
+      "breite": 57
+    },
+    {
+      "feld": "papier_behaelter",
+      "wenn": {
+        "papier_groesse": "1100 l"
+      },
+      "seite": 2,
+      "x": 257,
+      "y": 581.5,
+      "breite": 86
+    },
+    {
+      "feld": "papier_abmelden_zum",
+      "wenn": {
+        "papier_groesse": "1100 l"
+      },
+      "seite": 2,
+      "x": 365,
+      "y": 581.5,
+      "breite": 76
+    },
+    {
+      "text": "{ort_unterschrift}, {heute}",
+      "seite": 2,
+      "x": 40,
+      "y": 741.5,
+      "breite": 190
+    }
+  ]
+}

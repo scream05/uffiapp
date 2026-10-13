@@ -1,0 +1,86 @@
+<?php
+/**
+ * @var \humhub\modules\vereine\models\Verein[] $vereine
+ * @var \humhub\modules\vereine\models\Verein[] $mine
+ * @var string $q
+ * @var string $kategorie
+ * @var string $ortsteil
+ * @var \humhub\modules\vereine\Module $module
+ */
+
+use humhub\helpers\Html;
+
+$space = $this->context->contentContainer;
+$filtered = trim($q) !== '' || $kategorie !== '' || $ortsteil !== '';
+?>
+<?php if ($mine): ?>
+<div class="panel panel-default">
+    <div class="panel-heading"><strong>Meine Vereine</strong></div>
+    <div class="panel-body">
+        <?php foreach ($mine as $v): ?>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+                <?= $this->render('_logo', ['verein' => $v, 'size' => 32]) ?>
+                <span style="flex:1"><?= Html::a(Html::encode($v->name), $v->getUrl()) ?></span>
+                <?= Html::a('<i class="fa fa-calendar-plus-o"></i> Termin eintragen', $space->createUrl('/vereine/termin/create', ['verein' => $v->id]), ['class' => 'btn btn-sm btn-primary']) ?>
+            </div>
+        <?php endforeach ?>
+    </div>
+</div>
+<?php endif ?>
+
+<div class="panel panel-default">
+    <div class="panel-heading"><strong>Vereinsverzeichnis</strong></div>
+    <div class="panel-body">
+        <p class="help-block">Vereine, Gruppen und Initiativen in Uffenheim und den Ortsteilen. Ihre Termine stehen im gemeinsamen Kalender
+            unter „Veranstaltungen“. Sie sind im Vorstand eines Vereins? Öffnen Sie die Seite Ihres Vereins und fragen Sie die Verwaltung an.</p>
+        <?= Html::beginForm($space->createUrl('/vereine/verein/index'), 'get', ['class' => 'verein-filter', 'style' => 'display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px']) ?>
+            <?= Html::hiddenInput('cguid', $space->guid) ?>
+            <?= Html::textInput('q', $q, ['class' => 'form-control', 'placeholder' => 'Suchen …', 'style' => 'flex:2 1 180px', 'aria-label' => 'Suchen']) ?>
+            <?= Html::dropDownList('kategorie', $kategorie, array_combine($module->categories, $module->categories),
+                ['class' => 'form-control', 'prompt' => 'Alle Kategorien', 'style' => 'flex:1 1 150px', 'aria-label' => 'Kategorie']) ?>
+            <?= Html::dropDownList('ortsteil', $ortsteil, array_combine($module->ortsteile, $module->ortsteile),
+                ['class' => 'form-control', 'prompt' => 'Alle Orte', 'style' => 'flex:1 1 130px', 'aria-label' => 'Ort']) ?>
+            <button type="submit" class="btn btn-light"><i class="fa fa-search"></i> Filtern</button>
+            <?php if ($filtered): ?>
+                <?= Html::a('Zurücksetzen', $space->createUrl('/vereine/verein/index'), ['class' => 'btn btn-link']) ?>
+            <?php endif ?>
+        <?= Html::endForm() ?>
+
+        <p class="text-muted"><?= count($vereine) ?> <?= count($vereine) === 1 ? 'Eintrag' : 'Einträge' ?></p>
+        <style <?= Html::nonce() ?>>
+            /* HumHub macht unter 992 px jede .list-group waagerecht scrollbar (gedacht fürs Space-Menü) – hier senkrecht lassen */
+            .verein-liste.list-group { flex-direction: column; overflow-x: visible; margin-left: 0; gap: 0; }
+            .verein-liste .list-group-item { white-space: normal; margin: 0 !important; }
+            .verein-liste .list-group-item strong { overflow-wrap: anywhere; }
+            .verein-liste .verein-status-zeile { display: none; }
+            /* Handy: Status als kleine Zeile unter dem Namen statt als Etikett rechts, damit der Name Platz hat */
+            @media (max-width: 575.98px) {
+                .verein-liste .verein-status-badge { display: none; }
+                .verein-liste .verein-status-zeile { display: block; }
+            }
+        </style>
+        <div class="list-group verein-liste">
+            <?php foreach ($vereine as $v): ?>
+                <?php // In der Liste nur „wartet auf Freigabe“ (sehen nur Verwalter); „aus öffentlichen Quellen“ steht auf der Vereinsseite
+                $label = $v->status === \humhub\modules\vereine\models\Verein::STATUS_VORGESCHLAGEN ? $v->getStatusLabel() : '' ?>
+                <a href="<?= Html::encode($v->getUrl()) ?>" class="list-group-item" style="display:flex;align-items:center;gap:12px">
+                    <?= $this->render('_logo', ['verein' => $v, 'size' => 44]) ?>
+                    <span style="flex:1;min-width:0">
+                        <strong style="display:block"><?= Html::encode($v->name) ?></strong>
+                        <small class="text-muted"><?= Html::encode($v->kategorie) ?> · <?= Html::encode($v->ortsteil) ?></small>
+                        <?php if ($label): ?>
+                            <small class="text-muted verein-status-zeile"><?= Html::encode($label) ?></small>
+                        <?php endif ?>
+                    </span>
+                    <?php if ($label): ?>
+                        <span class="badge verein-status-badge" style="background:#eee;color:#666;font-weight:normal"><?= Html::encode($label) ?></span>
+                    <?php endif ?>
+                </a>
+            <?php endforeach ?>
+        </div>
+        <?php if (!$vereine): ?>
+            <p>Nichts gefunden.</p>
+        <?php endif ?>
+        <p style="margin-top:12px">Ihr Verein fehlt? <?= Html::a('Verein vorschlagen', $space->createUrl('/vereine/verein/create')) ?></p>
+    </div>
+</div>

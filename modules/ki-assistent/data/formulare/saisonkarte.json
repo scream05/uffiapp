@@ -1,0 +1,286 @@
+{
+  "id": "saisonkarte",
+  "titel": "Antrag Saisonkarte Freibad / Hallenbad",
+  "zweck": "Saisonkarte für das Freibad (ab Mai) und/oder das Hallenbad (ab Oktober) Uffenheim beantragen",
+  "ablauf": "Das Formular der Stadt gilt für das Jahr 2026 (Freibad-Saison ab Mai 2026, Hallenbad ab Oktober 2026). Für eine spätere Saison darauf hinweisen, dass die Stadt das Formular jährlich neu herausgibt und Preise sich ändern können; ggf. im Rathaus nachfragen. Preise (Stand 15.10.2024): Freibad ermäßigt 40 €, Erwachsene 80 €, Familie 100 €; Hallenbad ermäßigt 45 €, Erwachsene 90 €, Familie 110 €. Ermäßigt: Kinder und Jugendliche ab 7 bis 18 Jahre, Schüler, Auszubildende, Studenten, Freiwilligendienstleistende, Schwerbehinderte ab 50 GdB, Inhaber der blauen Ehrenamtskarte, Erwerbslose, Bezieher von Bürgergeld/Grundsicherung und Asylbewerber aus dem Landkreis NEA-BW (Nachweis beim Erwerb vorlegen). Familienkarte: bis zu zwei Erwachsene einer Familie mit allen Kindern bis 18 im Haushalt; Ehepaare ohne Kinder brauchen zwei Erwachsenenkarten. Antrag mit aktuellem Lichtbild per E-Mail an saisonkarten@uffenheim.de schicken oder im Rathaus (Kasse, Zimmer 104) abgeben. Betrag überweisen an IBAN DE03 7625 1020 0620 0034 00 (Sparkasse im Lkr. NEA-BW), Kassenzeichen „Saisonkarte(n) - Name, Vorname“. Etwa eine Woche nach Zahlungseingang liegt die Karte an der Kasse des Freibads zur Abholung bereit. Keine Rückerstattung; Ersatzkarte bei Verlust 5 €. Saisonkarten können nicht im Bad beantragt oder bezahlt werden.",
+  "quelle": "https://www.uffenheim.de/erleben/sport-freizeiteinrichtungen/freibad",
+  "vorlage": "saisonkarte.pdf",
+  "dateiname": "Antrag-Saisonkarte",
+  "felder": [
+    {
+      "name": "bereich",
+      "label": "Für welches Bad? (Freibad, Hallenbad oder beide)",
+      "typ": "mehrfach",
+      "optionen": [
+        "Freibad",
+        "Hallenbad"
+      ],
+      "pflicht": true
+    },
+    {
+      "name": "tarif",
+      "label": "Welche Karte?",
+      "typ": "auswahl",
+      "optionen": [
+        "ermäßigt",
+        "Erwachsene",
+        "Familie"
+      ],
+      "pflicht": true
+    },
+    {
+      "name": "name",
+      "label": "Antragsteller: Name, Vorname",
+      "pflicht": true
+    },
+    {
+      "name": "geburtsdatum",
+      "label": "Antragsteller: Geburtsdatum",
+      "typ": "datum",
+      "pflicht": true
+    },
+    {
+      "name": "anschrift",
+      "label": "Anschrift (Straße, Hausnummer)",
+      "pflicht": true
+    },
+    {
+      "name": "plz_ort",
+      "label": "PLZ und Ort",
+      "pflicht": true
+    },
+    {
+      "name": "telefon",
+      "label": "Telefon"
+    },
+    {
+      "name": "email",
+      "label": "E-Mail"
+    },
+    {
+      "name": "familie_erwachsene",
+      "label": "Familienkarte: Erwachsene",
+      "nur_wenn": {
+        "tarif": "Familie"
+      },
+      "pflicht": true,
+      "max": 300,
+      "hinweis": "höchstens 2, je „Name, Vorname, Geburtsdatum“, getrennt durch Semikolon; den Antragsteller mit aufführen"
+    },
+    {
+      "name": "familie_kinder",
+      "label": "Familienkarte: Kinder",
+      "nur_wenn": {
+        "tarif": "Familie"
+      },
+      "max": 600,
+      "hinweis": "höchstens 5, je „Name, Vorname, Geburtsdatum“, getrennt durch Semikolon"
+    },
+    {
+      "name": "lichtbild",
+      "label": "Darf die Stadt das Lichtbild für künftige Saisonkarten speichern? (freiwillige Einwilligung)",
+      "typ": "auswahl",
+      "optionen": [
+        "ja",
+        "nein"
+      ],
+      "pflicht": true
+    },
+    {
+      "name": "ort",
+      "label": "Ort der Unterschrift",
+      "pflicht": true,
+      "hinweis": "z. B. Uffenheim"
+    }
+  ],
+  "druck": [
+    {
+      "weiss": [
+        303.6,
+        132.5,
+        9.3,
+        8.6
+      ],
+      "seite": 1
+    },
+    {
+      "feld": "bereich",
+      "wert": "Freibad",
+      "seite": 1,
+      "x": 92.5,
+      "y": 140.5
+    },
+    {
+      "feld": "bereich",
+      "wert": "Hallenbad",
+      "seite": 1,
+      "x": 304.5,
+      "y": 140.5
+    },
+    {
+      "feld": "name",
+      "seite": 1,
+      "x": 61,
+      "y": 179,
+      "breite": 196
+    },
+    {
+      "feld": "geburtsdatum",
+      "seite": 1,
+      "x": 317,
+      "y": 179,
+      "breite": 172
+    },
+    {
+      "feld": "anschrift",
+      "seite": 1,
+      "x": 61,
+      "y": 208,
+      "breite": 196
+    },
+    {
+      "feld": "plz_ort",
+      "seite": 1,
+      "x": 317,
+      "y": 208,
+      "breite": 172
+    },
+    {
+      "feld": "telefon",
+      "seite": 1,
+      "x": 61,
+      "y": 237,
+      "breite": 196
+    },
+    {
+      "feld": "email",
+      "seite": 1,
+      "x": 317,
+      "y": 237,
+      "breite": 172
+    },
+    {
+      "feld": "tarif",
+      "wert": "ermäßigt",
+      "wenn": {
+        "bereich": "Freibad"
+      },
+      "seite": 1,
+      "x": 209.5,
+      "y": 310.5
+    },
+    {
+      "feld": "tarif",
+      "wert": "Erwachsene",
+      "wenn": {
+        "bereich": "Freibad"
+      },
+      "seite": 1,
+      "x": 326.5,
+      "y": 310.5
+    },
+    {
+      "feld": "tarif",
+      "wert": "Familie",
+      "wenn": {
+        "bereich": "Freibad"
+      },
+      "seite": 1,
+      "x": 437.8,
+      "y": 310
+    },
+    {
+      "feld": "tarif",
+      "wert": "ermäßigt",
+      "wenn": {
+        "bereich": "Hallenbad"
+      },
+      "seite": 1,
+      "x": 209.5,
+      "y": 333.5
+    },
+    {
+      "feld": "tarif",
+      "wert": "Erwachsene",
+      "wenn": {
+        "bereich": "Hallenbad"
+      },
+      "seite": 1,
+      "x": 326.5,
+      "y": 333.5
+    },
+    {
+      "feld": "tarif",
+      "wert": "Familie",
+      "wenn": {
+        "bereich": "Hallenbad"
+      },
+      "seite": 1,
+      "x": 438,
+      "y": 333
+    },
+    {
+      "feld": "familie_erwachsene",
+      "seite": 1,
+      "zeilen": [
+        488,
+        503
+      ],
+      "groesse": 8,
+      "spalten": [
+        {
+          "x": 150,
+          "breite": 86
+        },
+        {
+          "x": 241,
+          "breite": 85
+        },
+        {
+          "x": 331.5,
+          "breite": 85
+        }
+      ]
+    },
+    {
+      "feld": "familie_kinder",
+      "seite": 1,
+      "zeilen": [
+        517.5,
+        532,
+        546.5,
+        561,
+        576
+      ],
+      "groesse": 8,
+      "spalten": [
+        {
+          "x": 150,
+          "breite": 86
+        },
+        {
+          "x": 241,
+          "breite": 85
+        },
+        {
+          "x": 331.5,
+          "breite": 85
+        }
+      ]
+    },
+    {
+      "feld": "lichtbild",
+      "wert": "ja",
+      "seite": 1,
+      "x": 55.5,
+      "y": 710.5
+    },
+    {
+      "text": "{ort}, {heute}",
+      "seite": 1,
+      "x": 61,
+      "y": 747,
+      "breite": 205
+    }
+  ]
+}
