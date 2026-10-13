@@ -123,13 +123,37 @@ class BauhofController extends ContentContainerController
             $aktion = $request->post('aktion');
             if ($aktion === 'speichern') {
                 $alterMitarbeiter = $auftrag->mitarbeiter_id;
+                $vorher = ['prioritaet' => $auftrag->prioritaet, 'faellig' => $auftrag->faellig, 'hinweis' => $auftrag->hinweis];
                 $auftrag->load($request->post());
                 $neuerMitarbeiter = $auftrag->mitarbeiter_id ? (int)$auftrag->mitarbeiter_id : null;
                 $auftrag->mitarbeiter_id = $alterMitarbeiter; // Wechsel macht Bauhof::zuweisen()
                 if ($auftrag->validate()) {
                     $auftrag->save(false);
                     $fehler = Bauhof::zuweisen($auftrag, $neuerMitarbeiter, $user, (bool)$request->post('senden'));
-                    Bauhof::statusSetzen($content, (string)$request->post('status'), (string)$request->post('hinweis_status'), $user);
+                    $hinweisStatus = trim((string)$request->post('hinweis_status'));
+                    $statusNeu = Bauhof::statusSetzen($content, (string)$request->post('status'), $hinweisStatus, $user, null, false);
+                    // Gleicher Mitarbeiter: alle Änderungen in einer WhatsApp (ein neuer bekommt ohnehin den ganzen Auftrag)
+                    if ($neuerMitarbeiter && (int)$alterMitarbeiter === $neuerMitarbeiter) {
+                        $teile = [];
+                        $was = [];
+                        if ($statusNeu) {
+                            $teile[] = Bauhof::statusZeile(MaengelStatus::forContent($content), $hinweisStatus);
+                            $was[] = 'Status';
+                        }
+                        if ($auftrag->prioritaet !== $vorher['prioritaet']) {
+                            $teile[] = '⚡ *Priorität:* ' . $auftrag->getPrioritaetLabel();
+                            $was[] = 'Priorität';
+                        }
+                        if ((string)$auftrag->faellig !== (string)$vorher['faellig']) {
+                            $teile[] = '📅 *Erledigen bis:* ' . ($auftrag->faellig ? date('d.m.Y', strtotime($auftrag->faellig)) : 'keine Frist mehr');
+                            $was[] = 'Frist';
+                        }
+                        if ((string)$auftrag->hinweis !== (string)$vorher['hinweis']) {
+                            $teile[] = '💬 *Hinweis:* ' . ($auftrag->hinweis ?: '(entfernt)');
+                            $was[] = 'Hinweis';
+                        }
+                        $fehler = Bauhof::meldeAenderung($content->id, $teile, implode(', ', $was), $user) ?? $fehler;
+                    }
                     $fehler ? $this->view->error('Gespeichert, aber WhatsApp-Versand fehlgeschlagen: ' . $fehler) : $this->view->saved();
                     return $this->redirect($this->zu('mangel', ['id' => $content->id]));
                 }

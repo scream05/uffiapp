@@ -120,16 +120,11 @@ class Bauhof
     public static function sendeAenderung(Mangel $alt, Mangel $neu, User $user): ?string
     {
         $id = $neu->getContentId();
-        $auftrag = Auftrag::findOne($id);
-        $m = $auftrag?->mitarbeiter;
-        $status = MaengelStatus::forContent($neu->post->content);
-        if (!$m || !$m->aktiv || in_array($status->status, MaengelStatus::CLOSED, true)) {
+        $m = self::bearbeiter($id);
+        if (!$m || ($aenderung = self::aenderung($alt, $neu)) === null) {
             return null;
         }
-        if (($aenderung = self::aenderung($alt, $neu)) === null) {
-            return null;
-        }
-        [$text, $was, $ortNeu] = $aenderung;
+        [$teile, $was, $ortNeu] = $aenderung;
         try {
             if ($ortNeu && $m->isFensterOffen()) {
                 $teil = self::neueAusgehende($m, $id, 'teil', null, null);
@@ -140,18 +135,39 @@ class Bauhof
         } catch (\Throwable $e) {
             Yii::warning("Standort Auftrag $id an {$m->name}: {$e->getMessage()}", 'maengelmelder');
         }
-        $fehler = self::nachricht($m, $id, $text, $user, 'system');
-        self::vermerk($id, $m->id, $user, $fehler ? "Änderung ($was) an {$m->name}: WhatsApp-Versand fehlgeschlagen: $fehler"
+        return self::meldeAenderung($id, $teile, $was, $user);
+    }
+
+    /** Zuständiger, aktiver Mitarbeiter eines Auftrags (oder null) */
+    public static function bearbeiter(int $contentId): ?Mitarbeiter
+    {
+        $m = Auftrag::findOne($contentId)?->mitarbeiter;
+        return $m && $m->aktiv ? $m : null;
+    }
+
+    /**
+     * Jede Änderung an einem zugewiesenen Auftrag per WhatsApp an den Mitarbeiter (Text; außerhalb des Fensters
+     * Vorlage „Neue Nachricht“, Text beim Antippen) und Vermerk im Verlauf.
+     * @param string[] $teile Zeilen der Änderung, z. B. „🔄 *Status:* Erledigt“
+     * @return string|null Fehlermeldung beim Senden
+     */
+    public static function meldeAenderung(int $contentId, array $teile, string $was, User $user): ?string
+    {
+        $m = self::bearbeiter($contentId);
+        if (!$m || !$teile) {
+            return null;
+        }
+        $fehler = self::nachricht($m, $contentId, "✏️ Auftrag Nr. $contentId wurde geändert:\n\n" . implode("\n\n", $teile), $user, 'system');
+        self::vermerk($contentId, $m->id, $user, $fehler ? "Änderung ($was) an {$m->name}: WhatsApp-Versand fehlgeschlagen: $fehler"
             : "Änderung ($was) an {$m->name} geschickt");
         return $fehler;
     }
 
     /**
-     * Was hat sich an der Meldung geändert? @return array{0:string,1:string,2:bool}|null [WhatsApp-Text, „Ort, Kategorie …“, Ort verschoben]
+     * Was hat sich an der Meldung geändert? @return array{0:string[],1:string,2:bool}|null [Zeilen, „Ort, Kategorie …“, Ort verschoben]
      */
     public static function aenderung(Mangel $alt, Mangel $neu): ?array
     {
-        $id = $neu->getContentId();
         $ortNeu = $neu->lat && (abs($neu->lat - (float)$alt->lat) > 1e-6 || abs($neu->lng - (float)$alt->lng) > 1e-6);
         $katNeu = $neu->kategorie !== $alt->kategorie;
         $textNeu = trim($neu->beschreibung) !== trim($alt->beschreibung);
@@ -170,7 +186,7 @@ class Bauhof
             return null;
         }
         $was = implode(', ', array_filter([$ortNeu ? 'Ort' : null, $katNeu ? 'Kategorie' : null, $textNeu ? 'Beschreibung' : null]));
-        return ["✏️ Auftrag Nr. $id wurde geändert:\n\n" . implode("\n\n", $teile), $was, $ortNeu];
+        return [$teile, $was, $ortNeu];
     }
 
     /** Auftrag mit Fotos, Standort und Status-Knöpfen (nur im offenen Fenster) */
@@ -246,7 +262,7 @@ class Bauhof
      * Status setzen (Bauhofseite oder Mitarbeiter per WhatsApp). Öffentlich erscheint nur der neue Status als Kommentar
      * des Bauhof-Kontos, nicht der Name des Mitarbeiters.
      */
-    public static function statusSetzen(Content $content, string $neu, ?string $hinweis, User $als, ?Mitarbeiter $von = null): bool
+    public static function statusSetzen(Content $content, string $neu, ?string $hinweis, User $als, ?Mitarbeiter $von = null, bool $melden = true): bool
     {
         if (!isset(MaengelStatus::STATUSES[$neu])) {
             return false;
@@ -282,7 +298,17 @@ class Bauhof
         $wer = $von ? $von->name . ' (WhatsApp)' : $als->displayName;
         self::vermerk($content->id, $von?->id, $von ? null : $als, "Status „{$status->getLabel()}“ – $wer"
             . ($hinweis !== null ? ": $hinweis" : ''), 'status');
+        // Änderung im Backend: zuständigen Mitarbeiter informieren (nicht, wenn er den Status selbst gesetzt hat)
+        if ($melden && $von === null) {
+            self::meldeAenderung($content->id, [self::statusZeile($status, $hinweis)], 'Status', $als);
+        }
         return true;
+    }
+
+    /** Zeile „🔄 Status: …“ für Änderungsnachrichten */
+    public static function statusZeile(MaengelStatus $status, ?string $hinweis): string
+    {
+        return "🔄 *Status:* " . $status->getLabel() . ($hinweis !== null && $hinweis !== '' ? "\n💬 $hinweis" : '');
     }
 
     // ------------------------------------------------------------------ Mitarbeiter → Bauhof
