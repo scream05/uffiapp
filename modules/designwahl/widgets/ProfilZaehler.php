@@ -3,23 +3,21 @@
 namespace humhub\modules\designwahl\widgets;
 
 use humhub\modules\user\widgets\ProfileHeaderCounterSet;
-use Yii;
 
 /**
- * Profilkopf ohne „Follower“ und „Folgt“; übrige Zähler (z. B. Spaces) bleiben.
- * Ersetzt ProfileHeaderCounterSet per DI-Container (Events::onBeforeRequest).
+ * Profilkopf ohne Zähler (Follower, Folgt, Spaces, ggf. Freunde).
+ * Ersetzt ProfileHeaderCounterSet per DI-Container (Events::onBeforeRequest), der Kern bleibt unverändert.
  */
 class ProfilZaehler extends ProfileHeaderCounterSet
 {
     public function init()
     {
         parent::init();
-        $weg = [Yii::t('UserModule.profile', 'Followers'), Yii::t('UserModule.profile', 'Following')];
-        $this->counters = array_values(array_filter($this->counters, fn($c) => !in_array($c->label, $weg, true)));
+        $this->counters = [];
     }
 
     public function run()
     {
-        return $this->counters ? parent::run() : '';
+        return '';
     }
 }
