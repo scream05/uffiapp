@@ -66,3 +66,7 @@
 [data-bs-theme="dark"] .event-participation-buttons .cal-antwort-nein { --ca-farbe: #e07a84; }
 [data-bs-theme="dark"] .event-participation-buttons .btn.cal-antwort.btn-accent { color: #1f2a33; }
 [data-bs-theme="dark"] .event-participation-buttons .btn.cal-antwort.btn-accent::before { color: #1f2a33; }
+
+/* Kalender-Erinnerungen sind systemweit aus: im Terminformular kein Haken „Erinnerung aktivieren“ und kein Reiter */
+#calendar-entry-form .field-calendarentryform-reminder,
+#calendar-entry-form .tab-reminder { display: none !important; }

@@ -40,6 +40,13 @@ class Events
         Yii::$container->set(\humhub\modules\space\widgets\Members::class, widgets\SpaceMitglieder::class);
         Yii::$container->set(\humhub\modules\space\widgets\SpaceDirectoryIcons::class, widgets\SpaceVerzeichnisSymbole::class);
         Yii::$container->set(\humhub\modules\user\widgets\ProfileHeaderCounterSet::class, widgets\ProfilZaehler::class);
+        // Kalender-Erinnerungen systemweit aus: kein Link am Termin, und keine neuen Erinnerungen speichern
+        // (weder am Termin noch als Standard für Space/Konto/System; Abfuhr-Erinnerung ist ein eigenes Modul)
+        if (class_exists(\humhub\modules\calendar\widgets\ReminderLink::class)) {
+            Yii::$container->set(\humhub\modules\calendar\widgets\ReminderLink::class, widgets\OhneErinnerung::class);
+            \yii\base\Event::on(\humhub\modules\calendar\models\reminder\CalendarReminder::class,
+                \yii\db\BaseActiveRecord::EVENT_BEFORE_INSERT, fn($e) => $e->isValid = false);
+        }
         Yii::$container->set(\humhub\modules\space\widgets\InviteButton::class, widgets\OhneEinladen::class);
         Yii::$container->set(\humhub\modules\user\widgets\PeopleHeadingButtons::class, widgets\PersonenKnoepfe::class);
     }
