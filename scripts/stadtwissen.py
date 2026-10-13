@@ -612,7 +612,7 @@ def community_inhalte():
     übernommene Stadt-Nachrichten. „space“ und „oeffentlich“ steuern, wem der KI-Assistent den Inhalt zeigt."""
     base = 'https://community.rundumuffni.de/s/'
     common = ("FROM content c JOIN space s ON s.contentcontainer_id = c.contentcontainer_id "
-              "WHERE c.state = 1 AND s.status = 1 AND s.name NOT IN ('Mängelmelder', 'Abfall & Termine') ")
+              "WHERE c.state = 1 AND s.status = 1 AND s.url NOT IN ('mangelmelder', 'abfall-and-termine') ")
     vis = "'space', s.id, 'surl', s.url, 'sname', s.name, 'offen', (c.visibility = 1 AND s.visibility >= 1), 'cid', c.id"
     found = []
     # Wiki ist abgeschaltet (Modul deaktiviert, Tabellen entfernt) – nur abfragen, wenn es wieder da ist

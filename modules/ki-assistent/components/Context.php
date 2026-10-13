@@ -32,7 +32,7 @@ class Context
         $today = date('Y-m-d');
         $parts = [];
 
-        $space = Space::findOne(['name' => 'Abfall & Termine']);
+        $space = Space::findOne(['url' => 'abfall-and-termine']);
         if ($space !== null) {
             $lines = [];
             $entries = ExternalCalendarEntry::find()->contentContainer($space)

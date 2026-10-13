@@ -46,7 +46,7 @@ class Erinnerung
 
     public static function space(): ?Space
     {
-        return Space::findOne(['name' => self::module()->spaceName]);
+        return Space::findOne(['url' => self::module()->spaceUrl]);
     }
 
     /**

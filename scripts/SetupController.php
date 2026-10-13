@@ -63,7 +63,8 @@ class SetupController extends Controller
             'modules' => ['polls', 'questions'],
         ],
         [
-            'name' => 'Abfall & Termine',
+            'name' => 'Abfall & Termine', // heute „Abfalltermine“, gefunden über url
+            'url' => 'abfall-and-termine',
             'description' => 'Abfuhrtermine für Uffenheim und Ortsteile: Restmüll, Bio, Papier, Gelbe Tonne.',
             'color' => '#2e7d32',
             'auto_add' => true,
@@ -138,7 +139,7 @@ class SetupController extends Controller
         Yii::$app->user->switchIdentity($owner);
 
         foreach (self::SPACES as $def) {
-            if (Space::findOne(['name' => $def['name']])) {
+            if (Space::findOne(['name' => $def['name']]) || (isset($def['url']) && Space::findOne(['url' => $def['url']]))) {
                 $this->stdout("= {$def['name']} (existiert)\n");
                 continue;
             }
@@ -268,7 +269,7 @@ class SetupController extends Controller
     {
         $owner = User::findOne(['username' => $ownerUsername]);
         Yii::$app->user->switchIdentity($owner);
-        $space = Space::findOne(['name' => 'Abfall & Termine']);
+        $space = Space::findOne(['url' => 'abfall-and-termine']);
         if ($space === null) {
             $this->stderr("Space fehlt, zuerst setup/spaces ausführen\n");
             return ExitCode::DATAERR;
@@ -332,15 +333,16 @@ class SetupController extends Controller
         }
         // Früher (autopost an) angelegte Termine aus Stream und Aktivitäten nehmen
         $entryClass = \humhub\modules\external_calendar\models\ExternalCalendarEntry::class;
+        // (auch die Beiträge „Ein neuer Kalender wurde hinzugefügt“: der Space zeigt nur den Kalender)
         $n = \humhub\modules\content\models\Content::updateAll(['stream_channel' => null],
-            ['object_model' => $entryClass, 'stream_channel' => 'default', 'contentcontainer_id' => $space->contentcontainer_id]);
+            ['object_model' => [$entryClass, $calClass], 'stream_channel' => 'default', 'contentcontainer_id' => $space->contentcontainer_id]);
         $a = 0;
-        foreach (\humhub\modules\activity\models\Activity::find()->where(['object_model' => $entryClass])->all() as $activity) {
+        foreach (\humhub\modules\activity\models\Activity::find()->where(['object_model' => [$entryClass, $calClass]])->all() as $activity) {
             $activity->hardDelete();
             $a++;
         }
         if ($n || $a) {
-            $this->stdout("Aus dem Stream genommen: $n Termine, $a Aktivitäten\n");
+            $this->stdout("Aus dem Stream genommen: $n Termine/Kalender, $a Aktivitäten\n");
         }
 
         // Info-Beitrag anlegen bzw. aktualisieren; erkannt an der Abo-Adresse im Text

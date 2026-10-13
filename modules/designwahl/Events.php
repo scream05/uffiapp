@@ -133,6 +133,12 @@ class Events
      */
     private static function abbrechenKnopf()
     {
+        // Nur auf der ganzen Anmelde-/Registrierungsseite, nicht in nachgeladenen Teilen (Stream, Modals)
+        $controller = Yii::$app->controller;
+        if (Yii::$app->request->isAjax || $controller === null
+            || !in_array($controller->uniqueId, ['user/auth', 'user/registration'], true)) {
+            return;
+        }
         $view = Yii::$app->view;
         $view->registerCss(<<<CSS
 .dn-abbrechen { display: inline-flex; align-items: center; gap: 6px; margin: 0 0 14px; padding: 9px 16px;

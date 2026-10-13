@@ -6,8 +6,8 @@ use humhub\modules\abfuhr\notifications\AbfuhrMorgen;
 
 class Module extends \humhub\components\Module
 {
-    /** Space mit dem Abfallkalender (External Calendar, siehe scripts/abfall-kalender.py) */
-    public string $spaceName = 'Abfall & Termine';
+    /** URL des Space mit dem Abfallkalender (External Calendar, siehe scripts/abfall-kalender.py) – bleibt beim Umbenennen gleich */
+    public string $spaceUrl = 'abfall-and-termine';
 
     /** Tonnen: Schlüssel => Anzeigename; Titel im Kalender beginnen mit dem Anzeigenamen */
     public array $tonnen = [
