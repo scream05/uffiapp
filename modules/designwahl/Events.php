@@ -14,11 +14,11 @@ class Events
     public static function onAccountTopMenuInit($event)
     {
         try {
-            if (Yii::$app->user->isGuest) {
-                return;
-            }
             /** @var Module $module */
             $module = Yii::$app->getModule('designwahl');
+            if (Yii::$app->user->isGuest || !$module->umschalterAnzeigen) {
+                return;
+            }
             $other = $module->getDesign() === 'neu' ? 'klassisch' : 'neu';
             $event->sender->addEntry(new MenuLink([
                 'label' => 'Design: ' . Module::DESIGNS[$other],

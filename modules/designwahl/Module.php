@@ -14,6 +14,12 @@ class Module extends \humhub\components\Module
     public const DESIGNS = ['klassisch' => 'Klassisch', 'neu' => 'Uffi frisch'];
 
     /**
+     * Umschalter „Design: …“ im Profilmenü anzeigen? Seit 15.10.2026 aus (alle nutzen „Uffi frisch“); die Technik
+     * (Benutzereinstellung, /designwahl/wechsel, klassisches Design) bleibt – zum Wiedereinschalten auf true setzen.
+     */
+    public bool $umschalterAnzeigen = false;
+
+    /**
      * Ziele im neuen Design: [Text, Symbol, Space-URL oder null, Route, Farbe].
      * „leiste“ steht in der Leiste (Handy unten, Computer oben), „mehr“ im Fach hinter „Mehr“.
      */
