@@ -8,6 +8,7 @@ use humhub\modules\maengelmelder\components\Bauhof;
 use humhub\modules\maengelmelder\models\Auftrag;
 use humhub\modules\maengelmelder\models\BauhofNachricht;
 use humhub\modules\maengelmelder\models\MaengelAuch;
+use humhub\modules\maengelmelder\models\MaengelKontakt;
 use humhub\modules\maengelmelder\models\MaengelStatus;
 use humhub\modules\maengelmelder\models\Mangel;
 use humhub\modules\maengelmelder\models\Mitarbeiter;
@@ -27,7 +28,7 @@ class BauhofController extends ContentContainerController
 {
     protected function getAccessRules()
     {
-        return [['login'], ['post' => ['mitarbeiter-loeschen', 'loeschen', 'senden']]];
+        return [['login'], ['post' => ['mitarbeiter-loeschen', 'loeschen', 'senden', 'freigeben']]];
     }
 
     public function beforeAction($action)
@@ -44,7 +45,8 @@ class BauhofController extends ContentContainerController
     /** Liste bzw. Karte aller Meldungen mit Filtern */
     public function actionIndex($status = 'offen', $mitarbeiter = '', $kategorie = '', $q = '', $ansicht = 'liste')
     {
-        $posts = Mangel::find($this->contentContainer)->andWhere(['content.state' => Content::STATE_PUBLISHED])
+        // Entwürfe = Gastmeldungen, die noch auf Freigabe warten
+        $posts = Mangel::find($this->contentContainer)->andWhere(['content.state' => [Content::STATE_PUBLISHED, Content::STATE_DRAFT]])
             ->orderBy(['content.created_at' => SORT_DESC])->limit(1000)->all();
         $ids = array_map(fn(Post $p) => (int)$p->content->id, $posts);
         $statuses = MaengelStatus::find()->where(['content_id' => $ids])->indexBy('content_id')->all();
@@ -58,19 +60,25 @@ class BauhofController extends ContentContainerController
             ->groupBy('content_id')->indexBy('content_id')->column();
 
         $zeilen = [];
-        $zaehler = ['offen' => 0, 'alle' => 0] + array_fill_keys(array_keys(MaengelStatus::STATUSES), 0);
+        $zaehler = ['pruefen' => 0, 'offen' => 0, 'alle' => 0] + array_fill_keys(array_keys(MaengelStatus::STATUSES), 0);
         foreach ($posts as $post) {
             $mangel = new Mangel($post);
             $id = $mangel->getContentId();
             $st = $statuses[$id] ?? new MaengelStatus(['status' => 'gemeldet']);
             $a = $auftraege[$id] ?? null;
+            $entwurf = (int)$post->content->state === Content::STATE_DRAFT;
             $zaehler['alle']++;
-            $zaehler[$st->status] = ($zaehler[$st->status] ?? 0) + 1;
             $istOffen = !in_array($st->status, MaengelStatus::CLOSED, true);
+            if ($entwurf) {
+                $zaehler['pruefen']++;
+            } else {
+                $zaehler[$st->status] = ($zaehler[$st->status] ?? 0) + 1;
+            }
             if ($istOffen) {
                 $zaehler['offen']++;
             }
-            if (($status === 'offen' && !$istOffen) || ($status !== 'offen' && $status !== 'alle' && $st->status !== $status)) {
+            if (($status === 'offen' && !$istOffen) || ($status === 'pruefen' && !$entwurf)
+                || (!in_array($status, ['offen', 'alle', 'pruefen'], true) && ($entwurf || $st->status !== $status))) {
                 continue;
             }
             if ($mitarbeiter === '0' && $a?->mitarbeiter_id) {
@@ -93,10 +101,11 @@ class BauhofController extends ContentContainerController
                 'ungelesen' => (int)($ungelesen[$id] ?? 0),
                 'aktivitaet' => max($letzte[$id] ?? '', $st->updated_at ?? '', $post->content->created_at),
                 'bilder' => count($mangel->getBilder()),
+                'entwurf' => $entwurf,
             ];
         }
         // Dringendes und Überfälliges nach oben, dann neueste Aktivität
-        $rang = fn($z) => ($z['auftrag']?->prioritaet === 'dringend' ? 2 : ($z['auftrag']?->prioritaet === 'hoch' ? 1 : 0))
+        $rang = fn($z) => ($z['entwurf'] ? 5 : 0) + ($z['auftrag']?->prioritaet === 'dringend' ? 2 : ($z['auftrag']?->prioritaet === 'hoch' ? 1 : 0))
             + ($z['auftrag']?->faellig && $z['auftrag']->faellig < date('Y-m-d') && !in_array($z['status']->status, MaengelStatus::CLOSED, true) ? 3 : 0);
         usort($zeilen, fn($x, $y) => [$rang($y), $y['aktivitaet']] <=> [$rang($x), $x['aktivitaet']]);
 
@@ -119,6 +128,12 @@ class BauhofController extends ContentContainerController
         $request = Yii::$app->request;
         $user = Yii::$app->user->getIdentity();
 
+        $entwurf = (int)$content->state === Content::STATE_DRAFT;
+
+        if ($request->isPost && $entwurf) {
+            $this->view->warn('Bitte die Gastmeldung zuerst freigeben.');
+            return $this->redirect($this->zu('mangel', ['id' => $content->id]));
+        }
         if ($request->isPost) {
             $aktion = $request->post('aktion');
             if ($aktion === 'speichern') {
@@ -186,7 +201,33 @@ class BauhofController extends ContentContainerController
             'auch' => MaengelAuch::counts([$content->id])[$content->id] ?? 0,
             'mitarbeiterListe' => Mitarbeiter::aktive(),
             'verlauf' => $this->verlauf(['content_id' => $content->id]),
+            'kontakt' => MaengelKontakt::findOne($content->id),
+            'entwurf' => $entwurf,
         ]);
+    }
+
+    /** Gastmeldung freigeben: erscheint dann im Space und auf der Karte */
+    public function actionFreigeben($id)
+    {
+        [$content] = $this->mangel($id);
+        if ((int)$content->state === Content::STATE_DRAFT) {
+            $content->getStateService()->publish();
+            $this->view->success('Meldung freigegeben. Sie erscheint jetzt auf der Karte.');
+        }
+        return $this->redirect($this->zu('mangel', ['id' => $content->id]));
+    }
+
+    /** Foto einer Meldung ausliefern (auch bei Gastmeldungen, die noch nicht freigegeben sind) */
+    public function actionFoto($id, $guid)
+    {
+        [, $mangel] = $this->mangel($id);
+        foreach ($mangel->getBilder() as $file) {
+            if ($file->guid === $guid && is_file($pfad = $file->getStore()->get())) {
+                Yii::$app->response->headers->set('Cache-Control', 'private, max-age=86400');
+                return Yii::$app->response->sendFile($pfad, $file->file_name, ['inline' => true, 'mimeType' => $file->mime_type]);
+            }
+        }
+        throw new NotFoundHttpException();
     }
 
     /** Verlauf neu laden (alle 20 s per JavaScript) */
@@ -268,11 +309,17 @@ class BauhofController extends ContentContainerController
         return $this->redirect($this->zu('mitarbeiter', []));
     }
 
-    /** Meldung löschen (z. B. Spam oder doppelt) */
+    /** Meldung löschen (z. B. Spam oder doppelt); abgelehnte Gastmeldungen samt Fotos und Kontaktdaten endgültig */
     public function actionLoeschen($id)
     {
-        [$content] = $this->mangel($id);
+        [$content, $mangel] = $this->mangel($id);
+        if ((int)$content->state === Content::STATE_DRAFT) {
+            $mangel->post->hardDelete();
+            $this->view->success('Gastmeldung abgelehnt und gelöscht.');
+            return $this->redirect($this->zu('index', []));
+        }
         $content->softDelete();
+        MaengelKontakt::deleteAll(['content_id' => $content->id]);
         $this->view->success('Meldung gelöscht.');
         return $this->redirect($this->zu('index', []));
     }
@@ -302,7 +349,7 @@ class BauhofController extends ContentContainerController
     private function mangel($id): array
     {
         $content = Content::findOne(['id' => (int)$id, 'contentcontainer_id' => $this->contentContainer->contentcontainer_id,
-            'object_model' => Post::class, 'state' => Content::STATE_PUBLISHED]);
+            'object_model' => Post::class, 'state' => [Content::STATE_PUBLISHED, Content::STATE_DRAFT]]);
         $mangel = $content ? Mangel::fromContent($content) : null;
         if (!$mangel) {
             throw new NotFoundHttpException('Meldung nicht gefunden.');

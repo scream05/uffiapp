@@ -6,6 +6,8 @@
  * @var string[] $errors
  * @var \humhub\modules\maengelmelder\Module $module
  * @var \humhub\modules\maengelmelder\models\Mangel|null $bearbeiten Meldung, die der Bauhof ändert
+ * @var \humhub\modules\maengelmelder\models\MeldeKontakt|null $kontakt Kontaktangaben (nicht beim Bearbeiten)
+ * @var string|null $danke Nr. der eben eingegangenen Gastmeldung
  */
 
 use humhub\helpers\Html;
@@ -13,8 +15,12 @@ use humhub\modules\file\widgets\FilePreview;
 use humhub\modules\file\widgets\UploadButton;
 use humhub\modules\file\widgets\UploadProgress;
 use humhub\modules\maengelmelder\assets\MapAsset;
+use humhub\widgets\form\CaptchaField;
+use yii\helpers\Url;
 
 MapAsset::register($this);
+$gast = Yii::$app->user->isGuest;
+$feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '';
 ?>
 <div class="panel panel-default">
     <div class="panel-heading"><strong><?= $bearbeiten ? 'Meldung Nr. ' . $bearbeiten->getContentId() . ' bearbeiten' : 'Mangel melden' ?></strong>
@@ -25,11 +31,24 @@ MapAsset::register($this);
         <?php endif ?>
     </div>
     <div class="panel-body">
-        <?php if (!$canPost): ?>
+        <?php if ($danke !== null): ?>
+            <div class="alert alert-success">
+                <strong>Vielen Dank<?= $danke ? ', Ihre Meldung Nr. ' . (int)$danke . ' ist eingegangen' : ', Ihre Meldung ist eingegangen' ?>.</strong><br>
+                Der Bauhof prüft sie und schaltet sie danach auf der Karte frei. Bei Rückfragen meldet er sich über die angegebenen Kontaktdaten.
+            </div>
+        <?php endif ?>
+        <?php if (!$canPost && $gast): ?>
+            <div class="alert alert-info">Um einen Mangel zu melden, melden Sie sich bitte an oder legen Sie ein kostenloses Konto an.
+                <?= Html::a('Anmelden', ['/user/auth/login'], ['class' => 'alert-link', 'data-pjax-prevent' => 1]) ?></div>
+        <?php elseif (!$canPost): ?>
             <div class="alert alert-info">Um einen Mangel zu melden, treten Sie bitte zuerst dem Bereich „<?= Html::encode($space->name) ?>“ bei.</div>
         <?php else: ?>
             <?php if ($bearbeiten): ?>
             <p class="help-block">Änderungen erscheinen direkt im Beitrag. Neue Fotos werden hinzugefügt; vorhandene bleiben.</p>
+            <?php elseif ($gast): ?>
+            <p class="help-block">Schlagloch, defekte Laterne, wilder Müll? Beschreiben Sie den Mangel, markieren Sie den Ort auf der Karte
+                und fügen Sie gern ein Foto hinzu. Sie brauchen dafür kein Konto: Der Bauhof prüft Ihre Meldung und schaltet sie
+                danach auf der Karte frei. Bitte keine Personen oder Kfz-Kennzeichen erkennbar fotografieren.</p>
             <?php else: ?>
             <p class="help-block">Schlagloch, defekte Laterne, wilder Müll? Beschreiben Sie den Mangel, markieren Sie den Ort auf der Karte
                 und fügen Sie gern ein Foto hinzu. Die Meldung erscheint als Beitrag in diesem Bereich.
@@ -39,7 +58,7 @@ MapAsset::register($this);
                 <div class="alert alert-danger"><?= implode('<br>', array_map([Html::class, 'encode'], $errors)) ?></div>
             <?php endif ?>
 
-            <?= Html::beginForm('', 'post', ['id' => 'maengel-form']) ?>
+            <?= Html::beginForm('', 'post', ['id' => 'maengel-form'] + ($gast ? ['enctype' => 'multipart/form-data'] : [])) ?>
             <div class="form-group">
                 <label for="maengel-kategorie">Kategorie</label>
                 <?= Html::dropDownList('Meldung[kategorie]', $data['kategorie'], array_combine($module->categories, $module->categories),
@@ -62,6 +81,14 @@ MapAsset::register($this);
                 <?= Html::hiddenInput('Meldung[lat]', $data['lat'], ['id' => 'maengel-lat']) ?>
                 <?= Html::hiddenInput('Meldung[lng]', $data['lng'], ['id' => 'maengel-lng']) ?>
             </div>
+            <?php if ($gast): ?>
+            <div class="form-group">
+                <label for="maengel-fotos">Fotos <small class="text-muted">– freiwillig, höchstens <?= $module->gastFotos ?></small></label>
+                <input type="file" name="fotos[]" id="maengel-fotos" class="form-control" accept="image/*" multiple
+                       data-max="<?= $module->gastFotos ?>" data-max-mb="<?= $module->gastFotoMaxMb ?>">
+                <small class="text-muted" id="maengel-fotos-hinweis"></small>
+            </div>
+            <?php else: ?>
             <div class="form-group">
                 <?= UploadButton::widget([
                     'id' => 'maengel-upload',
@@ -76,12 +103,79 @@ MapAsset::register($this);
                 <?= UploadProgress::widget(['id' => 'maengel-progress']) ?>
                 <?= FilePreview::widget(['id' => 'maengel-preview', 'edit' => true, 'options' => ['style' => 'margin-top:10px']]) ?>
             </div>
+            <?php endif ?>
+
+            <?php if ($kontakt && $gast): ?>
+            <fieldset class="maengel-kontakt">
+                <legend>Ihre Kontaktdaten <small class="text-muted">– für Rückfragen des Bauhofs</small></legend>
+                <p class="help-block">Ihre Angaben sehen nur die Bauhofleitung und die Administratoren dieser Plattform, nicht die Öffentlichkeit.
+                    Sie werden nur für Rückfragen zu dieser Meldung verwendet und <?= round($module->kontaktAufbewahrungTage / 30) ?> Monate
+                    nach ihrer Erledigung gelöscht.</p>
+                <div class="row">
+                    <div class="col-sm-6 form-group">
+                        <label for="kontakt-vorname">Vorname</label>
+                        <?= Html::activeTextInput($kontakt, 'vorname', ['id' => 'kontakt-vorname', 'class' => 'form-control' . $feld('vorname'),
+                            'required' => true, 'maxlength' => 60, 'autocomplete' => 'given-name']) ?>
+                    </div>
+                    <div class="col-sm-6 form-group">
+                        <label for="kontakt-nachname">Nachname</label>
+                        <?= Html::activeTextInput($kontakt, 'nachname', ['id' => 'kontakt-nachname', 'class' => 'form-control' . $feld('nachname'),
+                            'required' => true, 'maxlength' => 60, 'autocomplete' => 'family-name']) ?>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 form-group">
+                        <label for="kontakt-email">E-Mail</label>
+                        <?= Html::activeInput('email', $kontakt, 'email', ['id' => 'kontakt-email', 'class' => 'form-control' . $feld('email'),
+                            'maxlength' => 150, 'autocomplete' => 'email']) ?>
+                    </div>
+                    <div class="col-sm-6 form-group">
+                        <label for="kontakt-telefon">Telefon</label>
+                        <?= Html::activeInput('tel', $kontakt, 'telefon', ['id' => 'kontakt-telefon', 'class' => 'form-control' . $feld('telefon'),
+                            'maxlength' => 30, 'autocomplete' => 'tel']) ?>
+                    </div>
+                </div>
+                <p class="help-block">Bitte mindestens E-Mail oder Telefon angeben.</p>
+                <div class="maengel-feld-website" aria-hidden="true">
+                    <label for="kontakt-website">Website (bitte leer lassen)</label>
+                    <?= Html::activeTextInput($kontakt, 'website', ['id' => 'kontakt-website', 'tabindex' => -1, 'autocomplete' => 'off']) ?>
+                </div>
+                <div class="form-check form-group">
+                    <?= Html::activeCheckbox($kontakt, 'datenschutz', ['id' => 'kontakt-datenschutz', 'class' => 'form-check-input' . $feld('datenschutz'),
+                        'label' => false, 'uncheck' => '0', 'required' => true]) ?>
+                    <label class="form-check-label" for="kontakt-datenschutz">Ich bin einverstanden, dass meine Angaben zur Bearbeitung dieser
+                        Meldung gespeichert werden. Einzelheiten in der
+                        <?= Html::a('Datenschutzerklärung', Url::to(['/legal/page/view', 'pageKey' => 'privacy']), ['target' => '_blank', 'rel' => 'noopener']) ?>.</label>
+                </div>
+                <div class="form-group">
+                    <?= CaptchaField::widget(['model' => $kontakt, 'attribute' => 'captcha']) ?>
+                </div>
+            </fieldset>
+            <?php elseif ($kontakt): ?>
+            <?php $ich = Yii::$app->user->getIdentity() ?>
+            <fieldset class="maengel-kontakt">
+                <legend>Ihre Kontaktdaten <small class="text-muted">– für Rückfragen des Bauhofs</small></legend>
+                <p style="margin-bottom:8px"><i class="fa fa-user"></i> <?= Html::encode($ich->displayName) ?>
+                    &nbsp; <i class="fa fa-envelope-o"></i> <?= Html::encode($ich->email) ?></p>
+                <div class="form-group" style="max-width:360px">
+                    <label for="kontakt-telefon">Telefon <small class="text-muted">– freiwillig</small></label>
+                    <?= Html::activeInput('tel', $kontakt, 'telefon', ['id' => 'kontakt-telefon', 'class' => 'form-control' . $feld('telefon'),
+                        'maxlength' => 30, 'autocomplete' => 'tel']) ?>
+                    <small class="text-muted">Nur für Rückfragen zu dieser Meldung; sieht nur der Bauhof.</small>
+                </div>
+            </fieldset>
+            <?php endif ?>
             <button type="submit" class="btn btn-primary"><?= $bearbeiten ? 'Speichern' : 'Meldung absenden' ?></button>
             <?= Html::endForm() ?>
         <?php endif ?>
     </div>
 </div>
 
+<style <?= Html::nonce() ?>>
+    .maengel-kontakt { margin: 18px 0 10px; padding-top: 14px; border-top: 1px solid var(--hh-border-color, #e5e5e5); }
+    .maengel-kontakt legend { font-size: 1rem; font-weight: 600; margin-bottom: 6px; }
+    .maengel-feld-website { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+</style>
 <?= $this->render('_tiles') ?>
 <?php if ($canPost): ?>
 <script <?= Html::nonce() ?>>
@@ -97,7 +191,16 @@ maengelReady(function () {
     // Schon gemeldet? Offene Meldungen in der Nähe anzeigen, damit man sich anschließen kann statt doppelt zu melden
     var nahe = document.getElementById('maengel-nahe'), naheLayer = L.layerGroup().addTo(map), naheTimer = null;
     var naheUrl = <?= json_encode($space->createUrl('/maengelmelder/meldung/nahe')) ?>;
-    var bearbeiten = <?= $bearbeiten ? 'true' : 'false' ?>;
+    var bearbeiten = <?= $bearbeiten ? 'true' : 'false' ?>, gast = <?= $gast ? 'true' : 'false' ?>;
+    var fotos = document.getElementById('maengel-fotos');
+    if (fotos) {
+        fotos.addEventListener('change', function () {
+            var max = +fotos.dataset.max, maxMb = +fotos.dataset.maxMb, zuGross = [].some.call(fotos.files, function (f) { return f.size > maxMb * 1048576; });
+            var text = fotos.files.length > max ? 'Bitte höchstens ' + max + ' Fotos auswählen.' : (zuGross ? 'Ein Foto ist größer als ' + maxMb + ' MB.' : '');
+            document.getElementById('maengel-fotos-hinweis').textContent = text;
+            fotos.setCustomValidity(text);
+        });
+    }
     var csrfParam = document.querySelector('meta[name=csrf-param]').content, csrfToken = document.querySelector('meta[name=csrf-token]').content;
     function esc(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
     function loadNahe(ll) {
@@ -124,8 +227,10 @@ maengelReady(function () {
                 + esc(m.statusLabel) + ' · gemeldet ' + esc(m.datum)
                 + (m.auch ? ' · ' + m.auch + ' weitere betroffen' : '') + '</small><br>'
                 + '<span>' + esc(m.auszug) + '</span><br>'
-                + '<a href="' + esc(m.url) + '" target="_blank" rel="noopener">Ansehen</a>';
-            if (m.eigene) {
+                + (m.url ? '<a href="' + esc(m.url) + '" target="_blank" rel="noopener">Ansehen</a>' : '');
+            if (gast) {
+                html += ' <small class="text-muted">Ist es derselbe Mangel? Dann ist keine neue Meldung nötig.</small>';
+            } else if (m.eigene) {
                 html += ' <small class="text-muted">(Ihre eigene Meldung)</small>';
             } else if (m.auchMeins) {
                 html += ' <small class="text-muted"><i class="fa fa-check"></i> Sie haben sich bereits angeschlossen</small>';

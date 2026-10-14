@@ -52,7 +52,10 @@ class Events
                 'sortOrder' => 151,
             ]);
             if (models\MaengelStatus::canManage() && $space->url === Yii::$app->getModule('maengelmelder')->bauhofSpace) {
-                $neu = models\BauhofNachricht::ungelesen();
+                // Ungelesene WhatsApp-Nachrichten und Gastmeldungen, die auf Freigabe warten
+                $neu = models\BauhofNachricht::ungelesen() + (int)\humhub\modules\content\models\Content::find()
+                    ->where(['state' => \humhub\modules\content\models\Content::STATE_DRAFT, 'contentcontainer_id' => $space->contentcontainer_id,
+                        'created_by' => Yii::$app->getModule('maengelmelder')->getGastKonto()?->id ?? 0])->count();
                 $link = \humhub\modules\ui\menu\MenuLink::createByArray([
                     'label' => 'Bauhof' . ($neu ? ' <span class="badge bg-danger">' . $neu . '</span>' : ''),
                     'url' => $space->createUrl('/maengelmelder/bauhof/index'),

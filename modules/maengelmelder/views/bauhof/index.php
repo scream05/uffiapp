@@ -17,13 +17,14 @@ MapAsset::register($this);
 $url = fn(array $p = []) => $space->createUrl('/maengelmelder/bauhof/index', array_filter($p + $filter, fn($v) => $v !== ''));
 $heute = date('Y-m-d');
 $fmt = Yii::$app->formatter;
+$pruefen = '<span class="bauhof-badge" style="background:#b45309" title="Gastmeldung ohne Konto – erst nach Freigabe sichtbar">Zu prüfen</span>';
 ?>
 <div class="panel panel-default">
     <div class="panel-body">
         <?= $this->render('_nav', ['space' => $space, 'aktiv' => 'index']) ?>
 
         <div class="d-flex flex-wrap gap-1 mb-2">
-            <?php foreach (['offen' => 'Offen', 'alle' => 'Alle'] + array_map(fn($s) => $s[0], MaengelStatus::STATUSES) as $key => $label): ?>
+            <?php foreach (($zaehler['pruefen'] || $filter['status'] === 'pruefen' ? ['pruefen' => 'Zu prüfen'] : []) + ['offen' => 'Offen', 'alle' => 'Alle'] + array_map(fn($s) => $s[0], MaengelStatus::STATUSES) as $key => $label): ?>
                 <?= Html::a(Html::encode($label) . ' <span class="opacity-75">' . ($zaehler[$key] ?? 0) . '</span>', $url(['status' => $key]),
                     ['class' => 'btn btn-sm ' . ($filter['status'] === $key ? 'btn-primary' : 'btn-light')]) ?>
             <?php endforeach ?>
@@ -79,7 +80,7 @@ $fmt = Yii::$app->formatter;
                                 <?= $z['bilder'] ? ' · <i class="fa fa-camera"></i> ' . $z['bilder'] : '' ?>
                                 <?= $z['auch'] ? ' · <i class="fa fa-users"></i> +' . $z['auch'] : '' ?></small>
                         </td>
-                        <td><?= $z['status']->getEtikett() ?></td>
+                        <td><?= $z['entwurf'] ? $pruefen : $z['status']->getEtikett() ?></td>
                         <td><?= $a?->mitarbeiter ? Html::encode($a->mitarbeiter->name) : '<span class="text-muted">–</span>' ?></td>
                         <td>
                             <?php if ($a && $a->prioritaet !== 'normal'): ?>
@@ -104,7 +105,7 @@ $fmt = Yii::$app->formatter;
                         <div class="d-flex justify-content-between gap-2">
                             <strong>Nr. <?= $m->getContentId() ?> · <?= Html::encode($m->kategorie) ?>
                                 <?php if ($z['ungelesen']): ?><span class="bauhof-neu"><?= $z['ungelesen'] ?></span><?php endif ?></strong>
-                            <?= $z['status']->getEtikett() ?>
+                            <?= $z['entwurf'] ? $pruefen : $z['status']->getEtikett() ?>
                         </div>
                         <small><?= Html::encode($m->getAuszug(100)) ?></small><br>
                         <small class="text-muted"><i class="fa fa-map-marker"></i> <?= Html::encode($m->getOrt()) ?></small><br>

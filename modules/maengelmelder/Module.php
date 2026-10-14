@@ -41,6 +41,18 @@ class Module extends ContentContainerModule
     /** Verlauf und Fotos des Bauhofs so viele Tage nach Abschluss einer Meldung löschen */
     public int $bauhofAufbewahrungTage = 365;
 
+    /**
+     * Meldungen ohne Konto (Gäste): erscheinen unter diesem Systemkonto als Entwurf und erst nach Freigabe
+     * durch den Bauhof. Ein- und ausschalten: yii bauhof/gastmeldungen an|aus (Einstellung „gastMeldungen“).
+     */
+    public string $gastKonto = 'gastmeldung';
+    public int $gastMeldungenProTag = 5; // je IP-Adresse
+    public int $gastFotos = 3;
+    public int $gastFotoMaxMb = 15;
+
+    /** Kontaktdaten der Meldenden so viele Tage nach Abschluss der Meldung löschen */
+    public int $kontaktAufbewahrungTage = 183;
+
     public function getNotifications()
     {
         return [notifications\BauhofMeldung::class];
@@ -68,6 +80,17 @@ class Module extends ContentContainerModule
             return [new permissions\ManageStatus()];
         }
         return $contentContainer instanceof \humhub\modules\space\models\Space ? [new permissions\MangelMelden()] : [];
+    }
+
+    /** Gastmeldungen eingeschaltet und Systemkonto vorhanden? */
+    public function gastMeldungenAktiv(): bool
+    {
+        return (bool)$this->settings->get('gastMeldungen') && $this->getGastKonto() !== null;
+    }
+
+    public function getGastKonto(): ?\humhub\modules\user\models\User
+    {
+        return \humhub\modules\user\models\User::findOne(['username' => $this->gastKonto, 'status' => \humhub\modules\user\models\User::STATUS_ENABLED]);
     }
 
     public function inBounds(float $lat, float $lng): bool

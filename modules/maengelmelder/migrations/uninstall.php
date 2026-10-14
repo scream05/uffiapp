@@ -6,6 +6,7 @@ class uninstall extends Migration
 {
     public function up()
     {
+        $this->dropTable('maengel_kontakt');
         $this->dropTable('bauhof_nachricht');
         $this->dropTable('maengel_auftrag');
         $this->dropTable('bauhof_mitarbeiter');

@@ -5,9 +5,12 @@ namespace humhub\modules\maengelmelder\controllers;
 use humhub\modules\content\components\ContentContainerController;
 use humhub\modules\content\models\Content;
 use humhub\modules\maengelmelder\components\Bauhof;
+use humhub\modules\maengelmelder\components\GastFotos;
 use humhub\modules\maengelmelder\models\MaengelAuch;
+use humhub\modules\maengelmelder\models\MaengelKontakt;
 use humhub\modules\maengelmelder\models\MaengelStatus;
 use humhub\modules\maengelmelder\models\Mangel;
+use humhub\modules\maengelmelder\models\MeldeKontakt;
 use humhub\modules\maengelmelder\Module;
 use humhub\modules\post\models\Post;
 use humhub\modules\maengelmelder\permissions\MangelMelden;
@@ -26,16 +29,23 @@ class MeldungController extends ContentContainerController
 {
     protected function getAccessRules()
     {
-        return [['login' => ['create', 'bearbeiten', 'nahe', 'auch']], ['post' => ['auch']]]; // Karte auch für Gäste
+        // Karte, „Schon gemeldet?“ und (falls eingeschaltet) das Melden auch für Gäste
+        return [['login' => ['bearbeiten', 'auch']], ['post' => ['auch']]];
     }
 
-    public function actionCreate()
+    public function actionCreate($danke = null)
     {
         $space = $this->contentContainer;
-        // Eigenes Recht statt „Beitrag erstellen“: Mitglieder melden, schreiben aber nicht frei in den Stream
-        $canPost = $space->permissionManager->can(MangelMelden::class);
+        $gast = Yii::$app->user->isGuest;
+        // Eigenes Recht statt „Beitrag erstellen“: Mitglieder melden, schreiben aber nicht frei in den Stream.
+        // Gäste melden ohne Konto (mit Kontaktangaben), sofern eingeschaltet; die Meldung prüft zuerst der Bauhof.
+        $canPost = $gast ? $this->module->gastMeldungenAktiv() : $space->permissionManager->can(MangelMelden::class);
         $data = ['kategorie' => '', 'beschreibung' => '', 'lat' => '', 'lng' => ''];
         $errors = [];
+        $kontakt = new MeldeKontakt(['scenario' => $gast ? MeldeKontakt::SCENARIO_GAST : MeldeKontakt::SCENARIO_KONTO]);
+        if (!$gast) {
+            $kontakt->telefon = MeldeKontakt::telefonAusProfil(Yii::$app->user->getIdentity());
+        }
 
         // Vorbelegung per Link (z. B. vom KI-Assistenten); abgeschickt wird erst mit „Meldung absenden“
         if (!Yii::$app->request->isPost) {
@@ -67,12 +77,35 @@ class MeldungController extends ContentContainerController
             } elseif (!$this->module->inBounds($lat, $lng)) {
                 $errors[] = 'Der markierte Ort liegt nicht im Stadtgebiet von Uffenheim.';
             }
+            $kontakt->load(Yii::$app->request->post());
+            if (!$kontakt->validate()) {
+                $errors = array_merge($errors, $kontakt->getErrorSummary(false));
+            }
+            if ($gast) {
+                if ($kontakt->istBot()) {
+                    Yii::warning('Gastmeldung verworfen (verstecktes Feld ausgefüllt)', 'maengelmelder');
+                    return $this->redirect($space->createUrl('/maengelmelder/meldung/create', ['danke' => 0]));
+                }
+                [$fotos, $fotoFehler] = GastFotos::pruefen($this->module);
+                $errors = array_merge($errors, $fotoFehler);
+                if (!$errors && !$this->gastZaehlen(false)) {
+                    $errors[] = 'Von Ihrem Anschluss kamen heute schon mehrere Meldungen. Bitte versuchen Sie es morgen wieder '
+                        . 'oder legen Sie ein kostenloses Konto an.';
+                }
+                if (!$errors) {
+                    return $this->gastMeldungSpeichern($space, $data, $lat, $lng, $kontakt, $fotos);
+                }
+            }
             if (!$errors) {
                 $post = new Post($space);
                 $post->message = Mangel::message($space, $data['kategorie'], mb_substr($data['beschreibung'], 0, 3000), $lat, $lng);
                 $post->content->visibility = $space->getDefaultContentVisibility();
                 if ($post->save()) {
                     $post->fileManager->attach(Yii::$app->request->post('fileList'));
+                    if ($kontakt->telefon !== '') {
+                        (new MaengelKontakt(['content_id' => $post->content->id, 'user_id' => Yii::$app->user->id,
+                            'telefon' => $kontakt->telefon, 'created_at' => date('Y-m-d H:i:s')]))->save(false);
+                    }
                     // Vom Bauhof angelegt: gleich zur Bearbeitung (Zuweisen usw.)
                     if (Yii::$app->request->get('bauhof') && MaengelStatus::canManage()) {
                         return $this->redirect($space->createUrl('/maengelmelder/bauhof/mangel', ['id' => $post->content->id]));
@@ -90,7 +123,64 @@ class MeldungController extends ContentContainerController
             'errors' => $errors,
             'module' => $this->module,
             'bearbeiten' => null,
+            'kontakt' => $kontakt,
+            'danke' => $danke,
         ]);
+    }
+
+    /**
+     * Gastmeldung als Entwurf unter dem Systemkonto speichern (nur der Bauhof sieht sie, bis er sie freigibt).
+     * Die Identität wird nur für diese Anfrage gesetzt, nicht in der Sitzung – der Gast bleibt abgemeldet.
+     */
+    private function gastMeldungSpeichern($space, array $data, float $lat, float $lng, MeldeKontakt $kontakt, array $fotos)
+    {
+        $user = Yii::$app->user;
+        $user->setIdentity($this->module->getGastKonto());
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $post = new Post($space);
+            $post->message = Mangel::message($space, $data['kategorie'], mb_substr($data['beschreibung'], 0, 3000), $lat, $lng);
+            $post->content->visibility = Content::VISIBILITY_PRIVATE;
+            $post->content->setState(Content::STATE_DRAFT);
+            if (!$post->save()) {
+                throw new \RuntimeException(json_encode($post->getErrors()));
+            }
+            [$files, $fotoFehler] = GastFotos::speichern($fotos);
+            foreach ($files as $file) {
+                $post->fileManager->attach($file);
+            }
+            (new MaengelKontakt([
+                'content_id' => $post->content->id,
+                'vorname' => $kontakt->vorname,
+                'nachname' => $kontakt->nachname,
+                'email' => $kontakt->email ?: null,
+                'telefon' => $kontakt->telefon ?: null,
+                'created_at' => date('Y-m-d H:i:s'),
+            ]))->save(false);
+            $transaction->commit();
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+            Yii::error('Gastmeldung: ' . $e->getMessage(), 'maengelmelder');
+            throw new \yii\web\ServerErrorHttpException('Die Meldung konnte nicht gespeichert werden. Bitte später noch einmal versuchen.');
+        } finally {
+            $user->setIdentity(null);
+        }
+        $this->gastZaehlen(true);
+        if ($fotoFehler) {
+            $this->view->warn(implode(' ', $fotoFehler) . ' Die Meldung wurde ohne diese Fotos gespeichert.');
+        }
+        return $this->redirect($space->createUrl('/maengelmelder/meldung/create', ['danke' => $post->content->id]));
+    }
+
+    /** Gastmeldungen je IP-Adresse und Tag zählen (nur im Cache, gespeichert wird die Adresse nicht) */
+    private function gastZaehlen(bool $erhoehen): bool
+    {
+        $key = 'maengel-gast-' . date('Ymd') . '-' . hash('sha256', (string)Yii::$app->request->userIP);
+        $n = (int)Yii::$app->cache->get($key);
+        if ($erhoehen) {
+            Yii::$app->cache->set($key, $n + 1, 86400);
+        }
+        return $n < $this->module->gastMeldungenProTag;
     }
 
     /** Kategorie, Beschreibung, Ort und Fotos einer Meldung ändern (Bauhof) */
@@ -145,6 +235,8 @@ class MeldungController extends ContentContainerController
             'errors' => $errors,
             'module' => $this->module,
             'bearbeiten' => $mangel,
+            'kontakt' => null,
+            'danke' => null,
         ]);
     }
 

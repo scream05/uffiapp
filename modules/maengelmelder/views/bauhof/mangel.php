@@ -7,6 +7,8 @@
  * @var int $auch
  * @var \humhub\modules\maengelmelder\models\Mitarbeiter[] $mitarbeiterListe
  * @var \humhub\modules\maengelmelder\models\BauhofNachricht[] $verlauf
+ * @var \humhub\modules\maengelmelder\models\MaengelKontakt|null $kontakt
+ * @var bool $entwurf Gastmeldung, noch nicht freigegeben
  */
 
 use humhub\helpers\Html;
@@ -31,24 +33,54 @@ if ($m && !isset($mitarbeiter[$m->id])) {
             <h2 class="h5 m-0 me-auto">Nr. <?= $id ?> · <?= Html::encode($mangel->kategorie) ?>
                 <?= $status->getEtikett() ?></h2>
             <?= Html::a('<i class="fa fa-pencil"></i> Bearbeiten', $space->createUrl('/maengelmelder/meldung/bearbeiten', ['id' => $id]), ['class' => 'btn btn-sm btn-light']) ?>
+            <?php if (!$entwurf): ?>
             <?= Html::a('<i class="fa fa-external-link"></i> Beitrag', $post->content->getUrl(), ['class' => 'btn btn-sm btn-light']) ?>
+            <?php endif ?>
             <?= Html::beginForm($space->createUrl('/maengelmelder/bauhof/loeschen', ['id' => $id]), 'post', ['class' => 'd-inline', 'id' => 'bauhof-loeschen']) ?>
             <button class="btn btn-sm btn-light text-danger" title="Meldung löschen"><i class="fa fa-trash"></i></button>
             <?= Html::endForm() ?>
         </div>
+
+        <?php if ($entwurf): ?>
+            <div class="alert alert-warning d-flex flex-wrap align-items-center gap-2">
+                <div class="me-auto"><strong>Gastmeldung ohne Konto – noch nicht freigegeben.</strong><br>
+                    Sie ist erst nach der Freigabe im Bereich und auf der Karte sichtbar. Zuweisen und Status setzen geht danach.</div>
+                <?= Html::beginForm($space->createUrl('/maengelmelder/bauhof/freigeben', ['id' => $id]), 'post', ['class' => 'd-inline']) ?>
+                <button class="btn btn-sm btn-primary"><i class="fa fa-check"></i> Freigeben</button>
+                <?= Html::endForm() ?>
+                <?= Html::beginForm($space->createUrl('/maengelmelder/bauhof/loeschen', ['id' => $id]), 'post', ['class' => 'd-inline', 'id' => 'bauhof-ablehnen']) ?>
+                <button class="btn btn-sm btn-light text-danger"><i class="fa fa-times"></i> Ablehnen und löschen</button>
+                <?= Html::endForm() ?>
+            </div>
+        <?php endif ?>
 
         <div class="row">
             <div class="col-lg-7">
                 <p style="white-space:pre-line"><?= Html::encode($mangel->beschreibung) ?></p>
                 <p class="text-muted small">
                     <i class="fa fa-map-marker"></i> <?= Html::encode($mangel->getOrt()) ?><br>
-                    Gemeldet <?= $fmt->asDatetime($post->content->created_at, 'short') ?> von <?= Html::encode($post->content->createdBy?->displayName ?? '–') ?>
+                    Gemeldet <?= $fmt->asDatetime($post->content->created_at, 'short') ?> von
+                    <?= Html::encode($kontakt?->istGast() ? $kontakt->getName() . ' (ohne Konto)' : ($post->content->createdBy?->displayName ?? '–')) ?>
                     <?= $auch ? " · $auch weitere betroffen" : '' ?>
                 </p>
+                <?php if ($kontakt): ?>
+                    <div class="card card-body mb-3 py-2 small">
+                        <strong>Kontakt für Rückfragen</strong>
+                        <span><i class="fa fa-user fa-fw"></i> <?= Html::encode($kontakt->getName()) ?></span>
+                        <?php if ($mail = $kontakt->getMail()): ?>
+                            <span><i class="fa fa-envelope-o fa-fw"></i> <?= Html::mailto(Html::encode($mail), $mail) ?></span>
+                        <?php endif ?>
+                        <?php if ($kontakt->telefon): ?>
+                            <span><i class="fa fa-phone fa-fw"></i> <?= Html::a(Html::encode($kontakt->telefon), 'tel:' . preg_replace('/[^+0-9]/', '', $kontakt->telefon)) ?></span>
+                        <?php endif ?>
+                        <span class="text-muted">Nur für den Bauhof sichtbar, wird <?= round(Yii::$app->getModule('maengelmelder')->kontaktAufbewahrungTage / 30) ?> Monate nach Abschluss gelöscht.</span>
+                    </div>
+                <?php endif ?>
                 <?php if ($bilder = $mangel->getBilder()): ?>
                     <div class="bauhof-fotos mb-2">
                         <?php foreach ($bilder as $f): ?>
-                            <a href="<?= Html::encode($f->getUrl()) ?>" target="_blank" rel="noopener"><img src="<?= Html::encode($f->getUrl()) ?>" alt="Foto der Meldung" loading="lazy"></a>
+                            <?php $fotoUrl = $space->createUrl('/maengelmelder/bauhof/foto', ['id' => $id, 'guid' => $f->guid]) ?>
+                            <a href="<?= Html::encode($fotoUrl) ?>" target="_blank" rel="noopener"><img src="<?= Html::encode($fotoUrl) ?>" alt="Foto der Meldung" loading="lazy"></a>
                         <?php endforeach ?>
                     </div>
                 <?php endif ?>
@@ -81,6 +113,7 @@ if ($m && !isset($mitarbeiter[$m->id])) {
             </div>
 
             <div class="col-lg-5">
+                <?php if (!$entwurf): ?>
                 <?= Html::beginForm('', 'post', ['class' => 'card card-body mb-3']) ?>
                 <?= Html::hiddenInput('aktion', 'speichern') ?>
                 <?= Html::errorSummary($auftrag, ['class' => 'alert alert-danger']) ?>
@@ -134,6 +167,7 @@ if ($m && !isset($mitarbeiter[$m->id])) {
                     <?= Html::a('<i class="fa fa-comments"></i> Alle Nachrichten', $space->createUrl('/maengelmelder/bauhof/chat', ['id' => $m->id]), ['class' => 'btn btn-sm btn-light']) ?>
                     <?= Html::endForm() ?>
                 <?php endif ?>
+                <?php endif ?>
             </div>
         </div>
     </div>
@@ -141,6 +175,9 @@ if ($m && !isset($mitarbeiter[$m->id])) {
 <?= $this->render('../meldung/_tiles') ?>
 <?= $this->render('_verlaufJs') ?>
 <script <?= Html::nonce() ?>>
+$('#bauhof-ablehnen').on('submit', function (e) {
+    if (!confirm('Gastmeldung Nr. <?= $id ?> ablehnen? Sie wird samt Fotos und Kontaktdaten endgültig gelöscht.')) e.preventDefault();
+});
 $('#bauhof-loeschen').on('submit', function (e) {
     if (!confirm('Meldung Nr. <?= $id ?> wirklich löschen? Sie verschwindet auch für die meldende Person.')) e.preventDefault();
 });
