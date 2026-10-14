@@ -3,14 +3,66 @@
 namespace humhub\modules\uebersicht;
 
 use humhub\modules\content\models\Content;
+use humhub\modules\space\models\Membership;
+use humhub\modules\space\models\Space;
+use humhub\modules\user\models\User;
 
 /**
  * Angepinnte Beiträge in der Übersicht (Dashboard). Der HumHub-Kern kann nur innerhalb eines Space anpinnen;
  * hier wählt ein Admin Beiträge aus beliebigen Spaces, die für alle oben in der Übersicht stehen
  * (jeweils nur für Personen, die den Beitrag ohnehin sehen dürfen). Liste als Moduleinstellung „ids“, neueste zuerst.
+ *
+ * „Meine Übersicht“: jede angemeldete Person schaltet Bereiche (Spaces) für ihre Übersicht an oder aus, unabhängig
+ * von der Mitgliedschaft. Standard: alles an. Gespeichert wird nur, was ausgeschaltet ist (Benutzereinstellung
+ * „ausgeblendet“, Space-GUIDs), damit neue Spaces automatisch an sind.
  */
 class Module extends \humhub\components\Module
 {
+    /** Spaces ohne Beiträge im Stream (nur Kalender) – erscheinen nicht in „Meine Übersicht“ */
+    public array $ohneSchalter = ['abfall-and-termine'];
+
+    /** @return Space[] Bereiche, die die Person sehen und für die Übersicht wählen kann */
+    public function getBereiche(User $user): array
+    {
+        return Space::find()->visible($user)->andWhere(['space.status' => Space::STATUS_ENABLED])
+            ->andWhere(['not in', 'space.url', $this->ohneSchalter])->orderBy(['space.name' => SORT_ASC])->all();
+    }
+
+    /** @return string[] GUIDs der ausgeschalteten Spaces */
+    public function getAusgeblendet(User $user): array
+    {
+        $guids = json_decode((string)$this->settings->user($user)->get('ausgeblendet', '[]'), true);
+        return is_array($guids) ? array_values(array_filter($guids, 'is_string')) : [];
+    }
+
+    /** Speichert die Auswahl und gleicht „Beiträge in der Übersicht“ der Mitgliedschaften an */
+    public function setAusgeblendet(User $user, array $guids): void
+    {
+        $guids = array_values(array_unique(array_filter($guids, 'is_string')));
+        $this->settings->user($user)->set('ausgeblendet', json_encode($guids));
+        foreach (Membership::findAll(['user_id' => $user->id]) as $m) {
+            $space = $m->space;
+            if ($space && !in_array($space->url, $this->ohneSchalter, true)) {
+                $m->updateAttributes(['show_at_dashboard' => in_array($space->guid, $guids, true) ? 0 : 1]);
+            }
+        }
+    }
+
+    /** @return array{0: int[], 1: int[]} Content-Container-IDs der ein- und der ausgeschalteten Bereiche */
+    public function getContainerIds(User $user): array
+    {
+        $aus = $this->getAusgeblendet($user);
+        $an = $weg = [];
+        foreach ($this->getBereiche($user) as $space) {
+            if (in_array($space->guid, $aus, true)) {
+                $weg[] = (int)$space->contentcontainer_id;
+            } else {
+                $an[] = (int)$space->contentcontainer_id;
+            }
+        }
+        return [$an, $weg];
+    }
+
     /** @return int[] Content-IDs, neueste Anpinnung zuerst */
     public function getIds(): array
     {

@@ -11,19 +11,6 @@ use Yii;
 
 class Events
 {
-    /** Übersicht angemeldeter Nutzer zeigt auch freigegebene Vereinsbeiträge (stream/DashboardMitVereinen) */
-    public static function onBeforeRequest($event)
-    {
-        try {
-            $dashboard = Yii::$app->getModule('dashboard');
-            if ($dashboard->memberFilterClass === \humhub\modules\dashboard\stream\filters\DashboardMemberStreamFilter::class) {
-                $dashboard->memberFilterClass = \humhub\modules\vereine\stream\DashboardMitVereinen::class;
-            }
-        } catch (\Throwable $e) {
-            Yii::error($e);
-        }
-    }
-
     public static function onMetaSearchInit($event)
     {
         if (!Yii::$app->user->isGuest && Yii::$app->getModule('vereine')->getDirectorySpace() !== null) {

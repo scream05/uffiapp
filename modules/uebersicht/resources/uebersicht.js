@@ -16,7 +16,20 @@ humhub.module('uebersicht', function (module, require, $) {
         });
     };
 
+    /* Link „Übersicht anpassen“ über dem Stream (nur angemeldet) */
+    var anpassenLink = function () {
+        if (!module.config.einstellungen || $('.uebersicht-anpassen').length) {
+            return;
+        }
+        var $stream = $('#wallStream.dashboard-wall-stream');
+        if ($stream.length) {
+            $stream.before('<div class="uebersicht-anpassen"><a href="' + module.config.einstellungen + '">'
+                + '<i class="fa fa-sliders"></i> Übersicht anpassen</a></div>');
+        }
+    };
+
     var init = function () {
+        anpassenLink();
         markieren();
         var stream = document.getElementById('wallStream') || document.querySelector('[data-stream]') || document.body;
         if (window.MutationObserver && !module.beobachter) {

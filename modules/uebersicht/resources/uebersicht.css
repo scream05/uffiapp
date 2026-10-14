@@ -7,3 +7,7 @@
 .uebersicht-angepinnt > .wall-entry, .uebersicht-angepinnt .panel:first-of-type {
     box-shadow: inset 4px 0 0 #7c1922, 0 1px 2px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.05);
 }
+
+/* Link „Übersicht anpassen“ über dem Stream */
+.uebersicht-anpassen { text-align: right; margin: 0 4px 8px; font-size: 13px; }
+.uebersicht-anpassen a { color: #446e88; font-weight: 600; }

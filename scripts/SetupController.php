@@ -1043,7 +1043,7 @@ class SetupController extends Controller
             return ExitCode::DATAERR;
         }
         Yii::$app->user->switchIdentity($autor); // Verfasser = Prüfer → keine Glocke „freigegeben“
-        Yii::$app->getModule('dashboard')->memberFilterClass = \humhub\modules\vereine\stream\DashboardMitVereinen::class;
+        Yii::$app->getModule('dashboard')->memberFilterClass = \humhub\modules\uebersicht\filters\MeineUebersicht::class;
         $b = new \humhub\modules\vereine\models\VereinBeitrag(['verein_id' => $vv->verein_id, 'user_id' => $autor->id,
             'status' => 'eingereicht', 'text' => 'TEST – bitte ignorieren (Probelauf Vereinsbeiträge)']);
         $b->save(false);
@@ -1060,7 +1060,7 @@ class SetupController extends Controller
         $this->stdout('Übersicht Gast: ' . (in_array($b->content_id, $ids(null)) ? 'sichtbar' : 'NICHT sichtbar') . "\n");
         Yii::$app->getModule('dashboard')->memberFilterClass = \humhub\modules\dashboard\stream\filters\DashboardMemberStreamFilter::class;
         $this->stdout("Gegenprobe ohne Erweiterung, {$leser->username}: " . (in_array($b->content_id, $ids($leser)) ? 'sichtbar' : 'nicht sichtbar') . "\n");
-        Yii::$app->getModule('dashboard')->memberFilterClass = \humhub\modules\vereine\stream\DashboardMitVereinen::class;
+        Yii::$app->getModule('dashboard')->memberFilterClass = \humhub\modules\uebersicht\filters\MeineUebersicht::class;
         $rest = array_filter($ids($leser), fn($id) => $id !== $b->content_id);
         $this->stdout('Übrige Übersicht unverändert lieferbar: ' . count($rest) . " weitere Einträge\n");
         // Text der Ablehnungs-Mail (wird hier nur erzeugt, nicht verschickt)

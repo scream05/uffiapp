@@ -32,7 +32,7 @@ class BeitragDienst
 
     /**
      * Freigeben: auf der Vereinsseite und/oder als HumHub-Beitrag (Verfasser: Vereinsverwalter) im Space des
-     * Verzeichnisses, der für alle in der Übersicht erscheint (stream/DashboardMitVereinen).
+     * Verzeichnisses, der in der Übersicht erscheint (Bereich „Vereine & Ehrenamt“ in „Meine Übersicht“, Standard an).
      */
     public static function freigeben(VereinBeitrag $b, bool $vereinsseite, bool $uebersicht): void
     {
