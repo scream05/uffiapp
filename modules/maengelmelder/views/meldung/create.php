@@ -272,13 +272,43 @@ maengelReady(function () {
     }
     map.on('click', function (e) { setPoint(e.latlng, false); });
     if (lat.value && lng.value) setPoint(L.latLng(+lat.value, +lng.value), true);
-    document.getElementById('maengel-locate').addEventListener('click', function () {
-        if (!navigator.geolocation) { coords.textContent = 'Standort wird von diesem Browser nicht unterstützt.'; return; }
+    // Standort: erst genau (GPS), bei Zeitüberschreitung noch einmal ungenauer (WLAN/Funkzelle), Fehler verständlich melden
+    var locateBtn = document.getElementById('maengel-locate');
+    function locateFehler(err) {
+        locateBtn.disabled = false;
+        if (!window.isSecureContext) {
+            coords.textContent = 'Die Ortung geht nur über eine sichere Verbindung (https).';
+        } else if (err && err.code === 1) {
+            coords.textContent = 'Der Standortzugriff ist nicht erlaubt. Bitte in den Einstellungen des Browsers bzw. der App '
+                + 'und des Handys (Ortungsdienste) erlauben – oder den Ort in der Karte antippen.';
+        } else if (err && err.code === 3) {
+            coords.textContent = 'Der Standort konnte nicht rechtzeitig ermittelt werden. Bitte noch einmal versuchen oder in die Karte tippen.';
+        } else {
+            coords.textContent = 'Standort nicht verfügbar (Ortungsdienste aus?) – bitte in die Karte tippen.';
+        }
+    }
+    function locateTreffer(p) {
+        locateBtn.disabled = false;
+        var ll = L.latLng(p.coords.latitude, p.coords.longitude);
+        if (!bounds.contains(ll)) {
+            coords.textContent = 'Ihr Standort liegt außerhalb von Uffenheim. Bitte den Ort des Mangels in der Karte antippen.';
+            return;
+        }
+        setPoint(ll, true);
+    }
+    locateBtn.addEventListener('click', function () {
+        if (!navigator.geolocation) { coords.textContent = 'Standort wird von diesem Browser nicht unterstützt – bitte in die Karte tippen.'; return; }
         coords.textContent = 'Standort wird ermittelt …';
-        navigator.geolocation.getCurrentPosition(function (p) {
-            setPoint(L.latLng(p.coords.latitude, p.coords.longitude), true);
-        }, function () { coords.textContent = 'Standort nicht verfügbar – bitte in die Karte klicken.'; },
-            {enableHighAccuracy: true, timeout: 10000});
+        locateBtn.disabled = true;
+        navigator.geolocation.getCurrentPosition(locateTreffer, function (err) {
+            if (err && (err.code === 3 || err.code === 2)) {
+                coords.textContent = 'Standort wird ermittelt (ungenauer) …';
+                navigator.geolocation.getCurrentPosition(locateTreffer, locateFehler,
+                    {enableHighAccuracy: false, timeout: 15000, maximumAge: 120000});
+            } else {
+                locateFehler(err);
+            }
+        }, {enableHighAccuracy: true, timeout: 12000, maximumAge: 30000});
     });
     document.getElementById('maengel-form').addEventListener('submit', function (e) {
         if (!lat.value) { e.preventDefault(); coords.textContent = 'Bitte zuerst den Ort auf der Karte markieren.'; el.scrollIntoView(); }
