@@ -149,10 +149,38 @@ class BauhofController extends Controller
         if (in_array($schalter, ['an', 'aus'], true)) {
             $mod->settings->set('buergerInfo', $schalter === 'an' ? 1 : 0);
         }
-        $this->stdout('Infos an Meldende: ' . ($mod->buergerInfoAktiv() ? 'an' : 'aus')
+        $this->stdout('Infos an Meldende: E-Mail ' . ($mod->buergerInfoAktiv() ? 'an' : 'aus')
+            . ', WhatsApp ' . ($mod->buergerWhatsappAktiv() ? 'an' : 'aus')
             . ', mit E-Mail: ' . MaengelKontakt::find()->where(['info_mail' => 1])->count()
             . ', mit WhatsApp: ' . MaengelKontakt::find()->where(['info_whatsapp' => 1])->count() . "\n");
         return ExitCode::OK;
+    }
+
+    /**
+     * WhatsApp-Infos an Meldende: an|aus, oder „auto“ (per Crontab): schaltet ein, sobald Meta beide Vorlagen
+     * genehmigt hat, und tut danach nichts mehr.
+     */
+    public function actionBuergerinfoWhatsapp($schalter = null)
+    {
+        $mod = $this->module();
+        if ($schalter === 'auto') {
+            if ($mod->settings->get('buergerInfoWhatsapp') !== null) {
+                return ExitCode::OK; // schon entschieden (an oder bewusst aus)
+            }
+            $status = [];
+            foreach (Api::vorlagen() as $v) {
+                $status[$v['name']] = $v['status'] ?? '';
+            }
+            $noetig = [$mod->vorlagen['buergerEingang'], $mod->vorlagen['buergerStatus']];
+            if (array_filter($noetig, fn($n) => ($status[$n] ?? '') !== 'APPROVED')) {
+                return ExitCode::OK;
+            }
+            $mod->settings->set('buergerInfoWhatsapp', 1);
+            $this->stdout(date('Y-m-d H:i:s') . ": Vorlagen genehmigt – WhatsApp-Infos an Meldende eingeschaltet\n");
+        } elseif (in_array($schalter, ['an', 'aus'], true)) {
+            $mod->settings->set('buergerInfoWhatsapp', $schalter === 'an' ? 1 : 0);
+        }
+        return $this->actionBuergerinfo();
     }
 
     /**

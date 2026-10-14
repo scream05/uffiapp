@@ -108,7 +108,7 @@ class MeldungController extends ContentContainerController
                         (new MaengelKontakt(['content_id' => $post->content->id, 'user_id' => Yii::$app->user->id,
                             'telefon' => $kontakt->telefon ?: null, 'created_at' => date('Y-m-d H:i:s'),
                             'info_mail' => $infos && $kontakt->info_mail ? 1 : 0,
-                            'info_whatsapp' => $infos && $kontakt->info_whatsapp ? 1 : 0,
+                            'info_whatsapp' => $this->module->buergerWhatsappAktiv() && $kontakt->info_whatsapp ? 1 : 0,
                             'wa_id' => MeldeKontakt::waId($kontakt->telefon)]))->save(false);
                         Buergerinfo::eingang($post->content);
                     }
@@ -163,7 +163,7 @@ class MeldungController extends ContentContainerController
                 'telefon' => $kontakt->telefon ?: null,
                 'created_at' => date('Y-m-d H:i:s'),
                 'info_mail' => $this->module->buergerInfoAktiv() && $kontakt->info_mail ? 1 : 0,
-                'info_whatsapp' => $this->module->buergerInfoAktiv() && $kontakt->info_whatsapp ? 1 : 0,
+                'info_whatsapp' => $this->module->buergerWhatsappAktiv() && $kontakt->info_whatsapp ? 1 : 0,
                 'wa_id' => MeldeKontakt::waId($kontakt->telefon),
             ]);
             $kontaktZeile->save(false);

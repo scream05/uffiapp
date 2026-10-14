@@ -143,11 +143,13 @@ $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '
                         <?= Html::activeCheckbox($kontakt, 'info_mail', ['id' => 'kontakt-info-mail', 'class' => 'form-check-input' . $feld('info_mail'), 'label' => false]) ?>
                         <label class="form-check-label" for="kontakt-info-mail">per E-Mail<?= $gast ? '' : ' (' . Html::encode(Yii::$app->user->getIdentity()->email) . ')' ?></label>
                     </div>
+                    <?php if ($module->buergerWhatsappAktiv()): ?>
                     <div class="form-check">
                         <?= Html::activeCheckbox($kontakt, 'info_whatsapp', ['id' => 'kontakt-info-whatsapp', 'class' => 'form-check-input' . $feld('info_whatsapp'), 'label' => false]) ?>
                         <label class="form-check-label" for="kontakt-info-whatsapp">per WhatsApp an meine Handynummer
                             <small class="text-muted">– Sie können darauf antworten, Ihre Antwort geht an den Bauhof. Abbestellen: STOPP schreiben.</small></label>
                     </div>
+                    <?php endif ?>
                 </div>
                 <?php endif ?>
 
@@ -185,11 +187,13 @@ $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '
                         <?= Html::activeCheckbox($kontakt, 'info_mail', ['id' => 'kontakt-info-mail', 'class' => 'form-check-input' . $feld('info_mail'), 'label' => false]) ?>
                         <label class="form-check-label" for="kontakt-info-mail">per E-Mail<?= $gast ? '' : ' (' . Html::encode(Yii::$app->user->getIdentity()->email) . ')' ?></label>
                     </div>
+                    <?php if ($module->buergerWhatsappAktiv()): ?>
                     <div class="form-check">
                         <?= Html::activeCheckbox($kontakt, 'info_whatsapp', ['id' => 'kontakt-info-whatsapp', 'class' => 'form-check-input' . $feld('info_whatsapp'), 'label' => false]) ?>
                         <label class="form-check-label" for="kontakt-info-whatsapp">per WhatsApp an meine Handynummer (oben)
                             <small class="text-muted">– Sie können darauf antworten, Ihre Antwort geht an den Bauhof. Abbestellen: STOPP schreiben.</small></label>
                     </div>
+                    <?php endif ?>
                 </div>
                 <?php endif ?>
 

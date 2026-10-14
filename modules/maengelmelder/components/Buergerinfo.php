@@ -39,7 +39,7 @@ class Buergerinfo
     {
         $k = MaengelKontakt::findOne($content->id);
         $mangel = Mangel::fromContent($content);
-        if (!$k || !$mangel || !$k->info_whatsapp || !$k->wa_id || !self::module()->buergerInfoAktiv()) {
+        if (!$k || !$mangel || !$k->info_whatsapp || !$k->wa_id || !self::module()->buergerWhatsappAktiv()) {
             return;
         }
         $text = "Ihre Mängelmeldung Nr. {$content->id} ({$mangel->kategorie}) ist eingegangen. "
@@ -72,7 +72,7 @@ class Buergerinfo
             if ($k->info_mail && ($mail = $k->getMail())) {
                 self::mail($k, $mail, $mangel, $stand, $hinweis);
             }
-            if ($k->info_whatsapp && $k->wa_id) {
+            if ($k->info_whatsapp && $k->wa_id && self::module()->buergerWhatsappAktiv()) {
                 $text = "Neuer Stand zu Ihrer Mängelmeldung Nr. {$content->id} ({$mangel->kategorie}): *$stand*"
                     . ($hinweis ? "\n💬 $hinweis" : '')
                     . "\n\nSie können auf diese Nachricht antworten; Ihre Antwort geht an den Bauhof. Keine Nachrichten mehr? Antworten Sie mit STOPP.";
@@ -155,7 +155,7 @@ class Buergerinfo
         try {
             $d = $event->daten;
             $von = preg_replace('/\D/', '', (string)($d['from'] ?? ''));
-            if ($von === '' || !self::module()->buergerInfoAktiv()) {
+            if ($von === '' || !self::module()->buergerWhatsappAktiv()) {
                 return;
             }
             $bezug = $d['context']['id'] ?? null;

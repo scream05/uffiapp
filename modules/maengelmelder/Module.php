@@ -85,10 +85,16 @@ class Module extends ContentContainerModule
         return $contentContainer instanceof \humhub\modules\space\models\Space ? [new permissions\MangelMelden()] : [];
     }
 
-    /** Meldende können sich über Statusänderungen informieren lassen (E-Mail/WhatsApp): yii bauhof/buergerinfo an|aus */
+    /** Meldende können sich über Statusänderungen per E-Mail informieren lassen: yii bauhof/buergerinfo an|aus */
     public function buergerInfoAktiv(): bool
     {
         return (bool)$this->settings->get('buergerInfo');
+    }
+
+    /** … zusätzlich per WhatsApp (braucht genehmigte Vorlagen): yii bauhof/buergerinfo-whatsapp an|aus|auto */
+    public function buergerWhatsappAktiv(): bool
+    {
+        return $this->buergerInfoAktiv() && (bool)$this->settings->get('buergerInfoWhatsapp');
     }
 
     /** Gastmeldungen eingeschaltet und Systemkonto vorhanden? */
