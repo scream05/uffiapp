@@ -163,7 +163,7 @@ class Verarbeitung
             try {
                 [$data, $mime] = Api::medium($n->media_id);
                 $mime = (new \finfo(FILEINFO_MIME_TYPE))->buffer($data) ?: $mime;
-                if (!str_starts_with($mime, 'image/') && $mime !== 'application/pdf') {
+                if (!in_array($mime, ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/heic', 'image/heif', 'application/pdf'], true)) {
                     $n->updateAttributes(['status' => Nachricht::STATUS_IGNORIERT, 'mime' => $mime, 'ergebnis' => 'Dateityp wird nicht ausgewertet']);
                     continue;
                 }

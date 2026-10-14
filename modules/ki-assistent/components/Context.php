@@ -27,6 +27,20 @@ class Context
             . $base . ($maengel !== null ? "\n\n" . $maengel : '');
     }
 
+    /**
+     * Nur veröffentlichte, öffentliche, nicht archivierte und nicht versteckte Inhalte: Der Kontext wird für alle
+     * (auch Gäste) zwischengespeichert, gelöschte Beiträge/Termine dürfen hier nicht mehr auftauchen.
+     */
+    private static function oeffentlich(): array
+    {
+        return ['and',
+            ['content.state' => \humhub\modules\content\models\Content::STATE_PUBLISHED],
+            ['content.visibility' => \humhub\modules\content\models\Content::VISIBILITY_PUBLIC],
+            ['or', ['content.archived' => 0], ['content.archived' => null]],
+            ['content.hidden' => 0],
+        ];
+    }
+
     private static function build(): string
     {
         $today = date('Y-m-d');
@@ -35,7 +49,7 @@ class Context
         $space = Space::findOne(['url' => 'abfall-and-termine']);
         if ($space !== null) {
             $lines = [];
-            $entries = ExternalCalendarEntry::find()->contentContainer($space)
+            $entries = ExternalCalendarEntry::find()->contentContainer($space)->andWhere(self::oeffentlich())
                 ->andWhere(['>=', 'external_calendar_entry.start_datetime', $today])
                 ->andWhere(['<', 'external_calendar_entry.start_datetime', date('Y-m-d', strtotime('+60 days'))])
                 ->orderBy(['external_calendar_entry.start_datetime' => SORT_ASC])->all();
@@ -58,7 +72,7 @@ class Context
         $space = Space::findOne(['url' => 'veranstaltungen']);
         if ($space !== null) {
             $lines = [];
-            $entries = CalendarEntry::find()->contentContainer($space)
+            $entries = CalendarEntry::find()->contentContainer($space)->andWhere(self::oeffentlich())
                 ->andWhere(['>=', 'calendar_entry.end_datetime', $today])
                 ->andWhere(['<', 'calendar_entry.start_datetime', date('Y-m-d', strtotime('+90 days'))])
                 ->orderBy(['calendar_entry.start_datetime' => SORT_ASC])->limit(80)->all();
@@ -78,7 +92,7 @@ class Context
         $space = Space::findOne(['url' => 'rathaus-uffenheim']);
         if ($space !== null) {
             $lines = [];
-            $posts = Post::find()->contentContainer($space)
+            $posts = Post::find()->contentContainer($space)->andWhere(self::oeffentlich())
                 ->orderBy(['content.created_at' => SORT_DESC])->limit(15)->all();
             foreach ($posts as $p) {
                 $lines[] = '- ' . self::date($p->content->created_at, false) . ' – ' . Url::to($p->content->getUrl(), true)

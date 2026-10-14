@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Strenge ImageMagick-Richtlinie für community.rundumuffni.de (ersetzt im Container /etc/ImageMagick-7/policy.xml,
+  eingebunden in compose.yml). ImageMagick verarbeitet Bilder aus fremden Quellen (Gast-Meldungen, Mail-Anhänge,
+  WhatsApp, HumHub-Vorschaubilder): erlaubt sind nur gängige Fotoformate, keine SVG/MVG/MSL/PS/EPS/PDF/Text und
+  keine Hilfsprogramme (Ghostscript wird von den Modulen direkt und mit -dSAFER aufgerufen, nicht über ImageMagick).
+  Ausnahme bei Bedarf: setup/rssuser bzw. das Umwandeln von SVG-Logos in setup/vereine-import brauchen SVG – dafür
+  die Einbindung in compose.yml kurz auskommentieren.
+-->
+<!DOCTYPE policymap [
+  <!ELEMENT policymap (policy)*>
+  <!ATTLIST policymap xmlns CDATA #FIXED "">
+  <!ELEMENT policy EMPTY>
+  <!ATTLIST policy xmlns CDATA #FIXED "">
+  <!ATTLIST policy domain NMTOKEN #REQUIRED>
+  <!ATTLIST policy name NMTOKEN #IMPLIED>
+  <!ATTLIST policy pattern CDATA #IMPLIED>
+  <!ATTLIST policy rights NMTOKEN #IMPLIED>
+  <!ATTLIST policy stealth NMTOKEN #IMPLIED>
+  <!ATTLIST policy value CDATA #IMPLIED>
+]>
+<policymap>
+  <policy domain="resource" name="memory" value="1024MiB"/>
+  <policy domain="resource" name="map" value="2048MiB"/>
+  <policy domain="resource" name="area" value="256MP"/>
+  <policy domain="resource" name="disk" value="2GiB"/>
+  <policy domain="resource" name="width" value="32KP"/>
+  <policy domain="resource" name="height" value="32KP"/>
+  <policy domain="path" rights="none" pattern="@*"/>
+  <policy domain="delegate" rights="none" pattern="*"/>
+  <policy domain="coder" rights="none" pattern="*"/>
+  <policy domain="coder" rights="read|write" pattern="{GIF,GIF87,JPEG,JPG,PJPEG,PNG,PNG00,PNG8,PNG24,PNG32,PNG48,PNG64,WEBP,HEIC,HEIF,AVIF}"/>
+</policymap>

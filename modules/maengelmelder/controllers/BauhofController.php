@@ -238,7 +238,7 @@ class BauhofController extends ContentContainerController
         foreach ($mangel->getBilder() as $file) {
             if ($file->guid === $guid && is_file($pfad = $file->getStore()->get())) {
                 Yii::$app->response->headers->set('Cache-Control', 'private, max-age=86400');
-                return Yii::$app->response->sendFile($pfad, $file->file_name, ['inline' => true, 'mimeType' => $file->mime_type]);
+                return \humhub\modules\maengelmelder\components\DateiAuslieferung::senden($pfad, $file->file_name);
             }
         }
         throw new NotFoundHttpException();
@@ -352,7 +352,7 @@ class BauhofController extends ContentContainerController
             throw new NotFoundHttpException();
         }
         Yii::$app->response->headers->set('Cache-Control', 'private, max-age=86400');
-        return Yii::$app->response->sendFile($pfad, $file->file_name, ['inline' => true, 'mimeType' => $file->mime_type]);
+        return \humhub\modules\maengelmelder\components\DateiAuslieferung::senden($pfad, $file->file_name);
     }
 
     /** Glocken-Hinweise „Gastmeldung wartet auf Freigabe“ bei allen Empfängern entfernen */

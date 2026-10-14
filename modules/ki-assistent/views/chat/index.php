@@ -18,7 +18,7 @@ ChatAsset::register($this);
 <div class="container ki-page">
     <div class="panel panel-default">
         <div class="panel-heading">
-            <strong>Uffi</strong> <span class="text-muted">· KI-Assistent</span> <span class="label label-warning">Testversion – nur für Admins sichtbar</span>
+            <strong>Uffi</strong> <span class="text-muted">· KI-Assistent</span>
         </div>
         <div class="panel-body">
             <style <?= Html::nonce() ?>>

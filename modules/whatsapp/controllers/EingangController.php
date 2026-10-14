@@ -115,7 +115,16 @@ class EingangController extends ContentContainerController
         if ($n === null || !$n->getPfad() || !is_file($n->getPfad())) {
             throw new NotFoundHttpException();
         }
-        return Yii::$app->response->sendFile($n->getPfad(), $n->datei, ['mimeType' => $n->mime, 'inline' => true]);
+        // Typ nach Inhalt; angezeigt werden nur Rasterbilder und PDF, alles andere als Download (keine SVG mit Skripten)
+        $pfad = $n->getPfad();
+        $typ = (string)((new \finfo(FILEINFO_MIME_TYPE))->file($pfad) ?: 'application/octet-stream');
+        $response = Yii::$app->response;
+        $response->headers->set('X-Content-Type-Options', 'nosniff');
+        if (in_array($typ, ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], true)) {
+            $response->headers->set('Content-Security-Policy', "default-src 'none'; img-src 'self'; style-src 'unsafe-inline'; sandbox");
+        }
+        $inline = in_array($typ, ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'], true);
+        return $response->sendFile($pfad, $n->datei, ['mimeType' => $inline ? $typ : 'application/octet-stream', 'inline' => $inline]);
     }
 
     private function findOffen($id): Entwurf

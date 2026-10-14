@@ -21,6 +21,8 @@ services:
       # Schrift Nunito Sans (design/fonts), öffentlich unter /fonts – statt Google Fonts
       - ./design/fonts:/app/public/fonts:ro
       - ./design/robots.txt:/app/public/robots.txt:ro
+      # Strenge ImageMagick-Richtlinie (nur Fotoformate, keine SVG/PS/PDF über ImageMagick)
+      - ./design/imagemagick-policy.xml:/etc/ImageMagick-7/policy.xml:ro
       # Eigenes Modul aus diesem Repo (KI-Assistent, Claude)
       - ./modules/ki-assistent:/data/modules/ki-assistent:ro
       - ./modules/maengelmelder:/data/modules/maengelmelder:ro

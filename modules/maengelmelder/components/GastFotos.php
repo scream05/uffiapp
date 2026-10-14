@@ -48,6 +48,11 @@ class GastFotos
         $fehler = [];
         foreach ($dateien as $i => $f) {
             try {
+                // Typ nach Inhalt prüfen, bevor ImageMagick die Datei überhaupt öffnet (keine SVG/PS/PDF o. Ä.)
+                $typ = (new \finfo(FILEINFO_MIME_TYPE))->file($f->tempName);
+                if (!in_array($typ, ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif', 'image/gif', 'image/avif'], true)) {
+                    throw new \RuntimeException("Typ $typ");
+                }
                 $im = new \Imagick();
                 $im->setResourceLimit(\Imagick::RESOURCETYPE_MEMORY, 256 * 1024 * 1024);
                 $im->pingImage($f->tempName);
