@@ -212,6 +212,7 @@ class BauhofController extends ContentContainerController
         [$content] = $this->mangel($id);
         if ((int)$content->state === Content::STATE_DRAFT) {
             $content->getStateService()->publish();
+            $this->gastHinweiseEntfernen($content->id);
             $this->view->success('Meldung freigegeben. Sie erscheint jetzt auf der Karte.');
         }
         return $this->redirect($this->zu('mangel', ['id' => $content->id]));
@@ -315,6 +316,7 @@ class BauhofController extends ContentContainerController
         [$content, $mangel] = $this->mangel($id);
         if ((int)$content->state === Content::STATE_DRAFT) {
             $mangel->post->hardDelete();
+            $this->gastHinweiseEntfernen($content->id);
             $this->view->success('Gastmeldung abgelehnt und gelöscht.');
             return $this->redirect($this->zu('index', []));
         }
@@ -338,6 +340,16 @@ class BauhofController extends ContentContainerController
         }
         Yii::$app->response->headers->set('Cache-Control', 'private, max-age=86400');
         return Yii::$app->response->sendFile($pfad, $file->file_name, ['inline' => true, 'mimeType' => $file->mime_type]);
+    }
+
+    /** Glocken-Hinweise „Gastmeldung wartet auf Freigabe“ bei allen Empfängern entfernen */
+    private function gastHinweiseEntfernen(int $contentId): void
+    {
+        \humhub\modules\notification\models\Notification::deleteAll([
+            'class' => \humhub\modules\maengelmelder\notifications\GastmeldungNeu::class,
+            'source_class' => MaengelKontakt::class,
+            'source_pk' => $contentId,
+        ]);
     }
 
     private function zu(string $aktion, array $params = []): string

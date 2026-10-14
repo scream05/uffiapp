@@ -149,14 +149,15 @@ class MeldungController extends ContentContainerController
             foreach ($files as $file) {
                 $post->fileManager->attach($file);
             }
-            (new MaengelKontakt([
+            $kontaktZeile = new MaengelKontakt([
                 'content_id' => $post->content->id,
                 'vorname' => $kontakt->vorname,
                 'nachname' => $kontakt->nachname,
                 'email' => $kontakt->email ?: null,
                 'telefon' => $kontakt->telefon ?: null,
                 'created_at' => date('Y-m-d H:i:s'),
-            ]))->save(false);
+            ]);
+            $kontaktZeile->save(false);
             $transaction->commit();
         } catch (\Throwable $e) {
             $transaction->rollBack();
@@ -166,6 +167,14 @@ class MeldungController extends ContentContainerController
             $user->setIdentity(null);
         }
         $this->gastZaehlen(true);
+        // Glocke an die Bauhofleitung (Fehler hier dürfen die Meldung nicht verhindern)
+        try {
+            if ($empfaenger = Bauhof::empfaenger()) {
+                \humhub\modules\maengelmelder\notifications\GastmeldungNeu::instance()->about($kontaktZeile)->sendBulk($empfaenger);
+            }
+        } catch (\Throwable $e) {
+            Yii::error('Gastmeldung-Benachrichtigung: ' . $e->getMessage(), 'maengelmelder');
+        }
         if ($fotoFehler) {
             $this->view->warn(implode(' ', $fotoFehler) . ' Die Meldung wurde ohne diese Fotos gespeichert.');
         }

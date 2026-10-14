@@ -55,7 +55,7 @@ class Module extends ContentContainerModule
 
     public function getNotifications()
     {
-        return [notifications\BauhofMeldung::class];
+        return [notifications\BauhofMeldung::class, notifications\GastmeldungNeu::class];
     }
 
     public function getContentContainerTypes()
