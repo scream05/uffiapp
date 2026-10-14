@@ -39,7 +39,7 @@ $markieren = function (string $text) use ($q): string {
     .mb-hinweis { color: var(--hh-text-color-soft, #777); font-size: .9em; margin-bottom: 12px; }
     @media (max-width: 575.98px) { .mb-raster { grid-template-columns: repeat(2, 1fr); gap: 12px; } }
 </style>
-<div class="container">
+<div class="<?= $this->context->contentContainer ? '' : 'container' ?>">
     <div class="panel panel-default">
         <div class="panel-heading"><strong>Mitteilungsblatt</strong> der Stadt Uffenheim</div>
         <div class="panel-body">
@@ -49,7 +49,7 @@ $markieren = function (string $text) use ($q): string {
                 <?php if ($termineUrl): ?> <?= Html::a('Alle Termine', $termineUrl, ['target' => '_blank', 'rel' => 'noopener']) ?><?php endif ?>
                 <br>Quelle: <?= Html::a('uffenheim.de', $quelle, ['target' => '_blank', 'rel' => 'noopener']) ?>
             </p>
-            <form method="get" action="<?= Url::to(['/mitteilungsblatt/index']) ?>" class="d-flex gap-2" role="search">
+            <form method="get" action="<?= $this->context->url('/mitteilungsblatt/index') ?>" class="d-flex gap-2" role="search">
                 <input type="search" name="q" value="<?= Html::encode($q) ?>" class="form-control"
                        placeholder="In allen Ausgaben suchen, z. B. Kirchweih, Sperrung, Bauplatz" aria-label="In allen Ausgaben suchen">
                 <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i><span class="visually-hidden">Suchen</span></button>
@@ -61,7 +61,7 @@ $markieren = function (string $text) use ($q): string {
         <div class="panel panel-default">
             <div class="panel-heading">
                 <strong><?= count($treffer) >= 60 ? 'Mehr als 60' : count($treffer) ?> Fundstellen</strong> für „<?= Html::encode($q) ?>“
-                <?= Html::a('Suche beenden', ['/mitteilungsblatt/index'], ['class' => 'float-end']) ?>
+                <?= Html::a('Suche beenden', $this->context->url('/mitteilungsblatt/index'), ['class' => 'float-end']) ?>
             </div>
             <div class="panel-body">
                 <?php if (!$treffer): ?>
@@ -70,7 +70,7 @@ $markieren = function (string $text) use ($q): string {
                 <?php foreach ($treffer as $t): ?>
                     <div class="mb-treffer">
                         <?= Html::a('<strong>' . Html::encode($t['ausgabe']->titel) . '</strong>, Seite ' . $t['seite'],
-                            ['/mitteilungsblatt/index/lesen', 'id' => $t['ausgabe']->id, 'seite' => $t['seite'], 'q' => $q]) ?>
+                            $this->context->url('/mitteilungsblatt/index/lesen', ['id' => $t['ausgabe']->id, 'seite' => $t['seite'], 'q' => $q])) ?>
                         <small class="text-muted">· <?= Html::encode($t['ausgabe']->datumText) ?></small><br>
                         <span><?= $markieren($t['auszug']) ?></span>
                     </div>
@@ -90,8 +90,8 @@ $markieren = function (string $text) use ($q): string {
                 <div class="mb-raster">
                     <?php foreach ($liste as $a): ?>
                         <a class="mb-ausgabe<?= $a === $ausgaben[0] && strtotime($a->datum) > time() - 14 * 86400 ? ' mb-neu' : '' ?>"
-                           href="<?= Url::to(['/mitteilungsblatt/index/lesen', 'id' => $a->id]) ?>">
-                            <img src="<?= Url::to(['/mitteilungsblatt/index/bild', 'id' => $a->id]) ?>" alt="Titelseite <?= Html::encode($a->titel) ?>" loading="lazy">
+                           href="<?= $this->context->url('/mitteilungsblatt/index/lesen', ['id' => $a->id]) ?>">
+                            <img src="<?= $this->context->url('/mitteilungsblatt/index/bild', ['id' => $a->id]) ?>" alt="Titelseite <?= Html::encode($a->titel) ?>" loading="lazy">
                             <strong><?= Html::encode($a->titel) ?></strong>
                             <small><?= Html::encode($a->datumText) ?></small>
                         </a>

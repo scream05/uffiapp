@@ -3,7 +3,6 @@
 namespace humhub\modules\mitteilungsblatt;
 
 use Yii;
-use yii\helpers\Url;
 
 class Events
 {
@@ -19,10 +18,10 @@ class Events
             $event->sender->addItem([
                 'label' => 'Mitteilungsblatt',
                 'group' => 'modules',
-                'url' => Url::to(['/mitteilungsblatt/index']),
+                'url' => $event->sender->space->createUrl('/mitteilungsblatt/index'),
                 'icon' => '<i class="fa fa-newspaper-o"></i>',
                 'sortOrder' => 55,
-                'isActive' => false,
+                'isActive' => Yii::$app->controller?->module?->id === 'mitteilungsblatt',
             ]);
         } catch (\Throwable $e) {
             Yii::error($e);

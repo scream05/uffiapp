@@ -11,7 +11,7 @@ use yii\helpers\Url;
 $this->title = 'Mitteilungsblatt ' . $ausgabe->titel;
 $hash = array_filter(['page' => $seite, 'search' => $q]);
 $viewer = PdfjsAsset::register($this)->baseUrl . '/web/viewer.html?file='
-    . rawurlencode(Url::to(['/mitteilungsblatt/index/pdf', 'id' => $ausgabe->id]))
+    . rawurlencode($this->context->url('/mitteilungsblatt/index/pdf', ['id' => $ausgabe->id]))
     . ($hash ? '#' . http_build_query($hash, '', '&', PHP_QUERY_RFC3986) : '');
 ?>
 <style <?= Html::nonce() ?>>
@@ -19,6 +19,7 @@ $viewer = PdfjsAsset::register($this)->baseUrl . '/web/viewer.html?file='
     .mb-kopf h1 { font-size: 1.25rem; margin: 0; flex: 1 1 auto; }
     .mb-kopf h1 small { font-size: .8em; font-weight: normal; color: var(--hh-text-color-soft, #777); }
     .mb-kopf .btn { white-space: nowrap; }
+    .panel-body > p:last-child { margin-bottom: 0; }
     #mb-reader { position: relative; height: 70vh; min-height: 360px; border-radius: 8px; overflow: hidden;
         box-shadow: 0 0 0 1px var(--hh-border-color, #ddd); background: #525659; }
     #mb-reader iframe { width: 100%; height: 100%; border: 0; display: block; }
@@ -30,15 +31,15 @@ $viewer = PdfjsAsset::register($this)->baseUrl . '/web/viewer.html?file='
     body.mb-vollbild-offen { overflow: hidden; }
     @media (max-width: 575.98px) { .mb-kopf .mb-text { display: none; } }
 </style>
-<div class="container">
+<div class="<?= $this->context->contentContainer ? 'panel panel-default' : 'container' ?>"><div class="<?= $this->context->contentContainer ? 'panel-body' : '' ?>">
     <div class="mb-kopf">
-        <?= Html::a('<i class="fa fa-arrow-left"></i><span class="mb-text"> Alle Ausgaben</span>', ['/mitteilungsblatt/index'],
+        <?= Html::a('<i class="fa fa-arrow-left"></i><span class="mb-text"> Alle Ausgaben</span>', $this->context->url('/mitteilungsblatt/index'),
             ['class' => 'btn btn-light', 'title' => 'Alle Ausgaben']) ?>
         <h1>Mitteilungsblatt <?= Html::encode($ausgabe->titel) ?> <small><?= Html::encode($ausgabe->datumText) ?></small></h1>
         <button type="button" class="btn btn-light" id="mb-vollbild" title="Vollbild">
             <i class="fa fa-expand"></i><span class="mb-text"> Vollbild</span></button>
         <?= Html::a('<i class="fa fa-download"></i><span class="mb-text"> Herunterladen</span>',
-            ['/mitteilungsblatt/index/pdf', 'id' => $ausgabe->id, 'download' => 1],
+            $this->context->url('/mitteilungsblatt/index/pdf', ['id' => $ausgabe->id, 'download' => 1]),
             ['class' => 'btn btn-light', 'title' => 'Herunterladen', 'data-pjax-prevent' => 1]) ?>
     </div>
     <div id="mb-reader" data-src="<?= Html::encode($viewer) ?>">
@@ -48,7 +49,7 @@ $viewer = PdfjsAsset::register($this)->baseUrl . '/web/viewer.html?file='
     <p class="text-muted" style="margin-top:8px;font-size:.85em">
         Herausgeberin: Stadt Uffenheim. <?= Html::a('Original auf uffenheim.de', $ausgabe->quelle_url, ['target' => '_blank', 'rel' => 'noopener']) ?>
     </p>
-</div>
+</div></div>
 <script <?= Html::nonce() ?>>
 (function () {
     var reader = document.getElementById('mb-reader');

@@ -18,7 +18,7 @@ $now = time();
     .nd-nr { font-size: 1.4em; font-weight: bold; margin-right: 8px; }
     .nd-hint { color: var(--hh-text-color-soft, #777); font-size: 0.9em; }
 </style>
-<div class="container">
+<div class="<?= $this->context->contentContainer ? '' : 'container' ?>">
     <div class="panel panel-default">
         <div class="panel-heading"><strong>Notrufnummern</strong></div>
         <div class="panel-body">

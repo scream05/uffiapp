@@ -3,16 +3,24 @@
 namespace humhub\modules\mitteilungsblatt\controllers;
 
 use humhub\components\access\ControllerAccess;
-use humhub\components\Controller;
+use humhub\modules\content\components\ContentContainerController;
 use humhub\modules\mitteilungsblatt\components\Termine;
 use humhub\modules\mitteilungsblatt\models\Ausgabe;
 use humhub\modules\mitteilungsblatt\models\Seite;
+use humhub\modules\space\models\Space;
 use Yii;
 use yii\web\ForbiddenHttpException;
+use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 
-class IndexController extends Controller
+/**
+ * Läuft im Space „Rathaus Uffenheim“ (/s/rathaus-uffenheim/mitteilungsblatt/…), damit Space-Kopf und -Menü
+ * sichtbar bleiben. Alte Adressen ohne Space (/mitteilungsblatt/…) werden dorthin umgeleitet.
+ */
+class IndexController extends ContentContainerController
 {
+    public $requireContainer = false;
+
     protected function getAccessRules()
     {
         return []; // auch für Gäste
@@ -28,7 +36,23 @@ class IndexController extends Controller
         }
         // Lesbar für alle, aber nicht in Suchmaschinen (Geburtstage, Jubilare, Anzeigen Dritter)
         Yii::$app->response->headers->set('X-Robots-Tag', 'noindex, nofollow');
+        if ($this->contentContainer !== null && $this->contentContainer->url !== $this->module->space) {
+            throw new NotFoundHttpException();
+        }
+        if ($this->contentContainer === null && in_array($action->id, ['index', 'lesen'], true)
+            && ($space = Space::findOne(['url' => $this->module->space])) !== null) {
+            $this->redirect($space->createUrl($action->id === 'index' ? '/mitteilungsblatt/index' : '/mitteilungsblatt/index/lesen', Yii::$app->request->get()));
+            return false;
+        }
         return true;
+    }
+
+    /** Adresse innerhalb des Space (falls vorhanden) – für die Ansichten */
+    public function url(string $route, array $params = []): string
+    {
+        return $this->contentContainer !== null
+            ? $this->contentContainer->createUrl($route, $params)
+            : Url::to(array_merge([$route], $params));
     }
 
     /** Archiv aller Ausgaben, mit ?q= Volltextsuche */

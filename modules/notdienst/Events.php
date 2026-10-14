@@ -4,7 +4,6 @@ namespace humhub\modules\notdienst;
 
 use humhub\modules\notdienst\widgets\NotdienstSidebar;
 use Yii;
-use yii\helpers\Url;
 
 class Events
 {
@@ -28,10 +27,10 @@ class Events
             $event->sender->addItem([
                 'label' => 'Notdienste',
                 'group' => 'modules',
-                'url' => Url::to(['/notdienst/index']),
+                'url' => $event->sender->space->createUrl('/notdienst/index'),
                 'icon' => '<i class="fa fa-medkit"></i>',
                 'sortOrder' => 60,
-                'isActive' => false,
+                'isActive' => Yii::$app->controller?->module?->id === 'notdienst',
             ]);
         } catch (\Throwable $e) {
             Yii::error($e);
