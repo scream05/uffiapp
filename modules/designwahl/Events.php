@@ -143,10 +143,6 @@ class Events
                 assets\KalenderAsset::register(Yii::$app->view);
             } else {
                 self::abbrechenKnopf();
-                // Gäste: Space-Kopf ohne Zahnrad-Menü (nur „Über“) – die Leiste darunter entfällt ganz
-                Yii::$app->view->registerCss(
-                    '.panel-profile > .panel-body:has(#space-header-controls-menu) { display: none; }'
-                );
             }
         } catch (\Throwable $e) {
             Yii::error($e);
@@ -216,6 +212,7 @@ JS, \yii\web\View::POS_END);
         '@questions/widgets/views' => '@designwahl/views/questions/widgets',
         '@calendar/widgets/views' => '@designwahl/views/calendar/widgets', // nur wallEntry.php (Teilnahme-Knöpfe), Rest Original
         '@calendar/views/common' => '@designwahl/views/calendar/common', // nur defaultConfig.php (ohne Reiter „Erinnerung“)
+        '@humhub/modules/space/widgets/views' => '@designwahl/views/space/widgets', // nur profileHeaderControls.php (Leiste nur für Admins)
     ];
 
     /** Aktionen, deren Formulardaten nur Text sein dürfen (Controller-ID => Aktionen) */
