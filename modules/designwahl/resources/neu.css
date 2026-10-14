@@ -2,7 +2,7 @@
  * Design „Uffi frisch“ für community.rundumuffni.de – Alternative zum klassischen Design (design/ios.scss).
  * Wird nur zusätzlich geladen, wenn ein Konto „Design: Uffi frisch“ gewählt hat (Modul designwahl), und greift
  * nur unter html.design-neu. Stadtfarben bleiben (Stahlblau führend), dazu warme Sandtöne, kräftige Rundungen,
- * farbige Symbolkreise, Kopfleiste in Stahlblau, am Handy eine schwebende Tab-Leiste.
+ * farbige Symbolkreise, Kopfleiste in Stahlblau, am Handy eine Tab-Leiste bündig am unteren Rand.
  * Wichtig: kein transform/filter/backdrop-filter/overflow auf #topbar – die Tab-Leiste (#top-menu-nav,
  * position: fixed) hängt sonst am Kopf statt am unteren Rand.
  */
@@ -209,25 +209,31 @@ html.design-neu #topbar .user-title strong {
     }
 }
 
-/* ---------- Handy: schwebende Tab-Leiste ---------- */
+/* ---------- Handy: Tab-Leiste bündig am unteren Rand ---------- */
 @media (max-width: 575.98px) {
     html.design-neu #topbar {
         border-radius: 0 0 var(--dn-r-m) var(--dn-r-m);
     }
 
+    /* Tab-Leiste liegt wie die Kopfleiste bündig am Rand (hier unten), runde Oberkante; der sichere Bereich
+       (Home-Balken am iPhone, Gestenleiste) gehört mit zur Leiste, die Reiter sitzen darüber */
     html.design-neu body #topbar > .container > #top-menu-nav {
-        left: 10px !important;
-        right: 10px !important;
-        bottom: calc(8px + var(--hh-mobile-app-safe-area-inset-bottom, env(safe-area-inset-bottom))) !important;
-        height: var(--hh-ct-top-bar-height) !important;
+        --dn-unten: var(--hh-mobile-app-safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        height: calc(var(--hh-ct-top-bar-height) + var(--dn-unten)) !important;
         width: auto !important;
-        padding: 0 6px !important;
+        min-width: 0 !important;
+        box-sizing: border-box;
+        padding: 2px 6px var(--dn-unten) !important;
+        align-items: stretch;
         border: 0 !important;
-        border-radius: 999px !important;
+        border-radius: var(--dn-r-m) var(--dn-r-m) 0 0 !important;
         background: var(--ios-glass) !important;
         -webkit-backdrop-filter: saturate(180%) blur(20px);
         backdrop-filter: saturate(180%) blur(20px);
-        box-shadow: 0 10px 30px rgba(43, 74, 95, .22), 0 0 0 1px var(--dn-linie) !important;
+        box-shadow: 0 -6px 24px rgba(43, 74, 95, .18), 0 -1px 0 var(--dn-linie) !important;
     }
 
     html.design-neu body #topbar > .container > #top-menu-nav > li > a {
@@ -258,14 +264,14 @@ html.design-neu #topbar .user-title strong {
         color: #9cc3dc !important;
     }
 
-    /* Platz unten, damit nichts hinter der schwebenden Leiste verschwindet */
+    /* Platz unten, damit nichts hinter der Leiste verschwindet */
     html.design-neu body {
-        padding-bottom: calc(var(--hh-ct-top-bar-height) + 24px + env(safe-area-inset-bottom)) !important;
+        padding-bottom: calc(var(--hh-ct-top-bar-height) + 16px + var(--hh-mobile-app-safe-area-inset-bottom, env(safe-area-inset-bottom, 0px))) !important;
     }
 
-    /* Uffi-Knopf über der schwebenden Leiste */
+    /* Uffi-Knopf über der Leiste */
     html.design-neu .ki-fab {
-        bottom: calc(var(--hh-ct-top-bar-height) + 20px + var(--hh-mobile-app-safe-area-inset-bottom, env(safe-area-inset-bottom))) !important;
+        bottom: calc(var(--hh-ct-top-bar-height) + 12px + var(--hh-mobile-app-safe-area-inset-bottom, env(safe-area-inset-bottom, 0px))) !important;
     }
 }
 
