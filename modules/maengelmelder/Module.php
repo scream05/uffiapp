@@ -49,6 +49,8 @@ class Module extends ContentContainerModule
     public int $gastMeldungenProTag = 5; // je IP-Adresse
     public int $gastFotos = 3;
     public int $gastFotoMaxMb = 15;
+    /** Antwortadresse der Eingangsbestätigung und für Widerruf/Löschung */
+    public string $kontaktMail = 'smartcity@buergerliste-uffenheim.de';
 
     /** Kontaktdaten der Meldenden so viele Tage nach Abschluss der Meldung löschen */
     public int $kontaktAufbewahrungTage = 183;

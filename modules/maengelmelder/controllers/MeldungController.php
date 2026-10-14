@@ -175,10 +175,47 @@ class MeldungController extends ContentContainerController
         } catch (\Throwable $e) {
             Yii::error('Gastmeldung-Benachrichtigung: ' . $e->getMessage(), 'maengelmelder');
         }
+        if ($kontakt->email !== '') {
+            $this->gastBestaetigen($post, $kontakt, count($files));
+        }
         if ($fotoFehler) {
             $this->view->warn(implode(' ', $fotoFehler) . ' Die Meldung wurde ohne diese Fotos gespeichert.');
         }
         return $this->redirect($space->createUrl('/maengelmelder/meldung/create', ['danke' => $post->content->id]));
+    }
+
+    /** Eingangsbestätigung per E-Mail an den Gast (Fehler beim Versand verhindern die Meldung nicht) */
+    private function gastBestaetigen(Post $post, MeldeKontakt $kontakt, int $fotos): void
+    {
+        try {
+            $mangel = new Mangel($post);
+            $params = [
+                'name' => trim("$kontakt->vorname $kontakt->nachname"),
+                'mangel' => $mangel,
+                'fotos' => $fotos,
+                'karteUrl' => $post->content->container->createUrl('/maengelmelder/meldung/karte',
+                    ['lat' => $mangel->lat, 'lng' => $mangel->lng], true),
+                'kontaktMail' => $this->module->kontaktMail,
+            ];
+            $text = $this->renderPartial('@maengelmelder/views/mail/eingang_text', $params);
+            $html = nl2br(\yii\helpers\Html::encode($text), false);
+            $html = preg_replace('#https?://[^\s<]+#', '<a href="$0">$0</a>', $html);
+            $mailer = Yii::$app->mailer;
+            $html = $mailer->render('@humhub/views/mail/TextOnly', ['message' => $html], $mailer->htmlLayout);
+            $mail = $mailer->compose()
+                ->setTo($kontakt->email)
+                ->setReplyTo($this->module->kontaktMail)
+                ->setSubject('Ihre Mängelmeldung Nr. ' . $mangel->getContentId() . ' ist eingegangen');
+            // Text/HTML direkt setzen: HumHubs Link-Dienst (go.humhub.com, für die App) würde die Links sonst umleiten;
+            // Gäste haben keine App, die Links sollen direkt auf die Plattform zeigen
+            $mail->getSymfonyEmail()->text($text)->html($html);
+            $ok = $mail->send();
+            if (!$ok) {
+                Yii::warning('Eingangsbestätigung Nr. ' . $mangel->getContentId() . ' nicht versendet', 'maengelmelder');
+            }
+        } catch (\Throwable $e) {
+            Yii::error('Eingangsbestätigung: ' . $e->getMessage(), 'maengelmelder');
+        }
     }
 
     /** Gastmeldungen je IP-Adresse und Tag zählen (nur im Cache, gespeichert wird die Adresse nicht) */
