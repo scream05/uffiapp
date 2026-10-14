@@ -48,7 +48,7 @@ class SetupController extends Controller
             'url' => 'mangelmelder',
             'description' => 'Schlagloch, defekte Laterne, wilder Müll? Hier mit Foto und Ort melden.',
             'color' => '#c0392b',
-            'auto_add' => false,
+            'auto_add' => true, // alle Angemeldeten sehen die Meldungen (setup/maengelmelder-alle)
             'modules' => [],
         ],
         [
@@ -1074,6 +1074,38 @@ class SetupController extends Controller
         }
         \humhub\modules\vereine\components\BeitragDienst::entfernen($b);
         $this->stdout('Entfernt: ' . (\humhub\modules\content\models\Content::findOne($b->content_id) ? 'NEIN' : 'ja') . "\n");
+        return ExitCode::OK;
+    }
+
+    /**
+     * Mängelmeldungen für alle Angemeldeten: setup/maengelmelder-alle
+     * Alle Konten (außer Import-/Systemkonten) werden still Mitglied im Space `mangelmelder`, neue automatisch
+     * (auto_add). Die Meldungen bleiben „nur für Mitglieder“ – Gäste sehen weiter nur die Karte (Datenschutz Abschn. 9).
+     * Benachrichtigungen aus dem Space: aus (Standard nur Rathaus); ob sie in der Übersicht erscheinen, regelt
+     * „Meine Übersicht“. Idempotent.
+     */
+    public function actionMaengelmelderAlle()
+    {
+        $space = Space::findOne(['url' => 'mangelmelder']);
+        if ($space === null) {
+            $this->stderr("Space mangelmelder nicht gefunden\n");
+            return ExitCode::DATAERR;
+        }
+        $space->updateAttributes(['auto_add_new_members' => 1]);
+        $uebersicht = Yii::$app->getModule('uebersicht');
+        $neu = 0;
+        foreach (User::find()->active()->all() as $user) {
+            if (in_array($user->username, [self::RSS_USER, self::FB_USER, 'gastmeldung'], true) || $space->isMember($user->id)) {
+                continue;
+            }
+            $space->addMember($user->id, 1, true);
+            $m = \humhub\modules\space\models\Membership::findOne(['space_id' => $space->id, 'user_id' => $user->id]);
+            $m?->updateAttributes(['send_notifications' => 0,
+                'show_at_dashboard' => $uebersicht && in_array($space->guid, $uebersicht->getAusgeblendet($user), true) ? 0 : 1]);
+            $this->stdout("+ Mitglied {$user->username}\n");
+            $neu++;
+        }
+        $this->stdout("Mängelmelder: $neu neue Mitglieder, neue Konten werden automatisch aufgenommen\n");
         return ExitCode::OK;
     }
 
