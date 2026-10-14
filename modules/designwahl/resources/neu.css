@@ -237,12 +237,6 @@ html.design-neu #topbar .user-title strong {
         box-shadow: 0 -6px 24px rgba(43, 74, 95, .18), 0 -1px 0 var(--dn-linie) !important;
     }
 
-    /* „Menü“-Symbol nur, wenn wirklich Reiter darin liegen. Das Auslagern bei Platzmangel macht das
-       Clean-Theme selbst (cleanTheme.topNavigation): Reiter brechen erst um, wenn ihre Beschriftungen
-       nebeneinander nicht mehr passen, dann wandern die letzten ins Menü */
-    html.design-neu body #topbar > .container > #top-menu-nav > #top-menu-sub:not(:has(#top-menu-sub-dropdown > li)) {
-        display: none !important;
-    }
 
     /* Reiter teilen sich die Breite gleichmäßig, lange Beschriftungen werden gekürzt statt abgeschnitten */
     html.design-neu body #topbar > .container > #top-menu-nav > li {
@@ -296,6 +290,37 @@ html.design-neu #topbar .user-title strong {
     /* Uffi-Knopf über der Leiste */
     html.design-neu .ki-fab {
         bottom: calc(var(--hh-ct-top-bar-height) + 12px + var(--hh-mobile-app-safe-area-inset-bottom, env(safe-area-inset-bottom, 0px))) !important;
+    }
+}
+
+/* „Menü“-Symbol nur, wenn wirklich Reiter darin liegen. Das Auslagern bei Platzmangel macht das
+   Clean-Theme selbst (cleanTheme.topNavigation): Reiter brechen erst um, wenn ihre Beschriftungen
+   nebeneinander nicht mehr passen, dann wandern die letzten ins Menü */
+html.design-neu body #topbar > .container > #top-menu-nav > #top-menu-sub:not(:has(#top-menu-sub-dropdown > li)) {
+    display: none !important;
+}
+
+/* ---------- Handy quer: Leiste bleibt oben, nur Symbole, damit alle Reiter samt „Mehr“ passen ---------- */
+@media (min-width: 576px) and (max-height: 500px) and (orientation: landscape) {
+    html.design-neu #topbar > .container > #top-menu-nav > li > a {
+        font-size: 0 !important;
+        min-width: 0 !important;
+        padding: 0 3px !important;
+        display: flex;
+        align-items: center;
+        height: 100%;
+    }
+
+    html.design-neu #topbar > .container > #top-menu-nav > li > a br {
+        display: none;
+    }
+
+    html.design-neu #topbar > .container > #top-menu-nav > li > a i {
+        font-size: 20px;
+        line-height: 38px;
+        width: 40px;
+        text-align: center;
+        border-radius: 999px;
     }
 }
 
