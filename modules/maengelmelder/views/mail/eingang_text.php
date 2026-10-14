@@ -10,9 +10,9 @@
  * @var bool $infoMail
  */
 ?>
-Guten Tag <?= $name ?>,
+Hallo <?= $name ?>,
 
-vielen Dank für Ihre Mängelmeldung. Sie ist bei uns eingegangen:
+vielen Dank für deine Mängelmeldung. Sie ist bei uns eingegangen:
 
 Nummer: <?= $mangel->getContentId() ?>
 
@@ -24,15 +24,15 @@ Beschreibung: <?= $mangel->beschreibung ?>
 
 <?= $fotos ? "Fotos: $fotos\n" : '' ?>
 
-Der Bauhof prüft Ihre Meldung und schaltet sie danach auf der Karte frei. Dort sehen Sie auch den Bearbeitungsstand:
+Der Bauhof prüft deine Meldung und schaltet sie danach auf der Karte frei. Dort siehst du auch den Bearbeitungsstand:
 <?= $karteUrl ?>
 
 
-Bei Rückfragen meldet sich der Bauhof über die angegebenen Kontaktdaten.<?= $infoMail ? ' Über jede Änderung am Bearbeitungsstand informieren wir Sie per E-Mail.' : '' ?>
+Bei Rückfragen meldet sich der Bauhof über die angegebenen Kontaktdaten.<?= $infoMail ? ' Über jede Änderung am Bearbeitungsstand informieren wir dich per E-Mail.' : '' ?>
 
-Sie können auf diese E-Mail antworten, z. B. mit einer Ergänzung oder einem weiteren Foto; Ihre Antwort geht an den Bauhof.
+Du kannst auf diese E-Mail antworten, z. B. mit einer Ergänzung oder einem weiteren Foto; deine Antwort geht an den Bauhof.
 
-Sie erhalten diese E-Mail, weil Ihre Adresse bei einer Mängelmeldung angegeben wurde. Waren Sie das nicht? Dann schreiben Sie bitte an <?= $kontaktMail ?>, wir löschen die Angaben.
+Du bekommst diese E-Mail, weil deine Adresse bei einer Mängelmeldung angegeben wurde. Warst du das nicht? Dann schreib bitte an <?= $kontaktMail ?>, wir löschen die Angaben.
 
 --
 Rund um Uffni – Bürgerplattform der Bürgerliste Uffenheim e. V., kein Angebot der Stadt Uffenheim.

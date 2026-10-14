@@ -34,10 +34,10 @@ $this->registerJs('window.kiChatDomains = ' . json_encode(Yii::$app->getModule('
                 <summary>KI-Antworten von Claude (Anthropic) – unverbindlich. Persönliche Daten nur für Formulare angeben. <u>Mehr</u></summary>
                 <p class="help-block" style="margin-top:6px">
                     Beantwortet Fragen zu Abfuhrterminen, Veranstaltungen, Vereinen, Nachrichten und Informationen der Stadt,
-                    bereitet Mängelmeldungen vor, trägt Termine in Ihren Kalender ein und füllt ausgewählte Antragsformulare der Stadt mit Ihnen aus.
-                    Ihre Nachrichten – bei Formularen auch Ihre Angaben wie Name und Anschrift – werden zur Beantwortung an Claude von Anthropic
+                    bereitet Mängelmeldungen vor, trägt Termine in deinen Kalender ein und füllt ausgewählte Antragsformulare der Stadt mit dir aus.
+                    Deine Nachrichten – bei Formularen auch deine Angaben wie Name und Anschrift – werden zur Beantwortung an Claude von Anthropic
                     (<?= Html::encode($model) ?>) übermittelt und hier nicht gespeichert; ein ausgefülltes Formular ist eine Stunde lang abrufbar und wird dann gelöscht.
-                    Bewerten Sie eine Antwort mit 👍/👎, speichern wir Frage und Antwort ohne Ihren Namen, um Uffi zu verbessern.
+                    Bewertest du eine Antwort mit 👍/👎, speichern wir Frage und Antwort ohne deinen Namen, um Uffi zu verbessern.
                     Antworten sind keine verbindliche Auskunft der Stadt Uffenheim.
                 </p>
                 <?php if (Yii::$app->user->isAdmin()): ?>
@@ -53,7 +53,7 @@ $this->registerJs('window.kiChatDomains = ' . json_encode(Yii::$app->getModule('
                 <div class="alert alert-info">
                     <?= Html::beginForm(['confirm-age'], 'post') ?>
                     <p>Uffi steht nur Personen ab 18 Jahren zur Verfügung.
-                        Bitte bestätigen Sie <?= Yii::$app->user->isGuest ? 'Ihr Alter.' : 'einmalig Ihr Alter.' ?></p>
+                        Bitte bestätige <?= Yii::$app->user->isGuest ? 'dein Alter.' : 'einmalig dein Alter.' ?></p>
                     <div class="checkbox">
                         <label><input type="checkbox" name="adult" value="1" required> Ich bin mindestens 18 Jahre alt.</label>
                     </div>

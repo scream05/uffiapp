@@ -81,7 +81,7 @@ window.kiChat = function (root, opts) {
             data.append('kommentar', comment || '');
             data.append(yii.getCsrfParam(), yii.getCsrfToken());
             fetch(opts.feedbackUrl, {method: 'POST', body: data, credentials: 'same-origin'}).then(function () {
-                wrap.textContent = 'Danke für Ihre Rückmeldung!';
+                wrap.textContent = 'Danke für deine Rückmeldung!';
             });
         }
         wrap.addEventListener('click', function (e) {

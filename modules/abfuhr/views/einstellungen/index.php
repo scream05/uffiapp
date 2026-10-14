@@ -15,8 +15,8 @@ use yii\helpers\Url;
 ?>
 <div class="panel-heading"><strong>Abfuhr-Erinnerung</strong></div>
 <div class="panel-body">
-    <p>Wir erinnern Sie rechtzeitig an die Müllabfuhr – als Benachrichtigung hier in der Glocke und, wenn Sie es auf Ihrem
-        Gerät erlaubt haben, als Push-Nachricht aufs Handy. Eine E-Mail können Sie zusätzlich unter
+    <p>Wir erinnern dich rechtzeitig an die Müllabfuhr – als Benachrichtigung hier in der Glocke und, wenn du es auf deinem
+        Gerät erlaubt hast, als Push-Nachricht aufs Handy. Eine E-Mail kannst du zusätzlich unter
         <?= Html::a('Benachrichtigungen', ['/notification/user']) ?> („Abfuhr-Erinnerung“) einschalten.</p>
 
     <?= Html::beginForm(['index'], 'post') ?>
@@ -25,7 +25,7 @@ use yii\helpers\Url;
     </div>
 
     <div class="mb-3">
-        <label class="control-label">Wo wohnen Sie?</label>
+        <label class="control-label">Wo wohnst du?</label>
         <div class="help-block" style="margin-top:0">Restmüll, Bio- und Papiertonne sind in ganz Uffenheim gleich, nur die Gelbe Tonne kommt in den Ortsteilen an einem anderen Tag.</div>
         <div class="radio"><label><?= Html::radio('gebiet', $gebiet === 'kernstadt', ['value' => 'kernstadt']) ?> Kernstadt Uffenheim</label></div>
         <div class="radio"><label><?= Html::radio('gebiet', $gebiet === 'ortsteil', ['value' => 'ortsteil']) ?>
@@ -50,7 +50,7 @@ use yii\helpers\Url;
     <?= Html::endForm() ?>
 
     <hr>
-    <strong>Ihre nächsten Abfuhren</strong> <small class="text-muted">(<?= $gebiet === 'ortsteil' ? 'Ortsteile' : 'Kernstadt' ?>, nächste 4 Wochen)</small>
+    <strong>Deine nächsten Abfuhren</strong> <small class="text-muted">(<?= $gebiet === 'ortsteil' ? 'Ortsteile' : 'Kernstadt' ?>, nächste 4 Wochen)</small>
     <?php if (!$termine): ?>
         <p class="text-muted">Keine Termine gefunden.</p>
     <?php else: ?>

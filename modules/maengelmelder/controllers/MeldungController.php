@@ -90,8 +90,8 @@ class MeldungController extends ContentContainerController
                 [$fotos, $fotoFehler] = GastFotos::pruefen($this->module);
                 $errors = array_merge($errors, $fotoFehler);
                 if (!$errors && !$this->gastZaehlen(false)) {
-                    $errors[] = 'Von Ihrem Anschluss kamen heute schon mehrere Meldungen. Bitte versuchen Sie es morgen wieder '
-                        . 'oder legen Sie ein kostenloses Konto an.';
+                    $errors[] = 'Von deinem Anschluss kamen heute schon mehrere Meldungen. Bitte versuch es morgen wieder '
+                        . 'oder leg ein kostenloses Konto an.';
                 }
                 if (!$errors) {
                     return $this->gastMeldungSpeichern($space, $data, $lat, $lng, $kontakt, $fotos);
@@ -216,7 +216,7 @@ class MeldungController extends ContentContainerController
             $mail = $mailer->compose()
                 ->setTo($kontakt->email)
                 ->setReplyTo(\humhub\modules\maengelmelder\components\MailEingang::antwortAdresse($mangel->getContentId()))
-                ->setSubject('Ihre Mängelmeldung Nr. ' . $mangel->getContentId() . ' ist eingegangen');
+                ->setSubject('Deine Mängelmeldung Nr. ' . $mangel->getContentId() . ' ist eingegangen');
             // Text/HTML direkt setzen: HumHubs Link-Dienst (go.humhub.com, für die App) würde die Links sonst umleiten;
             // Gäste haben keine App, die Links sollen direkt auf die Plattform zeigen
             $mail->getSymfonyEmail()->text($text)->html($html);
@@ -334,7 +334,7 @@ class MeldungController extends ContentContainerController
             throw new NotFoundHttpException();
         }
         $on = MaengelAuch::toggle($content, Yii::$app->user->id);
-        $this->view->success($on ? 'Danke! Wir haben vermerkt, dass Sie das auch betrifft.' : 'Vermerk zurückgenommen.');
+        $this->view->success($on ? 'Danke! Wir haben vermerkt, dass dich das auch betrifft.' : 'Vermerk zurückgenommen.');
         return $this->redirect($content->getUrl());
     }
 

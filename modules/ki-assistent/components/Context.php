@@ -144,7 +144,8 @@ class Context
             ->andWhere(['like', 'post.message', 'maengelmelder/meldung/karte?lat='])
             ->orderBy(['content.created_at' => SORT_DESC])->limit(150)->all();
         if (!$posts && !$space->isMember()) {
-            return "## Mängelmelder\nMeldungen sieht nur, wer dem Bereich „{$space->name}“ beigetreten ist: " . $space->createUrl('/space/space', [], true);
+            return "## Mängelmelder\nAlle Angemeldeten sehen die Meldungen (mit Beschreibung und Fotos), Gäste nur die Karte mit Ort, Art und Stand. "
+                . "Melden geht mit und ohne Konto: " . $space->createUrl('/space/space', [], true);
         }
         $ids = array_map(fn($p) => $p->content->id, $posts);
         $statuses = \humhub\modules\maengelmelder\models\MaengelStatus::find()->where(['content_id' => $ids])->indexBy('content_id')->all();

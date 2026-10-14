@@ -38,7 +38,7 @@ use yii\web\View;
         <form class="ki-form">
             <div class="input-group">
                 <input type="text" class="form-control ki-input" maxlength="2000" autocomplete="off"
-                       placeholder="Ihre Frage …" aria-label="Ihre Frage" <?= $enabled ? '' : 'disabled' ?>>
+                       placeholder="Deine Frage …" aria-label="Deine Frage" <?= $enabled ? '' : 'disabled' ?>>
                 <button class="btn btn-primary" type="submit" title="Senden" aria-label="Senden" <?= $enabled ? '' : 'disabled' ?>>
                     <i class="fa fa-paper-plane"></i></button>
             </div>

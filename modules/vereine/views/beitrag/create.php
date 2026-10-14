@@ -16,8 +16,8 @@ use humhub\widgets\form\ActiveForm;
     <div class="panel-body">
         <p><?= Html::a('<i class="fa fa-arrow-left"></i> ' . Html::encode($verein->name), $verein->getUrl()) ?></p>
         <h1 style="font-size:1.4em;margin-top:0">Beitrag schreiben</h1>
-        <p class="help-block">Neuigkeiten, Rückblicke, Aufrufe Ihres Vereins. Der Beitrag wird vor der Veröffentlichung kurz geprüft;
-            danach erscheint er auf der Vereinsseite und/oder in der Übersicht für alle. Termine tragen Sie bitte über „Termin eintragen“ ein.</p>
+        <p class="help-block">Neuigkeiten, Rückblicke, Aufrufe deines Vereins. Der Beitrag wird vor der Veröffentlichung kurz geprüft;
+            danach erscheint er auf der Vereinsseite und/oder in der Übersicht für alle. Termine trägst du bitte über „Termin eintragen“ ein.</p>
         <?php $form = ActiveForm::begin() ?>
             <?= $form->field($beitrag, 'text')->textarea(['rows' => 8, 'maxlength' => 5000, 'placeholder' => 'Was gibt es Neues im Verein?']) ?>
             <div class="form-group">

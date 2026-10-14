@@ -23,12 +23,12 @@ class VerwaltungBestaetigt extends BaseNotification
 
     public function getMailSubject()
     {
-        return "Sie können jetzt den Verein {$this->source->name} verwalten";
+        return "Du kannst jetzt den Verein {$this->source->name} verwalten";
     }
 
     public function html()
     {
-        return Html::tag('strong', Html::encode($this->originator->displayName)) . ' hat bestätigt: Sie können jetzt den Verein '
+        return Html::tag('strong', Html::encode($this->originator->displayName)) . ' hat bestätigt: Du kannst jetzt den Verein '
             . Html::tag('strong', Html::encode($this->source->name)) . ' verwalten (Vorstellungsseite und Termine).';
     }
 }

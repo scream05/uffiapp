@@ -33,7 +33,7 @@ $filtered = trim($q) !== '' || $kategorie !== '' || $ortsteil !== '';
     <div class="panel-heading"><strong>Vereinsverzeichnis</strong></div>
     <div class="panel-body">
         <p class="help-block">Vereine, Gruppen und Initiativen in Uffenheim und den Ortsteilen. Ihre Termine stehen im gemeinsamen Kalender
-            unter „Veranstaltungen“. Sie sind im Vorstand eines Vereins? Öffnen Sie die Seite Ihres Vereins und fragen Sie die Verwaltung an.</p>
+            unter „Veranstaltungen“. Du bist im Vorstand eines Vereins? Öffne die Seite deines Vereins und frag die Verwaltung an.</p>
         <?= Html::beginForm($space->createUrl('/vereine/verein/index'), 'get', ['class' => 'verein-filter', 'style' => 'display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px']) ?>
             <?= Html::hiddenInput('cguid', $space->guid) ?>
             <?= Html::textInput('q', $q, ['class' => 'form-control', 'placeholder' => 'Suchen …', 'style' => 'flex:2 1 180px', 'aria-label' => 'Suchen']) ?>
@@ -85,6 +85,6 @@ $filtered = trim($q) !== '' || $kategorie !== '' || $ortsteil !== '';
         <?php if (!$vereine): ?>
             <p>Nichts gefunden.</p>
         <?php endif ?>
-        <p style="margin-top:12px">Ihr Verein fehlt? <?= Html::a('Verein vorschlagen', $space->createUrl('/vereine/verein/create')) ?></p>
+        <p style="margin-top:12px">Dein Verein fehlt? <?= Html::a('Verein vorschlagen', $space->createUrl('/vereine/verein/create')) ?></p>
     </div>
 </div>

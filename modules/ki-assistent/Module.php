@@ -99,7 +99,7 @@ class Module extends \humhub\components\Module
     {
         $mutex = \Yii::$app->mutex;
         if (!$mutex->acquire('ki-assistent-limit', 5)) {
-            return 'Uffi ist gerade sehr gefragt. Bitte versuchen Sie es gleich noch einmal.';
+            return 'Uffi ist gerade sehr gefragt. Bitte versuch es gleich noch einmal.';
         }
         try {
             [$requests, $in, $out, $guests] = $this->getUsage();
@@ -114,7 +114,7 @@ class Module extends \humhub\components\Module
             $stunde = 'ki-stunde-' . $this->ident() . '-' . date('YmdH');
             $tag = 'ki-tag-' . $this->ident() . '-' . date('Ymd');
             if ((int)$cache->get($stunde) >= $this->hourlyLimit || (int)$cache->get($tag) >= $this->dailyLimit) {
-                return 'Sie haben schon viele Fragen gestellt. Bitte versuchen Sie es später noch einmal.';
+                return 'Du hast schon viele Fragen gestellt. Bitte versuch es später noch einmal.';
             }
             $cache->set($stunde, (int)$cache->get($stunde) + 1, 3600);
             $cache->set($tag, (int)$cache->get($tag) + 1, 86400);

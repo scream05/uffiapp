@@ -16,7 +16,7 @@ $isNew = $form->entry->isNewRecord;
     <div class="panel-heading"><strong><?= $isNew ? 'Termin eintragen' : 'Termin bearbeiten' ?>: <?= Html::encode($verein->name) ?></strong></div>
     <div class="panel-body">
         <?php if ($isNew): ?>
-            <p class="help-block">Der Termin erscheint im gemeinsamen Kalender unter „Veranstaltungen“ und auf der Seite Ihres Vereins.
+            <p class="help-block">Der Termin erscheint im gemeinsamen Kalender unter „Veranstaltungen“ und auf der Seite deines Vereins.
                 Alle Verwalter des Vereins können ihn später ändern.</p>
         <?php endif ?>
 
@@ -29,7 +29,7 @@ $isNew = $form->entry->isNewRecord;
                         <li><?= Html::a(Html::encode($e->title), $e->content->getUrl(), ['target' => '_blank']) ?> (<?= Html::encode($e->getFormattedTime()) ?>)</li>
                     <?php endforeach ?>
                 </ul>
-                Wenn es derselbe Termin ist, brauchen Sie ihn nicht noch einmal einzutragen.
+                Wenn es derselbe Termin ist, brauchst du ihn nicht noch einmal einzutragen.
                 <div class="checkbox" style="margin-bottom:0"><label><?= Html::activeCheckbox($form, 'trotzdem', ['label' => false]) ?> Es ist ein anderer Termin, trotzdem eintragen</label></div>
             </div>
         <?php endif ?>

@@ -12,7 +12,7 @@ use Yii;
 class Notdienst
 {
     public const QUELLE = 'Der Apotheken-Notdienstplan der örtlichen Apotheken in Bayern wird durch die Bayerische Landesapothekerkammer, '
-        . 'Maria-Theresia-Str. 28, 81675 München zur Verfügung gestellt. Bitte beachten Sie das dortige Impressum, '
+        . 'Maria-Theresia-Str. 28, 81675 München zur Verfügung gestellt. Bitte beachte das dortige Impressum, '
         . 'den Haftungsausschluss und die Datenschutzhinweise der Bayerischen Landesapothekerkammer.';
     public const QUELLE_LINKS = [
         'Impressum' => 'https://www.blak.de/service/impressum',

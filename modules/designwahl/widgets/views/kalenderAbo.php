@@ -14,7 +14,7 @@ use humhub\helpers\Html;
         <strong><i class="fa fa-calendar-plus-o"></i> Kalender abonnieren</strong>
     </div>
     <div class="panel-body">
-        <p>Die Termine erscheinen in Ihrem Kalender auf dem Handy oder am Computer und werden von selbst aktualisiert.
+        <p>Die Termine erscheinen in deinem Kalender auf dem Handy oder am Computer und werden von selbst aktualisiert.
             Ein Konto ist dafür nicht nötig.</p>
         <?php if ($hinweis !== '') : ?>
             <p class="text-muted"><?= Html::encode($hinweis) ?></p>

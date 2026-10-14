@@ -53,7 +53,7 @@ class BauhofController extends Controller
                 'category' => 'UTILITY',
                 'components' => [
                     ['type' => 'BODY',
-                        'text' => "Ihre Mängelmeldung Nr. {{1}} ({{2}}) bei Rund um Uffni ist eingegangen. Über Änderungen am Bearbeitungsstand informieren wir Sie hier.\n\nSie können auf diese Nachricht antworten; Ihre Antwort geht an den Bauhof. Keine Nachrichten mehr? Antworten Sie mit STOPP.",
+                        'text' => "Deine Mängelmeldung Nr. {{1}} ({{2}}) bei Rund um Uffni ist eingegangen. Über Änderungen am Bearbeitungsstand informieren wir dich hier.\n\nDu kannst auf diese Nachricht antworten; deine Antwort geht an den Bauhof. Keine Nachrichten mehr? Antworte mit STOPP.",
                         'example' => ['body_text' => [['12', 'Straßenbeleuchtung']]]],
                 ],
             ],
@@ -63,7 +63,7 @@ class BauhofController extends Controller
                 'category' => 'UTILITY',
                 'components' => [
                     ['type' => 'BODY',
-                        'text' => "Neuer Stand zu Ihrer Mängelmeldung Nr. {{1}} ({{2}}): {{3}}\nHinweis des Bauhofs: {{4}}\n\nSie können auf diese Nachricht antworten; Ihre Antwort geht an den Bauhof. Keine Nachrichten mehr? Antworten Sie mit STOPP.",
+                        'text' => "Neuer Stand zu deiner Mängelmeldung Nr. {{1}} ({{2}}): {{3}}\nHinweis des Bauhofs: {{4}}\n\nDu kannst auf diese Nachricht antworten; deine Antwort geht an den Bauhof. Keine Nachrichten mehr? Antworte mit STOPP.",
                         'example' => ['body_text' => [['12', 'Straßenbeleuchtung', 'In Arbeit', 'Lampe wird am Freitag getauscht']]]],
                 ],
             ],

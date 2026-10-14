@@ -33,25 +33,25 @@ $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '
     <div class="panel-body">
         <?php if ($danke !== null): ?>
             <div class="alert alert-success">
-                <strong>Vielen Dank<?= $danke ? ', Ihre Meldung Nr. ' . (int)$danke . ' ist eingegangen' : ', Ihre Meldung ist eingegangen' ?>.</strong><br>
+                <strong>Vielen Dank<?= $danke ? ', deine Meldung Nr. ' . (int)$danke . ' ist eingegangen' : ', deine Meldung ist eingegangen' ?>.</strong><br>
                 Der Bauhof prüft sie und schaltet sie danach auf der Karte frei. Bei Rückfragen meldet er sich über die angegebenen Kontaktdaten.
             </div>
         <?php endif ?>
         <?php if (!$canPost && $gast): ?>
-            <div class="alert alert-info">Um einen Mangel zu melden, melden Sie sich bitte an oder legen Sie ein kostenloses Konto an.
+            <div class="alert alert-info">Um einen Mangel zu melden, melde dich bitte an oder leg ein kostenloses Konto an.
                 <?= Html::a('Anmelden', ['/user/auth/login'], ['class' => 'alert-link', 'data-pjax-prevent' => 1]) ?></div>
         <?php elseif (!$canPost): ?>
-            <div class="alert alert-info">Um einen Mangel zu melden, treten Sie bitte zuerst dem Bereich „<?= Html::encode($space->name) ?>“ bei.</div>
+            <div class="alert alert-info">Um einen Mangel zu melden, tritt bitte zuerst dem Bereich „<?= Html::encode($space->name) ?>“ bei.</div>
         <?php else: ?>
             <?php if ($bearbeiten): ?>
             <p class="help-block">Änderungen erscheinen direkt im Beitrag. Neue Fotos werden hinzugefügt; vorhandene bleiben.</p>
             <?php elseif ($gast): ?>
-            <p class="help-block">Schlagloch, defekte Laterne, wilder Müll? Beschreiben Sie den Mangel, markieren Sie den Ort auf der Karte
-                und fügen Sie gern ein Foto hinzu. Sie brauchen dafür kein Konto: Der Bauhof prüft Ihre Meldung und schaltet sie
+            <p class="help-block">Schlagloch, defekte Laterne, wilder Müll? Beschreib den Mangel, markier den Ort auf der Karte
+                und füg gern ein Foto hinzu. Du brauchst dafür kein Konto: Der Bauhof prüft deine Meldung und schaltet sie
                 danach auf der Karte frei. Bitte keine Personen oder Kfz-Kennzeichen erkennbar fotografieren.</p>
             <?php else: ?>
-            <p class="help-block">Schlagloch, defekte Laterne, wilder Müll? Beschreiben Sie den Mangel, markieren Sie den Ort auf der Karte
-                und fügen Sie gern ein Foto hinzu. Die Meldung erscheint als Beitrag in diesem Bereich.
+            <p class="help-block">Schlagloch, defekte Laterne, wilder Müll? Beschreib den Mangel, markier den Ort auf der Karte
+                und füg gern ein Foto hinzu. Die Meldung erscheint als Beitrag in diesem Bereich.
                 Bitte keine Personen oder Kfz-Kennzeichen erkennbar fotografieren.</p>
             <?php endif ?>
             <?php if ($errors): ?>
@@ -107,8 +107,8 @@ $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '
 
             <?php if ($kontakt && $gast): ?>
             <fieldset class="maengel-kontakt">
-                <legend>Ihre Kontaktdaten <small class="text-muted">– für Rückfragen des Bauhofs</small></legend>
-                <p class="help-block">Ihre Angaben sehen nur die Bauhofleitung und die Administratoren dieser Plattform, nicht die Öffentlichkeit.
+                <legend>Deine Kontaktdaten <small class="text-muted">– für Rückfragen des Bauhofs</small></legend>
+                <p class="help-block">Deine Angaben sehen nur die Bauhofleitung und die Administratoren dieser Plattform, nicht die Öffentlichkeit.
                     Sie werden nur für Rückfragen zu dieser Meldung verwendet und <?= round($module->kontaktAufbewahrungTage / 30) ?> Monate
                     nach ihrer Erledigung gelöscht.</p>
                 <div class="row">
@@ -147,7 +147,7 @@ $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '
                     <div class="form-check">
                         <?= Html::activeCheckbox($kontakt, 'info_whatsapp', ['id' => 'kontakt-info-whatsapp', 'class' => 'form-check-input' . $feld('info_whatsapp'), 'label' => false]) ?>
                         <label class="form-check-label" for="kontakt-info-whatsapp">per WhatsApp an meine Handynummer
-                            <small class="text-muted">– Sie können darauf antworten, Ihre Antwort geht an den Bauhof. Abbestellen: STOPP schreiben.</small></label>
+                            <small class="text-muted">– Du kannst darauf antworten, deine Antwort geht an den Bauhof. Abbestellen: STOPP schreiben.</small></label>
                     </div>
                     <?php endif ?>
                 </div>
@@ -171,7 +171,7 @@ $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '
             <?php elseif ($kontakt): ?>
             <?php $ich = Yii::$app->user->getIdentity() ?>
             <fieldset class="maengel-kontakt">
-                <legend>Ihre Kontaktdaten <small class="text-muted">– für Rückfragen des Bauhofs</small></legend>
+                <legend>Deine Kontaktdaten <small class="text-muted">– für Rückfragen des Bauhofs</small></legend>
                 <p style="margin-bottom:8px"><i class="fa fa-user"></i> <?= Html::encode($ich->displayName) ?>
                     &nbsp; <i class="fa fa-envelope-o"></i> <?= Html::encode($ich->email) ?></p>
                 <div class="form-group" style="max-width:360px">
@@ -191,7 +191,7 @@ $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '
                     <div class="form-check">
                         <?= Html::activeCheckbox($kontakt, 'info_whatsapp', ['id' => 'kontakt-info-whatsapp', 'class' => 'form-check-input' . $feld('info_whatsapp'), 'label' => false]) ?>
                         <label class="form-check-label" for="kontakt-info-whatsapp">per WhatsApp an meine Handynummer (oben)
-                            <small class="text-muted">– Sie können darauf antworten, Ihre Antwort geht an den Bauhof. Abbestellen: STOPP schreiben.</small></label>
+                            <small class="text-muted">– Du kannst darauf antworten, deine Antwort geht an den Bauhof. Abbestellen: STOPP schreiben.</small></label>
                     </div>
                     <?php endif ?>
                 </div>
@@ -251,7 +251,7 @@ maengelReady(function () {
         naheLayer.clearLayers();
         if (!list.length) { nahe.style.display = 'none'; nahe.innerHTML = ''; return; }
         var html = '<strong><i class="fa fa-info-circle"></i> In der Nähe wurde schon etwas gemeldet.</strong> '
-            + 'Ist es derselbe Mangel? Dann schließen Sie sich bitte an, statt ihn noch einmal zu melden.'
+            + 'Ist es derselbe Mangel? Dann schließ dich bitte an, statt ihn noch einmal zu melden.'
             + '<ul class="list-unstyled" style="margin:8px 0 0">';
         list.forEach(function (m) {
             L.circleMarker([m.lat, m.lng], {radius: 8, color: '#fff', weight: 2, fillColor: m.farbe, fillOpacity: 0.9})
@@ -265,9 +265,9 @@ maengelReady(function () {
             if (gast) {
                 html += ' <small class="text-muted">Ist es derselbe Mangel? Dann ist keine neue Meldung nötig.</small>';
             } else if (m.eigene) {
-                html += ' <small class="text-muted">(Ihre eigene Meldung)</small>';
+                html += ' <small class="text-muted">(deine eigene Meldung)</small>';
             } else if (m.auchMeins) {
-                html += ' <small class="text-muted"><i class="fa fa-check"></i> Sie haben sich bereits angeschlossen</small>';
+                html += ' <small class="text-muted"><i class="fa fa-check"></i> Du hast dich bereits angeschlossen</small>';
             } else {
                 html += ' <button type="button" class="btn btn-primary btn-sm" style="margin-left:8px" data-auch-url="'
                     + esc(m.auchUrl) + '">Betrifft mich auch</button>';
@@ -325,7 +325,7 @@ maengelReady(function () {
         locateBtn.disabled = false;
         var ll = L.latLng(p.coords.latitude, p.coords.longitude);
         if (!bounds.contains(ll)) {
-            coords.textContent = 'Ihr Standort liegt außerhalb von Uffenheim. Bitte den Ort des Mangels in der Karte antippen.';
+            coords.textContent = 'Dein Standort liegt außerhalb von Uffenheim. Bitte den Ort des Mangels in der Karte antippen.';
             return;
         }
         setPoint(ll, true);

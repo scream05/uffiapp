@@ -43,17 +43,17 @@ class Buergerinfo
         if (!$k || !$mangel || !$k->info_whatsapp || !$k->wa_id || !self::module()->buergerWhatsappAktiv()) {
             return;
         }
-        $text = "Ihre Mängelmeldung Nr. {$content->id} ({$mangel->kategorie}) ist eingegangen. "
+        $text = "Deine Mängelmeldung Nr. {$content->id} ({$mangel->kategorie}) ist eingegangen. "
             . ($content->state == Content::STATE_DRAFT ? 'Der Bauhof prüft sie und schaltet sie dann frei. ' : '')
-            . "Über Änderungen am Bearbeitungsstand informieren wir Sie hier. Sie können auf diese Nachricht antworten; "
-            . "Ihre Antwort geht an den Bauhof. Keine Nachrichten mehr? Antworten Sie mit STOPP.";
+            . "Über Änderungen am Bearbeitungsstand informieren wir dich hier. Du kannst auf diese Nachricht antworten; "
+            . "Deine Antwort geht an den Bauhof. Keine Nachrichten mehr? Antworte mit STOPP.";
         self::whatsapp($k, $content->id, $text, self::module()->vorlagen['buergerEingang'], [(string)$content->id, $mangel->kategorie], 'eingang');
     }
 
     /** Freigabe einer Gastmeldung durch den Bauhof */
     public static function freigegeben(Content $content): void
     {
-        self::melden($content, 'Geprüft und freigegeben', 'Ihre Meldung ist jetzt auf der Karte zu sehen.');
+        self::melden($content, 'Geprüft und freigegeben', 'Deine Meldung ist jetzt auf der Karte zu sehen.');
     }
 
     /** Statusänderung (Bauhofseite oder Mitarbeiter per WhatsApp) */
@@ -74,9 +74,9 @@ class Buergerinfo
                 self::mail($k, $mail, $mangel, $stand, $hinweis);
             }
             if ($k->info_whatsapp && $k->wa_id && self::module()->buergerWhatsappAktiv()) {
-                $text = "Neuer Stand zu Ihrer Mängelmeldung Nr. {$content->id} ({$mangel->kategorie}): *$stand*"
+                $text = "Neuer Stand zu deiner Mängelmeldung Nr. {$content->id} ({$mangel->kategorie}): *$stand*"
                     . ($hinweis ? "\n💬 $hinweis" : '')
-                    . "\n\nSie können auf diese Nachricht antworten; Ihre Antwort geht an den Bauhof. Keine Nachrichten mehr? Antworten Sie mit STOPP.";
+                    . "\n\nDu kannst auf diese Nachricht antworten; deine Antwort geht an den Bauhof. Keine Nachrichten mehr? Antworte mit STOPP.";
                 self::whatsapp($k, $content->id, $text, self::module()->vorlagen['buergerStatus'],
                     [(string)$content->id, $mangel->kategorie, $stand, $hinweis ?: '–'], 'status');
             }
@@ -113,8 +113,8 @@ class Buergerinfo
         }
         if ($weg[0] === 'whatsapp') {
             $k = MaengelKontakt::findOne($content->id);
-            $volltext = "Nachricht vom Bauhof zu Ihrer Mängelmeldung Nr. {$content->id} ({$mangel->kategorie}):\n\n$text"
-                . "\n\nSie können auf diese Nachricht antworten; Ihre Antwort geht an den Bauhof. Keine Nachrichten mehr? Antworten Sie mit STOPP.";
+            $volltext = "Nachricht vom Bauhof zu deiner Mängelmeldung Nr. {$content->id} ({$mangel->kategorie}):\n\n$text"
+                . "\n\nDu kannst auf diese Nachricht antworten; deine Antwort geht an den Bauhof. Keine Nachrichten mehr? Antworte mit STOPP.";
             // Außerhalb des 24-Stunden-Fensters über die Status-Vorlage (Parameter ohne Zeilenumbrüche)
             $einzeilig = trim(preg_replace('/\s+/u', ' ', $text));
             $log = self::whatsapp($k, $content->id, $volltext, self::module()->vorlagen['buergerStatus'],
@@ -123,10 +123,10 @@ class Buergerinfo
         }
         $k = MaengelKontakt::findOne($content->id);
         $name = $k ? $k->getName() : $content->createdBy->displayName;
-        $mail = "Guten Tag $name,\n\nder Bauhof hat eine Nachricht zu Ihrer Mängelmeldung Nr. {$content->id} ({$mangel->kategorie}, "
-            . $mangel->getOrt() . "):\n\n$text\n\nSie können einfach auf diese E-Mail antworten; Ihre Antwort geht an den Bauhof.\n\n--\n"
+        $mail = "Hallo $name,\n\nder Bauhof hat eine Nachricht zu deiner Mängelmeldung Nr. {$content->id} ({$mangel->kategorie}, "
+            . $mangel->getOrt() . "):\n\n$text\n\nDu kannst einfach auf diese E-Mail antworten; deine Antwort geht an den Bauhof.\n\n--\n"
             . 'Rund um Uffni – Bürgerplattform der Bürgerliste Uffenheim e. V., kein Angebot der Stadt Uffenheim.';
-        $ok = self::mailSenden($weg[1], "Nachricht vom Bauhof zu Ihrer Mängelmeldung Nr. {$content->id}", $mail, $content->id);
+        $ok = self::mailSenden($weg[1], "Nachricht vom Bauhof zu deiner Mängelmeldung Nr. {$content->id}", $mail, $content->id);
         (new BauhofNachricht(['content_id' => $content->id, 'richtung' => BauhofNachricht::AUS, 'buerger' => 1,
             'typ' => 'mail', 'text' => $text, 'verarbeitet' => 1, 'user_id' => $absender->id,
             'zustellung' => $ok ? 'gesendet' : 'fehler', 'fehler' => $ok ? null : 'E-Mail-Versand fehlgeschlagen']))->save(false);
@@ -172,7 +172,7 @@ class Buergerinfo
             'name' => $k->getName(), 'mangel' => $mangel, 'stand' => $stand, 'hinweis' => $hinweis, 'link' => $link,
             'kontaktMail' => self::module()->kontaktMail, 'gast' => $k->istGast(),
         ]);
-        self::mailSenden($an, "Neuer Stand zu Ihrer Mängelmeldung Nr. {$content->id}: $stand", $text, $content->id);
+        self::mailSenden($an, "Neuer Stand zu deiner Mängelmeldung Nr. {$content->id}: $stand", $text, $content->id);
     }
 
     /**
@@ -303,7 +303,7 @@ class Buergerinfo
                 $n->updateAttributes(['gelesen_at' => date('Y-m-d H:i:s')]);
                 Bauhof::vermerk($n->content_id, null, null, 'Meldende Person hat WhatsApp-Infos abbestellt (STOPP)');
                 $ok = new BauhofNachricht(['content_id' => $n->content_id, 'richtung' => BauhofNachricht::AUS, 'buerger' => 1,
-                    'typ' => 'text', 'verarbeitet' => 1, 'text' => 'Sie bekommen von uns keine WhatsApp-Infos zu Ihren Mängelmeldungen mehr. Danke!']);
+                    'typ' => 'text', 'verarbeitet' => 1, 'text' => 'Du bekommst von uns keine WhatsApp-Infos zu deinen Mängelmeldungen mehr. Danke!']);
                 try {
                     $ok->wamid = Api::sendeText($k->wa_id, $ok->text, $n->wamid);
                     $ok->zustellung = 'gesendet';
@@ -323,7 +323,7 @@ class Buergerinfo
                 Yii::$app->cache->set($key, 1, 3600);
                 $ack = new BauhofNachricht(['content_id' => $n->content_id, 'richtung' => BauhofNachricht::AUS, 'buerger' => 1,
                     'typ' => 'text', 'verarbeitet' => 1,
-                    'text' => "Danke, Ihre Nachricht zu Meldung Nr. {$n->content_id} ist beim Bauhof angekommen."]);
+                    'text' => "Danke, deine Nachricht zu Meldung Nr. {$n->content_id} ist beim Bauhof angekommen."]);
                 try {
                     $ack->wamid = Api::sendeText($k->wa_id, $ack->text, $n->wamid);
                     $ack->zustellung = 'gesendet';

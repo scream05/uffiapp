@@ -26,11 +26,11 @@ class BeitragFreigegeben extends BaseNotification
 
     public function getMailSubject()
     {
-        return "Ihr Beitrag für {$this->source->verein->name} ist veröffentlicht";
+        return "Dein Beitrag für {$this->source->verein->name} ist veröffentlicht";
     }
 
     public function html()
     {
-        return 'Ihr Beitrag für ' . Html::tag('strong', Html::encode($this->source->verein->name)) . ' ist jetzt veröffentlicht.';
+        return 'Dein Beitrag für ' . Html::tag('strong', Html::encode($this->source->verein->name)) . ' ist jetzt veröffentlicht.';
     }
 }

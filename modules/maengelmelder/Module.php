@@ -36,7 +36,8 @@ class Module extends ContentContainerModule
 
     /** WhatsApp-Vorlagen für den Erstkontakt außerhalb des 24-Stunden-Fensters (siehe commands/BauhofController) */
     public array $vorlagen = ['auftrag' => 'bauhof_auftrag', 'nachricht' => 'bauhof_nachricht',
-        'buergerEingang' => 'maengel_eingang', 'buergerStatus' => 'maengel_status'];
+        // Bürger-Vorlagen in der Du-Form (seit 14.10.2026; die alten Sie-Vorlagen maengel_eingang/maengel_status werden nicht mehr genutzt)
+        'buergerEingang' => 'maengel_eingang_du', 'buergerStatus' => 'maengel_status_du'];
     public string $vorlagenSprache = 'de';
 
     /** Verlauf und Fotos des Bauhofs so viele Tage nach Abschluss einer Meldung löschen */

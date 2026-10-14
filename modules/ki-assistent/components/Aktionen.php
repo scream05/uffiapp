@@ -141,15 +141,26 @@ class Aktionen
             'zeilen' => array_values(array_filter([
                 "Kategorie: $kategorie",
                 $hit ? "Ort: $ort (auf der Karte markiert, bitte prüfen)" : "Ort „{$ort}“ nicht gefunden – bitte im Formular auf der Karte markieren",
-                'Ein Foto können Sie im Formular hinzufügen. Gesendet wird erst mit „Meldung absenden“.',
-                Yii::$app->user->isGuest ? 'Zum Melden ist ein kostenloses Konto nötig – nach der Anmeldung geht es mit dem Formular weiter.' : null,
+                'Ein Foto kannst du im Formular hinzufügen. Gesendet wird erst mit „Meldung absenden“.',
+                Yii::$app->user->isGuest ? (self::gastMeldungen()
+                    ? 'Melden geht auch ohne Konto: Name und E-Mail oder Telefon für Rückfragen angeben, der Bauhof prüft die Meldung vor der Veröffentlichung.'
+                    : 'Zum Melden ist ein kostenloses Konto nötig – nach der Anmeldung geht es mit dem Formular weiter.') : null,
             ])),
             'knopf' => 'Meldeformular öffnen',
             'url' => $url,
         ];
         return [['ok' => true, 'ort_gefunden' => $hit !== null,
             'hinweis' => 'Der Knopf zum vorausgefüllten Meldeformular erscheint unter deiner Antwort. Der Nutzer muss den Ort prüfen und selbst absenden.'
-                . (Yii::$app->user->isGuest ? ' Der Nutzer ist nicht angemeldet: zum Absenden braucht er ein kostenloses Konto (Anmeldung/Registrierung öffnet sich über den Knopf).' : '')], $karte];
+                . (Yii::$app->user->isGuest ? (self::gastMeldungen()
+                    ? ' Der Nutzer ist nicht angemeldet: Er kann trotzdem melden (mit Name und E-Mail oder Telefon für Rückfragen); der Bauhof prüft Gastmeldungen vor der Veröffentlichung.'
+                    : ' Der Nutzer ist nicht angemeldet: zum Absenden braucht er ein kostenloses Konto (Anmeldung/Registrierung öffnet sich über den Knopf).') : '')], $karte];
+    }
+
+    /** Mängel melden ohne Konto eingeschaltet? (yii bauhof/gastmeldungen) */
+    private static function gastMeldungen(): bool
+    {
+        $m = Yii::$app->getModule('maengelmelder');
+        return $m !== null && method_exists($m, 'gastMeldungenAktiv') && $m->gastMeldungenAktiv();
     }
 
     private static function termin(array $args): array

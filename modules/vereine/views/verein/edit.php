@@ -22,7 +22,7 @@ $logo = $isNew ? null : $verein->getLogo();
     <div class="panel-heading"><strong><?= $isNew ? 'Verein vorschlagen' : 'Vereinsseite bearbeiten' ?></strong></div>
     <div class="panel-body">
         <?php if ($isNew && !Module::canManageAll()): ?>
-            <p class="help-block">Ihr Vorschlag wird kurz geprüft. Danach erscheint der Verein im Verzeichnis und Sie können Seite und Termine pflegen.</p>
+            <p class="help-block">Dein Vorschlag wird kurz geprüft. Danach erscheint der Verein im Verzeichnis und du kannst Seite und Termine pflegen.</p>
         <?php endif ?>
         <p class="help-block">Bitte nur Angaben, die öffentlich sein dürfen: allgemeine Kontaktdaten des Vereins
             (z. B. info@…), keine privaten Adressen oder Telefonnummern ohne Einverständnis der Person.</p>
@@ -137,7 +137,7 @@ $logo = $isNew ? null : $verein->getLogo();
 
         <?php if ($isNew && !Module::canManageAll()): ?>
             <div class="form-group">
-                <label for="verein-nachricht">Ihre Funktion im Verein</label>
+                <label for="verein-nachricht">Deine Funktion im Verein</label>
                 <?= Html::textInput('nachricht', $nachricht, ['id' => 'verein-nachricht', 'class' => 'form-control', 'maxlength' => 1000,
                     'placeholder' => 'z. B. 1. Vorsitzender, Kassiererin', 'required' => true]) ?>
             </div>

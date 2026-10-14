@@ -14,8 +14,8 @@ $this->title = 'Meine Übersicht';
 <div class="panel panel-default" style="max-width:640px;margin:0 auto">
     <div class="panel-body">
         <h1 style="font-size:1.4em;margin-top:0">Meine Übersicht</h1>
-        <p class="help-block">Wählen Sie, aus welchen Bereichen Beiträge in Ihrer Übersicht erscheinen. Das gilt nur für Sie.
-            Beiträge, die wir oben anpinnen, sehen Sie immer. Ihre Benachrichtigungen ändern sich dadurch nicht.</p>
+        <p class="help-block">Wähle, aus welchen Bereichen Beiträge in deiner Übersicht erscheinen. Das gilt nur für dich.
+            Beiträge, die wir oben anpinnen, siehst du immer. Deine Benachrichtigungen ändern sich dadurch nicht.</p>
         <?= Html::beginForm(['/uebersicht/einstellungen/index'], 'post') ?>
             <div class="list-group uebersicht-bereiche" style="margin:16px 0">
                 <?php foreach ($bereiche as $space): ?>

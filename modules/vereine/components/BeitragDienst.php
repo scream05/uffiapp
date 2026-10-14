@@ -114,7 +114,7 @@ class BeitragDienst
         $mailer = Yii::$app->mailer;
         $html = $mailer->render('@humhub/views/mail/TextOnly', ['message' => $html], $mailer->htmlLayout);
         $mail = $mailer->compose()->setTo($user->email)->setReplyTo($module->kontaktMail)
-            ->setSubject("Ihr Beitrag für „{$b->verein->name}“ wurde nicht veröffentlicht");
+            ->setSubject("Dein Beitrag für „{$b->verein->name}“ wurde nicht veröffentlicht");
         $mail->getSymfonyEmail()->text($text)->html($html);
         $ok = $mail->send();
         if (!$ok) {

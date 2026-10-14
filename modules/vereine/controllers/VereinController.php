@@ -105,7 +105,7 @@ class VereinController extends ContentContainerController
                 $this->saveImages($verein);
                 if (!Module::canManageAll()) {
                     $this->request($verein, $nachricht);
-                    $this->view->success('Danke! Ihr Vorschlag wird geprüft. Sobald er freigegeben ist, können Sie die Seite pflegen.');
+                    $this->view->success('Danke! Dein Vorschlag wird geprüft. Sobald er freigegeben ist, kannst du die Seite pflegen.');
                 }
                 return $this->redirect($verein->getUrl());
             }
@@ -157,7 +157,7 @@ class VereinController extends ContentContainerController
             return $this->redirect($verein->getUrl());
         }
         $this->request($verein, trim((string)Yii::$app->request->post('nachricht', '')));
-        $this->view->success('Ihre Anfrage wurde verschickt. Sie erhalten eine Benachrichtigung, sobald sie bestätigt ist.');
+        $this->view->success('Deine Anfrage wurde verschickt. Du bekommst eine Benachrichtigung, sobald sie bestätigt ist.');
         return $this->redirect($verein->getUrl());
     }
 

@@ -77,12 +77,12 @@ class ChatController extends Controller
         }
 
         if (!$this->module->isAgeConfirmed()) {
-            return $this->asJson(['error' => 'Bitte bestätigen Sie zuerst, dass Sie mindestens 18 Jahre alt sind.']);
+            return $this->asJson(['error' => 'Bitte bestätige zuerst, dass du mindestens 18 Jahre alt bist.']);
         }
         $key = $this->module->getApiKey();
         if ($key === null) {
             Yii::error('KI-Assistent: kein Claude-Schlüssel hinterlegt (secrets/anthropic_api_key)', 'ki-assistent');
-            return $this->asJson(['error' => 'Uffi ist gerade nicht erreichbar. Bitte versuchen Sie es später noch einmal.']);
+            return $this->asJson(['error' => 'Uffi ist gerade nicht erreichbar. Bitte versuch es später noch einmal.']);
         }
         if (($grund = $this->module->reserve()) !== null) {
             return $this->asJson(['error' => $grund]);
@@ -94,7 +94,7 @@ class ChatController extends Controller
         } catch (\Throwable $e) {
             // Nur die Fehlermeldung protokollieren, nie den Inhalt der Frage
             Yii::error('KI-Assistent: ' . $e->getMessage(), 'ki-assistent');
-            return $this->asJson(['error' => 'Uffi ist gerade nicht erreichbar. Bitte versuchen Sie es später noch einmal.']);
+            return $this->asJson(['error' => 'Uffi ist gerade nicht erreichbar. Bitte versuch es später noch einmal.']);
         }
         $this->module->addUsage($in, $out);
         // „memo“ hängt der Browser an den Verlauf an, damit die KI später weiß, welche Aktionen schon liefen
@@ -139,7 +139,7 @@ class ChatController extends Controller
             $messages[] = ['role' => 'user', 'content' => $results];
         }
         if (($answer ?? '') === '') {
-            $answer = $cards ? 'Bitte schön:' : 'Das hat leider nicht geklappt. Bitte formulieren Sie die Frage noch einmal.';
+            $answer = $cards ? 'Bitte schön:' : 'Das hat leider nicht geklappt. Bitte formulier die Frage noch einmal.';
         }
         return [$answer, $cards, implode(' ', array_unique($memo)), $in, $out];
     }
@@ -149,7 +149,7 @@ class ChatController extends Controller
     {
         $r = Yii::$app->request;
         if (!$this->module->takeFeedback()) {
-            return $this->asJson(['error' => 'Danke – für den Moment haben wir genug Bewertungen von Ihnen.']);
+            return $this->asJson(['error' => 'Danke – für den Moment haben wir genug Bewertungen von dir.']);
         }
         $rating = (int)$r->post('bewertung') === 1 ? 1 : -1;
         $fb = new Feedback([
@@ -216,7 +216,7 @@ Betrieben wird die Plattform ehrenamtlich von der Bürgerliste Uffenheim (BLU), 
 
 Regeln:
 - Antworte auf Deutsch, freundlich, kurz und konkret (meist 1–5 Sätze oder eine kurze Liste).
-- Sieze die Nutzer („Sie“). Nur wenn der Nutzer dich selbst duzt, antworte mit „du“.
+- Sprich die Nutzer immer mit „du“ an (du, dich, dir, dein) – die ganze Plattform duzt. Das gilt auch, wenn jemand dich siezt oder „Guten Tag“ schreibt: Antworte trotzdem freundlich in der Du-Form, nie mit „Sie“.
 - Stütze dich bei Terminen, Abfuhr, Nachrichten, Ansprechpartnern, Öffnungszeiten und Stadtgeschichte ausschließlich auf die Daten unten. Erfinde keine Termine, Uhrzeiten, Orte, Telefonnummern oder Öffnungszeiten.
 - Steht etwas nicht in den Daten, sag das offen und verweise auf https://www.uffenheim.de oder das Rathaus.
 - Verlinke die passende Quelle als Markdown-Link [Text](URL), nur URLs aus den Daten unten.
@@ -242,7 +242,7 @@ Aktionen (Werkzeuge) – biete sie aktiv an, wenn sie passen:
 Daten:
 TXT;
         if (Yii::$app->has('user') && Yii::$app->user->isGuest) {
-            $prompt .= "\n- Der Nutzer ist nicht angemeldet (Gast). Lesen geht ohne Konto; Mängel melden, Abfuhr-Erinnerung aufs Handy, Kommentieren und Beiträge brauchen ein kostenloses Konto (Anmelden/Registrieren oben rechts). Sag das kurz, wenn es passt.";
+            $prompt .= "\n- Der Nutzer ist nicht angemeldet (Gast). Lesen geht ohne Konto, Mängel melden ebenfalls (mit Name und E-Mail oder Telefon, der Bauhof prüft vor der Veröffentlichung); Abfuhr-Erinnerung aufs Handy, Kommentieren und Beiträge brauchen ein kostenloses Konto (Anmelden/Registrieren oben rechts). Sag das kurz, wenn es passt.";
         }
         return str_replace('{FORMULARE}', Formulare::catalog(), $prompt) . "\n" . Context::get() . "\n\n" . Wissen::forQuestion($question, $embed);
     }

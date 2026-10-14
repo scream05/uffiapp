@@ -189,14 +189,14 @@ $website = $verein->website;
 <div class="panel panel-default">
     <div class="panel-body">
         <?php if ($own && $own->status === VereinVerwalter::STATUS_ANGEFRAGT): ?>
-            <p class="text-muted"><i class="fa fa-hourglass-half"></i> Ihre Anfrage, diesen Verein zu verwalten, wartet auf Bestätigung.</p>
+            <p class="text-muted"><i class="fa fa-hourglass-half"></i> Deine Anfrage, diesen Verein zu verwalten, wartet auf Bestätigung.</p>
         <?php else: ?>
             <details>
-                <summary style="cursor:pointer"><strong>Sie sind im Vorstand dieses Vereins?</strong> Seite und Termine selbst pflegen</summary>
+                <summary style="cursor:pointer"><strong>Du bist im Vorstand dieses Vereins?</strong> Seite und Termine selbst pflegen</summary>
                 <?= Html::beginForm($space->createUrl('/vereine/verein/anfrage', ['id' => $verein->id]), 'post', ['style' => 'margin-top:10px']) ?>
-                    <p class="help-block">Ihre Anfrage geht an die Verwalter des Vereins bzw. an die Betreiber der Plattform. Wir prüfen kurz, ob Sie zum Verein gehören.</p>
+                    <p class="help-block">Deine Anfrage geht an die Verwalter des Vereins bzw. an die Betreiber der Plattform. Wir prüfen kurz, ob du zum Verein gehörst.</p>
                     <div class="form-group">
-                        <label for="verein-nachricht">Ihre Funktion im Verein</label>
+                        <label for="verein-nachricht">Deine Funktion im Verein</label>
                         <?= Html::textInput('nachricht', '', ['id' => 'verein-nachricht', 'class' => 'form-control', 'maxlength' => 1000,
                             'placeholder' => 'z. B. 2. Vorsitzende, Schriftführer, Jugendwart', 'required' => true]) ?>
                     </div>

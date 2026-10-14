@@ -11,9 +11,9 @@
  * @var bool $gast
  */
 ?>
-Guten Tag <?= $name ?>,
+Hallo <?= $name ?>,
 
-es gibt einen neuen Stand zu Ihrer Mängelmeldung:
+es gibt einen neuen Stand zu deiner Mängelmeldung:
 
 Nummer: <?= $mangel->getContentId() ?>
 
@@ -25,13 +25,13 @@ Neuer Stand: <?= $stand ?>
 
 <?= $hinweis ? "Hinweis des Bauhofs: $hinweis\n" : '' ?>
 
-<?= $gast ? 'Den Bearbeitungsstand sehen Sie auch auf der Karte:' : 'Zur Meldung:' ?>
+<?= $gast ? 'Den Bearbeitungsstand siehst du auch auf der Karte:' : 'Zur Meldung:' ?>
 
 <?= $link ?>
 
 
-Sie können auf diese E-Mail antworten; Ihre Antwort geht an den Bauhof.
-Sie erhalten diese E-Mail, weil Sie beim Melden Infos per E-Mail gewünscht haben. Keine Infos mehr? Antworten Sie mit STOPP.
+Du kannst auf diese E-Mail antworten; deine Antwort geht an den Bauhof.
+Du bekommst diese E-Mail, weil du beim Melden Infos per E-Mail gewünscht hast. Keine Infos mehr? Antworte mit STOPP.
 
 --
 Rund um Uffni – Bürgerplattform der Bürgerliste Uffenheim e. V., kein Angebot der Stadt Uffenheim.

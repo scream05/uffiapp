@@ -8,21 +8,21 @@
 ?>
 Hallo <?= $name ?>,
 
-Ihr Beitrag für „<?= $beitrag->verein->name ?>“ auf Rund um Uffni wurde geprüft und nicht veröffentlicht.
+dein Beitrag für „<?= $beitrag->verein->name ?>“ auf Rund um Uffni wurde geprüft und nicht veröffentlicht.
 
 Begründung:
 <?= $beitrag->begruendung ?>
 
 
-Ihr Text:
+Dein Text:
 <?= $beitrag->text ?>
 
 
-Sie können den Beitrag überarbeiten und über die Vereinsseite neu einreichen:
+Du kannst den Beitrag überarbeiten und über die Vereinsseite neu einreichen:
 <?= $link ?>
 
 
-Fragen? Antworten Sie einfach auf diese Mail oder schreiben Sie an <?= $kontaktMail ?>.
+Fragen? Antworte einfach auf diese E-Mail oder schreib an <?= $kontaktMail ?>.
 
 Viele Grüße
 Rund um Uffni – Bürgerplattform der Bürgerliste Uffenheim e. V.

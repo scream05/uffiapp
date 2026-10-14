@@ -19,7 +19,7 @@ $button = fn($row, $aktion, $label, $class, $confirm = null) => Html::beginForm(
     <div class="panel-body">
         <p><?= Html::a('<i class="fa fa-arrow-left"></i> Zur Vereinsseite', $verein->getUrl()) ?></p>
         <p class="help-block">Verwalter pflegen die Vorstellungsseite und tragen Termine in den gemeinsamen Kalender ein.
-            Bestätigen Sie nur Personen, die tatsächlich für den Verein sprechen dürfen.</p>
+            Bestätige nur Personen, die tatsächlich für den Verein sprechen dürfen.</p>
         <?php if (!$rows): ?>
             <p class="text-muted">Noch keine Verwalter.</p>
         <?php endif ?>
@@ -44,6 +44,6 @@ $button = fn($row, $aktion, $label, $class, $confirm = null) => Html::beginForm(
                 <?php endif ?>
             </div>
         <?php endforeach ?>
-        <p class="help-block" style="margin-top:12px">Weitere Vorstandsmitglieder fragen die Verwaltung auf der Vereinsseite an; Sie können sie dann hier bestätigen.</p>
+        <p class="help-block" style="margin-top:12px">Weitere Vorstandsmitglieder fragen die Verwaltung auf der Vereinsseite an; du kannst sie dann hier bestätigen.</p>
     </div>
 </div>

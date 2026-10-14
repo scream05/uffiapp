@@ -40,7 +40,7 @@ $now = time();
         <div class="panel-body">
             <?php if ($stale): ?>
                 <div class="alert alert-warning">
-                    Die Notdienstdaten sind gerade nicht aktuell. Bitte nutzen Sie die
+                    Die Notdienstdaten sind gerade nicht aktuell. Bitte nutze die
                     <?= Html::a('Notdienstsuche der Landesapothekerkammer', $module->suchUrl, ['target' => '_blank', 'rel' => 'noopener']) ?>.
                 </div>
             <?php endif ?>

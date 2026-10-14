@@ -40,7 +40,7 @@ class BeitragController extends ContentContainerController
                 $beitrag->fileManager->attach($bilder);
             }
             BeitragDienst::eingereicht($beitrag);
-            $this->view->success('Danke! Ihr Beitrag wird geprüft und danach veröffentlicht. Sie bekommen Bescheid.');
+            $this->view->success('Danke! Dein Beitrag wird geprüft und danach veröffentlicht. Du bekommst Bescheid.');
             return $this->redirect($v->getUrl());
         }
         return $this->render('create', ['verein' => $v, 'beitrag' => $beitrag]);
