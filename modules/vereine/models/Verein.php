@@ -6,6 +6,7 @@ use humhub\components\ActiveRecord;
 use humhub\interfaces\ViewableInterface;
 use humhub\modules\calendar\models\CalendarEntry;
 use humhub\modules\file\models\File;
+use humhub\modules\user\helpers\AuthHelper;
 use humhub\modules\user\models\User;
 use humhub\modules\vereine\Module;
 use Yii;
@@ -249,9 +250,13 @@ class Verein extends ActiveRecord implements ViewableInterface
         parent::afterDelete();
     }
 
+    /**
+     * Bestimmt u. a., wer Logo und Bilder (file/download) sehen darf. Das Verzeichnis ist auch für Gäste
+     * lesbar, solange der Gastzugang an ist.
+     */
     public function canView($user = null): bool
     {
-        return !Yii::$app->user->isGuest;
+        return !Yii::$app->user->isGuest || AuthHelper::isGuestAccessEnabled();
     }
 
     public function getUrl(bool $scheme = false): string
