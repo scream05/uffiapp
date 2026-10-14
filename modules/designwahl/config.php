@@ -17,6 +17,7 @@ return [
     'events' => [
         ['class' => AccountTopMenu::class, 'event' => AccountTopMenu::EVENT_INIT, 'callback' => [Events::class, 'onAccountTopMenuInit']],
         ['class' => Application::class, 'event' => Application::EVENT_BEFORE_REQUEST, 'callback' => [Events::class, 'onBeforeRequest']],
+        ['class' => Application::class, 'event' => Application::EVENT_BEFORE_ACTION, 'callback' => [Events::class, 'onAppBeforeAction']],
         ['class' => FooterMenu::class, 'event' => FooterMenu::EVENT_INIT, 'callback' => [Events::class, 'onFooterMenuInit']],
         ['class' => TopMenu::class, 'event' => TopMenu::EVENT_RUN, 'callback' => [Events::class, 'onTopMenuRun']],
         // Klasse als Text: das Kalendermodul ist beim Laden dieser Konfiguration evtl. noch nicht registriert

@@ -306,6 +306,31 @@ JS, \yii\web\View::POS_END);
     }
 
     /**
+     * Gäste: „Herunterladen als ICS-Datei“ bei Terminen, die sie sehen dürfen – das Kalendermodul verlangt
+     * dafür sonst eine Anmeldung. Gleiche Prüfung und Ausgabe wie ExportController::actionEvent.
+     */
+    public static function onAppBeforeAction($event)
+    {
+        // Läuft vor der Zugriffsprüfung des Controllers (die schickt Gäste sonst zur Anmeldung)
+        if ($event->action->controller->uniqueId !== 'calendar/export' || $event->action->id !== 'event'
+            || !Yii::$app->user->isGuest) {
+            return;
+        }
+        $content = \humhub\modules\content\models\Content::findOne(['id' => Yii::$app->request->get('id')]);
+        if (!$content || !$content->getModel() || !$content->canView()
+            || !method_exists($content->model, 'generateIcs')) {
+            return; // weiter wie bisher (Anmeldeseite)
+        }
+        $ics = $content->model->generateIcs(true);
+        if (empty($ics)) {
+            return;
+        }
+        $uid = method_exists($content->model, 'getUid') && $content->model->getUid() ? $content->model->getUid() : 'termin';
+        $event->isValid = false;
+        Yii::$app->response->sendContentAsFile($ics, $uid . '.ics', ['mimeType' => 'text/calendar']);
+    }
+
+    /**
      * Gäste: Standardsprache (Deutsch) statt Browsersprache – HumHub nimmt sonst die Browsersprache und
      * ohne Angabe die erste erlaubte (Englisch). Eine selbst gewählte Sprache (Auswahl auf der Anmeldeseite,
      * Cookie „language“) bleibt.
