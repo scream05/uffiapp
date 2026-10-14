@@ -40,7 +40,7 @@ class Buergerinfo
     {
         $k = MaengelKontakt::findOne($content->id);
         $mangel = Mangel::fromContent($content);
-        if (!$k || !$mangel || !$k->info_whatsapp || !$k->wa_id || !self::module()->buergerWhatsappAktiv()) {
+        if (!$k || !$mangel || !$k->info_whatsapp || !$k->waBestaetigt() || !self::module()->buergerWhatsappAktiv()) {
             return;
         }
         $text = "Deine Mängelmeldung Nr. {$content->id} ({$mangel->kategorie}) ist eingegangen. "
@@ -70,10 +70,10 @@ class Buergerinfo
             if (!$k || !$mangel || !self::module()->buergerInfoAktiv() || !($k->info_mail || $k->info_whatsapp)) {
                 return;
             }
-            if ($k->info_mail && ($mail = $k->getMail())) {
+            if ($k->info_mail && $k->mailBestaetigt() && ($mail = $k->getMail())) {
                 self::mail($k, $mail, $mangel, $stand, $hinweis);
             }
-            if ($k->info_whatsapp && $k->wa_id && self::module()->buergerWhatsappAktiv()) {
+            if ($k->info_whatsapp && $k->waBestaetigt() && self::module()->buergerWhatsappAktiv()) {
                 $text = "Neuer Stand zu deiner Mängelmeldung Nr. {$content->id} ({$mangel->kategorie}): *$stand*"
                     . ($hinweis ? "\n💬 $hinweis" : '')
                     . "\n\nDu kannst auf diese Nachricht antworten; deine Antwort geht an den Bauhof. Keine Nachrichten mehr? Antworte mit STOPP.";
@@ -93,10 +93,11 @@ class Buergerinfo
     public static function weg(Content $content): ?array
     {
         $k = MaengelKontakt::findOne($content->id);
-        if ($k && $k->info_whatsapp && $k->wa_id && self::module()->buergerWhatsappAktiv()) {
+        if ($k && $k->info_whatsapp && $k->waBestaetigt() && self::module()->buergerWhatsappAktiv()) {
             return ['whatsapp', $k->wa_id];
         }
-        $mail = $k ? $k->getMail() : null;
+        // E-Mail nur, wenn bestätigt (Gäste über den Link; Konto-Adressen sind bei der Registrierung bestätigt)
+        $mail = $k && $k->mailBestaetigt() ? $k->getMail() : null;
         if ($mail === null && !$k && ($autor = $content->createdBy) && $autor->username !== self::module()->gastKonto) {
             $mail = $autor->email ?: null;
         }
@@ -212,6 +213,12 @@ class Buergerinfo
             if ($von === '' || !self::module()->buergerWhatsappAktiv()) {
                 return;
             }
+            // „START 123“: die Nummer bestätigt WhatsApp-Infos zu Meldung 123 (nur wenn sie dort angegeben ist)
+            if (($d['type'] ?? '') === 'text' && preg_match('/^\s*start\s*(?:nr\.?\s*)?(\d{1,9})\s*$/iu', (string)($d['text']['body'] ?? ''), $m)) {
+                $event->handled = true;
+                self::start((int)$m[1], $von, (string)$d['id']);
+                return;
+            }
             $bezug = $d['context']['id'] ?? null;
             $contentId = $bezug ? BauhofNachricht::find()->select('content_id')
                 ->where(['wamid' => $bezug, 'buerger' => 1, 'richtung' => BauhofNachricht::AUS])->scalar() : null;
@@ -256,11 +263,40 @@ class Buergerinfo
         }
     }
 
+    /**
+     * „START <Nr>“ von einer Nummer: passt sie zur Meldung, gelten die WhatsApp-Infos als bestätigt und die
+     * Eingangsbestätigung geht raus (das 24-Stunden-Fenster ist durch die Nachricht offen). Sonst ein kurzer Hinweis.
+     */
+    private static function start(int $contentId, string $von, string $wamid): void
+    {
+        if (BauhofNachricht::find()->where(['wamid' => $wamid])->exists()) {
+            return;
+        }
+        $k = MaengelKontakt::findOne(['content_id' => $contentId, 'wa_id' => $von]);
+        $content = $k ? Content::findOne($contentId) : null;
+        if (!$k || !$content || !in_array((int)$content->state, [Content::STATE_PUBLISHED, Content::STATE_DRAFT], true)) {
+            try {
+                Api::sendeText($von, "Zu dieser Nummer haben wir keine Mängelmeldung Nr. $contentId gefunden. "
+                    . 'Bitte prüf die Nummer der Meldung und die beim Melden angegebene Handynummer.');
+            } catch (\Throwable $e) {
+                Yii::warning('START-Antwort: ' . $e->getMessage(), 'maengelmelder');
+            }
+            return;
+        }
+        (new BauhofNachricht(['content_id' => $contentId, 'richtung' => BauhofNachricht::EIN, 'buerger' => 1, 'typ' => 'text',
+            'text' => "START $contentId", 'wamid' => $wamid, 'verarbeitet' => 1, 'gelesen_at' => date('Y-m-d H:i:s'),
+            'created_at' => date('Y-m-d H:i:s')]))->save(false);
+        $k->updateAttributes(['wa_bestaetigt' => date('Y-m-d H:i:s'), 'info_whatsapp' => 1]);
+        Bauhof::vermerk($contentId, null, null, 'Meldende Person hat WhatsApp-Infos bestätigt (START)');
+        self::eingang($content);
+    }
+
     /** Meldung mit WhatsApp-Infos an diese Nummer, zu der zuletzt geschrieben wurde (sonst die neueste) */
     private static function letzteMeldung(string $waId): ?int
     {
         $ids = MaengelKontakt::find()->alias('k')->innerJoin('content c', 'c.id = k.content_id')
             ->where(['k.wa_id' => $waId, 'k.info_whatsapp' => 1, 'c.state' => [Content::STATE_PUBLISHED, Content::STATE_DRAFT]])
+            ->andWhere(['not', ['k.wa_bestaetigt' => null]])
             ->select('k.content_id')->column();
         if (!$ids) {
             return null;

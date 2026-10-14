@@ -32,10 +32,30 @@ $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '
     </div>
     <div class="panel-body">
         <?php if ($danke !== null): ?>
-            <div class="alert alert-success">
-                <strong>Vielen Dank<?= $danke ? ', deine Meldung Nr. ' . (int)$danke . ' ist eingegangen' : ', deine Meldung ist eingegangen' ?>.</strong><br>
-                Der Bauhof prüft sie und schaltet sie danach auf der Karte frei. Bei Rückfragen meldet er sich über die angegebenen Kontaktdaten.
+            <?php $nr = (int)$danke; $req = Yii::$app->request ?>
+            <div class="alert alert-success" role="status">
+                <strong>Vielen Dank<?= $nr ? ", deine Meldung Nr. $nr ist eingegangen" : ', deine Meldung ist eingegangen' ?>.</strong><br>
+                <?php if ($gast): ?>
+                    Der Bauhof prüft sie und schaltet sie danach auf der Karte frei. Bei Rückfragen meldet er sich über die angegebenen Kontaktdaten.
+                <?php else: ?>
+                    <?= Html::a('Zur Meldung', ['/content/perma', 'id' => $nr]) ?>
+                <?php endif ?>
             </div>
+            <?php if ($nr && $req->get('mail')): ?>
+                <div class="alert alert-info" role="status"><i class="fa fa-envelope-o"></i> Wir haben dir eine E-Mail geschickt.
+                    Bitte bestätige darin deine Adresse – erst dann bekommst du Infos und Rückfragen per E-Mail.</div>
+            <?php endif ?>
+            <?php if ($nr && $req->get('wa') && $module->buergerWhatsappAktiv()): ?>
+                <div class="alert alert-info">
+                    <strong><i class="fa fa-whatsapp"></i> Noch ein Schritt für WhatsApp-Infos:</strong>
+                    Schick uns „START <?= $nr ?>“ von der angegebenen Handynummer. Erst dann schreiben wir dir per WhatsApp.<br>
+                    <?= Html::a('<i class="fa fa-whatsapp"></i> WhatsApp-Infos einschalten',
+                        'https://wa.me/' . $module->whatsappNummer . '?text=' . rawurlencode("START $nr"),
+                        ['class' => 'btn btn-success btn-sm', 'style' => 'margin-top:8px', 'target' => '_blank', 'rel' => 'noopener']) ?>
+                    <small class="d-block text-muted" style="margin-top:6px">Am Computer: Nachricht „START <?= $nr ?>“ an
+                        +<?= Html::encode(preg_replace('/^49(\d{3})(\d+)$/', '49 $1 $2', $module->whatsappNummer)) ?> schicken.</small>
+                </div>
+            <?php endif ?>
         <?php endif ?>
         <?php if (!$canPost && $gast): ?>
             <div class="alert alert-info">Um einen Mangel zu melden, melde dich bitte an oder leg ein kostenloses Konto an.
@@ -147,7 +167,7 @@ $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '
                     <div class="form-check">
                         <?= Html::activeCheckbox($kontakt, 'info_whatsapp', ['id' => 'kontakt-info-whatsapp', 'class' => 'form-check-input' . $feld('info_whatsapp'), 'label' => false]) ?>
                         <label class="form-check-label" for="kontakt-info-whatsapp">per WhatsApp an meine Handynummer
-                            <small class="text-muted">– Du kannst darauf antworten, deine Antwort geht an den Bauhof. Abbestellen: STOPP schreiben.</small></label>
+                            <small class="text-muted">– danach schickst du uns einmal „START“ per WhatsApp; antworten geht auch, Abbestellen mit STOPP.</small></label>
                     </div>
                     <?php endif ?>
                 </div>
@@ -191,7 +211,7 @@ $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '
                     <div class="form-check">
                         <?= Html::activeCheckbox($kontakt, 'info_whatsapp', ['id' => 'kontakt-info-whatsapp', 'class' => 'form-check-input' . $feld('info_whatsapp'), 'label' => false]) ?>
                         <label class="form-check-label" for="kontakt-info-whatsapp">per WhatsApp an meine Handynummer (oben)
-                            <small class="text-muted">– Du kannst darauf antworten, deine Antwort geht an den Bauhof. Abbestellen: STOPP schreiben.</small></label>
+                            <small class="text-muted">– danach schickst du uns einmal „START“ per WhatsApp; antworten geht auch, Abbestellen mit STOPP.</small></label>
                     </div>
                     <?php endif ?>
                 </div>

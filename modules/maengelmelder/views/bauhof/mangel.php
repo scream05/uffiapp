@@ -69,10 +69,17 @@ if ($m && !isset($mitarbeiter[$m->id])) {
                         <strong>Kontakt für Rückfragen</strong>
                         <span><i class="fa fa-user fa-fw"></i> <?= Html::encode($kontakt->getName()) ?></span>
                         <?php if ($mail = $kontakt->getMail()): ?>
-                            <span><i class="fa fa-envelope-o fa-fw"></i> <?= Html::mailto(Html::encode($mail), $mail) ?></span>
+                            <span><i class="fa fa-envelope-o fa-fw"></i> <?= Html::mailto(Html::encode($mail), $mail) ?>
+                                <?= $kontakt->mailBestaetigt() ? '<small class="text-success">bestätigt</small>'
+                                    : '<small class="text-muted">nicht bestätigt – keine automatischen E-Mails</small>' ?></span>
                         <?php endif ?>
                         <?php if ($kontakt->telefon): ?>
                             <span><i class="fa fa-phone fa-fw"></i> <?= Html::a(Html::encode($kontakt->telefon), 'tel:' . preg_replace('/[^+0-9]/', '', $kontakt->telefon)) ?></span>
+                        <?php endif ?>
+                        <?php if ($kontakt->info_whatsapp && $kontakt->wa_id): ?>
+                            <span><i class="fa fa-whatsapp fa-fw"></i> <?= $kontakt->waBestaetigt()
+                                ? '<small class="text-success">WhatsApp bestätigt (START)</small>'
+                                : '<small class="text-muted">WhatsApp: wartet auf „START ' . (int)$kontakt->content_id . '“ von der Nummer</small>' ?></span>
                         <?php endif ?>
                         <?php if ($kontakt->info_mail || $kontakt->info_whatsapp): ?>
                             <span><i class="fa fa-bell-o fa-fw"></i> Infos bei Statusänderung: <?= implode(' und ', array_filter([

@@ -109,12 +109,16 @@ class MeldungController extends ContentContainerController
                             'telefon' => $kontakt->telefon ?: null, 'created_at' => date('Y-m-d H:i:s'),
                             'info_mail' => $infos && $kontakt->info_mail ? 1 : 0,
                             'info_whatsapp' => $this->module->buergerWhatsappAktiv() && $kontakt->info_whatsapp ? 1 : 0,
-                            'wa_id' => MeldeKontakt::waId($kontakt->telefon)]))->save(false);
-                        Buergerinfo::eingang($post->content);
+                            'wa_id' => MeldeKontakt::waId($kontakt->telefon),
+                            'mail_bestaetigt' => date('Y-m-d H:i:s')]))->save(false); // Konto-Adresse ist bestätigt
                     }
                     // Vom Bauhof angelegt: gleich zur Bearbeitung (Zuweisen usw.)
                     if (Yii::$app->request->get('bauhof') && MaengelStatus::canManage()) {
                         return $this->redirect($space->createUrl('/maengelmelder/bauhof/mangel', ['id' => $post->content->id]));
+                    }
+                    // WhatsApp-Infos gewünscht: Danke-Seite mit Knopf „START“ (erst dann schreiben wir per WhatsApp)
+                    if ($this->module->buergerWhatsappAktiv() && $kontakt->info_whatsapp && MeldeKontakt::waId($kontakt->telefon)) {
+                        return $this->redirect($space->createUrl('/maengelmelder/meldung/create', ['danke' => $post->content->id, 'wa' => 1]));
                     }
                     return $this->redirect($post->content->getUrl());
                 }
@@ -184,49 +188,74 @@ class MeldungController extends ContentContainerController
         } catch (\Throwable $e) {
             Yii::error('Gastmeldung-Benachrichtigung: ' . $e->getMessage(), 'maengelmelder');
         }
-        if ($kontakt->email !== '') {
-            $this->gastBestaetigen($post, $kontakt, count($files));
+        if ($kontaktZeile->email) {
+            $this->bestaetigungsMail($kontaktZeile);
         }
-        Buergerinfo::eingang($post->content);
         if ($fotoFehler) {
             $this->view->warn(implode(' ', $fotoFehler) . ' Die Meldung wurde ohne diese Fotos gespeichert.');
         }
-        return $this->redirect($space->createUrl('/maengelmelder/meldung/create', ['danke' => $post->content->id]));
+        return $this->redirect($space->createUrl('/maengelmelder/meldung/create', ['danke' => $post->content->id,
+            'wa' => $kontaktZeile->info_whatsapp && $kontaktZeile->wa_id ? 1 : null, 'mail' => $kontaktZeile->email ? 1 : null]));
     }
 
-    /** Eingangsbestätigung per E-Mail an den Gast (Fehler beim Versand verhindern die Meldung nicht) */
-    private function gastBestaetigen(Post $post, MeldeKontakt $kontakt, int $fotos): void
+    /**
+     * Bestätigungsmail an die E-Mail-Adresse eines Gastes: nur ein Link, kein Text aus der Meldung (die Adresse
+     * könnte fremd sein). Erst nach dem Klick schicken wir Infos und Nachrichten des Bauhofs per E-Mail.
+     * Höchstens bestaetigungsMailsProTag Mails am Tag (für alle zusammen).
+     */
+    private function bestaetigungsMail(MaengelKontakt $k): void
     {
         try {
-            $mangel = new Mangel($post);
-            $params = [
-                'name' => trim("$kontakt->vorname $kontakt->nachname"),
-                'mangel' => $mangel,
-                'fotos' => $fotos,
-                'karteUrl' => $post->content->container->createUrl('/maengelmelder/meldung/karte',
-                    ['lat' => $mangel->lat, 'lng' => $mangel->lng], true),
-                'kontaktMail' => $this->module->kontaktMail,
-                'infoMail' => $this->module->buergerInfoAktiv() && $kontakt->info_mail,
-            ];
-            $text = $this->renderPartial('@maengelmelder/views/mail/eingang_text', $params);
+            $key = 'maengel-bestaetigungsmails-' . date('Ymd');
+            $n = (int)Yii::$app->cache->get($key);
+            if ($n >= $this->module->bestaetigungsMailsProTag) {
+                Yii::warning("Bestätigungsmail für Meldung {$k->content_id} nicht gesendet: Tagesgrenze erreicht", 'maengelmelder');
+                return;
+            }
+            Yii::$app->cache->set($key, $n + 1, 86400);
+            $k->updateAttributes(['mail_token' => bin2hex(random_bytes(24))]);
+            $link = $this->contentContainer->createUrl('/maengelmelder/meldung/bestaetigen', ['id' => $k->content_id, 't' => $k->mail_token], true);
+            $text = $this->renderPartial('@maengelmelder/views/mail/bestaetigung_text', [
+                'name' => $k->getName(), 'nr' => $k->content_id, 'link' => $link,
+                'stunden' => $this->module->bestaetigungStunden, 'kontaktMail' => $this->module->kontaktMail,
+            ]);
             $html = nl2br(\yii\helpers\Html::encode($text), false);
             $html = preg_replace('#https?://[^\s<]+#', '<a href="$0">$0</a>', $html);
             $mailer = Yii::$app->mailer;
             $html = $mailer->render('@humhub/views/mail/TextOnly', ['message' => $html], $mailer->htmlLayout);
-            $mail = $mailer->compose()
-                ->setTo($kontakt->email)
-                ->setReplyTo(\humhub\modules\maengelmelder\components\MailEingang::antwortAdresse($mangel->getContentId()))
-                ->setSubject('Deine Mängelmeldung Nr. ' . $mangel->getContentId() . ' ist eingegangen');
-            // Text/HTML direkt setzen: HumHubs Link-Dienst (go.humhub.com, für die App) würde die Links sonst umleiten;
-            // Gäste haben keine App, die Links sollen direkt auf die Plattform zeigen
+            $mail = $mailer->compose()->setTo($k->email)->setReplyTo($this->module->kontaktMail)
+                ->setSubject('Bitte bestätige deine E-Mail-Adresse (Mängelmeldung Nr. ' . $k->content_id . ')');
+            // Text/HTML direkt setzen: HumHubs Link-Dienst (go.humhub.com) würde den Link sonst umleiten
             $mail->getSymfonyEmail()->text($text)->html($html);
-            $ok = $mail->send();
-            if (!$ok) {
-                Yii::warning('Eingangsbestätigung Nr. ' . $mangel->getContentId() . ' nicht versendet', 'maengelmelder');
+            if (!$mail->send()) {
+                Yii::warning("Bestätigungsmail Nr. {$k->content_id} nicht versendet", 'maengelmelder');
             }
         } catch (\Throwable $e) {
-            Yii::error('Eingangsbestätigung: ' . $e->getMessage(), 'maengelmelder');
+            Yii::error('Bestätigungsmail: ' . $e->getMessage(), 'maengelmelder');
         }
+    }
+
+    /** Link aus der Bestätigungsmail: E-Mail-Adresse einer Gastmeldung bestätigen */
+    public function actionBestaetigen($id, $t)
+    {
+        $k = MaengelKontakt::findOne((int)$id);
+        $ok = false;
+        $abgelaufen = false;
+        // Nur mit passendem Code – sonst verrät die Seite nichts über die Meldung (der Code bleibt nach der Bestätigung
+        // gespeichert, damit ein zweites Öffnen des Links „bestätigt“ zeigt)
+        if ($k && $k->mail_token && hash_equals($k->mail_token, (string)$t)) {
+            if ($k->mail_bestaetigt !== null) {
+                $ok = true;
+            } elseif (strtotime($k->created_at) < time() - $this->module->bestaetigungStunden * 3600) {
+                $abgelaufen = true;
+            } else {
+                $k->updateAttributes(['mail_bestaetigt' => date('Y-m-d H:i:s')]);
+                Bauhof::vermerk($k->content_id, null, null, 'Meldende Person hat ihre E-Mail-Adresse bestätigt');
+                $ok = true;
+            }
+        }
+        return $this->render('bestaetigt', ['ok' => $ok, 'abgelaufen' => $abgelaufen, 'kontakt' => $ok ? $k : null,
+            'space' => $this->contentContainer, 'infos' => $this->module->buergerInfoAktiv()]);
     }
 
     /** Gastmeldungen je IP-Adresse und Tag zählen (nur im Cache, gespeichert wird die Adresse nicht) */

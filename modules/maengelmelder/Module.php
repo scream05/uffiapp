@@ -51,6 +51,15 @@ class Module extends ContentContainerModule
     public int $gastMeldungenProTag = 5; // je IP-Adresse
     public int $gastFotos = 3;
     public int $gastFotoMaxMb = 15;
+    /** Öffentliche WhatsApp-Nummer (ohne +) für „START <Nr>“ – dieselbe wie die Termin-Nummer auf dem Flyer */
+    public string $whatsappNummer = '4915563025017';
+
+    /** Höchstens so viele Bestätigungsmails pro Tag (für alle zusammen, gegen Missbrauch) */
+    public int $bestaetigungsMailsProTag = 50;
+
+    /** So lange gilt der Bestätigungslink */
+    public int $bestaetigungStunden = 48;
+
     /** Antwortadresse der Eingangsbestätigung und für Widerruf/Löschung */
     public string $kontaktMail = 'smartcity@buergerliste-uffenheim.de';
 
