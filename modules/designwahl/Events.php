@@ -327,7 +327,7 @@ JS, \yii\web\View::POS_END);
         }
         $uid = method_exists($content->model, 'getUid') && $content->model->getUid() ? $content->model->getUid() : 'termin';
         $event->isValid = false;
-        Yii::$app->response->sendContentAsFile($ics, $uid . '.ics', ['mimeType' => 'text/calendar']);
+        Yii::$app->response->sendContentAsFile(controllers\AboController::ohnePersonen($ics), $uid . '.ics', ['mimeType' => 'text/calendar']);
     }
 
     /**
@@ -381,15 +381,38 @@ JS, \yii\web\View::POS_END);
         try {
             /** @var \humhub\modules\calendar\widgets\CalendarTypeLegend $legend */
             $legend = $event->sender;
-            if (Yii::$app->user->isGuest || $event->result === '') {
-                return;
+            if (!Yii::$app->user->isGuest && $event->result !== '') {
+                $event->result = $legend->view->render('@designwahl/widgets/views/kalenderLegende', [
+                    'types' => $legend->getCalendarTypes(),
+                ]);
             }
-            $event->result = $legend->view->render('@designwahl/widgets/views/kalenderLegende', [
-                'types' => $legend->getCalendarTypes(),
-            ]);
+            $event->result .= self::kalenderAbo($legend);
         } catch (\Throwable $e) {
             Yii::error($e, 'designwahl');
         }
+    }
+
+    /** Kasten „Kalender abonnieren“ (öffentliche Abos ohne Konto) für Veranstaltungen und Abfuhrtermine */
+    private static function kalenderAbo($legend): string
+    {
+        $space = $legend->contentContainer;
+        if (!$space instanceof \humhub\modules\space\models\Space) {
+            return '';
+        }
+        if (in_array($space->url, controllers\AboController::KALENDER, true)) {
+            $abos = [['Veranstaltungen', Url::to(['/designwahl/abo', 'kalender' => array_search($space->url, controllers\AboController::KALENDER, true)], true)]];
+            $hinweis = '';
+        } elseif ($space->url === 'abfall-and-termine') {
+            $abos = [
+                ['Kernstadt Uffenheim', Url::to('/abfall/abfall-kernstadt.ics', true)],
+                ['Ortsteile', Url::to('/abfall/abfall-ortsteile.ics', true)],
+            ];
+            $hinweis = 'Restmüll, Bio- und Papiertonne sind überall gleich, die Gelbe Tonne kommt in den Ortsteilen einen Tag später. '
+                . 'Bitte den passenden Kalender wählen.';
+        } else {
+            return '';
+        }
+        return $legend->view->render('@designwahl/widgets/views/kalenderAbo', ['abos' => $abos, 'hinweis' => $hinweis]);
     }
 
     /** Abfallkalender: Filter „Nur anzeigen“ (Teilnahme/Eigene …) ausblenden – für Abfuhrtermine sinnlos */

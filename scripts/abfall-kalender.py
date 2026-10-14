@@ -138,6 +138,11 @@ def main():
         raise RuntimeError("Zu wenige Tonnenarten gefunden: %s" % sorted({t for _, t in found}))
 
     write(OUT, "Abfuhrtermine Uffenheim", sorted(found))
+    # Abos für Bürger: alle Tonnen, Gelbe Tonne nur für den eigenen Bereich
+    for name, label, ohne in (("kernstadt", "Kernstadt", "Gelbe Tonne – Ortsteile"),
+                              ("ortsteile", "Ortsteile", "Gelbe Tonne – Kernstadt")):
+        write(OUT.replace("abfall.ics", "abfall-%s.ics" % name), "Abfuhrtermine Uffenheim – " + label,
+              sorted(e for e in found if e[1] != ohne))
     for name, prefix in FILES.items():
         write(OUT.replace("abfall.ics", "abfall-%s.ics" % name), "Abfuhrtermine Uffenheim – " + prefix,
               sorted(e for e in found if e[1].startswith(prefix)))
