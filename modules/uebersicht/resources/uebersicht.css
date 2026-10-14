@@ -1,0 +1,9 @@
+/* Angepinnter Beitrag in der Übersicht */
+.uebersicht-pin {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin: 0 0 6px 4px; padding: 2px 10px; border-radius: 999px;
+    background: #f6e4e5; color: #7c1922; font-size: 12px; font-weight: 700;
+}
+.uebersicht-angepinnt > .wall-entry, .uebersicht-angepinnt .panel:first-of-type {
+    box-shadow: inset 4px 0 0 #7c1922, 0 1px 2px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.05);
+}

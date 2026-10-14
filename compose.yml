@@ -31,6 +31,7 @@ services:
       - ./modules/designwahl:/data/modules/designwahl:ro
       - ./modules/facebook:/data/modules/facebook:ro
       - ./modules/mitteilungsblatt:/data/modules/mitteilungsblatt:ro
+      - ./modules/uebersicht:/data/modules/uebersicht:ro
       # Stadtwissen von uffenheim.de (scripts/stadtwissen.py)
       - ./wissen:/srv/wissen:ro
     secrets:

@@ -1002,6 +1002,32 @@ class SetupController extends Controller
     }
 
     /**
+     * Benachrichtigungen über neue Beiträge (Push, Glocke, Mail) standardmäßig nur aus „Rathaus Uffenheim“:
+     * setup/push-rathaus
+     * Setzt die Standard-Spaces auf Rathaus und alle Konten auf diesen Standard zurück (eigene Space-Auswahl
+     * wird verworfen, send_notifications überall 0, „is_touched_settings“ gelöscht). Wer später in den
+     * Benachrichtigungseinstellungen andere Spaces wählt, behält seine Wahl. Andere Kategorien (Kommentare,
+     * Erwähnungen, Abfuhr-Erinnerung, Bauhof …) bleiben unverändert.
+     */
+    public function actionPushRathaus()
+    {
+        $rathaus = Space::findOne(['url' => 'rathaus-uffenheim']);
+        if ($rathaus === null) {
+            $this->stderr("Space rathaus-uffenheim nicht gefunden\n");
+            return ExitCode::DATAERR;
+        }
+        Yii::$app->notification->setSpaces([$rathaus->guid]);
+        Yii::$app->notification->resetSpaces();
+        $geloescht = \humhub\modules\content\models\ContentContainerSetting::deleteAll([
+            'module_id' => 'notification',
+            'name' => \humhub\modules\notification\components\NotificationManager::IS_TOUCHED_SETTINGS,
+        ]);
+        Yii::$app->cache->flush();
+        $this->stdout("Standard-Spaces für Benachrichtigungen: {$rathaus->name}; $geloescht Konten auf Standard zurückgesetzt\n");
+        return ExitCode::OK;
+    }
+
+    /**
      * Minimale Profildaten: setup/profil-minimal [1=Probelauf]
      * Alle ausgeblendeten Profilfelder (außer Vor-/Nachname) nicht durchsuchbar und nicht bearbeitbar, Inhalte bei allen
      * Konten leeren, Online-Status ausblenden (Datenminimierung, Datenschutzerklärung Abschnitt 5). Idempotent.

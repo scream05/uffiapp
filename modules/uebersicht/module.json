@@ -1,0 +1,10 @@
+{
+  "id": "uebersicht",
+  "name": "Übersicht anpinnen",
+  "description": "Admins können Beiträge oben in der Übersicht (Dashboard) anpinnen – für alle sichtbar, die den Beitrag sehen dürfen.",
+  "keywords": ["dashboard", "pin"],
+  "version": "0.1.0",
+  "humhub": {
+    "minVersion": "1.18"
+  }
+}
