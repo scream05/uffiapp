@@ -226,7 +226,8 @@ html.design-neu #topbar .user-title strong {
         width: auto !important;
         min-width: 0 !important;
         box-sizing: border-box;
-        padding: 2px 6px var(--dn-unten) !important;
+        /* oben kein Innenabstand: Clean prüft Überlauf per position().top > 0 der Reiter */
+        padding: 0 6px var(--dn-unten) !important;
         align-items: stretch;
         border: 0 !important;
         border-radius: var(--dn-r-m) var(--dn-r-m) 0 0 !important;
@@ -236,7 +237,9 @@ html.design-neu #topbar .user-title strong {
         box-shadow: 0 -6px 24px rgba(43, 74, 95, .18), 0 -1px 0 var(--dn-linie) !important;
     }
 
-    /* HumHubs „Menü“-Symbol nur, wenn wirklich Reiter darin liegen (neu.js lagert nur bei Platzmangel aus) */
+    /* „Menü“-Symbol nur, wenn wirklich Reiter darin liegen. Das Auslagern bei Platzmangel macht das
+       Clean-Theme selbst (cleanTheme.topNavigation): Reiter brechen erst um, wenn ihre Beschriftungen
+       nebeneinander nicht mehr passen, dann wandern die letzten ins Menü */
     html.design-neu body #topbar > .container > #top-menu-nav > #top-menu-sub:not(:has(#top-menu-sub-dropdown > li)) {
         display: none !important;
     }
