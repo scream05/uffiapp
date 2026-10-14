@@ -142,11 +142,19 @@ class Events
     public static function onWallEntryControlsRun($event)
     {
         try {
-            if (!Yii::$app->user->isGuest) {
-                return;
-            }
             /** @var \humhub\modules\content\widgets\WallEntryControls $menu */
             $menu = $event->sender;
+            if (!Yii::$app->user->isGuest) {
+                // Eintrag „Teilnehmer“ bei Terminen nur für alle, die die Teilnehmerliste sehen dürfen
+                foreach ($menu->getEntries() as $entry) {
+                    if ($entry instanceof WidgetMenuEntry
+                        && $entry->widgetClass === 'humhub\\modules\\calendar\\widgets\\ParticipantsLink'
+                        && !self::darfTeilnehmerSehen($entry->widgetOptions['entry']->id ?? null)) {
+                        $menu->removeEntry($entry);
+                    }
+                }
+                return;
+            }
             foreach ($menu->getEntries() as $entry) {
                 if (!($entry instanceof WidgetMenuEntry && $entry->widgetClass === PermaLink::class)) {
                     $menu->removeEntry($entry);
@@ -240,7 +248,7 @@ JS, \yii\web\View::POS_END);
         '@mail/views/mail' => '@designwahl/views/mail',
         '@questions/views/question' => '@designwahl/views/questions/question',
         '@questions/widgets/views' => '@designwahl/views/questions/widgets',
-        '@calendar/widgets/views' => '@designwahl/views/calendar/widgets', // nur wallEntry.php (Teilnahme-Knöpfe), Rest Original
+        '@calendar/widgets/views' => '@designwahl/views/calendar/widgets', // nur wallEntry.php (Teilnahme-Knöpfe) + participants.php (Liste nur für Bearbeiter), Rest Original
         '@calendar/views/common' => '@designwahl/views/calendar/common', // nur defaultConfig.php (ohne Reiter „Erinnerung“)
         '@humhub/modules/space/widgets/views' => '@designwahl/views/space/widgets', // nur profileHeaderControls.php (Leiste nur für Admins)
     ];
@@ -254,15 +262,27 @@ JS, \yii\web\View::POS_END);
         'questions/answer' => ['edit'],
     ];
 
+    /** Teilnehmerliste eines Termins: nur wer ihn bearbeiten darf (Ersteller, Space-Admins, Admins) */
+    public static function darfTeilnehmerSehen($eintragId): bool
+    {
+        if (Yii::$app->user->isGuest) {
+            return false;
+        }
+        $eintrag = \humhub\modules\calendar\models\CalendarEntry::findOne(['id' => (int) $eintragId]);
+        return $eintrag !== null && $eintrag->content->canEdit();
+    }
+
     /**
      * Kommentare, Nachrichten, Beiträge und Fragen nur als Text (beide Designs): eigene Views mit
      * einfachem Textfeld ohne Anhänge einbinden und beim Speichern nur Text annehmen
      */
     public static function onControllerBeforeAction($event)
     {
-        // Gäste: keine Teilnehmerlisten von Terminen (Namen der Teilnehmer), auch nicht über die Adresse
-        if (Yii::$app->user->isGuest && $event->action->controller->uniqueId === 'calendar/entry'
-            && in_array($event->action->id, ['modal-participants', 'participants-list'], true)) {
+        // Teilnehmerlisten von Terminen (Namen der Teilnehmer) nur für alle, die den Termin bearbeiten dürfen
+        // (Ersteller, Space-Admins, Admins) – Gäste und Mitglieder sehen nur die Anzahl, auch nicht über die Adresse
+        if ($event->action->controller->uniqueId === 'calendar/entry'
+            && in_array($event->action->id, ['modal-participants', 'participants-list'], true)
+            && !self::darfTeilnehmerSehen(Yii::$app->request->get('id'))) {
             throw new \yii\web\ForbiddenHttpException();
         }
         try {
