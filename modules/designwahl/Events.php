@@ -73,13 +73,19 @@ class Events
     public static function onTopMenuRun($event)
     {
         try {
+            /** @var \humhub\widgets\TopMenu $menu */
+            $menu = $event->sender;
+            // Menüpunkt „Spaces“ (Space-Verzeichnis) nur für Admins – in beiden Designs und im Fach „Mehr“
+            if (Yii::$app->user->isGuest || !Yii::$app->user->isAdmin()) {
+                if (($spaces = $menu->getEntryById('spaces')) !== null) {
+                    $menu->removeEntry($spaces);
+                }
+            }
             /** @var Module $module */
             $module = Yii::$app->getModule('designwahl');
             if ($module->getDesign() !== 'neu') {
                 return;
             }
-            /** @var \humhub\widgets\TopMenu $menu */
-            $menu = $event->sender;
             $mehrAktiv = false;
             Module::$mehrAusMenue = [];
             foreach ($menu->getEntries() as $entry) {
