@@ -5,11 +5,14 @@
  * @var bool $canManage
  * @var \humhub\modules\calendar\models\CalendarEntry[] $entries
  * @var \humhub\modules\space\models\Space|null $calendarSpace
+ * @var VereinBeitrag[] $beitraege veröffentlicht auf der Vereinsseite
+ * @var VereinBeitrag[] $eigene eingereichte/abgelehnte (nur für Verwalter)
  */
 
 use humhub\helpers\Html;
 use humhub\modules\content\widgets\richtext\RichText;
 use humhub\modules\vereine\models\Verein;
+use humhub\modules\vereine\models\VereinBeitrag;
 use humhub\modules\vereine\models\VereinVerwalter;
 use humhub\modules\vereine\Module;
 
@@ -32,6 +35,7 @@ $website = $verein->website;
             <div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:6px">
                 <?php if ($verein->status !== Verein::STATUS_VORGESCHLAGEN): ?>
                     <?= Html::a('<i class="fa fa-calendar-plus-o"></i> Termin eintragen', $space->createUrl('/vereine/termin/create', ['verein' => $verein->id]), ['class' => 'btn btn-primary btn-sm']) ?>
+                    <?= Html::a('<i class="fa fa-pencil-square-o"></i> Beitrag schreiben', $space->createUrl('/vereine/beitrag/create', ['verein' => $verein->id]), ['class' => 'btn btn-primary btn-sm']) ?>
                 <?php endif ?>
                 <?= Html::a('<i class="fa fa-pencil"></i> Seite bearbeiten', $space->createUrl('/vereine/verein/edit', ['id' => $verein->id]), ['class' => 'btn btn-light btn-sm']) ?>
                 <?= Html::a('<i class="fa fa-user-plus"></i> Verwalter' . ($pending ? " ($pending neu)" : ''), $space->createUrl('/vereine/verein/verwalter', ['id' => $verein->id]), ['class' => 'btn btn-light btn-sm']) ?>
@@ -121,6 +125,40 @@ $website = $verein->website;
                 <?php endif ?>
             </ul>
         </details>
+    </div>
+</div>
+<?php endif ?>
+
+<?php if ($beitraege || $eigene): ?>
+<div class="panel panel-default">
+    <div class="panel-heading"><strong>Beiträge</strong></div>
+    <div class="panel-body">
+        <?php foreach ($eigene as $b): ?>
+            <div class="alert <?= $b->status === VereinBeitrag::STATUS_ABGELEHNT ? 'alert-danger' : 'alert-warning' ?>" style="margin-bottom:12px">
+                <strong><?= $b->status === VereinBeitrag::STATUS_ABGELEHNT ? 'Nicht veröffentlicht' : 'Wartet auf Prüfung' ?></strong>
+                (eingereicht <?= Yii::$app->formatter->asDatetime($b->created_at, 'short') ?> von <?= Html::encode($b->user->displayName ?? '') ?>):
+                <?= Html::encode(mb_strimwidth($b->text, 0, 120, '…')) ?>
+                <?php if ($b->status === VereinBeitrag::STATUS_ABGELEHNT && $b->begruendung): ?>
+                    <br><small>Begründung: <?= Html::encode($b->begruendung) ?></small>
+                <?php endif ?>
+            </div>
+        <?php endforeach ?>
+        <?php foreach ($beitraege as $b): ?>
+            <div style="padding:12px 0;border-top:1px solid #eee">
+                <small class="text-muted"><?= Yii::$app->formatter->asDate($b->geprueft_am ?? $b->created_at, 'medium') ?></small>
+                <?= $this->render('@vereine/views/beitrag/_beitrag', ['beitrag' => $b]) ?>
+                <div style="margin-top:6px;font-size:0.9em">
+                    <?php if ($b->content): ?>
+                        <?= Html::a('<i class="fa fa-comment-o"></i> Kommentieren', $b->content->getUrl()) ?>
+                    <?php endif ?>
+                    <?php if (Module::canManageAll()): ?>
+                        <?= Html::a('<i class="fa fa-trash"></i> Entfernen', $space->createUrl('/vereine/beitrag/entfernen', ['id' => $b->id]), [
+                            'class' => 'text-danger', 'style' => 'margin-left:12px', 'data-method' => 'post', 'data-params' => ['zurueck' => 'verein'],
+                            'data-confirm' => 'Diesen Beitrag ganz entfernen (auch aus der Übersicht)?']) ?>
+                    <?php endif ?>
+                </div>
+            </div>
+        <?php endforeach ?>
     </div>
 </div>
 <?php endif ?>

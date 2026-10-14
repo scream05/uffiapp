@@ -1028,6 +1028,69 @@ class SetupController extends Controller
     }
 
     /**
+     * Probelauf Vereinsbeiträge: setup/vereinsbeitrag-test <verwalter-username> <prüf-username>
+     * Legt als Verwalter einen Testbeitrag für dessen ersten Verein an, gibt ihn für Vereinsseite + Übersicht frei,
+     * prüft, ob er in der Übersicht der zweiten Person (kein Mitglied des Verzeichnis-Space) und von Gästen
+     * erscheint, und entfernt ihn wieder. Ohne Benachrichtigungen und Mails.
+     */
+    public function actionVereinsbeitragTest($verwalter, $pruefer, $behalten = 0)
+    {
+        $autor = User::findOne(['username' => $verwalter]);
+        $leser = User::findOne(['username' => $pruefer]);
+        $vv = $autor ? \humhub\modules\vereine\models\VereinVerwalter::findOne(['user_id' => $autor->id, 'status' => 'bestaetigt']) : null;
+        if (!$autor || !$leser || !$vv) {
+            $this->stderr("Verwalter/Leser nicht gefunden oder kein bestätigter Verwalter\n");
+            return ExitCode::DATAERR;
+        }
+        Yii::$app->user->switchIdentity($autor); // Verfasser = Prüfer → keine Glocke „freigegeben“
+        Yii::$app->getModule('dashboard')->memberFilterClass = \humhub\modules\vereine\stream\DashboardMitVereinen::class;
+        $b = new \humhub\modules\vereine\models\VereinBeitrag(['verein_id' => $vv->verein_id, 'user_id' => $autor->id,
+            'status' => 'eingereicht', 'text' => 'TEST – bitte ignorieren (Probelauf Vereinsbeiträge)']);
+        $b->save(false);
+        \humhub\modules\vereine\components\BeitragDienst::freigeben($b, true, true);
+        $b->refresh();
+        $this->stdout("Beitrag {$b->id} für „{$b->verein->name}“: Status {$b->status}, Content {$b->content_id}\n");
+        // wie die Übersicht im Browser: Beitrags-Stream (nicht der Aktivitäten-Kanal), aus Sicht der jeweiligen Person
+        $ids = function (?User $user) {
+            Yii::$app->user->switchIdentity($user);
+            $q = new \humhub\modules\dashboard\stream\DashboardStreamQuery(['user' => $user, 'limit' => 5, 'activity' => false]);
+            return array_map(fn($c) => $c->id, $q->all());
+        };
+        $this->stdout("Übersicht {$leser->username}: " . (in_array($b->content_id, $ids($leser)) ? 'sichtbar' : 'NICHT sichtbar') . "\n");
+        $this->stdout('Übersicht Gast: ' . (in_array($b->content_id, $ids(null)) ? 'sichtbar' : 'NICHT sichtbar') . "\n");
+        Yii::$app->getModule('dashboard')->memberFilterClass = \humhub\modules\dashboard\stream\filters\DashboardMemberStreamFilter::class;
+        $this->stdout("Gegenprobe ohne Erweiterung, {$leser->username}: " . (in_array($b->content_id, $ids($leser)) ? 'sichtbar' : 'nicht sichtbar') . "\n");
+        Yii::$app->getModule('dashboard')->memberFilterClass = \humhub\modules\vereine\stream\DashboardMitVereinen::class;
+        $rest = array_filter($ids($leser), fn($id) => $id !== $b->content_id);
+        $this->stdout('Übrige Übersicht unverändert lieferbar: ' . count($rest) . " weitere Einträge\n");
+        // Text der Ablehnungs-Mail (wird hier nur erzeugt, nicht verschickt)
+        $b->begruendung = 'Beispiel-Begründung';
+        $this->stdout("--- Ablehnungs-Mail (Vorschau) ---\n" . Yii::$app->view->renderFile('@vereine/views/mail/abgelehnt_text.php', [
+            'beitrag' => $b, 'name' => $autor->displayName, 'link' => $b->verein->getUrl(true), 'kontaktMail' => 'smartcity@buergerliste-uffenheim.de',
+        ]) . "---\n");
+        if ($behalten) {
+            $this->stdout("Behalten – entfernen mit: setup/vereinsbeitrag-entfernen {$b->id}\n");
+            return ExitCode::OK;
+        }
+        \humhub\modules\vereine\components\BeitragDienst::entfernen($b);
+        $this->stdout('Entfernt: ' . (\humhub\modules\content\models\Content::findOne($b->content_id) ? 'NEIN' : 'ja') . "\n");
+        return ExitCode::OK;
+    }
+
+    /** Vereinsbeitrag samt HumHub-Beitrag entfernen: setup/vereinsbeitrag-entfernen <id> */
+    public function actionVereinsbeitragEntfernen($id)
+    {
+        $b = \humhub\modules\vereine\models\VereinBeitrag::findOne((int)$id);
+        if ($b === null) {
+            $this->stderr("Beitrag $id nicht gefunden\n");
+            return ExitCode::DATAERR;
+        }
+        \humhub\modules\vereine\components\BeitragDienst::entfernen($b);
+        $this->stdout("Beitrag $id entfernt\n");
+        return ExitCode::OK;
+    }
+
+    /**
      * Minimale Profildaten: setup/profil-minimal [1=Probelauf]
      * Alle ausgeblendeten Profilfelder (außer Vor-/Nachname) nicht durchsuchbar und nicht bearbeitbar, Inhalte bei allen
      * Konten leeren, Online-Status ausblenden (Datenminimierung, Datenschutzerklärung Abschnitt 5). Idempotent.

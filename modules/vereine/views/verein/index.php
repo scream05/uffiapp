@@ -6,6 +6,7 @@
  * @var string $kategorie
  * @var string $ortsteil
  * @var \humhub\modules\vereine\Module $module
+ * @var string[] $verwalter Verein-ID => Name des ersten Verwalters (nur für Admins gefüllt)
  */
 
 use humhub\helpers\Html;
@@ -68,6 +69,9 @@ $filtered = trim($q) !== '' || $kategorie !== '' || $ortsteil !== '';
                     <span style="flex:1;min-width:0">
                         <strong style="display:block"><?= Html::encode($v->name) ?></strong>
                         <small class="text-muted"><?= Html::encode($v->kategorie) ?> · <?= Html::encode($v->ortsteil) ?></small>
+                        <?php if (isset($verwalter[$v->id])): ?>
+                            <small class="text-muted" style="display:block"><i class="fa fa-user"></i> Verwalter: <?= Html::encode($verwalter[$v->id]) ?></small>
+                        <?php endif ?>
                         <?php if ($label): ?>
                             <small class="text-muted verein-status-zeile"><?= Html::encode($label) ?></small>
                         <?php endif ?>

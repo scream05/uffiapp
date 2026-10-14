@@ -3,12 +3,27 @@
 namespace humhub\modules\vereine;
 
 use humhub\modules\calendar\models\CalendarEntry;
+use humhub\modules\post\models\Post;
+use humhub\modules\vereine\models\VereinBeitrag;
 use humhub\modules\vereine\models\VereinVerwalter;
 use humhub\modules\vereine\widgets\VereinAddon;
 use Yii;
 
 class Events
 {
+    /** Übersicht angemeldeter Nutzer zeigt auch freigegebene Vereinsbeiträge (stream/DashboardMitVereinen) */
+    public static function onBeforeRequest($event)
+    {
+        try {
+            $dashboard = Yii::$app->getModule('dashboard');
+            if ($dashboard->memberFilterClass === \humhub\modules\dashboard\stream\filters\DashboardMemberStreamFilter::class) {
+                $dashboard->memberFilterClass = \humhub\modules\vereine\stream\DashboardMitVereinen::class;
+            }
+        } catch (\Throwable $e) {
+            Yii::error($e);
+        }
+    }
+
     public static function onMetaSearchInit($event)
     {
         if (!Yii::$app->user->isGuest && Yii::$app->getModule('vereine')->getDirectorySpace() !== null) {
@@ -29,7 +44,7 @@ class Events
                 'group' => 'modules',
                 'url' => $space->createUrl('/vereine/verein/index'),
                 'icon' => '<i class="fa fa-users"></i>',
-                'isActive' => $active && Yii::$app->controller->action->id !== 'anfragen',
+                'isActive' => $active && !in_array(Yii::$app->controller->action->id, ['anfragen', 'pruefen'], true),
                 'sortOrder' => 90,
             ]);
             if (Module::canManageAll()) {
@@ -41,6 +56,15 @@ class Events
                     'icon' => '<i class="fa fa-inbox"></i>',
                     'isActive' => $active && Yii::$app->controller->action->id === 'anfragen',
                     'sortOrder' => 91,
+                ]);
+                $offen = VereinBeitrag::find()->where(['status' => VereinBeitrag::STATUS_EINGEREICHT])->count();
+                $event->sender->addItem([
+                    'label' => 'Vereins-Beiträge' . ($offen ? " ($offen)" : ''),
+                    'group' => 'modules',
+                    'url' => $space->createUrl('/vereine/beitrag/pruefen'),
+                    'icon' => '<i class="fa fa-check-square-o"></i>',
+                    'isActive' => $active && Yii::$app->controller->action->id === 'pruefen',
+                    'sortOrder' => 92,
                 ]);
             }
         } catch (\Throwable $e) {
@@ -55,6 +79,8 @@ class Events
             $object = $event->sender->object;
             if ($object instanceof CalendarEntry) {
                 $event->sender->addWidget(VereinAddon::class, ['entry' => $object], ['sortOrder' => 5]);
+            } elseif ($object instanceof Post && ($b = VereinBeitrag::forContent($object->content->id)) !== null) {
+                $event->sender->addWidget(VereinAddon::class, ['beitrag' => $b], ['sortOrder' => 5]);
             }
         } catch (\Throwable $e) {
             Yii::error($e);

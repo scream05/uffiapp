@@ -20,6 +20,9 @@ class Module extends ContentContainerModule
     /** Kalender-Kategorie für Vereinstermine (dieselbe wie beim Import von uffenheim.de) */
     public string $calendarType = 'Vereinsveranstaltungen, JHV, Sommerfeste, Jubiläen usw.';
 
+    /** Antwortadresse der Ablehnungs-Mails */
+    public string $kontaktMail = 'smartcity@buergerliste-uffenheim.de';
+
     public array $categories = [
         'Sport',
         'Musik & Gesang',
@@ -63,7 +66,8 @@ class Module extends ContentContainerModule
 
     public function getNotifications()
     {
-        return [notifications\VerwaltungAngefragt::class, notifications\VerwaltungBestaetigt::class];
+        return [notifications\VerwaltungAngefragt::class, notifications\VerwaltungBestaetigt::class,
+            notifications\BeitragEingereicht::class, notifications\BeitragFreigegeben::class];
     }
 
     public function getCalendarSpace(): ?Space

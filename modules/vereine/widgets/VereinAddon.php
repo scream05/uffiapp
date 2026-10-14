@@ -6,13 +6,20 @@ use humhub\components\Widget;
 use humhub\helpers\Html;
 use humhub\modules\calendar\models\CalendarEntry;
 use humhub\modules\vereine\models\Verein;
+use humhub\modules\vereine\models\VereinBeitrag;
 
 class VereinAddon extends Widget
 {
-    public CalendarEntry $entry;
+    public ?CalendarEntry $entry = null;
+    public ?VereinBeitrag $beitrag = null;
 
     public function run()
     {
+        if ($this->beitrag !== null) {
+            $verein = $this->beitrag->verein;
+            return $verein ? Html::tag('div', '<i class="fa fa-users"></i> Beitrag von ' . Html::a(Html::encode($verein->name), $verein->getUrl()),
+                ['class' => 'verein-addon', 'style' => 'margin:8px 0 4px;font-size:0.95em']) : '';
+        }
         $verein = Verein::forEntry($this->entry);
         if ($verein === null) {
             return '';

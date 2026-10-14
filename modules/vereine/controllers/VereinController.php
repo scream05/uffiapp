@@ -5,6 +5,7 @@ namespace humhub\modules\vereine\controllers;
 use humhub\modules\content\components\ContentContainerController;
 use humhub\modules\user\models\User;
 use humhub\modules\vereine\models\Verein;
+use humhub\modules\vereine\models\VereinBeitrag;
 use humhub\modules\vereine\models\VereinVerwalter;
 use humhub\modules\vereine\Module;
 use humhub\modules\vereine\notifications\VerwaltungAngefragt;
@@ -51,8 +52,19 @@ class VereinController extends ContentContainerController
         $mine = Verein::find()->innerJoin('verein_verwalter vv', 'vv.verein_id = verein.id')
             ->where(['vv.user_id' => Yii::$app->user->id, 'vv.status' => VereinVerwalter::STATUS_BESTAETIGT])
             ->orderBy(['name' => SORT_ASC])->all();
+        // Admins sehen in der Liste den ersten (am längsten bestätigten) Verwalter je Verein
+        $verwalter = [];
+        if (Module::canManageAll()) {
+            foreach (VereinVerwalter::find()->with('user')->where(['status' => VereinVerwalter::STATUS_BESTAETIGT])
+                         ->orderBy(['created_at' => SORT_ASC, 'user_id' => SORT_ASC])->all() as $row) {
+                if ($row->user && !isset($verwalter[$row->verein_id])) {
+                    $verwalter[$row->verein_id] = $row->user->displayName;
+                }
+            }
+        }
         return $this->render('index', [
             'vereine' => $query->all(),
+            'verwalter' => $verwalter,
             'mine' => $mine,
             'q' => $q,
             'kategorie' => $kategorie,
@@ -71,6 +83,13 @@ class VereinController extends ContentContainerController
             'canManage' => $verein->canManage(),
             'entries' => $verein->getUpcomingEntries(),
             'calendarSpace' => $this->module->getCalendarSpace(),
+            'beitraege' => VereinBeitrag::find()->where(['verein_id' => $verein->id, 'status' => VereinBeitrag::STATUS_VEROEFFENTLICHT,
+                'auf_vereinsseite' => 1])->orderBy(['geprueft_am' => SORT_DESC, 'id' => SORT_DESC])->limit(20)->all(),
+            // Eingereichte und (letzte 30 Tage) abgelehnte Beiträge sehen die Verwalter des Vereins
+            'eigene' => $verein->canManage() ? VereinBeitrag::find()->with('user')->where(['verein_id' => $verein->id])
+                ->andWhere(['or', ['status' => VereinBeitrag::STATUS_EINGEREICHT],
+                    ['and', ['status' => VereinBeitrag::STATUS_ABGELEHNT], ['>=', 'geprueft_am', date('Y-m-d H:i:s', strtotime('-30 days'))]]])
+                ->orderBy(['created_at' => SORT_DESC])->all() : [],
         ]);
     }
 
