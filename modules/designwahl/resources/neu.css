@@ -236,6 +236,11 @@ html.design-neu #topbar .user-title strong {
         box-shadow: 0 -6px 24px rgba(43, 74, 95, .18), 0 -1px 0 var(--dn-linie) !important;
     }
 
+    /* HumHubs „Menü“-Symbol nur, wenn wirklich Reiter darin liegen (neu.js lagert nur bei Platzmangel aus) */
+    html.design-neu body #topbar > .container > #top-menu-nav > #top-menu-sub:not(:has(#top-menu-sub-dropdown > li)) {
+        display: none !important;
+    }
+
     /* Reiter teilen sich die Breite gleichmäßig, lange Beschriftungen werden gekürzt statt abgeschnitten */
     html.design-neu body #topbar > .container > #top-menu-nav > li {
         flex: 1 1 auto;

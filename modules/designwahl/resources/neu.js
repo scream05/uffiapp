@@ -125,11 +125,35 @@
         }
     }
 
-    function leisteSpaeter() { setTimeout(leiste, 120); } // nach HumHubs eigener Prüfung (50 ms bzw. resize)
+    // HumHub prüft zu verschiedenen Zeitpunkten erneut (Start, resize, Seitenwechsel per PJAX, App-Ansicht) –
+    // deshalb jede Änderung an der Leiste beobachten und danach korrigieren. Während der eigenen
+    // Korrektur ist der Beobachter aus, damit er sich nicht selbst auslöst.
+    var beobachter = null, geplant = null;
+
+    function leisteSpaeter() {
+        clearTimeout(geplant);
+        geplant = setTimeout(function () {
+            if (beobachter) beobachter.disconnect();
+            try { leiste(); } finally { beobachten(); }
+        }, 30);
+    }
+
+    function beobachten() {
+        var nav = document.getElementById('top-menu-nav');
+        if (!nav || !window.MutationObserver) return;
+        if (!beobachter) beobachter = new MutationObserver(leisteSpaeter);
+        beobachter.observe(nav, {childList: true, subtree: true, attributes: true, attributeFilter: ['style']});
+    }
+
     window.addEventListener('resize', leisteSpaeter);
     window.addEventListener('load', leisteSpaeter);
     if (handy.addEventListener) handy.addEventListener('change', leisteSpaeter);
-    leisteSpaeter();
+    document.addEventListener('humhub:ready', leisteSpaeter);
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', leisteSpaeter);
+    } else {
+        leisteSpaeter();
+    }
 
     // --- Fach „Mehr“ (Handy: von unten, Computer: unter der Kopfleiste) ---
     function fach() { return document.getElementById('dn-mehr'); }
