@@ -73,12 +73,12 @@ class BeitragController extends ContentContainerController
         if ($request->post('aktion') === 'ablehnen') {
             $begruendung = trim((string)$request->post('begruendung', ''));
             if ($begruendung === '') {
-                $this->view->error('Bitte eine Begründung für die Ablehnung angeben – sie geht per Mail an den Verfasser.');
+                $this->view->error('Bitte eine Begründung für die Ablehnung angeben – sie geht per E-Mail an den Verfasser.');
                 return $this->redirect($zurueck);
             }
             $ok = BeitragDienst::ablehnen($b, $begruendung);
-            $ok ? $this->view->success("Abgelehnt. {$b->user->displayName} hat die Begründung per Mail bekommen.")
-                : $this->view->error('Abgelehnt, aber die Mail an den Verfasser konnte nicht verschickt werden.');
+            $ok ? $this->view->success("Abgelehnt. {$b->user->displayName} hat die Begründung per E-Mail bekommen.")
+                : $this->view->error('Abgelehnt, aber die E-Mail an den Verfasser konnte nicht verschickt werden.');
             return $this->redirect($zurueck);
         }
         if ($request->post('aktion') !== 'freigeben') {

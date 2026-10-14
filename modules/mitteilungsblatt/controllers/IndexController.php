@@ -58,6 +58,7 @@ class IndexController extends ContentContainerController
     /** Archiv aller Ausgaben, mit ?q= Volltextsuche */
     public function actionIndex($q = '')
     {
+        $this->view->setPageTitle('Mitteilungsblatt');
         $q = trim(mb_substr((string)$q, 0, 100));
         return $this->render('index', [
             'ausgaben' => Ausgabe::find()->orderBy(['jahr' => SORT_DESC, 'nr' => SORT_DESC])->all(),
@@ -71,6 +72,7 @@ class IndexController extends ContentContainerController
 
     public function actionLesen($id, $seite = null, $q = null)
     {
+        $this->view->setPageTitle('Mitteilungsblatt');
         return $this->render('lesen', [
             'ausgabe' => $this->ausgabe($id),
             'seite' => $seite !== null ? max(1, (int)$seite) : null,

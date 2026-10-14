@@ -33,7 +33,7 @@ $filtered = trim($q) !== '' || $kategorie !== '' || $ortsteil !== '';
     <div class="panel-heading"><strong>Vereinsverzeichnis</strong></div>
     <div class="panel-body">
         <p class="help-block">Vereine, Gruppen und Initiativen in Uffenheim und den Ortsteilen. Ihre Termine stehen im gemeinsamen Kalender
-            unter „Veranstaltungen“. Du bist im Vorstand eines Vereins? Öffne die Seite deines Vereins und frag die Verwaltung an.</p>
+            unter „Veranstaltungen“. Du bist im Vorstand eines Vereins? Öffne die Seite deines Vereins und frag dort an, ob du ihn verwalten darfst.</p>
         <?= Html::beginForm($space->createUrl('/vereine/verein/index'), 'get', ['class' => 'verein-filter', 'style' => 'display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px']) ?>
             <?= Html::hiddenInput('cguid', $space->guid) ?>
             <?= Html::textInput('q', $q, ['class' => 'form-control', 'placeholder' => 'Suchen …', 'style' => 'flex:2 1 180px', 'aria-label' => 'Suchen']) ?>

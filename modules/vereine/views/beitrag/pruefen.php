@@ -14,7 +14,7 @@ $space = $this->context->contentContainer;
     <div class="panel-body">
         <p class="help-block">Beiträge, die Vereinsverwalter eingereicht haben. Freigeben auf der Vereinsseite und/oder in der Übersicht
             (dort als normaler Beitrag im Space „<?= Html::encode($space->name) ?>“, für alle sichtbar, mit Kommentaren). Bei Ablehnung
-            geht die Begründung per Mail an den Verfasser.</p>
+            geht die Begründung per E-Mail an den Verfasser.</p>
         <?php if (!$offen): ?>
             <p class="text-muted">Zurzeit nichts zu prüfen.</p>
         <?php endif ?>
@@ -39,11 +39,11 @@ $space = $this->context->contentContainer;
                     <?= Html::beginForm($url, 'post', ['style' => 'margin-top:8px']) ?>
                         <?= Html::hiddenInput('aktion', 'ablehnen') ?>
                         <div class="form-group">
-                            <label for="begruendung-<?= $b->id ?>">Begründung (geht per Mail an <?= Html::encode($b->user->displayName) ?>)</label>
+                            <label for="begruendung-<?= $b->id ?>">Begründung (geht per E-Mail an <?= Html::encode($b->user->displayName) ?>)</label>
                             <?= Html::textarea('begruendung', '', ['id' => 'begruendung-' . $b->id, 'class' => 'form-control', 'rows' => 3,
                                 'maxlength' => 2000, 'required' => true]) ?>
                         </div>
-                        <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-times"></i> Ablehnen und Mail senden</button>
+                        <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-times"></i> Ablehnen und E-Mail senden</button>
                     <?= Html::endForm() ?>
                 </details>
             </div>

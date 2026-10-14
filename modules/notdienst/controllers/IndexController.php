@@ -39,6 +39,7 @@ class IndexController extends ContentContainerController
 
     public function actionIndex()
     {
+        $this->view->setPageTitle('Notdienste');
         return $this->render('index', [
             'module' => $this->module,
             'periods' => Notdienst::periods(3),

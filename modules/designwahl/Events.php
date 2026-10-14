@@ -88,6 +88,14 @@ class Events
             if ($module->getDesign() !== 'neu') {
                 return;
             }
+            // „Kalender“ (alle Kalender) doppelt sich mit „Termine“ in der Leiste – im neuen Design nur für Admins
+            if (!Yii::$app->user->isAdmin()) {
+                foreach ($menu->getEntries() as $entry) {
+                    if ($entry instanceof MenuLink && str_contains((string)$entry->getUrl(), '/calendar/global')) {
+                        $menu->removeEntry($entry);
+                    }
+                }
+            }
             $mehrAktiv = false;
             Module::$mehrAusMenue = [];
             foreach ($menu->getEntries() as $entry) {
@@ -287,6 +295,10 @@ JS, \yii\web\View::POS_END);
         }
         try {
             self::gastSprache();
+            // Seitentitel der Übersicht: HumHub setzt ihn schon in init(), bei Gästen also noch vor der Umstellung auf Deutsch
+            if ($event->sender instanceof \humhub\modules\dashboard\controllers\DashboardController) {
+                $event->sender->setPageTitle('Übersicht');
+            }
             $theme = Yii::$app->view->theme;
             if ($theme !== null) {
                 $theme->applyTo(''); // füllt die Standard-pathMap des Themes, bevor wir ergänzen

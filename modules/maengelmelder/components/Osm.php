@@ -15,6 +15,13 @@ class Osm
     private const CACHE_DAYS = 30;
     /** Nur Kacheln rund um Uffenheim (kein offener Proxy) */
     private const TILE_BOUNDS = ['south' => 49.35, 'west' => 9.95, 'north' => 49.75, 'east' => 10.55];
+    /** Ab dieser Zoomstufe nur das Stadtgebiet mit Ortsteilen (sonst wären es Hunderttausende Kacheln) */
+    private const NAH_ZOOM = 15;
+    private const NAH_BOUNDS = ['south' => 49.46, 'west' => 10.10, 'north' => 49.62, 'east' => 10.36];
+    /** Höchstens so viele Abrufe bei openstreetmap.org pro Stunde (Tile Usage Policy, Schutz vor Sperre) */
+    private const OSM_PRO_STUNDE = 2000;
+    /** Zwischenspeicher höchstens so groß; darüber werden neue Kacheln geliefert, aber nicht mehr gespeichert */
+    private const CACHE_MAX_MB = 1024;
 
     /** PNG-Daten einer Kachel oder null, wenn außerhalb des erlaubten Bereichs/Zooms */
     public static function tile(int $z, int $x, int $y): ?string
@@ -28,7 +35,7 @@ class Osm
         $east = ($x + 1) / $n * 360 - 180;
         $north = rad2deg(atan(sinh(M_PI * (1 - 2 * $y / $n))));
         $south = rad2deg(atan(sinh(M_PI * (1 - 2 * ($y + 1) / $n))));
-        $b = self::TILE_BOUNDS;
+        $b = $z >= self::NAH_ZOOM ? self::NAH_BOUNDS : self::TILE_BOUNDS;
         if ($east < $b['west'] || $west > $b['east'] || $north < $b['south'] || $south > $b['north']) {
             return null;
         }
@@ -37,12 +44,21 @@ class Osm
         if (is_file($file) && filemtime($file) > time() - self::CACHE_DAYS * 86400) {
             return file_get_contents($file);
         }
+        // Gesamtgrenze für Abrufe bei OSM (für alle Nutzer zusammen)
+        $key = 'maengel-osm-abrufe-' . date('YmdH');
+        $abrufe = (int)Yii::$app->cache->get($key);
+        if ($abrufe >= self::OSM_PRO_STUNDE) {
+            return is_file($file) ? file_get_contents($file) : null;
+        }
+        Yii::$app->cache->set($key, $abrufe + 1, 3600);
         $png = self::get(sprintf(self::TILE_URL, $z, $x, $y));
         if ($png === null || !str_starts_with($png, "\x89PNG")) {
             return is_file($file) ? file_get_contents($file) : null; // lieber alte Kachel als keine
         }
-        @mkdir(dirname($file), 0775, true);
-        file_put_contents($file, $png);
+        if (self::cacheMb() < self::CACHE_MAX_MB) {
+            @mkdir(dirname($file), 0775, true);
+            file_put_contents($file, $png);
+        }
         return $png;
     }
 
@@ -82,6 +98,21 @@ class Osm
             return null;
         }
         return [round((float)$hit['lat'], 6), round((float)$hit['lon'], 6), (string)($hit['display_name'] ?? $query)];
+    }
+
+    /** Größe des Kachel-Zwischenspeichers in MB (stündlich neu gezählt) */
+    private static function cacheMb(): int
+    {
+        return (int)Yii::$app->cache->getOrSet('maengel-tiles-mb', function () {
+            $dir = Yii::getAlias('@runtime/maengel-tiles');
+            $bytes = 0;
+            if (is_dir($dir)) {
+                foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS)) as $f) {
+                    $bytes += $f->getSize();
+                }
+            }
+            return intdiv($bytes, 1024 * 1024);
+        }, 3600);
     }
 
     private static function get(string $url): ?string

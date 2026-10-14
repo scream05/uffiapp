@@ -44,6 +44,6 @@ $button = fn($row, $aktion, $label, $class, $confirm = null) => Html::beginForm(
                 <?php endif ?>
             </div>
         <?php endforeach ?>
-        <p class="help-block" style="margin-top:12px">Weitere Vorstandsmitglieder fragen die Verwaltung auf der Vereinsseite an; du kannst sie dann hier bestätigen.</p>
+        <p class="help-block" style="margin-top:12px">Weitere Vorstandsmitglieder fragen auf der Vereinsseite als Verwalter an; du kannst sie dann hier bestätigen.</p>
     </div>
 </div>

@@ -200,7 +200,7 @@ $website = $verein->website;
                         <?= Html::textInput('nachricht', '', ['id' => 'verein-nachricht', 'class' => 'form-control', 'maxlength' => 1000,
                             'placeholder' => 'z. B. 2. Vorsitzende, Schriftführer, Jugendwart', 'required' => true]) ?>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-sm">Verwaltung anfragen</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Als Verwalter anfragen</button>
                 <?= Html::endForm() ?>
             </details>
         <?php endif ?>
