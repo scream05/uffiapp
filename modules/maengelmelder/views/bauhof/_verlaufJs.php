@@ -25,7 +25,7 @@ use humhub\helpers\Html;
         if (!document.body.contains(box)) { clearInterval(timer); return; } // Seitenwechsel per PJAX
         laden();
     }, 20000);
-    $('#bauhof-chat').on('submit', function (e) {
+    $('.bauhof-chat-form').on('submit', function (e) {
         e.preventDefault();
         var form = this, btn = form.querySelector('button');
         btn.disabled = true;

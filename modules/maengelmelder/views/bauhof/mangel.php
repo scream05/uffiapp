@@ -9,6 +9,7 @@
  * @var \humhub\modules\maengelmelder\models\BauhofNachricht[] $verlauf
  * @var \humhub\modules\maengelmelder\models\MaengelKontakt|null $kontakt
  * @var bool $entwurf Gastmeldung, noch nicht freigegeben
+ * @var array|null $buergerWeg [whatsapp|mail, Ziel] für Nachrichten an die meldende Person (Buergerinfo::weg)
  */
 
 use humhub\helpers\Html;
@@ -98,7 +99,7 @@ if ($m && !isset($mitarbeiter[$m->id])) {
                     <?= $this->render('_verlauf', ['verlauf' => $verlauf, 'space' => $space, 'mitAuftrag' => false]) ?>
                 </div>
                 <?php if ($m): ?>
-                    <?= Html::beginForm('', 'post', ['class' => 'mt-2', 'id' => 'bauhof-chat']) ?>
+                    <?= Html::beginForm('', 'post', ['class' => 'mt-2 bauhof-chat-form', 'id' => 'bauhof-chat']) ?>
                     <?= Html::hiddenInput('aktion', 'chat') ?>
                     <div class="input-group">
                         <?= Html::textarea('text', '', ['class' => 'form-control', 'rows' => 2, 'maxlength' => 2000, 'required' => true,
@@ -114,6 +115,24 @@ if ($m && !isset($mitarbeiter[$m->id])) {
                 <?php else: ?>
                     <p class="text-muted small">Zum Schreiben zuerst einen Mitarbeiter zuweisen.</p>
                 <?php endif ?>
+
+                <?= Html::beginForm('', 'post', ['class' => 'mt-3 bauhof-chat-form', 'id' => 'bauhof-buerger']) ?>
+                <?= Html::hiddenInput('aktion', 'buerger') ?>
+                <label class="form-label small mb-1"><strong>An die meldende Person</strong>
+                    <?= $buergerWeg ? '(' . ($buergerWeg[0] === 'whatsapp' ? 'per WhatsApp' : 'per E-Mail') . ')' : '' ?></label>
+                <?php if ($buergerWeg): ?>
+                    <div class="input-group">
+                        <?= Html::textarea('text', '', ['class' => 'form-control', 'rows' => 2, 'maxlength' => 1500, 'required' => true,
+                            'placeholder' => 'Rückfrage oder Info an ' . ($kontakt?->getName() ?: $post->content->createdBy?->displayName ?? 'die meldende Person') . ' …']) ?>
+                        <button class="btn btn-info" title="An die meldende Person senden"><i class="fa fa-paper-plane"></i></button>
+                    </div>
+                    <small class="text-muted">Geht nur an die meldende Person, nicht öffentlich. <?= $buergerWeg[0] === 'whatsapp'
+                        ? 'Antworten erscheinen hier im Verlauf.'
+                        : 'Antworten kommen per E-Mail an ' . Html::encode(Yii::$app->getModule('maengelmelder')->kontaktMail) . '.' ?></small>
+                <?php else: ?>
+                    <p class="text-muted small">Keine E-Mail-Adresse und kein WhatsApp-Kontakt hinterlegt<?= $kontakt?->telefon ? ' – bitte anrufen' : '' ?>.</p>
+                <?php endif ?>
+                <?= Html::endForm() ?>
             </div>
 
             <div class="col-lg-5">

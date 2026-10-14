@@ -85,13 +85,61 @@ class Buergerinfo
     }
 
     /**
+     * Wie erreicht die Bauhofseite die meldende Person mit einer eigenen Nachricht? 'whatsapp' (nur wenn beim Melden
+     * gewünscht und nicht per STOPP abbestellt), sonst 'mail' (Kontaktdaten „für Rückfragen“), sonst null.
+     * @return array{0: string, 1: string}|null [Weg, Adresse/Nummer]
+     */
+    public static function weg(Content $content): ?array
+    {
+        $k = MaengelKontakt::findOne($content->id);
+        if ($k && $k->info_whatsapp && $k->wa_id && self::module()->buergerWhatsappAktiv()) {
+            return ['whatsapp', $k->wa_id];
+        }
+        $mail = $k ? $k->getMail() : null;
+        if ($mail === null && !$k && ($autor = $content->createdBy) && $autor->username !== self::module()->gastKonto) {
+            $mail = $autor->email ?: null;
+        }
+        return $mail ? ['mail', $mail] : null;
+    }
+
+    /** Eigene Nachricht der Bauhofseite an die meldende Person; gibt einen Fehlertext zurück oder null */
+    public static function nachricht(Content $content, string $text, \humhub\modules\user\models\User $absender): ?string
+    {
+        $mangel = Mangel::fromContent($content);
+        $weg = self::weg($content);
+        if (!$mangel || $weg === null) {
+            return 'Für diese Meldung ist keine E-Mail-Adresse und kein WhatsApp-Kontakt hinterlegt.';
+        }
+        if ($weg[0] === 'whatsapp') {
+            $k = MaengelKontakt::findOne($content->id);
+            $volltext = "Nachricht vom Bauhof zu Ihrer Mängelmeldung Nr. {$content->id} ({$mangel->kategorie}):\n\n$text"
+                . "\n\nSie können auf diese Nachricht antworten; Ihre Antwort geht an den Bauhof. Keine Nachrichten mehr? Antworten Sie mit STOPP.";
+            // Außerhalb des 24-Stunden-Fensters über die Status-Vorlage (Parameter ohne Zeilenumbrüche)
+            $einzeilig = trim(preg_replace('/\s+/u', ' ', $text));
+            $log = self::whatsapp($k, $content->id, $volltext, self::module()->vorlagen['buergerStatus'],
+                [(string)$content->id, $mangel->kategorie, 'Nachricht vom Bauhof', mb_substr($einzeilig, 0, 900)], 'text', $absender->id);
+            return $log->zustellung === 'fehler' ? 'WhatsApp nicht gesendet: ' . $log->fehler : null;
+        }
+        $k = MaengelKontakt::findOne($content->id);
+        $name = $k ? $k->getName() : $content->createdBy->displayName;
+        $mail = "Guten Tag $name,\n\nder Bauhof hat eine Nachricht zu Ihrer Mängelmeldung Nr. {$content->id} ({$mangel->kategorie}, "
+            . $mangel->getOrt() . "):\n\n$text\n\nSie können einfach auf diese E-Mail antworten.\n\n--\n"
+            . 'Rund um Uffni – Bürgerplattform der Bürgerliste Uffenheim e. V., kein Angebot der Stadt Uffenheim.';
+        $ok = self::mailSenden($weg[1], "Nachricht vom Bauhof zu Ihrer Mängelmeldung Nr. {$content->id}", $mail);
+        (new BauhofNachricht(['content_id' => $content->id, 'richtung' => BauhofNachricht::AUS, 'buerger' => 1,
+            'typ' => 'mail', 'text' => $text, 'verarbeitet' => 1, 'user_id' => $absender->id,
+            'zustellung' => $ok ? 'gesendet' : 'fehler', 'fehler' => $ok ? null : 'E-Mail-Versand fehlgeschlagen']))->save(false);
+        return $ok ? null : 'E-Mail konnte nicht versendet werden.';
+    }
+
+    /**
      * WhatsApp an die meldende Person: im offenen 24-Stunden-Fenster als Text, sonst als Vorlage. Wird im Verlauf
      * der Meldung gespeichert (Zustellstatus aktualisiert Bauhof::onStatus über die wamid).
      */
-    private static function whatsapp(MaengelKontakt $k, int $contentId, string $text, string $vorlage, array $parameter, string $typ): void
+    private static function whatsapp(MaengelKontakt $k, int $contentId, string $text, string $vorlage, array $parameter, string $typ, ?int $userId = null): BauhofNachricht
     {
         $log = new BauhofNachricht(['content_id' => $contentId, 'richtung' => BauhofNachricht::AUS, 'buerger' => 1,
-            'typ' => $typ, 'text' => $text, 'verarbeitet' => 1]);
+            'typ' => $typ, 'text' => $text, 'verarbeitet' => 1, 'user_id' => $userId]);
         try {
             $log->wamid = self::fensterOffen($k->wa_id)
                 ? Api::sendeText($k->wa_id, $text)
@@ -103,6 +151,7 @@ class Buergerinfo
             Yii::warning("Bürger-WhatsApp $contentId: " . $e->getMessage(), 'maengelmelder');
         }
         $log->save(false);
+        return $log;
     }
 
     private static function fensterOffen(string $waId): bool

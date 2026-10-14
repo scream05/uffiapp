@@ -5,6 +5,7 @@ namespace humhub\modules\maengelmelder\controllers;
 use humhub\modules\content\components\ContentContainerController;
 use humhub\modules\content\models\Content;
 use humhub\modules\maengelmelder\components\Bauhof;
+use humhub\modules\maengelmelder\components\Buergerinfo;
 use humhub\modules\maengelmelder\models\Auftrag;
 use humhub\modules\maengelmelder\models\BauhofNachricht;
 use humhub\modules\maengelmelder\models\MaengelAuch;
@@ -130,7 +131,7 @@ class BauhofController extends ContentContainerController
 
         $entwurf = (int)$content->state === Content::STATE_DRAFT;
 
-        if ($request->isPost && $entwurf) {
+        if ($request->isPost && $entwurf && $request->post('aktion') !== 'buerger') {
             $this->view->warn('Bitte die Gastmeldung zuerst freigeben.');
             return $this->redirect($this->zu('mangel', ['id' => $content->id]));
         }
@@ -183,6 +184,16 @@ class BauhofController extends ContentContainerController
                     return $this->renderVerlauf(['content_id' => $content->id]);
                 }
                 return $this->redirect($this->zu('mangel', ['id' => $content->id]) . '#verlauf');
+            } elseif ($aktion === 'buerger') {
+                $text = trim(mb_substr((string)$request->post('text'), 0, 1500));
+                if ($text !== '') {
+                    $fehler = Buergerinfo::nachricht($content, $text, $user);
+                    $fehler ? $this->view->error($fehler) : null;
+                }
+                if ($request->isAjax) {
+                    return $this->renderVerlauf(['content_id' => $content->id]);
+                }
+                return $this->redirect($this->zu('mangel', ['id' => $content->id]) . '#verlauf');
             } elseif ($aktion === 'senden' && $auftrag->mitarbeiter) {
                 $fehler = Bauhof::sendeAuftrag($auftrag, $user);
                 $fehler ? $this->view->error($fehler) : $this->view->success('Auftrag per WhatsApp geschickt.');
@@ -203,6 +214,7 @@ class BauhofController extends ContentContainerController
             'verlauf' => $this->verlauf(['content_id' => $content->id]),
             'kontakt' => MaengelKontakt::findOne($content->id),
             'entwurf' => $entwurf,
+            'buergerWeg' => Buergerinfo::weg($content),
         ]);
     }
 
@@ -213,7 +225,7 @@ class BauhofController extends ContentContainerController
         if ((int)$content->state === Content::STATE_DRAFT) {
             $content->getStateService()->publish();
             $this->gastHinweiseEntfernen($content->id);
-            \humhub\modules\maengelmelder\components\Buergerinfo::freigegeben($content);
+            Buergerinfo::freigegeben($content);
             $this->view->success('Meldung freigegeben. Sie erscheint jetzt auf der Karte.');
         }
         return $this->redirect($this->zu('mangel', ['id' => $content->id]));
