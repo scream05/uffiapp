@@ -215,7 +215,7 @@ class MeldungController extends ContentContainerController
             $html = $mailer->render('@humhub/views/mail/TextOnly', ['message' => $html], $mailer->htmlLayout);
             $mail = $mailer->compose()
                 ->setTo($kontakt->email)
-                ->setReplyTo($this->module->kontaktMail)
+                ->setReplyTo(\humhub\modules\maengelmelder\components\MailEingang::antwortAdresse($mangel->getContentId()))
                 ->setSubject('Ihre Mängelmeldung Nr. ' . $mangel->getContentId() . ' ist eingegangen');
             // Text/HTML direkt setzen: HumHubs Link-Dienst (go.humhub.com, für die App) würde die Links sonst umleiten;
             // Gäste haben keine App, die Links sollen direkt auf die Plattform zeigen

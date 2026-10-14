@@ -19,7 +19,8 @@ use yii\helpers\Html;
 /**
  * Infos an die meldende Person (wenn beim Melden gewünscht): bei Eingang (WhatsApp), Freigabe und jeder Statusänderung
  * per E-Mail und/oder WhatsApp. Antworten per WhatsApp landen im Verlauf der Meldung (bauhof_nachricht, buerger = 1),
- * die Bauhofleitung bekommt eine Glocke, der zugewiesene Mitarbeiter die Nachricht per WhatsApp.
+ * die Bauhofleitung bekommt eine Glocke, der zugewiesene Mitarbeiter die Nachricht per WhatsApp. Antworten per E-Mail
+ * holt MailEingang ab (Antwortadresse je Meldung) und behandelt sie genauso.
  * Außerhalb des 24-Stunden-Fensters gehen WhatsApp-Infos als Vorlage (Module::$vorlagen buergerEingang/buergerStatus).
  * „STOPP“ beendet die WhatsApp-Infos für die Nummer.
  */
@@ -123,9 +124,9 @@ class Buergerinfo
         $k = MaengelKontakt::findOne($content->id);
         $name = $k ? $k->getName() : $content->createdBy->displayName;
         $mail = "Guten Tag $name,\n\nder Bauhof hat eine Nachricht zu Ihrer Mängelmeldung Nr. {$content->id} ({$mangel->kategorie}, "
-            . $mangel->getOrt() . "):\n\n$text\n\nSie können einfach auf diese E-Mail antworten.\n\n--\n"
+            . $mangel->getOrt() . "):\n\n$text\n\nSie können einfach auf diese E-Mail antworten; Ihre Antwort geht an den Bauhof.\n\n--\n"
             . 'Rund um Uffni – Bürgerplattform der Bürgerliste Uffenheim e. V., kein Angebot der Stadt Uffenheim.';
-        $ok = self::mailSenden($weg[1], "Nachricht vom Bauhof zu Ihrer Mängelmeldung Nr. {$content->id}", $mail);
+        $ok = self::mailSenden($weg[1], "Nachricht vom Bauhof zu Ihrer Mängelmeldung Nr. {$content->id}", $mail, $content->id);
         (new BauhofNachricht(['content_id' => $content->id, 'richtung' => BauhofNachricht::AUS, 'buerger' => 1,
             'typ' => 'mail', 'text' => $text, 'verarbeitet' => 1, 'user_id' => $absender->id,
             'zustellung' => $ok ? 'gesendet' : 'fehler', 'fehler' => $ok ? null : 'E-Mail-Versand fehlgeschlagen']))->save(false);
@@ -171,17 +172,21 @@ class Buergerinfo
             'name' => $k->getName(), 'mangel' => $mangel, 'stand' => $stand, 'hinweis' => $hinweis, 'link' => $link,
             'kontaktMail' => self::module()->kontaktMail, 'gast' => $k->istGast(),
         ]);
-        self::mailSenden($an, "Neuer Stand zu Ihrer Mängelmeldung Nr. {$content->id}: $stand", $text);
+        self::mailSenden($an, "Neuer Stand zu Ihrer Mängelmeldung Nr. {$content->id}: $stand", $text, $content->id);
     }
 
-    /** Text-Mail im Layout der Plattform; Links ohne HumHubs Weiterleitungsdienst (wie die Eingangsbestätigung) */
-    public static function mailSenden(string $an, string $betreff, string $text): bool
+    /**
+     * Text-Mail im Layout der Plattform; Links ohne HumHubs Weiterleitungsdienst (wie die Eingangsbestätigung).
+     * Mit $contentId geht die Antwort an die Antwortadresse der Meldung (MailEingang) und landet im Verlauf.
+     */
+    public static function mailSenden(string $an, string $betreff, string $text, ?int $contentId = null): bool
     {
         $html = nl2br(Html::encode($text), false);
         $html = preg_replace('#https?://[^\s<]+#', '<a href="$0">$0</a>', $html);
         $mailer = Yii::$app->mailer;
         $html = $mailer->render('@humhub/views/mail/TextOnly', ['message' => $html], $mailer->htmlLayout);
-        $mail = $mailer->compose()->setTo($an)->setReplyTo(self::module()->kontaktMail)->setSubject($betreff);
+        $mail = $mailer->compose()->setTo($an)
+            ->setReplyTo($contentId ? MailEingang::antwortAdresse($contentId) : self::module()->kontaktMail)->setSubject($betreff);
         $mail->getSymfonyEmail()->text($text)->html($html);
         $ok = $mail->send();
         if (!$ok) {
@@ -273,6 +278,16 @@ class Buergerinfo
             return;
         }
         $n->updateAttributes(['verarbeitet' => 1]);
+        if ($n->typ === 'mail') {
+            // Antwort per E-Mail (MailEingang): Glocke an den Bauhof, Weiterleitung an den Mitarbeiter
+            try {
+                self::glocke($n);
+                self::anMitarbeiter($n);
+            } catch (\Throwable $e) {
+                Yii::error("Bürger-Mail $id: " . $e->getMessage(), 'maengelmelder');
+            }
+            return;
+        }
         $k = MaengelKontakt::findOne($n->content_id);
         if (!$k || !$k->wa_id) {
             return;
@@ -319,7 +334,7 @@ class Buergerinfo
                 $ack->save(false);
             }
             self::glocke($n);
-            self::anMitarbeiter($n, $k);
+            self::anMitarbeiter($n);
         } catch (\Throwable $e) {
             Yii::error("Bürger-Nachricht $id: " . $e->getMessage(), 'maengelmelder');
         }
@@ -355,15 +370,18 @@ class Buergerinfo
     }
 
     /** Zugewiesener Mitarbeiter bekommt die Nachricht über die Uffi-Nummer (Fenster/Vorlage regelt Bauhof::nachricht) */
-    private static function anMitarbeiter(BauhofNachricht $n, MaengelKontakt $k): void
+    private static function anMitarbeiter(BauhofNachricht $n): void
     {
         $m = Bauhof::bearbeiter($n->content_id);
         if ($m === null) {
             return;
         }
         $inhalt = trim((string)$n->text);
-        if ($n->file_id) {
-            $inhalt = '📷 Foto' . ($inhalt !== '' ? ": $inhalt" : '') . ' (auf der Plattform beim Auftrag zu sehen)';
+        // Weitere Fotos derselben Mail hängen als eigene Einträge daran
+        $fotos = ($n->file_id ? 1 : 0) + ($n->typ === 'mail' && $n->wamid ? (int)BauhofNachricht::find()
+                ->where(['like', 'wamid', $n->wamid . '#', false])->andWhere(['not', ['file_id' => null]])->count() : 0);
+        if ($fotos) {
+            $inhalt = '📷 ' . ($fotos > 1 ? "$fotos Fotos" : 'Foto') . ($inhalt !== '' ? ": $inhalt" : '') . ' (auf der Plattform beim Auftrag zu sehen)';
         }
         if ($inhalt === '') {
             return;

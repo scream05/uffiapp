@@ -105,6 +105,37 @@ class BauhofController extends Controller
      * Verlauf und WhatsApp-Fotos von Meldungen löschen, die seit $bauhofAufbewahrungTage abgeschlossen sind,
      * dazu Nachrichten ohne Meldung nach derselben Frist und verwaiste Dateien.
      */
+    /**
+     * Antworten der meldenden Personen per E-Mail abholen (Crontab alle 5 Min., Log rss/bauhof.log):
+     * bauhof/mail-abrufen [1=Probelauf, nichts speichern, nichts als gelesen markieren]
+     */
+    public function actionMailAbrufen($probelauf = 0)
+    {
+        try {
+            foreach (\humhub\modules\maengelmelder\components\MailEingang::abrufen((bool)$probelauf) as $zeile) {
+                $this->stdout(date('Y-m-d H:i') . " Mail-Eingang $zeile\n");
+            }
+        } catch (\Throwable $e) {
+            $this->stderr(date('Y-m-d H:i') . ' Mail-Eingang: ' . $e->getMessage() . "\n");
+            return ExitCode::UNSPECIFIED_ERROR;
+        }
+        return ExitCode::OK;
+    }
+
+    /** Antwortadresse einer Meldung anzeigen: bauhof/antwortadresse <content-id> */
+    public function actionAntwortadresse($id)
+    {
+        $this->stdout(\humhub\modules\maengelmelder\components\MailEingang::antwortAdresse((int)$id) . "\n");
+        return ExitCode::OK;
+    }
+
+    /** Eine gespeicherte Mail (.eml im Container) testweise auswerten: bauhof/mail-test <datei> [0=wirklich übernehmen] */
+    public function actionMailTest($datei, $probelauf = 1)
+    {
+        $this->stdout(\humhub\modules\maengelmelder\components\MailEingang::verarbeiten((string)file_get_contents($datei), (bool)$probelauf) . "\n");
+        return ExitCode::OK;
+    }
+
     public function actionAufraeumen()
     {
         $frist = date('Y-m-d H:i:s', time() - $this->module()->bauhofAufbewahrungTage * 86400);

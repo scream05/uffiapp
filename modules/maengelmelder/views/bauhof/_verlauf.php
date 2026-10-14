@@ -31,7 +31,7 @@ $haken = ['wartet' => ['fa-clock-o', 'wartet, bis der Mitarbeiter auf den Hinwei
     <?php else:
         $ein = $n->richtung === BauhofNachricht::EIN;
         $von = $n->buerger
-            ? ($ein ? '👤 Meldende Person (WhatsApp)' : ($n->user ? Html::encode($n->user->displayName) . ' → ' : '')
+            ? ($ein ? '👤 Meldende Person (' . ($n->typ === 'mail' ? 'E-Mail' : 'WhatsApp') . ')' : ($n->user ? Html::encode($n->user->displayName) . ' → ' : '')
                 . 'An die meldende Person (' . ($n->typ === 'mail' ? 'E-Mail' : 'WhatsApp') . ')')
             : ($ein ? ($n->mitarbeiter?->name ?? 'Mitarbeiter (gelöscht)') : ($n->user?->displayName ?? 'Bauhof (automatisch)'));
         ?>

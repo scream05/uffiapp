@@ -30,7 +30,8 @@ Neuer Stand: <?= $stand ?>
 <?= $link ?>
 
 
-Sie erhalten diese E-Mail, weil Sie beim Melden Infos per E-Mail gewünscht haben. Keine Infos mehr? Antworten Sie einfach auf diese E-Mail.
+Sie können auf diese E-Mail antworten; Ihre Antwort geht an den Bauhof.
+Sie erhalten diese E-Mail, weil Sie beim Melden Infos per E-Mail gewünscht haben. Keine Infos mehr? Antworten Sie mit STOPP.
 
 --
 Rund um Uffni – Bürgerplattform der Bürgerliste Uffenheim e. V., kein Angebot der Stadt Uffenheim.

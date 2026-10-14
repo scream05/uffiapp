@@ -126,9 +126,7 @@ if ($m && !isset($mitarbeiter[$m->id])) {
                             'placeholder' => 'Rückfrage oder Info an ' . ($kontakt?->getName() ?: $post->content->createdBy?->displayName ?? 'die meldende Person') . ' …']) ?>
                         <button class="btn btn-info" title="An die meldende Person senden"><i class="fa fa-paper-plane"></i></button>
                     </div>
-                    <small class="text-muted">Geht nur an die meldende Person, nicht öffentlich. <?= $buergerWeg[0] === 'whatsapp'
-                        ? 'Antworten erscheinen hier im Verlauf.'
-                        : 'Antworten kommen per E-Mail an ' . Html::encode(Yii::$app->getModule('maengelmelder')->kontaktMail) . '.' ?></small>
+                    <small class="text-muted">Geht nur an die meldende Person, nicht öffentlich. Antworten erscheinen hier im Verlauf.</small>
                 <?php else: ?>
                     <p class="text-muted small">Keine E-Mail-Adresse und kein WhatsApp-Kontakt hinterlegt<?= $kontakt?->telefon ? ' – bitte anrufen' : '' ?>.</p>
                 <?php endif ?>
