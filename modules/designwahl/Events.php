@@ -2,7 +2,9 @@
 
 namespace humhub\modules\designwahl;
 
+use humhub\modules\content\widgets\PermaLink;
 use humhub\modules\ui\menu\MenuLink;
+use humhub\modules\ui\menu\WidgetMenuEntry;
 use Yii;
 use yii\helpers\Url;
 
@@ -133,6 +135,28 @@ class Events
     }
 
     /** Neues Design: Stylesheet laden und html.design-neu setzen (nur beim vollen Seitenaufbau, bleibt bei PJAX) */
+    /**
+     * Gäste: im Menü neben Beiträgen (Drei-Punkte-Knopf) nur „Permalink“ – z. B. keine „Teilnehmer“-Liste
+     * bei Terminen und keine Trennlinien.
+     */
+    public static function onWallEntryControlsRun($event)
+    {
+        try {
+            if (!Yii::$app->user->isGuest) {
+                return;
+            }
+            /** @var \humhub\modules\content\widgets\WallEntryControls $menu */
+            $menu = $event->sender;
+            foreach ($menu->getEntries() as $entry) {
+                if (!($entry instanceof WidgetMenuEntry && $entry->widgetClass === PermaLink::class)) {
+                    $menu->removeEntry($entry);
+                }
+            }
+        } catch (\Throwable $e) {
+            Yii::error($e);
+        }
+    }
+
     public static function onLayoutAddons($event)
     {
         try {
@@ -236,6 +260,11 @@ JS, \yii\web\View::POS_END);
      */
     public static function onControllerBeforeAction($event)
     {
+        // Gäste: keine Teilnehmerlisten von Terminen (Namen der Teilnehmer), auch nicht über die Adresse
+        if (Yii::$app->user->isGuest && $event->action->controller->uniqueId === 'calendar/entry'
+            && in_array($event->action->id, ['modal-participants', 'participants-list'], true)) {
+            throw new \yii\web\ForbiddenHttpException();
+        }
         try {
             self::gastSprache();
             $theme = Yii::$app->view->theme;

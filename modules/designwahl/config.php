@@ -24,6 +24,7 @@ return [
         ['class' => 'humhub\modules\calendar\widgets\CalendarFilterBar', 'event' => 'beforeRun', 'callback' => [Events::class, 'onCalendarFilterBar']],
         ['class' => 'humhub\modules\comment\widgets\Form', 'event' => 'create', 'callback' => [Events::class, 'onCommentFormCreate']],
         ['class' => 'humhub\components\Controller', 'event' => 'beforeAction', 'callback' => [Events::class, 'onControllerBeforeAction']],
+        ['class' => 'humhub\modules\content\widgets\WallEntryControls', 'event' => 'run', 'callback' => [Events::class, 'onWallEntryControlsRun']],
         ['class' => LayoutAddons::class, 'event' => LayoutAddons::EVENT_BEFORE_RUN, 'callback' => [Events::class, 'onLayoutAddons']],
     ],
 ];
