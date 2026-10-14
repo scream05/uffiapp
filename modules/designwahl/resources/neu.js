@@ -88,6 +88,49 @@
         wetter(ziel.querySelector('.dn-hero'), vorlage.getAttribute('data-wetter-url'));
     }
 
+    // --- Handy: Tab-Leiste unten zeigt alle Reiter, die Platz haben ---
+    // HumHubs Überlaufprüfung (ui.topNavigation) misst am Handy falsch und schiebt Reiter in ein
+    // „Menü“-Symbol oder lässt sie rechts abschneiden. Hier: alle Reiter zurück in die Leiste (sie teilen
+    // sich die Breite, siehe neu.css); nur wenn es dann noch zu eng ist, wandern die letzten Reiter vor
+    // „Mehr“ ins Menü-Symbol – „Mehr“ bleibt immer sichtbar.
+    var handy = window.matchMedia('(max-width: 575.98px)');
+
+    function leiste() {
+        var nav = document.getElementById('top-menu-nav');
+        var sub = document.getElementById('top-menu-sub');
+        var liste = document.getElementById('top-menu-sub-dropdown');
+        if (!handy.matches || !nav || !sub || !liste) return;
+        Array.prototype.slice.call(liste.children).forEach(function (li) {
+            var i = li.querySelector('a > i');
+            if (i && !(i.nextElementSibling && i.nextElementSibling.tagName === 'BR')) {
+                i.insertAdjacentElement('afterend', document.createElement('br'));
+            }
+            nav.insertBefore(li, sub);
+        });
+        sub.style.display = 'none';
+        var mehrLi = nav.querySelector('[data-dn-mehr]');
+        mehrLi = mehrLi ? mehrLi.closest('li') : null;
+        if (mehrLi && mehrLi !== sub.previousElementSibling) nav.insertBefore(mehrLi, sub); // „Mehr“ zuletzt
+        var zuEng = function () { return nav.scrollWidth > nav.clientWidth + 1; };
+        while (zuEng()) {
+            var reiter = nav.querySelectorAll(':scope > li.top-menu-item');
+            var letzter = null;
+            for (var k = reiter.length - 1; k >= 0; k--) {
+                if (reiter[k] !== mehrLi) { letzter = reiter[k]; break; }
+            }
+            if (!letzter) break;
+            sub.style.display = '';
+            letzter.querySelectorAll('br').forEach(function (br) { br.remove(); });
+            liste.insertBefore(letzter, liste.firstChild);
+        }
+    }
+
+    function leisteSpaeter() { setTimeout(leiste, 120); } // nach HumHubs eigener Prüfung (50 ms bzw. resize)
+    window.addEventListener('resize', leisteSpaeter);
+    window.addEventListener('load', leisteSpaeter);
+    if (handy.addEventListener) handy.addEventListener('change', leisteSpaeter);
+    leisteSpaeter();
+
     // --- Fach „Mehr“ (Handy: von unten, Computer: unter der Kopfleiste) ---
     function fach() { return document.getElementById('dn-mehr'); }
 

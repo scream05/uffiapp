@@ -236,16 +236,32 @@ html.design-neu #topbar .user-title strong {
         box-shadow: 0 -6px 24px rgba(43, 74, 95, .18), 0 -1px 0 var(--dn-linie) !important;
     }
 
+    /* Reiter teilen sich die Breite gleichmäßig, lange Beschriftungen werden gekürzt statt abgeschnitten */
+    html.design-neu body #topbar > .container > #top-menu-nav > li {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
     html.design-neu body #topbar > .container > #top-menu-nav > li > a {
         background: transparent !important;
         color: var(--hh-ct-bottom-menu-text-color) !important;
         font-weight: 700;
+        display: block;
+        min-width: 0 !important;
+        max-width: none !important;
+        padding-left: 2px !important;
+        padding-right: 2px !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     /* Aktiver Reiter: Symbol in einer farbigen Pille */
     html.design-neu body #topbar > .container > #top-menu-nav > li > a i {
-        display: inline-block;
+        display: block;
+        margin: 0 auto 1px;
         width: 46px;
+        max-width: 100%;
         border-radius: 999px;
         transition: background-color .2s ease, color .2s ease;
     }
