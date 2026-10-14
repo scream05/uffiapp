@@ -167,8 +167,28 @@ class BauhofController extends Controller
                 ->andWhere(['<', 'updated_at', $kontaktFrist])],
             ['content_id' => Content::find()->select('id')->where(['state' => Content::STATE_DELETED])],
         ]);
-        if ($n || $f || $k) {
-            $this->stdout(date('Y-m-d H:i:s') . ": $n Nachrichten, $f verwaiste Dateien, $k Kontaktdaten gelöscht\n");
+        // Höchstfrist auch für nie abgeschlossene Meldungen: Kontaktdaten und Nachrichten mit der meldenden Person
+        $hoechst = date('Y-m-d H:i:s', time() - $this->module()->kontaktHoechstTage * 86400);
+        $uralt = Content::find()->select('id')->where(['<', 'created_at', $hoechst]);
+        foreach (BauhofNachricht::find()->where(['buerger' => 1, 'content_id' => $uralt])->each() as $msg) {
+            $msg->delete();
+            $n++;
+        }
+        $k += MaengelKontakt::deleteAll(['content_id' => $uralt]);
+        // Nie geprüfte Gastmeldungen (Entwürfe des Gast-Kontos) samt Fotos und Kontaktdaten löschen
+        $g = 0;
+        $gast = User::findOne(['username' => $this->module()->gastKonto]);
+        if ($gast) {
+            foreach (Content::find()->where(['state' => Content::STATE_DRAFT, 'created_by' => $gast->id,
+                'object_model' => \humhub\modules\post\models\Post::class])
+                         ->andWhere(['<', 'created_at', date('Y-m-d H:i:s', time() - $this->module()->gastEntwurfTage * 86400)])->all() as $c) {
+                MaengelKontakt::deleteAll(['content_id' => $c->id]);
+                $c->getModel()?->hardDelete();
+                $g++;
+            }
+        }
+        if ($n || $f || $k || $g) {
+            $this->stdout(date('Y-m-d H:i:s') . ": $n Nachrichten, $f verwaiste Dateien, $k Kontaktdaten, $g ungeprüfte Gastmeldungen gelöscht\n");
         }
         return ExitCode::OK;
     }

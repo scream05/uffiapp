@@ -22,6 +22,9 @@ class MailEingang
     public const IMAP_HOST = 'imap.gmail.com';
     public const IMAP_PORT = 993;
     private const MAX_FOTOS = 3;
+    /** Gmail-Label für verarbeitete Antworten; nach LOESCHEN_TAGE kommen sie in den Papierkorb */
+    public const LABEL = 'Maengelmelder';
+    public const LOESCHEN_TAGE = 30;
     private const MAX_TEXT = 3000;
 
     private static function module(): Module
@@ -93,16 +96,43 @@ class MailEingang
                 if (!$probelauf) {
                     $erledigt['uids'][] = $uid;
                     $imap->befehl("UID STORE $uid +FLAGS (\\Seen)");
+                    try {
+                        $imap->befehl("UID STORE $uid +X-GM-LABELS (" . self::LABEL . ")"); // für das Aufräumen (nur Gmail)
+                    } catch (\Throwable $e) {
+                    }
                 }
             }
             if (!$probelauf) {
                 $erledigt['uids'] = array_slice($erledigt['uids'], -500);
                 self::module()->settings->set('mailErledigt', json_encode($erledigt));
             }
+            // Einmal täglich: verarbeitete Antworten nach LOESCHEN_TAGE in den Papierkorb (Gmail leert ihn nach 30 Tagen)
+            if (!$probelauf && self::module()->settings->get('mailAufgeraeumt') !== date('Y-m-d')) {
+                $n = self::aufraeumen($imap);
+                self::module()->settings->set('mailAufgeraeumt', date('Y-m-d'));
+                if ($n) {
+                    $log[] = "$n verarbeitete Antworten älter als " . self::LOESCHEN_TAGE . ' Tage in den Papierkorb verschoben';
+                }
+            }
         } finally {
             $imap->logout();
         }
         return $log;
+    }
+
+    /** Verarbeitete Antworten (Label) älter als LOESCHEN_TAGE in den Papierkorb; gibt die Anzahl zurück */
+    private static function aufraeumen(Imap $imap): int
+    {
+        $papierkorb = $imap->ordnerMit('\\Trash');
+        if ($papierkorb === null) {
+            Yii::warning('Mail-Eingang: Papierkorb im Postfach nicht gefunden – alte Antworten bleiben liegen', 'maengelmelder');
+            return 0;
+        }
+        $uids = $imap->suche('X-GM-RAW "label:' . self::LABEL . ' older_than:' . self::LOESCHEN_TAGE . 'd"');
+        foreach (array_chunk($uids, 100) as $teil) {
+            $imap->befehl('UID MOVE ' . implode(',', $teil) . ' "' . addcslashes($papierkorb, '"\\') . '"');
+        }
+        return count($uids);
     }
 
     /** Eine Mail (roh) verarbeiten; gibt eine Protokollzeile zurück */
@@ -281,6 +311,17 @@ class Imap
     {
         $a = $this->befehl("UID SEARCH $kriterien");
         return preg_match('/^\* SEARCH ?([\d ]*)/m', $a, $m) ? array_map('intval', array_filter(explode(' ', trim($m[1])))) : [];
+    }
+
+    /** Name des Ordners mit dem Sonderattribut (z. B. \\Trash = Papierkorb, je nach Sprache anders benannt) */
+    public function ordnerMit(string $attribut): ?string
+    {
+        foreach (explode("\n", $this->befehl('LIST "" "*"')) as $zeile) {
+            if (stripos($zeile, $attribut) !== false && preg_match('/"([^"]+)"\s*$/', trim($zeile), $m)) {
+                return $m[1];
+            }
+        }
+        return null;
     }
 
     /** Empfänger-Kopfzeilen einer Mail (ohne sie als gelesen zu markieren) */

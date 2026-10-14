@@ -13,6 +13,8 @@ use yii\helpers\Url;
 use yii\web\View;
 
 ChatAsset::register($this);
+// Links nur zu diesen Seiten klickbar (siehe Module::$linkDomains)
+$this->registerJs('window.kiChatDomains = ' . json_encode(Yii::$app->getModule('ki-assistent')->getLinkDomains()) . ';', \yii\web\View::POS_HEAD);
 
 ?>
 <div class="container ki-page">
@@ -40,7 +42,7 @@ ChatAsset::register($this);
                 </p>
                 <?php if (Yii::$app->user->isAdmin()): ?>
                 <p class="help-block" id="ki-usage">
-                    Diesen Monat: <?= $usage[0] ?> von <?= $limit ?> Anfragen, <?= number_format($usage[1], 0, ',', '.') ?> Eingabe- / <?= number_format($usage[2], 0, ',', '.') ?> Ausgabe-Tokens
+                    Diesen Monat: <?= $usage[0] ?> von <?= $limit ?> Anfragen (davon <?= $usage[3] ?? 0 ?> ohne Konto), <?= number_format($usage[1], 0, ',', '.') ?> Eingabe- / <?= number_format($usage[2], 0, ',', '.') ?> Ausgabe-Tokens
                 </p>
                 <?php endif ?>
             </details>
@@ -86,7 +88,7 @@ ChatAsset::register($this);
         onAsk: function () { info.removeAttribute('open'); },
         onUsage: function (usage) {
             if (!document.getElementById('ki-usage')) return;
-            document.getElementById('ki-usage').textContent = 'Diesen Monat: ' + usage[0] + ' von <?= $limit ?> Anfragen, '
+            document.getElementById('ki-usage').textContent = 'Diesen Monat: ' + usage[0] + ' von <?= $limit ?> Anfragen (davon ' + (usage[3] || 0) + ' ohne Konto), '
                 + usage[1].toLocaleString('de-DE') + ' Eingabe- / ' + usage[2].toLocaleString('de-DE') + ' Ausgabe-Tokens';
         }
     });

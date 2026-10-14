@@ -12,6 +12,8 @@ return [
         'uebersicht' => 'humhub\modules\uebersicht\commands\UebersichtController',
     ],
     'events' => [
+        // Kontolöschung: Benutzereinstellungen der eigenen Module (Abfuhr, Design, Übersicht, Uffi …) löschen
+        ['class' => 'humhub\modules\user\models\User', 'event' => 'beforeSoftDelete', 'callback' => [Events::class, 'onUserLoeschen']],
         ['class' => Application::class, 'event' => Application::EVENT_BEFORE_REQUEST, 'callback' => [Events::class, 'onBeforeRequest']],
         ['class' => 'humhub\modules\user\widgets\AccountTopMenu', 'event' => 'init', 'callback' => [Events::class, 'onAccountTopMenuInit']],
         ['class' => 'humhub\modules\space\widgets\HeaderControlsMenu', 'event' => 'run', 'callback' => [Events::class, 'onSpaceHeaderControlsRun']],

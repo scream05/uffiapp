@@ -7,8 +7,32 @@ class Module extends \humhub\components\Module
     /** Obergrenze an Anfragen pro Kalendermonat, damit das Claude-Guthaben nicht unbemerkt aufgebraucht wird */
     public int $monthlyLimit = 1000;
 
-    /** Obergrenze je Konto bzw. (bei Gästen) je IP-Adresse und Stunde, gegen Missbrauch der offenen Nutzung */
+    /** Davon höchstens so viele für Gäste (ohne Konto), damit Missbrauch Uffi nicht für alle Angemeldeten abschaltet */
+    public int $guestMonthlyLimit = 400;
+
+    /** Kostenbremse je Monat: Eingabe-Tokens + 5 × Ausgabe-Tokens (Ausgabe kostet ein Vielfaches) */
+    public int $monthlyTokenLimit = 60000000;
+
+    /** Obergrenze je Konto bzw. (bei Gästen) je Anschluss und Stunde bzw. Tag, gegen Missbrauch der offenen Nutzung */
     public int $hourlyLimit = 20;
+    public int $dailyLimit = 60;
+
+    /** Bewertungen 👍/👎 je Konto bzw. Anschluss und Stunde */
+    public int $feedbackHourlyLimit = 10;
+
+    /**
+     * Links in Uffis Antworten sind nur zu diesen Seiten klickbar (Endung der Domain); alle anderen Adressen
+     * erscheinen als Text. Schützt davor, dass eingeschleuste Texte (Beiträge, Meldungen) Phishing-Links empfehlen.
+     * Dazu kommen die Websites der Vereine aus dem Vereinsverzeichnis.
+     */
+    public array $linkDomains = [
+        'rundumuffni.de', 'uffenheim.de', 'stadtwerke-uffenheim.de', 'buergerliste-uffenheim.de',
+        'bayern.de', 'bund.de', 'gov.de', 'bayernportal.de', 'komuna.net', 'kreis-nea.de', 'terminland.de',
+        'personalausweisportal.de', 'bundesjustizamt.de', 'bundespolizei.de', 'auswaertiges-amt.de', 'personenstandsrecht.de',
+        'datenschutz-bayern.de', 'digitale-verwaltung.de', 'buergerdienste-online.de', 'little-bird.de', 'vvm-info.de',
+        'blak.de', 'notdienst-portal.de', 'aponet.de', '116117.de', 'zahnarzt-notdienst.de', 'diakonie-neustadt-aisch.de',
+        'wikipedia.org', 'openstreetmap.org', 'dwd.de',
+    ];
 
     /**
      * Online-Terminbuchung der Stadt (Bürgerbüro: Einwohnermeldeamt, Pass-, Standes-, Gewerbe-, Ordnungsamt, Fundsachen).
@@ -54,29 +78,105 @@ class Module extends \humhub\components\Module
         $this->settings->user()?->set('age-confirmed', date('Y-m-d H:i:s'));
     }
 
-    /** Zählt eine Anfrage je Konto bzw. IP-Adresse; false, wenn das Stundenlimit erreicht ist */
-    public function takeHourly(): bool
+    /** Wer fragt: Konto, sonst Anschluss (IPv6 auf das /64-Netz gekürzt – ein Anschluss hat dort viele Adressen) */
+    public function ident(): string
     {
-        $who = \Yii::$app->user->isGuest ? 'ip-' . \Yii::$app->request->userIP : 'u-' . \Yii::$app->user->id;
-        $key = 'ki-stunde-' . $who . '-' . date('YmdH');
-        $n = (int)\Yii::$app->cache->get($key) + 1;
-        if ($n > $this->hourlyLimit) {
+        if (!\Yii::$app->user->isGuest) {
+            return 'u-' . \Yii::$app->user->id;
+        }
+        $ip = (string)\Yii::$app->request->userIP;
+        if (str_contains($ip, ':') && ($bin = @inet_pton($ip)) !== false) {
+            $ip = bin2hex(substr($bin, 0, 8)) . '::/64';
+        }
+        return 'ip-' . $ip;
+    }
+
+    /**
+     * Prüft alle Grenzen und reserviert eine Anfrage (atomar über die Datenbank-Sperre, damit parallele Anfragen
+     * die Grenzen nicht überspringen). Gibt null zurück oder den Grund für die Ablehnung.
+     */
+    public function reserve(): ?string
+    {
+        $mutex = \Yii::$app->mutex;
+        if (!$mutex->acquire('ki-assistent-limit', 5)) {
+            return 'Uffi ist gerade sehr gefragt. Bitte versuchen Sie es gleich noch einmal.';
+        }
+        try {
+            [$requests, $in, $out, $guests] = $this->getUsage();
+            if ($requests >= $this->monthlyLimit || $in + 5 * $out >= $this->monthlyTokenLimit) {
+                return 'Uffi macht für diesen Monat Pause – das Kontingent ist aufgebraucht. Ab dem 1. geht es weiter.';
+            }
+            $gast = \Yii::$app->user->isGuest;
+            if ($gast && $guests >= $this->guestMonthlyLimit) {
+                return 'Ohne Konto ist Uffis Kontingent für diesen Monat aufgebraucht. Mit einem kostenlosen Konto geht es weiter.';
+            }
+            $cache = \Yii::$app->cache;
+            $stunde = 'ki-stunde-' . $this->ident() . '-' . date('YmdH');
+            $tag = 'ki-tag-' . $this->ident() . '-' . date('Ymd');
+            if ((int)$cache->get($stunde) >= $this->hourlyLimit || (int)$cache->get($tag) >= $this->dailyLimit) {
+                return 'Sie haben schon viele Fragen gestellt. Bitte versuchen Sie es später noch einmal.';
+            }
+            $cache->set($stunde, (int)$cache->get($stunde) + 1, 3600);
+            $cache->set($tag, (int)$cache->get($tag) + 1, 86400);
+            $this->saveUsage([$requests + 1, $in, $out, $guests + ($gast ? 1 : 0)]);
+            return null;
+        } finally {
+            $mutex->release('ki-assistent-limit');
+        }
+    }
+
+    /** Bewertungen begrenzen (je Konto bzw. Anschluss und Stunde) */
+    public function takeFeedback(): bool
+    {
+        $key = 'ki-feedback-' . $this->ident() . '-' . date('YmdH');
+        $cache = \Yii::$app->cache;
+        if ((int)$cache->get($key) >= $this->feedbackHourlyLimit) {
             return false;
         }
-        \Yii::$app->cache->set($key, $n, 3600);
+        $cache->set($key, (int)$cache->get($key) + 1, 3600);
         return true;
     }
 
-    /** Zähler für den laufenden Monat: [Anfragen, Eingabe-Tokens, Ausgabe-Tokens] */
+    /** Zähler für den laufenden Monat: [Anfragen, Eingabe-Tokens, Ausgabe-Tokens, davon Gast-Anfragen] */
     public function getUsage(): array
     {
         $usage = json_decode((string)$this->settings->get('usage-' . date('Y-m')), true);
-        return is_array($usage) ? $usage + [0, 0, 0] : [0, 0, 0];
+        return array_values(array_map('intval', is_array($usage) ? $usage + [0, 0, 0, 0] : [0, 0, 0, 0]));
     }
 
+    private function saveUsage(array $usage): void
+    {
+        $this->settings->set('usage-' . date('Y-m'), json_encode(array_values($usage)));
+    }
+
+    /** Tokens nach der Antwort nachtragen (die Anfrage selbst zählt schon bei reserve()) */
     public function addUsage(int $promptTokens, int $outputTokens): void
     {
-        [$requests, $in, $out] = $this->getUsage();
-        $this->settings->set('usage-' . date('Y-m'), json_encode([$requests + 1, $in + $promptTokens, $out + $outputTokens]));
+        $mutex = \Yii::$app->mutex;
+        $mutex->acquire('ki-assistent-limit', 5);
+        try {
+            [$requests, $in, $out, $guests] = $this->getUsage();
+            $this->saveUsage([$requests, $in + $promptTokens, $out + $outputTokens, $guests]);
+        } finally {
+            $mutex->release('ki-assistent-limit');
+        }
+    }
+
+    /** Hosts, deren Links im Chat klickbar sind (Domain-Endungen + Websites der Vereine) */
+    public function getLinkDomains(): array
+    {
+        return \Yii::$app->cache->getOrSet('ki-link-domains', function () {
+            $domains = $this->linkDomains;
+            if (\Yii::$app->db->getTableSchema('verein') !== null) {
+                foreach ((new \yii\db\Query())->select('website')->from('verein')->where(['not', ['website' => null]])
+                             ->andWhere(['!=', 'status', 'vorgeschlagen'])->column() as $url) {
+                    $host = strtolower((string)parse_url($url, PHP_URL_HOST));
+                    if ($host !== '') {
+                        $domains[] = preg_replace('/^www\./', '', $host);
+                    }
+                }
+            }
+            return array_values(array_unique($domains));
+        }, 3600);
     }
 }

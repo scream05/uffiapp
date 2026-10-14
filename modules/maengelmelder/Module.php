@@ -56,6 +56,12 @@ class Module extends ContentContainerModule
     /** Kontaktdaten der Meldenden so viele Tage nach Abschluss der Meldung löschen */
     public int $kontaktAufbewahrungTage = 183;
 
+    /** Höchstfrist für Kontaktdaten und Nachrichten auch bei nie abgeschlossenen Meldungen (ab Meldung) */
+    public int $kontaktHoechstTage = 730;
+
+    /** Gastmeldungen, die der Bauhof so lange nicht geprüft hat, werden samt Kontaktdaten und Fotos gelöscht */
+    public int $gastEntwurfTage = 60;
+
     public function getNotifications()
     {
         return [notifications\BauhofMeldung::class, notifications\GastmeldungNeu::class];

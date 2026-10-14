@@ -19,6 +19,7 @@ class FloatingChat extends Widget
             /** @var Module $module */
             $module = Yii::$app->getModule('ki-assistent');
             $bundle = ChatAsset::register($this->view);
+            $this->view->registerJs('window.kiChatDomains = ' . json_encode(\Yii::$app->getModule('ki-assistent')->getLinkDomains()) . ';', \yii\web\View::POS_HEAD);
 
             return $this->render('floatingChat', [
                 'avatar' => $bundle->baseUrl . '/avatar.svg',

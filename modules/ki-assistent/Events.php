@@ -7,6 +7,16 @@ use yii\helpers\Url;
 
 class Events
 {
+    /** Täglich: Bewertungen nach Feedback::KEEP_DAYS löschen (Datenschutzerklärung Abschnitt 10) */
+    public static function onCronDaily($event)
+    {
+        try {
+            \humhub\modules\kiAssistent\models\Feedback::cleanup();
+        } catch (\Throwable $e) {
+            Yii::error($e);
+        }
+    }
+
     public static function onTopMenuInit($event)
     {
         try {

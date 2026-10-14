@@ -11,6 +11,22 @@ use yii\helpers\Url;
 
 class Events
 {
+    /** Module dieses Projekts, deren Benutzereinstellungen beim Löschen eines Kontos mit gelöscht werden */
+    public const EIGENE_MODULE = ['abfuhr', 'designwahl', 'uebersicht', 'ki-assistent', 'vereine', 'maengelmelder',
+        'mitteilungsblatt', 'notdienst', 'whatsapp', 'facebook'];
+
+    public static function onUserLoeschen($event)
+    {
+        try {
+            $user = $event->user ?? $event->sender;
+            \humhub\modules\content\models\ContentContainerSetting::deleteAll([
+                'contentcontainer_id' => $user->contentcontainer_id, 'module_id' => self::EIGENE_MODULE]);
+            Yii::$app->cache->flush(); // Einstellungen liegen auch im Cache
+        } catch (\Throwable $e) {
+            Yii::error($e);
+        }
+    }
+
     /** Übersicht angemeldeter Nutzer nach „Meine Übersicht“ (filters/MeineUebersicht) */
     public static function onBeforeRequest($event)
     {

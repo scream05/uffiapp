@@ -9,6 +9,18 @@ use Yii;
 
 class Events
 {
+    public static function onUserLoeschen($event)
+    {
+        try {
+            $user = $event->user ?? $event->sender;
+            models\MaengelKontakt::deleteAll(['user_id' => $user->id]);
+            \Yii::$app->db->createCommand()->delete('maengel_auch', ['user_id' => $user->id])->execute();
+            models\BauhofNachricht::updateAll(['user_id' => null], ['user_id' => $user->id]);
+        } catch (\Throwable $e) {
+            \Yii::error($e);
+        }
+    }
+
     /** Status-Etikett unter jedem Beitrag in Spaces mit aktivem Mängelmelder */
     public static function onWallEntryAddonsInit($event)
     {

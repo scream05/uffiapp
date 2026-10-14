@@ -12,6 +12,9 @@ return [
         'bauhof' => 'humhub\modules\maengelmelder\commands\BauhofController',
     ],
     'events' => [
+        // Kontolöschung: Kontaktdaten/Telefonnummer, „Betrifft mich auch“; Absender im Bauhof-Verlauf anonymisieren
+        ['class' => 'humhub\modules\user\models\User', 'event' => 'beforeSoftDelete', 'callback' => [Events::class, 'onUserLoeschen']],
+        ['class' => 'humhub\modules\user\models\User', 'event' => 'beforeDelete', 'callback' => [Events::class, 'onUserLoeschen']],
         // WhatsApp-Nachrichten von Bauhof-Mitarbeitern (Klassen als Text: WhatsApp-Modul evtl. noch nicht geladen)
         ['class' => 'humhub\modules\whatsapp\components\Verarbeitung', 'event' => 'empfangen',
             'callback' => ['humhub\modules\maengelmelder\components\Bauhof', 'onEmpfangen']],

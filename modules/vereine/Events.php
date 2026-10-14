@@ -11,6 +11,35 @@ use Yii;
 
 class Events
 {
+    /** Abgelehnte Vereinsbeiträge so viele Tage nach der Prüfung löschen */
+    public const ABGELEHNT_TAGE = 30;
+
+    public static function onUserLoeschen($event)
+    {
+        try {
+            $user = $event->user ?? $event->sender;
+            VereinVerwalter::deleteAll(['user_id' => $user->id]);
+            foreach (VereinBeitrag::find()->where(['user_id' => $user->id])
+                         ->andWhere(['!=', 'status', VereinBeitrag::STATUS_VEROEFFENTLICHT])->all() as $b) {
+                $b->delete(); // samt Bildern
+            }
+        } catch (\Throwable $e) {
+            Yii::error($e);
+        }
+    }
+
+    public static function onCronDaily($event)
+    {
+        try {
+            foreach (VereinBeitrag::find()->where(['status' => VereinBeitrag::STATUS_ABGELEHNT])
+                         ->andWhere(['<', 'geprueft_am', date('Y-m-d H:i:s', strtotime('-' . self::ABGELEHNT_TAGE . ' days'))])->all() as $b) {
+                $b->delete();
+            }
+        } catch (\Throwable $e) {
+            Yii::error($e);
+        }
+    }
+
     public static function onMetaSearchInit($event)
     {
         if (!Yii::$app->user->isGuest && Yii::$app->getModule('vereine')->getDirectorySpace() !== null) {

@@ -30,13 +30,21 @@ window.kiChat = function (root, opts) {
         return url.indexOf(location.origin + '/') === 0 || /^\/(?!\/)/.test(url) ? '' : ' target="_blank" rel="noopener"';
     }
 
-    // Kleines, sicheres Markdown: erst alles escapen, dann nur Links (http/https), fett und Listen
+    // Links nur zu vertrauten Seiten klickbar (Liste vom Server: window.kiChatDomains), alle anderen bleiben Text
+    function erlaubt(url) {
+        var host;
+        try { host = new URL(url.replace(/&amp;/g, '&')).hostname.toLowerCase(); } catch (e) { return false; }
+        if (host === location.hostname) return true;
+        return (window.kiChatDomains || []).some(function (d) { return host === d || host.slice(-(d.length + 1)) === '.' + d; });
+    }
+
+    // Kleines, sicheres Markdown: erst alles escapen, dann nur Links (http/https, vertraute Seiten), fett und Listen
     function render(text) {
         return esc(text).split('\n').map(function (line) {
             line = line.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, function (m, label, url) {
-                return '<a href="' + url + '"' + linkAttrs(url) + '>' + label + '</a>';
+                return erlaubt(url) ? '<a href="' + url + '"' + linkAttrs(url) + '>' + label + '</a>' : label + ' (' + url + ')';
             }).replace(/(^|[\s(])(https?:\/\/[^\s<)]+)/g, function (m, pre, url) {
-                return pre + '<a href="' + url + '"' + linkAttrs(url) + '>' + url + '</a>';
+                return erlaubt(url) ? pre + '<a href="' + url + '"' + linkAttrs(url) + '>' + url + '</a>' : m;
             }).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
                 .replace(/`([^`]+)`/g, '<code>$1</code>');
             if (/^#{1,4} /.test(line)) return '<strong>' + line.replace(/^#{1,4} /, '') + '</strong>';

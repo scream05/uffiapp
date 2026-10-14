@@ -207,7 +207,7 @@ class Verarbeitung
         if ($medien === [] && (mb_strlen($text) < 40 || !preg_match('/\d/', $text))) {
             $markieren(Nachricht::STATUS_IGNORIERT, 'Kein Plakat und kein Text mit Datum');
             self::antworten($first->wa_id, self::HILFE, $log);
-            $log("· {$first->wa_id}: kein Plakat/Datum, Hilfe gesendet");
+            $log("· Gruppe {$first->gruppe}: kein Plakat/Datum, Hilfe gesendet");
             return;
         }
         [$anzahl] = $module->getUsage();
@@ -221,7 +221,7 @@ class Verarbeitung
             [$termine, $keinTermin, $in, $out] = Auslesen::termine($text, $medien, $kategorien);
             $module->addUsage($in, $out);
         } catch (\Throwable $e) {
-            $log("! Auswertung {$first->wa_id}: {$e->getMessage()}");
+            $log("! Auswertung Gruppe {$first->gruppe}: {$e->getMessage()}");
             // Bei Ausfall der KI später erneut versuchen; nach 6 Stunden als Fehler im Eingang zeigen
             if (strtotime($first->empfangen_at) < time() - 6 * 3600) {
                 $markieren(Nachricht::STATUS_FEHLER, 'Auswertung fehlgeschlagen: ' . $e->getMessage());
@@ -243,7 +243,7 @@ class Verarbeitung
             }
         }
         $markieren(Nachricht::STATUS_VERARBEITET, $entwuerfe ? count($entwuerfe) . ' Termin(e) erkannt' : 'Kein Termin: ' . ($keinTermin ?: 'nicht erkannt'));
-        $log("+ {$first->wa_id}: " . count($medien) . ' Datei(en), ' . count($entwuerfe) . ' Termin(e)' . ($entwuerfe ? '' : " – $keinTermin"));
+        $log("+ Gruppe {$first->gruppe}: " . count($medien) . ' Datei(en), ' . count($entwuerfe) . ' Termin(e)' . ($entwuerfe ? '' : " – $keinTermin"));
 
         if ($entwuerfe) {
             $liste = implode("\n", array_map(fn(Entwurf $e) => '• ' . $e->titel . ' – ' . self::wann($e), $entwuerfe));
@@ -284,7 +284,7 @@ class Verarbeitung
             Api::sendeText($waId, $text);
             return true;
         } catch (\Throwable $e) {
-            ($log ?? fn($s) => Yii::warning($s, 'whatsapp'))("! Antwort an $waId: {$e->getMessage()}");
+            ($log ?? fn($s) => Yii::warning($s, 'whatsapp'))("! Antwort an …" . substr($waId, -3) . ": {$e->getMessage()}");
             return false;
         }
     }
@@ -314,7 +314,8 @@ class Verarbeitung
     {
         $frist = date('Y-m-d H:i:s', time() - self::module()->aufbewahrungTage * 86400);
         $offen = Entwurf::find()->select('gruppe')->where(['status' => Entwurf::STATUS_OFFEN])->column();
-        $alt = Nachricht::find()->where(['<', 'empfangen_at', $frist])->andWhere(['not', ['status' => Nachricht::STATUS_NEU]])
+        // Auch nie verarbeitete Nachrichten (Status „neu“) fallen nach der Frist weg – Telefonnummern nicht länger als 30 Tage
+        $alt = Nachricht::find()->where(['<', 'empfangen_at', $frist])
             ->andWhere(['or', ['gruppe' => null], ['not in', 'gruppe', $offen ?: ['']]])->all();
         foreach ($alt as $n) {
             $n->delete();

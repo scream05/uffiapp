@@ -63,7 +63,11 @@ class ChatController extends Controller
         $history = array_values(array_filter(array_map(fn($m) => [
             'role' => ($m['role'] ?? '') === 'model' ? 'model' : 'user',
             'text' => mb_substr(trim((string)($m['text'] ?? '')), 0, 2000),
-        ], array_slice($history, -20)), fn($m) => $m['text'] !== ''));
+        ], array_slice($history, -8)), fn($m) => $m['text'] !== ''));
+        // Verlauf begrenzen (Kosten, eingeschleuste Texte): höchstens 8 Nachrichten und 8000 Zeichen, die neuesten zählen
+        while (count($history) > 1 && array_sum(array_map(fn($m) => mb_strlen($m['text']), $history)) > 8000) {
+            array_shift($history);
+        }
         // Das Gespräch muss mit dem Nutzer beginnen und mit seiner Frage enden
         while ($history !== [] && $history[0]['role'] !== 'user') {
             array_shift($history);
@@ -77,13 +81,11 @@ class ChatController extends Controller
         }
         $key = $this->module->getApiKey();
         if ($key === null) {
-            return $this->asJson(['error' => 'Kein Claude-Schlüssel hinterlegt (secrets/anthropic_api_key).']);
+            Yii::error('KI-Assistent: kein Claude-Schlüssel hinterlegt (secrets/anthropic_api_key)', 'ki-assistent');
+            return $this->asJson(['error' => 'Uffi ist gerade nicht erreichbar. Bitte versuchen Sie es später noch einmal.']);
         }
-        if ($this->module->getUsage()[0] >= $this->module->monthlyLimit) {
-            return $this->asJson(['error' => 'Uffi macht für diesen Monat Pause – das Kontingent ist aufgebraucht. Ab dem 1. geht es weiter.']);
-        }
-        if (!$this->module->takeHourly()) {
-            return $this->asJson(['error' => 'Sie haben in dieser Stunde schon viele Fragen gestellt. Bitte versuchen Sie es später noch einmal.']);
+        if (($grund = $this->module->reserve()) !== null) {
+            return $this->asJson(['error' => $grund]);
         }
 
         try {
@@ -92,7 +94,7 @@ class ChatController extends Controller
         } catch (\Throwable $e) {
             // Nur die Fehlermeldung protokollieren, nie den Inhalt der Frage
             Yii::error('KI-Assistent: ' . $e->getMessage(), 'ki-assistent');
-            return $this->asJson(['error' => 'Die KI ist gerade nicht erreichbar. ' . $e->getMessage()]);
+            return $this->asJson(['error' => 'Uffi ist gerade nicht erreichbar. Bitte versuchen Sie es später noch einmal.']);
         }
         $this->module->addUsage($in, $out);
         // „memo“ hängt der Browser an den Verlauf an, damit die KI später weiß, welche Aktionen schon liefen
@@ -146,6 +148,9 @@ class ChatController extends Controller
     public function actionFeedback()
     {
         $r = Yii::$app->request;
+        if (!$this->module->takeFeedback()) {
+            return $this->asJson(['error' => 'Danke – für den Moment haben wir genug Bewertungen von Ihnen.']);
+        }
         $rating = (int)$r->post('bewertung') === 1 ? 1 : -1;
         $fb = new Feedback([
             'bewertung' => $rating,
@@ -159,7 +164,6 @@ class ChatController extends Controller
             return $this->asJson(['error' => 'Ungültige Anfrage']);
         }
         $fb->save(false);
-        Feedback::cleanup();
         return $this->asJson(['ok' => true]);
     }
 
