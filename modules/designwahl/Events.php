@@ -143,6 +143,10 @@ class Events
                 assets\KalenderAsset::register(Yii::$app->view);
             } else {
                 self::abbrechenKnopf();
+                // Gäste: Space-Kopf ohne Zahnrad-Menü (nur „Über“) – die Leiste darunter entfällt ganz
+                Yii::$app->view->registerCss(
+                    '.panel-profile > .panel-body:has(#space-header-controls-menu) { display: none; }'
+                );
             }
         } catch (\Throwable $e) {
             Yii::error($e);
