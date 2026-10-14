@@ -7,6 +7,7 @@
  * @var int $fotos
  * @var string $karteUrl
  * @var string $kontaktMail
+ * @var bool $infoMail
  */
 ?>
 Guten Tag <?= $name ?>,
@@ -27,7 +28,7 @@ Der Bauhof prüft Ihre Meldung und schaltet sie danach auf der Karte frei. Dort 
 <?= $karteUrl ?>
 
 
-Bei Rückfragen meldet sich der Bauhof über die angegebenen Kontaktdaten.
+Bei Rückfragen meldet sich der Bauhof über die angegebenen Kontaktdaten.<?= $infoMail ? ' Über jede Änderung am Bearbeitungsstand informieren wir Sie per E-Mail.' : '' ?>
 
 Sie erhalten diese E-Mail, weil Ihre Adresse bei einer Mängelmeldung angegeben wurde. Waren Sie das nicht? Dann schreiben Sie bitte an <?= $kontaktMail ?>, wir löschen die Angaben.
 

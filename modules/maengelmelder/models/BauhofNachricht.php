@@ -26,6 +26,7 @@ use humhub\modules\user\models\User;
  * @property int|null $user_id
  * @property int $verarbeitet
  * @property string|null $gelesen_at
+ * @property int $buerger Nachricht an/von der meldenden Person (nicht Mitarbeiter)
  * @property string $created_at
  * @property-read Mitarbeiter|null $mitarbeiter
  * @property-read User|null $user

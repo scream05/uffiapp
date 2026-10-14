@@ -15,6 +15,9 @@ use humhub\modules\user\models\User;
  * @property string|null $nachname
  * @property string|null $email
  * @property string|null $telefon
+ * @property int $info_mail Über Statusänderungen per E-Mail informieren
+ * @property int $info_whatsapp … per WhatsApp an wa_id
+ * @property string|null $wa_id Telefon im WhatsApp-Format (nur Ziffern, mit Ländervorwahl)
  * @property string $created_at
  * @property-read User|null $user
  */

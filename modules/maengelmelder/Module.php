@@ -35,7 +35,8 @@ class Module extends ContentContainerModule
     public string $bauhofGruppe = 'Bauhof';
 
     /** WhatsApp-Vorlagen für den Erstkontakt außerhalb des 24-Stunden-Fensters (siehe commands/BauhofController) */
-    public array $vorlagen = ['auftrag' => 'bauhof_auftrag', 'nachricht' => 'bauhof_nachricht'];
+    public array $vorlagen = ['auftrag' => 'bauhof_auftrag', 'nachricht' => 'bauhof_nachricht',
+        'buergerEingang' => 'maengel_eingang', 'buergerStatus' => 'maengel_status'];
     public string $vorlagenSprache = 'de';
 
     /** Verlauf und Fotos des Bauhofs so viele Tage nach Abschluss einer Meldung löschen */
@@ -82,6 +83,12 @@ class Module extends ContentContainerModule
             return [new permissions\ManageStatus()];
         }
         return $contentContainer instanceof \humhub\modules\space\models\Space ? [new permissions\MangelMelden()] : [];
+    }
+
+    /** Meldende können sich über Statusänderungen informieren lassen (E-Mail/WhatsApp): yii bauhof/buergerinfo an|aus */
+    public function buergerInfoAktiv(): bool
+    {
+        return (bool)$this->settings->get('buergerInfo');
     }
 
     /** Gastmeldungen eingeschaltet und Systemkonto vorhanden? */

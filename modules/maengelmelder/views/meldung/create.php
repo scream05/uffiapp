@@ -136,6 +136,21 @@ $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '
                     </div>
                 </div>
                 <p class="help-block">Bitte mindestens E-Mail oder Telefon angeben.</p>
+                <?php if ($module->buergerInfoAktiv()): ?>
+                <div class="form-group maengel-info">
+                    <label>Über den Bearbeitungsstand informieren <small class="text-muted">– freiwillig, bei jeder Statusänderung</small></label>
+                    <div class="form-check">
+                        <?= Html::activeCheckbox($kontakt, 'info_mail', ['id' => 'kontakt-info-mail', 'class' => 'form-check-input' . $feld('info_mail'), 'label' => false]) ?>
+                        <label class="form-check-label" for="kontakt-info-mail">per E-Mail<?= $gast ? '' : ' (' . Html::encode(Yii::$app->user->getIdentity()->email) . ')' ?></label>
+                    </div>
+                    <div class="form-check">
+                        <?= Html::activeCheckbox($kontakt, 'info_whatsapp', ['id' => 'kontakt-info-whatsapp', 'class' => 'form-check-input' . $feld('info_whatsapp'), 'label' => false]) ?>
+                        <label class="form-check-label" for="kontakt-info-whatsapp">per WhatsApp an meine Handynummer
+                            <small class="text-muted">– Sie können darauf antworten, Ihre Antwort geht an den Bauhof. Abbestellen: STOPP schreiben.</small></label>
+                    </div>
+                </div>
+                <?php endif ?>
+
                 <div class="maengel-feld-website" aria-hidden="true">
                     <label for="kontakt-website">Website (bitte leer lassen)</label>
                     <?= Html::activeTextInput($kontakt, 'website', ['id' => 'kontakt-website', 'tabindex' => -1, 'autocomplete' => 'off']) ?>
@@ -158,11 +173,26 @@ $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '
                 <p style="margin-bottom:8px"><i class="fa fa-user"></i> <?= Html::encode($ich->displayName) ?>
                     &nbsp; <i class="fa fa-envelope-o"></i> <?= Html::encode($ich->email) ?></p>
                 <div class="form-group" style="max-width:360px">
-                    <label for="kontakt-telefon">Telefon <small class="text-muted">– freiwillig</small></label>
+                    <label for="kontakt-telefon">Telefon <small class="text-muted">– freiwillig, für WhatsApp-Infos eine Handynummer</small></label>
                     <?= Html::activeInput('tel', $kontakt, 'telefon', ['id' => 'kontakt-telefon', 'class' => 'form-control' . $feld('telefon'),
                         'maxlength' => 30, 'autocomplete' => 'tel']) ?>
                     <small class="text-muted">Nur für Rückfragen zu dieser Meldung; sieht nur der Bauhof.</small>
                 </div>
+                <?php if ($module->buergerInfoAktiv()): ?>
+                <div class="form-group maengel-info">
+                    <label>Über den Bearbeitungsstand informieren <small class="text-muted">– freiwillig, bei jeder Statusänderung</small></label>
+                    <div class="form-check">
+                        <?= Html::activeCheckbox($kontakt, 'info_mail', ['id' => 'kontakt-info-mail', 'class' => 'form-check-input' . $feld('info_mail'), 'label' => false]) ?>
+                        <label class="form-check-label" for="kontakt-info-mail">per E-Mail<?= $gast ? '' : ' (' . Html::encode(Yii::$app->user->getIdentity()->email) . ')' ?></label>
+                    </div>
+                    <div class="form-check">
+                        <?= Html::activeCheckbox($kontakt, 'info_whatsapp', ['id' => 'kontakt-info-whatsapp', 'class' => 'form-check-input' . $feld('info_whatsapp'), 'label' => false]) ?>
+                        <label class="form-check-label" for="kontakt-info-whatsapp">per WhatsApp an meine Handynummer (oben)
+                            <small class="text-muted">– Sie können darauf antworten, Ihre Antwort geht an den Bauhof. Abbestellen: STOPP schreiben.</small></label>
+                    </div>
+                </div>
+                <?php endif ?>
+
             </fieldset>
             <?php endif ?>
             <button type="submit" class="btn btn-primary"><?= $bearbeiten ? 'Speichern' : 'Meldung absenden' ?></button>

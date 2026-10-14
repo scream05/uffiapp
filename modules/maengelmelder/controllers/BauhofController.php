@@ -213,6 +213,7 @@ class BauhofController extends ContentContainerController
         if ((int)$content->state === Content::STATE_DRAFT) {
             $content->getStateService()->publish();
             $this->gastHinweiseEntfernen($content->id);
+            \humhub\modules\maengelmelder\components\Buergerinfo::freigegeben($content);
             $this->view->success('Meldung freigegeben. Sie erscheint jetzt auf der Karte.');
         }
         return $this->redirect($this->zu('mangel', ['id' => $content->id]));

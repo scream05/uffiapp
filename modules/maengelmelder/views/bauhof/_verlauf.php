@@ -30,9 +30,11 @@ $haken = ['wartet' => ['fa-clock-o', 'wartet, bis der Mitarbeiter auf den Hinwei
         </div>
     <?php else:
         $ein = $n->richtung === BauhofNachricht::EIN;
-        $von = $ein ? ($n->mitarbeiter?->name ?? 'Mitarbeiter (gelöscht)') : ($n->user?->displayName ?? 'Bauhof (automatisch)');
+        $von = $n->buerger
+            ? ($ein ? '👤 Meldende Person (WhatsApp)' : 'An die meldende Person (WhatsApp)')
+            : ($ein ? ($n->mitarbeiter?->name ?? 'Mitarbeiter (gelöscht)') : ($n->user?->displayName ?? 'Bauhof (automatisch)'));
         ?>
-        <div class="bauhof-msg bauhof-msg-<?= $ein ? 'ein' : 'aus' ?>">
+        <div class="bauhof-msg bauhof-msg-<?= $ein ? 'ein' : 'aus' ?><?= $n->buerger ? ' bauhof-msg-buerger' : '' ?>">
             <small><?= Html::encode($von) ?> · <?= $wann ?><?= $auftrag ?>
                 <?php if (!$ein && isset($haken[$n->zustellung])): ?>
                     <i class="fa <?= $haken[$n->zustellung][0] ?>" title="<?= Html::encode($haken[$n->zustellung][1] . ($n->fehler ? ': ' . $n->fehler : '')) ?>"></i>

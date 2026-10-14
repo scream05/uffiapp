@@ -73,6 +73,10 @@ if ($m && !isset($mitarbeiter[$m->id])) {
                         <?php if ($kontakt->telefon): ?>
                             <span><i class="fa fa-phone fa-fw"></i> <?= Html::a(Html::encode($kontakt->telefon), 'tel:' . preg_replace('/[^+0-9]/', '', $kontakt->telefon)) ?></span>
                         <?php endif ?>
+                        <?php if ($kontakt->info_mail || $kontakt->info_whatsapp): ?>
+                            <span><i class="fa fa-bell-o fa-fw"></i> Infos bei Statusänderung: <?= implode(' und ', array_filter([
+                                $kontakt->info_mail ? 'E-Mail' : null, $kontakt->info_whatsapp ? 'WhatsApp' : null])) ?></span>
+                        <?php endif ?>
                         <span class="text-muted">Nur für den Bauhof sichtbar, wird <?= round(Yii::$app->getModule('maengelmelder')->kontaktAufbewahrungTage / 30) ?> Monate nach Abschluss gelöscht.</span>
                     </div>
                 <?php endif ?>

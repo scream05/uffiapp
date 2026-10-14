@@ -22,6 +22,7 @@ use yii\console\ExitCode;
  *   /app/yii bauhof/aufraeumen          Verlauf/Fotos/Kontaktdaten lange abgeschlossener Meldungen löschen (täglich per Crontab)
  *   /app/yii bauhof/gastmeldungen       Meldungen ohne Konto: Stand anzeigen
  *   /app/yii bauhof/gastmeldungen an    einschalten (legt das Systemkonto an), „aus“ schaltet ab
+ *   /app/yii bauhof/buergerinfo an|aus  Infos an Meldende bei Statusänderung (E-Mail/WhatsApp)
  */
 class BauhofController extends Controller
 {
@@ -44,6 +45,26 @@ class BauhofController extends Controller
                         'text' => "Neuer Auftrag vom Bauhof Uffenheim: Nr. {{1}} – {{2}}, Ort: {{3}}.\n\nTippe auf „Auftrag anzeigen“, um Beschreibung, Fotos und Karte zu bekommen.",
                         'example' => ['body_text' => [['12', 'Straße / Gehweg', 'Marktplatz 1, Uffenheim']]]],
                     ['type' => 'BUTTONS', 'buttons' => [['type' => 'QUICK_REPLY', 'text' => 'Auftrag anzeigen']]],
+                ],
+            ],
+            $mod->vorlagen['buergerEingang'] => [
+                'name' => $mod->vorlagen['buergerEingang'],
+                'language' => $mod->vorlagenSprache,
+                'category' => 'UTILITY',
+                'components' => [
+                    ['type' => 'BODY',
+                        'text' => "Ihre Mängelmeldung Nr. {{1}} ({{2}}) bei Rund um Uffni ist eingegangen. Über Änderungen am Bearbeitungsstand informieren wir Sie hier.\n\nSie können auf diese Nachricht antworten; Ihre Antwort geht an den Bauhof. Keine Nachrichten mehr? Antworten Sie mit STOPP.",
+                        'example' => ['body_text' => [['12', 'Straßenbeleuchtung']]]],
+                ],
+            ],
+            $mod->vorlagen['buergerStatus'] => [
+                'name' => $mod->vorlagen['buergerStatus'],
+                'language' => $mod->vorlagenSprache,
+                'category' => 'UTILITY',
+                'components' => [
+                    ['type' => 'BODY',
+                        'text' => "Neuer Stand zu Ihrer Mängelmeldung Nr. {{1}} ({{2}}): {{3}}\nHinweis des Bauhofs: {{4}}\n\nSie können auf diese Nachricht antworten; Ihre Antwort geht an den Bauhof. Keine Nachrichten mehr? Antworten Sie mit STOPP.",
+                        'example' => ['body_text' => [['12', 'Straßenbeleuchtung', 'In Arbeit', 'Lampe wird am Freitag getauscht']]]],
                 ],
             ],
             $mod->vorlagen['nachricht'] => [
@@ -104,6 +125,12 @@ class BauhofController extends Controller
         }
         // Kontaktdaten: nach $kontaktAufbewahrungTage ab Abschluss, bei gelöschten Meldungen sofort
         $kontaktFrist = date('Y-m-d H:i:s', time() - $this->module()->kontaktAufbewahrungTage * 86400);
+        // Nachrichten mit der meldenden Person: mit derselben Frist wie die Kontaktdaten
+        foreach (BauhofNachricht::find()->where(['buerger' => 1, 'content_id' => MaengelStatus::find()->select('content_id')
+            ->where(['status' => MaengelStatus::CLOSED])->andWhere(['<', 'updated_at', $kontaktFrist])])->each() as $msg) {
+            $msg->delete();
+            $n++;
+        }
         $k = MaengelKontakt::deleteAll(['or',
             ['content_id' => MaengelStatus::find()->select('content_id')->where(['status' => MaengelStatus::CLOSED])
                 ->andWhere(['<', 'updated_at', $kontaktFrist])],
@@ -112,6 +139,19 @@ class BauhofController extends Controller
         if ($n || $f || $k) {
             $this->stdout(date('Y-m-d H:i:s') . ": $n Nachrichten, $f verwaiste Dateien, $k Kontaktdaten gelöscht\n");
         }
+        return ExitCode::OK;
+    }
+
+    /** Infos an Meldende (E-Mail/WhatsApp bei Statusänderung) ein- oder ausschalten: bauhof/buergerinfo an|aus */
+    public function actionBuergerinfo($schalter = null)
+    {
+        $mod = $this->module();
+        if (in_array($schalter, ['an', 'aus'], true)) {
+            $mod->settings->set('buergerInfo', $schalter === 'an' ? 1 : 0);
+        }
+        $this->stdout('Infos an Meldende: ' . ($mod->buergerInfoAktiv() ? 'an' : 'aus')
+            . ', mit E-Mail: ' . MaengelKontakt::find()->where(['info_mail' => 1])->count()
+            . ', mit WhatsApp: ' . MaengelKontakt::find()->where(['info_whatsapp' => 1])->count() . "\n");
         return ExitCode::OK;
     }
 

@@ -302,6 +302,8 @@ class Bauhof
         if ($melden && $von === null) {
             self::meldeAenderung($content->id, [self::statusZeile($status, $hinweis)], 'Status', $als);
         }
+        // Meldende Person, falls sie Infos per E-Mail/WhatsApp wünscht
+        Buergerinfo::statusGeaendert($content, $status, $hinweis);
         return true;
     }
 

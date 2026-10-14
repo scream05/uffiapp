@@ -15,6 +15,8 @@ return [
         // WhatsApp-Nachrichten von Bauhof-Mitarbeitern (Klassen als Text: WhatsApp-Modul evtl. noch nicht geladen)
         ['class' => 'humhub\modules\whatsapp\components\Verarbeitung', 'event' => 'empfangen',
             'callback' => ['humhub\modules\maengelmelder\components\Bauhof', 'onEmpfangen']],
+        ['class' => 'humhub\modules\whatsapp\components\Verarbeitung', 'event' => 'empfangen',
+            'callback' => ['humhub\modules\maengelmelder\components\Buergerinfo', 'onEmpfangen']],
         ['class' => 'humhub\modules\whatsapp\components\Verarbeitung', 'event' => 'status',
             'callback' => ['humhub\modules\maengelmelder\components\Bauhof', 'onStatus']],
         ['class' => Menu::class, 'event' => Menu::EVENT_INIT, 'callback' => [Events::class, 'onSpaceMenuInit']],

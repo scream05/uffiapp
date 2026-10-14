@@ -22,6 +22,8 @@ class MeldeKontakt extends Model
     public $datenschutz = false;
     public $captcha;
     public $website = '';
+    public $info_mail = false;
+    public $info_whatsapp = false;
 
     public function formName()
     {
@@ -31,8 +33,8 @@ class MeldeKontakt extends Model
     public function scenarios()
     {
         return [
-            self::SCENARIO_GAST => ['vorname', 'nachname', 'email', 'telefon', 'datenschutz', 'captcha', 'website'],
-            self::SCENARIO_KONTO => ['telefon'],
+            self::SCENARIO_GAST => ['vorname', 'nachname', 'email', 'telefon', 'datenschutz', 'captcha', 'website', 'info_mail', 'info_whatsapp'],
+            self::SCENARIO_KONTO => ['telefon', 'info_mail', 'info_whatsapp'],
         ];
     }
 
@@ -49,7 +51,53 @@ class MeldeKontakt extends Model
             ['email', 'kontaktNoetig', 'skipOnEmpty' => false, 'on' => self::SCENARIO_GAST],
             ['datenschutz', 'compare', 'compareValue' => '1', 'message' => 'Bitte bestätigen Sie die Datenschutzhinweise.'],
             ['captcha', Yii::$app->captcha->getValidatorClass(), 'on' => self::SCENARIO_GAST],
+            [['info_mail', 'info_whatsapp'], 'boolean'],
+            ['info_mail', 'infoMailPruefen'],
+            ['info_whatsapp', 'infoWhatsappPruefen'],
         ];
+    }
+
+    public function infoMailPruefen($attribute)
+    {
+        if ($this->info_mail && $this->scenario === self::SCENARIO_GAST && $this->email === '') {
+            $this->addError('info_mail', 'Für Infos per E-Mail bitte Ihre E-Mail-Adresse angeben.');
+        }
+    }
+
+    public function infoWhatsappPruefen($attribute)
+    {
+        if ($this->info_whatsapp && self::waId($this->telefon) === null) {
+            $this->addError('info_whatsapp', 'Für Infos per WhatsApp bitte Ihre Handynummer angeben (z. B. 0171 1234567 oder +49 171 1234567).');
+        }
+    }
+
+    /**
+     * Telefonnummer ins WhatsApp-Format (nur Ziffern mit Ländervorwahl): 0171 123 → 49171123, +43… / 0043… bleibt.
+     * Deutsche Festnetznummern (nicht 015x/016x/017x) haben kein WhatsApp: null.
+     */
+    public static function waId(?string $telefon): ?string
+    {
+        $t = trim((string)$telefon);
+        if ($t === '') {
+            return null;
+        }
+        $ziffern = preg_replace('/\D/', '', $t);
+        if (str_starts_with($t, '+')) {
+            $nr = $ziffern;
+        } elseif (str_starts_with($ziffern, '00')) {
+            $nr = substr($ziffern, 2);
+        } elseif (str_starts_with($ziffern, '0')) {
+            $nr = '49' . substr($ziffern, 1);
+        } else {
+            return null;
+        }
+        if (strlen($nr) < 9 || strlen($nr) > 15) {
+            return null;
+        }
+        if (str_starts_with($nr, '49') && !preg_match('/^491[567]\d{7,10}$/', $nr)) {
+            return null;
+        }
+        return $nr;
     }
 
     public function kontaktNoetig($attribute)

@@ -27,6 +27,10 @@ class BauhofMeldung extends BaseNotification
     public function text()
     {
         $n = $this->source;
+        if ($n->buerger) {
+            return "Bauhof: Die meldende Person hat zu Nr. {$n->content_id} " . ($n->file_id || $n->media_id ? 'ein Foto geschickt.'
+                : 'geschrieben: „' . mb_strimwidth((string)$n->text, 0, 80, '…') . '“');
+        }
         $wer = $n->mitarbeiter?->name ?? 'Ein Mitarbeiter';
         $nr = $n->content_id ? " zu Auftrag Nr. {$n->content_id}" : '';
         if ($n->typ === 'knopf' && preg_match('/^s:(\d+):(\w+)$/', (string)$n->text, $m)) {

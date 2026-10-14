@@ -5,6 +5,7 @@ namespace humhub\modules\maengelmelder\controllers;
 use humhub\modules\content\components\ContentContainerController;
 use humhub\modules\content\models\Content;
 use humhub\modules\maengelmelder\components\Bauhof;
+use humhub\modules\maengelmelder\components\Buergerinfo;
 use humhub\modules\maengelmelder\components\GastFotos;
 use humhub\modules\maengelmelder\models\MaengelAuch;
 use humhub\modules\maengelmelder\models\MaengelKontakt;
@@ -102,9 +103,14 @@ class MeldungController extends ContentContainerController
                 $post->content->visibility = $space->getDefaultContentVisibility();
                 if ($post->save()) {
                     $post->fileManager->attach(Yii::$app->request->post('fileList'));
-                    if ($kontakt->telefon !== '') {
+                    $infos = $this->module->buergerInfoAktiv();
+                    if ($kontakt->telefon !== '' || ($infos && ($kontakt->info_mail || $kontakt->info_whatsapp))) {
                         (new MaengelKontakt(['content_id' => $post->content->id, 'user_id' => Yii::$app->user->id,
-                            'telefon' => $kontakt->telefon, 'created_at' => date('Y-m-d H:i:s')]))->save(false);
+                            'telefon' => $kontakt->telefon ?: null, 'created_at' => date('Y-m-d H:i:s'),
+                            'info_mail' => $infos && $kontakt->info_mail ? 1 : 0,
+                            'info_whatsapp' => $infos && $kontakt->info_whatsapp ? 1 : 0,
+                            'wa_id' => MeldeKontakt::waId($kontakt->telefon)]))->save(false);
+                        Buergerinfo::eingang($post->content);
                     }
                     // Vom Bauhof angelegt: gleich zur Bearbeitung (Zuweisen usw.)
                     if (Yii::$app->request->get('bauhof') && MaengelStatus::canManage()) {
@@ -156,6 +162,9 @@ class MeldungController extends ContentContainerController
                 'email' => $kontakt->email ?: null,
                 'telefon' => $kontakt->telefon ?: null,
                 'created_at' => date('Y-m-d H:i:s'),
+                'info_mail' => $this->module->buergerInfoAktiv() && $kontakt->info_mail ? 1 : 0,
+                'info_whatsapp' => $this->module->buergerInfoAktiv() && $kontakt->info_whatsapp ? 1 : 0,
+                'wa_id' => MeldeKontakt::waId($kontakt->telefon),
             ]);
             $kontaktZeile->save(false);
             $transaction->commit();
@@ -178,6 +187,7 @@ class MeldungController extends ContentContainerController
         if ($kontakt->email !== '') {
             $this->gastBestaetigen($post, $kontakt, count($files));
         }
+        Buergerinfo::eingang($post->content);
         if ($fotoFehler) {
             $this->view->warn(implode(' ', $fotoFehler) . ' Die Meldung wurde ohne diese Fotos gespeichert.');
         }
@@ -196,6 +206,7 @@ class MeldungController extends ContentContainerController
                 'karteUrl' => $post->content->container->createUrl('/maengelmelder/meldung/karte',
                     ['lat' => $mangel->lat, 'lng' => $mangel->lng], true),
                 'kontaktMail' => $this->module->kontaktMail,
+                'infoMail' => $this->module->buergerInfoAktiv() && $kontakt->info_mail,
             ];
             $text = $this->renderPartial('@maengelmelder/views/mail/eingang_text', $params);
             $html = nl2br(\yii\helpers\Html::encode($text), false);
