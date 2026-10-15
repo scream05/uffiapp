@@ -49,9 +49,13 @@ $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '
                 <div class="alert alert-info">
                     <strong><i class="fa fa-whatsapp"></i> Noch ein Schritt für WhatsApp-Infos:</strong>
                     Schick uns „START <?= $nr ?>“ von der angegebenen Handynummer. Erst dann schreiben wir dir per WhatsApp.<br>
+                    <?php // Die HumHub-App öffnet wa.me-Links in ihrem eigenen Browser; whatsapp:// gibt sie direkt an WhatsApp weiter
+                    $inApp = \humhub\helpers\DeviceDetectorHelper::isAppRequest(); ?>
                     <?= Html::a('<i class="fa fa-whatsapp"></i> WhatsApp-Infos einschalten',
-                        'https://wa.me/' . $module->whatsappNummer . '?text=' . rawurlencode("START $nr"),
-                        ['class' => 'btn btn-success btn-sm', 'style' => 'margin-top:8px', 'target' => '_blank', 'rel' => 'noopener']) ?>
+                        ($inApp ? 'whatsapp://send?phone=' : 'https://wa.me/') . $module->whatsappNummer
+                            . ($inApp ? '&text=' : '?text=') . rawurlencode("START $nr"),
+                        ['class' => 'btn btn-success btn-sm', 'style' => 'margin-top:8px', 'data-pjax-prevent' => 1]
+                            + ($inApp ? [] : ['target' => '_blank', 'rel' => 'noopener'])) ?>
                     <small class="d-block text-muted" style="margin-top:6px">Am Computer: Nachricht „START <?= $nr ?>“ an
                         +<?= Html::encode(preg_replace('/^49(\d{3})(\d+)$/', '49 $1 $2', $module->whatsappNummer)) ?> schicken.</small>
                 </div>
