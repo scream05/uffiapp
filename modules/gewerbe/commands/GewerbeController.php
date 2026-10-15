@@ -137,6 +137,74 @@ class GewerbeController extends Controller
         return ExitCode::OK;
     }
 
+    /**
+     * Einmalige Web-Recherche einspielen: /app/yii gewerbe/web-import <json> [1 = Probelauf]
+     * JSON-Array je Betrieb (id, gefunden, beschreibung, angebot, website, email, telefon, social [{typ,url}],
+     * logo_url, logo_ersetzen, quellen, hinweis). Nur Einträge mit Status „offen“; leere Angaben lassen
+     * vorhandene (aus OSM/Startliste) stehen. Ein vorhandenes Logo wird nur mit logo_ersetzen getauscht.
+     */
+    public function actionWebImport($pfad, $probe = 0)
+    {
+        $stats = ['geändert' => 0, 'übersprungen' => 0, 'logos' => 0];
+        foreach (json_decode(file_get_contents($pfad), true) as $row) {
+            $b = Betrieb::findOne((int)($row['id'] ?? 0));
+            if ($b === null || $b->status !== Betrieb::STATUS_OFFEN || empty($row['gefunden'])) {
+                $stats['übersprungen']++;
+                continue;
+            }
+            $text = fn($k, $max) => mb_substr(trim((string)($row[$k] ?? '')), 0, $max);
+            $b->beschreibung = $text('beschreibung', 20000) ?: $b->beschreibung;
+            $b->angebot = $text('angebot', 500) ?: $b->angebot;
+            $b->website = $text('website', 255) ?: $b->website;
+            $b->telefon = $text('telefon', 50) ?: $b->telefon;
+            $email = self::geschaeftlich($text('email', 150) ?: null, $b->website);
+            $b->email = $email ?? $b->email;
+            if (!empty($row['social'])) {
+                $b->socialRows = array_map(fn($s) => ['typ' => $s['typ'] ?? '', 'url' => preg_replace('#^http://#', 'https://', (string)($s['url'] ?? ''))],
+                    (array)$row['social']);
+            }
+            // Ungültige Einzelangaben verwerfen statt den ganzen Betrieb
+            if (!$b->validate(['beschreibung', 'angebot', 'website', 'telefon', 'email', 'socialRows'])) {
+                foreach (array_keys($b->getErrors()) as $attr) {
+                    $this->stderr("  {$b->name}: $attr verworfen (" . implode(' ', $b->getErrors($attr)) . ")\n");
+                    if ($attr === 'socialRows') {
+                        $b->socialRows = $b->getSocialList();
+                    } else {
+                        $b->$attr = $b->getOldAttribute($attr);
+                    }
+                }
+            }
+            $quellen = array_values(array_filter((array)($row['quellen'] ?? []), fn($u) => preg_match('#^https?://\S+$#', (string)$u)));
+            $b->web_quellen = $quellen ? json_encode(array_slice($quellen, 0, 8), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : null;
+            $b->web_recherche_am = date('Y-m-d');
+            $logo = trim((string)($row['logo_url'] ?? ''));
+            $logo = $logo !== '' && (!$b->logo_guid || !empty($row['logo_ersetzen'])) ? $logo : '';
+            $this->stdout("~ {$b->name}: " . mb_strlen((string)$b->beschreibung) . ' Zeichen' . ($logo ? ', Logo' : '')
+                . (!empty($row['hinweis']) ? ' | Hinweis: ' . $row['hinweis'] : '') . "\n");
+            if ($probe) {
+                continue;
+            }
+            $b->geocodeAus = true; // Ort bleibt (Adresse wird hier nicht geändert)
+            if (!$b->save(false)) {
+                $this->stderr("! {$b->name}: nicht gespeichert\n");
+                continue;
+            }
+            if ($logo !== '') {
+                $grund = Logo::vonUrl($b, $logo);
+                $grund === null ? $stats['logos']++ : $this->stderr("  {$b->name}: Logo $logo – $grund\n");
+            } elseif (!empty($row['logo_ersetzen']) && ($alt = $b->getLogo())) {
+                // Bisheriges Logo war kein Firmenlogo (Foto, fremdes Logo) und es gibt keinen Ersatz
+                $alt->delete();
+                $b->updateAttributes(['logo_guid' => null, 'logo_quelle' => null]);
+                $this->stdout("  {$b->name}: falsches Logo entfernt\n");
+            }
+            $stats['geändert']++;
+        }
+        $this->stdout(($probe ? 'Probelauf: ' : '') . implode(', ', array_map(fn($k, $v) => "$v $k", array_keys($stats), $stats)) . "\n");
+        Yii::$app->cache->delete('ki-link-domains');
+        return ExitCode::OK;
+    }
+
     public function actionLogos()
     {
         foreach (Betrieb::find()->where(['logo_guid' => null])->andWhere(['not', ['website' => null]])->orderBy('name')->all() as $b) {

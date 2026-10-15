@@ -53,6 +53,21 @@ class Logo
         return 'kein passendes Logo gefunden';
     }
 
+    /** Logo von einer bekannten Bild-Adresse (Web-Recherche) übernehmen; ersetzt ein vorhandenes. Fehler oder null */
+    public static function vonUrl(Betrieb $betrieb, string $url): ?string
+    {
+        $file = self::bild($url);
+        if ($file === null) {
+            return 'Bild nicht ladbar oder ungeeignet';
+        }
+        if ($alt = $betrieb->getLogo()) {
+            $alt->delete();
+        }
+        $betrieb->fileManager->attach([$file->guid]);
+        $betrieb->updateAttributes(['logo_guid' => $file->guid, 'logo_quelle' => mb_substr($url, 0, 500)]);
+        return null;
+    }
+
     /** Domain ohne „www.“ */
     public static function host(string $url): string
     {

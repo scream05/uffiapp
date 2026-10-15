@@ -7,6 +7,7 @@
 
 use humhub\helpers\Html;
 use humhub\modules\content\widgets\richtext\RichText;
+use humhub\modules\gewerbe\components\Logo;
 use humhub\modules\gewerbe\components\Oeffnungszeiten;
 use humhub\modules\gewerbe\models\Betrieb;
 use humhub\modules\gewerbe\models\BetriebVerwalter;
@@ -47,9 +48,15 @@ $stand = $betrieb->getStand();
 
         <?php if ($betrieb->status === Betrieb::STATUS_VORGESCHLAGEN): ?>
             <div class="alert alert-warning" style="margin-top:14px">Dieser Eintrag wartet auf Freigabe. Erst danach ist er im Verzeichnis zu sehen.</div>
-        <?php elseif ($betrieb->isRecherchiert()): $osm = str_contains((string)$betrieb->quelle, 'openstreetmap.org'); ?>
+        <?php elseif ($betrieb->isRecherchiert()): $osm = str_contains((string)$betrieb->quelle, 'openstreetmap.org');
+            $webQuellen = [];
+            foreach ((array)json_decode((string)$betrieb->web_quellen, true) as $u) {
+                $webQuellen[Logo::host($u)] ??= $u; // je Domain nur der erste Link
+            }
+            $webQuellen = array_slice($webQuellen, 0, 4, true); ?>
             <div class="alert alert-info" style="margin-top:14px">Diese Angaben stammen aus <?= $osm ? 'OpenStreetMap' : 'einer öffentlichen Liste der Stadt Uffenheim' ?>
-                (<?= Html::a('Quelle', $betrieb->quelle, ['target' => '_blank', 'rel' => 'noopener nofollow']) ?><?= $betrieb->recherchiert_am ? ', Stand ' . Yii::$app->formatter->asDate($betrieb->recherchiert_am, 'medium') : '' ?>)
+                (<?= Html::a('Quelle', $betrieb->quelle, ['target' => '_blank', 'rel' => 'noopener nofollow']) ?><?= $betrieb->recherchiert_am ? ', Stand ' . Yii::$app->formatter->asDate($betrieb->recherchiert_am, 'medium') : '' ?>)<?php if ($webQuellen): ?>,
+                Vorstellung und Leistungen aus öffentlichen Angaben im Netz (<?= implode(', ', array_map(fn($host, $u) => Html::a(Html::encode($host), $u, ['target' => '_blank', 'rel' => 'noopener nofollow']), array_keys($webQuellen), $webQuellen)) ?><?= $betrieb->web_recherche_am ? ', Stand ' . Yii::$app->formatter->asDate($betrieb->web_recherche_am, 'medium') : '' ?>)<?php endif ?>
                 und werden wöchentlich abgeglichen; der Betrieb hat sie noch nicht bestätigt. Das ist dein Betrieb? Unten kannst du die Seite übernehmen.</div>
         <?php endif ?>
         <?php if ($canManage && $betrieb->abgleich_hinweis): ?>
