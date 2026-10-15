@@ -324,6 +324,11 @@ class Bauhof
             if ($m === null) {
                 return;
             }
+            // Mitarbeiter können auch selbst Mängel melden: „START <Nr>“ zur eigenen Meldung und Antworten auf
+            // Nachrichten an die meldende Person gehören zu den Infos an Meldende (Buergerinfo::onEmpfangen)
+            if (Buergerinfo::gehoertZuMeldung($event->daten)) {
+                return;
+            }
             // Weitergeleitete Beiträge (Veranstaltungsplakate aus Gruppen) gehören in den Termin-Eingang –
             // außer es ist eine Antwort auf eine Bauhof-Nachricht. Eigene Fotos der Mitarbeiter sind nie weitergeleitet.
             $weitergeleitet = !empty($d['context']['forwarded']) || !empty($d['context']['frequently_forwarded']);

@@ -263,6 +263,31 @@ class Buergerinfo
      * Webhook (nach Bauhof::onEmpfangen, das Mitarbeiter-Nummern übernimmt): Nachrichten von Nummern, die Infos zu
      * einer Meldung bekommen, gehören zur Meldung – bevorzugt zu der, auf deren Nachricht geantwortet wurde.
      */
+    /**
+     * Nachricht einer Nummer, die auch als Bauhof-Mitarbeiter eingetragen ist, die aber zu einer Meldung dieser Nummer
+     * gehört: „START <Nr>“ (Nummer bei Meldung <Nr> angegeben) oder Antwort auf eine Nachricht an die meldende Person.
+     */
+    public static function gehoertZuMeldung(array $d): bool
+    {
+        if (!self::module()->buergerWhatsappAktiv()) {
+            return false;
+        }
+        $von = preg_replace('/\D/', '', (string)($d['from'] ?? ''));
+        if (($nr = self::startNummer($d)) !== null) {
+            return MaengelKontakt::find()->where(['content_id' => $nr, 'wa_id' => $von])->exists();
+        }
+        $bezug = $d['context']['id'] ?? null;
+        return $bezug !== null && BauhofNachricht::find()
+            ->where(['wamid' => $bezug, 'buerger' => 1, 'richtung' => BauhofNachricht::AUS])->exists();
+    }
+
+    /** Meldungsnummer aus „START 123“ (auch „start nr. 123“), sonst null */
+    private static function startNummer(array $d): ?int
+    {
+        return ($d['type'] ?? '') === 'text'
+            && preg_match('/^\s*start\s*(?:nr\.?\s*)?(\d{1,9})\s*$/iu', (string)($d['text']['body'] ?? ''), $m) ? (int)$m[1] : null;
+    }
+
     public static function onEmpfangen(EmpfangEvent $event): void
     {
         if ($event->handled) {
@@ -275,9 +300,9 @@ class Buergerinfo
                 return;
             }
             // „START 123“: die Nummer bestätigt WhatsApp-Infos zu Meldung 123 (nur wenn sie dort angegeben ist)
-            if (($d['type'] ?? '') === 'text' && preg_match('/^\s*start\s*(?:nr\.?\s*)?(\d{1,9})\s*$/iu', (string)($d['text']['body'] ?? ''), $m)) {
+            if (($nr = self::startNummer($d)) !== null) {
                 $event->handled = true;
-                self::start((int)$m[1], $von, (string)$d['id']);
+                self::start($nr, $von, (string)$d['id']);
                 return;
             }
             $bezug = $d['context']['id'] ?? null;
