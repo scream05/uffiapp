@@ -23,6 +23,7 @@ class DesignNeu extends Widget
         'mangelmelder' => 'maengelmelder',
         'vereine-and-ehrenamt' => 'vereine',
         'abfall-and-termine' => 'abfall',
+        'gewerbe' => 'gewerbe',
     ];
 
     public function run()

@@ -1,0 +1,10 @@
+{
+  "id": "gewerbe",
+  "name": "Gewerbe",
+  "description": "Verzeichnis für Einzelhandel, Handwerk, Gastronomie und Dienstleister in Uffenheim; Betriebe pflegen ihre Seite selbst.",
+  "keywords": ["gewerbe", "einkaufen", "verzeichnis"],
+  "version": "0.1.0",
+  "humhub": {
+    "minVersion": "1.18"
+  }
+}

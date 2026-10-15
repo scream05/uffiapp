@@ -60,6 +60,14 @@ class SetupController extends Controller
             'modules' => ['calendar', 'polls'],
         ],
         [
+            'name' => 'Gewerbe & Einkaufen',
+            'url' => 'gewerbe',
+            'description' => 'Geschäfte, Handwerk, Gastronomie und Dienstleister aus Uffenheim',
+            'color' => '#5e7f0a',
+            'auto_add' => false,
+            'modules' => ['gewerbe'],
+        ],
+        [
             'name' => 'Bürgerbeteiligung',
             'description' => 'Ideen, Umfragen und Diskussionen zur Zukunft Uffenheims.',
             'color' => '#16a085',
@@ -1358,6 +1366,59 @@ class SetupController extends Controller
      * („Veranstaltungen“) dürfen normale Mitglieder keine Termine mehr anlegen (Vereinstermine kommen über das
      * Modul), Startliste der Vereine aus modules/vereine/data/start.json anlegen (nur fehlende, nur Name/Kategorie/Ort/Website).
      */
+    /**
+     * Gewerbeverzeichnis: setup/gewerbe (idempotent)
+     * Legt den Space „Gewerbe & Einkaufen“ (URL gewerbe) an, schaltet das Modul ein, macht das Verzeichnis zur
+     * Startseite des Space, sperrt Stream-Beiträge von Mitgliedern und macht den Space für alle (auch Gäste) sichtbar.
+     */
+    public function actionGewerbe($ownerUsername = 'admin')
+    {
+        $space = Space::findOne(['url' => 'gewerbe']);
+        if ($space === null) {
+            // Nur diesen Space anlegen – nicht actionSpaces(), das bewusst gelöschte Spaces wieder anlegen würde
+            $def = current(array_filter(self::SPACES, fn($d) => ($d['url'] ?? '') === 'gewerbe'));
+            $owner = User::findOne(['username' => $ownerUsername]);
+            if ($owner === null) {
+                $this->stderr("User $ownerUsername not found\n");
+                return ExitCode::DATAERR;
+            }
+            Yii::$app->user->switchIdentity($owner);
+            $space = new Space();
+            $space->scenario = Space::SCENARIO_CREATE;
+            $space->name = $def['name'];
+            $space->description = $def['description'];
+            $space->color = $def['color'];
+            $space->visibility = Space::VISIBILITY_ALL;
+            $space->join_policy = Space::JOIN_POLICY_FREE;
+            $space->auto_add_new_members = 0;
+            if (!$space->save()) {
+                $this->stderr("! {$def['name']}: " . json_encode($space->getErrors(), JSON_UNESCAPED_UNICODE) . "\n");
+                return ExitCode::DATAERR;
+            }
+            if ($space->url !== 'gewerbe') {
+                $space->updateAttributes(['url' => 'gewerbe']);
+            }
+            $this->stdout("+ {$space->name}\n");
+        }
+        if (!$space->moduleManager->isEnabled('gewerbe')) {
+            $space->moduleManager->enable('gewerbe');
+            $this->stdout("+ gewerbe im Space {$space->name}\n");
+        }
+        $space->visibility = Space::VISIBILITY_ALL;
+        $space->default_content_visibility = 1;
+        $space->save(false);
+        // Startseite des Space = Verzeichnis (für angemeldete Nutzer und Gäste)
+        $start = $space->createUrl('/gewerbe/betrieb/index');
+        $space->getSettings()->set('indexUrl', $start);
+        $space->getSettings()->set('indexGuestUrl', $start);
+        $this->stdout("Startseite: $start\n");
+        $this->actionKeineBeitraege('gewerbe');
+        $space->permissionManager->setGroupState(Space::USERGROUP_MEMBER,
+            new \humhub\modules\space\permissions\InviteUsers(), \humhub\libs\BasePermission::STATE_DENY);
+        Yii::$app->cache->flush();
+        return ExitCode::OK;
+    }
+
     public function actionVereine()
     {
         $space = Space::findOne(['url' => 'vereine-and-ehrenamt']);

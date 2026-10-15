@@ -30,6 +30,7 @@ class Module extends \humhub\components\Module
     ];
     public const MEHR = [
         'vereine' => ['Vereine', 'users', 'vereine-and-ehrenamt', '/vereine/verein/index', 'tuerkis'],
+        'gewerbe' => ['Gewerbe', 'shopping-bag', 'gewerbe', '/gewerbe/betrieb/index', 'gruen'],
         'rathaus' => ['Rathaus', 'university', 'rathaus-uffenheim', '/space/space/home', 'bordeaux'],
         'notdienste' => ['Notdienste', 'medkit', null, '/notdienst/index', 'rot'],
         'mitteilungsblatt' => ['Mitteilungsblatt', 'newspaper-o', null, '/mitteilungsblatt/index', 'blau'],
