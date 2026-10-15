@@ -684,6 +684,40 @@ def community_vereine():
     return found
 
 
+def community_gewerbe():
+    """Betriebsseiten aus dem Gewerbeverzeichnis der Community (Datenbank) als [(rel, titel, url, text)].
+    Nur geschäftliche Angaben; Verwalter werden nicht übernommen."""
+    rows = db_json("SELECT JSON_OBJECT('id', b.id, 'name', b.name, 'kategorie', b.kategorie, 'ortsteil', b.ortsteil, "
+                   "'angebot', b.angebot, 'beschreibung', b.beschreibung, 'adresse', b.adresse, 'website', b.website, "
+                   "'email', b.email, 'telefon', b.telefon, 'social', b.social, 'status', b.status, "
+                   "'hinweise', b.oeffnungszeiten, 'web', b.web_recherche_am, "
+                   "'space', (SELECT s.url FROM space s JOIN contentcontainer_module m ON m.contentcontainer_id = s.contentcontainer_id "
+                   "AND m.module_id = 'gewerbe' AND m.module_state = 1 LIMIT 1)) FROM gewerbe_betrieb b WHERE b.status != 'vorgeschlagen'")
+    found = []
+    for b in rows:
+        if not b.get('space'):
+            continue
+        url = f"https://community.rundumuffni.de/s/{b['space']}/gewerbe/betrieb/view?id={b['id']}"
+        lines = [f"Branche: {b['kategorie']} · Ort: {b['ortsteil']}"]
+        if b['status'] == 'offen':
+            lines.append('Angaben aus öffentlichen Quellen (OpenStreetMap, Website des Betriebs), vom Betrieb noch nicht bestätigt.'
+                         + (f" Recherche vom {b['web']}." if b.get('web') else ''))
+        if b.get('angebot'):
+            lines.append(f"Angebot: {b['angebot']}")
+        if b.get('beschreibung'):
+            lines += ['', plain_markdown(b['beschreibung'])]
+        contact = [f'- {label}: {b[key]}' for key, label in (('adresse', 'Adresse'), ('telefon', 'Telefon'), ('email', 'E-Mail'),
+                                                              ('website', 'Website'), ('hinweise', 'Hinweise zu den Öffnungszeiten')) if b.get(key)]
+        for x in json.loads(b['social'] or '[]'):
+            contact.append(f"- {x.get('typ') or 'Link'}: {x.get('url')}")
+        if contact:
+            lines += ['', '## Kontakt', *contact]
+        lines += ['', 'Aktuelle Öffnungszeiten stehen in der Liste des Gewerbeverzeichnisses bzw. auf der Seite.']
+        slug = re.sub(r'[^a-z0-9]+', '-', b['name'].lower().translate(str.maketrans({'ä': 'ae', 'ö': 'oe', 'ü': 'ue', 'ß': 'ss'}))).strip('-')
+        found.append((f"community/gewerbe/{slug}-{b['id']}.md", f"Betrieb: {b['name']} ({b['kategorie']}, {b['ortsteil']})", url, '\n'.join(lines)))
+    return found
+
+
 def main():
     written = []
     home = fetch('/')
@@ -779,6 +813,12 @@ def community_written():
             kept += [(os.path.relpath(os.path.join(d, f), ROOT), False, False) for f in files if f.endswith('.md')]
         written = kept
     try:
+        written += [write(rel, title, url, text) for rel, title, url, text in community_gewerbe()]
+    except Exception as e:
+        print(f'! Gewerbeverzeichnis nicht gelesen: {e}', file=sys.stderr)
+        for d, _, files in os.walk(os.path.join(ROOT, 'community', 'gewerbe')):
+            written += [(os.path.relpath(os.path.join(d, f), ROOT), False, False) for f in files if f.endswith('.md')]
+    try:
         written += [write(rel, title, url, text) for rel, title, url, text in community_mitteilungsblatt()]
     except Exception as e:
         print(f'! Mitteilungsblatt nicht gelesen: {e}', file=sys.stderr)
@@ -852,7 +892,7 @@ def vereine_only():
         if '/.git' not in d + '/':
             keep |= {os.path.relpath(os.path.join(d, f), ROOT) for f in files if f.endswith('.md') and f != 'README.md'}
     embedded = update_index(keep)
-    print(f'{datetime.now():%Y-%m-%d %H:%M:%S}: nur Community (Vereine, Wiki, Fragen, Beiträge): {len(written)} Seiten, '
+    print(f'{datetime.now():%Y-%m-%d %H:%M:%S}: nur Community (Vereine, Gewerbe, Wiki, Fragen, Beiträge): {len(written)} Seiten, '
           f'{sum(1 for w in written if w[1])} neu, {sum(1 for w in written if w[2])} geändert, {removed} gelöscht, '
           f'{embedded} Embeddings berechnet')
 

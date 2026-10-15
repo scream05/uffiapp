@@ -123,7 +123,7 @@ class Context
                 $zeiten = \humhub\modules\gewerbe\components\Oeffnungszeiten::zeilen($b->getZeiten());
                 $stand = $b->getStand();
                 $lines[] = "- {$b->name} ({$b->kategorie}, {$b->ortsteil})"
-                    . ($b->angebot ? '; Angebot: ' . self::plain($b->angebot, 200) : '')
+                    . ($b->angebot ? '; Angebot: ' . self::plain($b->angebot, 300) : '')
                     . ($b->adresse ? '; Adresse: ' . $b->adresse : '')
                     . ($b->telefon ? '; Tel. ' . $b->telefon : '')
                     . (\humhub\modules\gewerbe\components\Oeffnungszeiten::hatZeiten($b->getZeiten())
@@ -134,7 +134,7 @@ class Context
                     . ' – ' . $b->getUrl(true);
             }
             if ($lines) {
-                $parts[] = "## Gewerbeverzeichnis der Community (Geschäfte, Gastronomie, Handwerk, Dienstleister; „gerade“ = Stand jetzt)\n"
+                $parts[] = "## Gewerbeverzeichnis der Community (Geschäfte, Gastronomie, Handwerk, Dienstleister; „gerade“ = Stand jetzt; Vorstellung und Leistungen passender Betriebe ggf. weiter unten bei den Informationen)\n"
                     . implode("\n", $lines);
             }
         }
