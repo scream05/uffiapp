@@ -27,11 +27,50 @@ class BetriebController extends ContentContainerController
         return [['login' => ['create', 'edit', 'delete', 'anfrage', 'verwalter', 'anfragen']]]; // Lesen auch für Gäste
     }
 
-    public function actionIndex($q = '', $kategorie = '', $ortsteil = '')
+    public function actionIndex($q = '', $kategorie = '', $ortsteil = '', $offen = '', $keyword = '')
+    {
+        $q = $q !== '' ? $q : $keyword; // „Alle Ergebnisse anzeigen“ der Suche in der Kopfleiste
+        $query = $this->filterQuery($q, $kategorie, $ortsteil);
+        $betriebe = $query->all();
+        if ($offen !== '') {
+            $betriebe = array_values(array_filter($betriebe, fn(Betrieb $b) => ($b->getStand()['offen'] ?? false)));
+        }
+        $mine = Yii::$app->user->isGuest ? [] : Betrieb::find()->innerJoin('gewerbe_verwalter gv', 'gv.betrieb_id = gewerbe_betrieb.id')
+            ->where(['gv.user_id' => Yii::$app->user->id, 'gv.status' => BetriebVerwalter::STATUS_BESTAETIGT])
+            ->orderBy(['name' => SORT_ASC])->all();
+        // Anzahl je Branche (nur aktive) für die Branchen-Kacheln
+        $anzahl = Betrieb::find()->select(['n' => 'COUNT(*)', 'kategorie'])->where(['!=', 'status', Betrieb::STATUS_VORGESCHLAGEN])
+            ->groupBy('kategorie')->indexBy('kategorie')->column();
+        return $this->render('index', [
+            'betriebe' => $betriebe,
+            'offen' => $offen,
+            'mine' => $mine,
+            'anzahl' => $anzahl,
+            'q' => $q,
+            'kategorie' => $kategorie,
+            'ortsteil' => $ortsteil,
+            'module' => $this->module,
+        ]);
+    }
+
+    /** Karte aller Betriebe mit bekanntem Ort (gleiche Filter wie die Liste) */
+    public function actionKarte($q = '', $kategorie = '', $ortsteil = '')
+    {
+        $punkte = [];
+        foreach ($this->filterQuery($q, $kategorie, $ortsteil)->andWhere(['not', ['lat' => null]])->all() as $b) {
+            $stand = $b->getStand();
+            $punkte[] = ['lat' => (float)$b->lat, 'lng' => (float)$b->lng, 'name' => $b->name, 'kategorie' => $b->kategorie,
+                'adresse' => (string)$b->adresse, 'url' => $b->getUrl(), 'stand' => $stand['text'] ?? '', 'offen' => $stand['offen'] ?? null];
+        }
+        return $this->render('karte', ['punkte' => $punkte, 'q' => $q, 'kategorie' => $kategorie, 'ortsteil' => $ortsteil,
+            'module' => $this->module, 'ohneOrt' => (int)$this->filterQuery($q, $kategorie, $ortsteil)->andWhere(['lat' => null])->count()]);
+    }
+
+    private function filterQuery(string $q, string $kategorie, string $ortsteil): \yii\db\ActiveQuery
     {
         $query = Betrieb::find()->orderBy(['name' => SORT_ASC]);
         if (!Module::canManageAll()) {
-            $query->andWhere(['status' => Betrieb::STATUS_AKTIV]);
+            $query->andWhere(['!=', 'status', Betrieb::STATUS_VORGESCHLAGEN]);
         }
         if (trim($q) !== '') {
             $query->andWhere(Betrieb::searchCondition($q));
@@ -42,21 +81,7 @@ class BetriebController extends ContentContainerController
         if (in_array($ortsteil, $this->module->ortsteile, true)) {
             $query->andWhere(['ortsteil' => $ortsteil]);
         }
-        $mine = Yii::$app->user->isGuest ? [] : Betrieb::find()->innerJoin('gewerbe_verwalter gv', 'gv.betrieb_id = gewerbe_betrieb.id')
-            ->where(['gv.user_id' => Yii::$app->user->id, 'gv.status' => BetriebVerwalter::STATUS_BESTAETIGT])
-            ->orderBy(['name' => SORT_ASC])->all();
-        // Anzahl je Branche (nur aktive) für die Branchen-Kacheln
-        $anzahl = Betrieb::find()->select(['n' => 'COUNT(*)', 'kategorie'])->where(['status' => Betrieb::STATUS_AKTIV])
-            ->groupBy('kategorie')->indexBy('kategorie')->column();
-        return $this->render('index', [
-            'betriebe' => $query->all(),
-            'mine' => $mine,
-            'anzahl' => $anzahl,
-            'q' => $q,
-            'kategorie' => $kategorie,
-            'ortsteil' => $ortsteil,
-            'module' => $this->module,
-        ]);
+        return $query;
     }
 
     public function actionView($id)
@@ -99,6 +124,12 @@ class BetriebController extends ContentContainerController
             // Umbenennen nur durch Admins (der Name ist das Erkennungsmerkmal im Verzeichnis)
             if (!Module::canManageAll()) {
                 $betrieb->name = $betrieb->getOldAttribute('name');
+            }
+            // Startlisten-Eintrag: mit dem ersten Speichern durch den Betrieb gilt er als gepflegt
+            if ($betrieb->status === Betrieb::STATUS_OFFEN) {
+                $betrieb->status = Betrieb::STATUS_AKTIV;
+                $betrieb->quelle = null;
+                $betrieb->recherchiert_am = null;
             }
             if ($betrieb->save()) {
                 $this->saveImages($betrieb);

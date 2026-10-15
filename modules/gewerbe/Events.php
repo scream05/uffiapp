@@ -17,6 +17,14 @@ class Events
         }
     }
 
+    /** Betriebe in der Suche der Kopfleiste (auch für Gäste; das Verzeichnis ist öffentlich) */
+    public static function onMetaSearchInit($event)
+    {
+        if (Yii::$app->getModule('gewerbe')->getDirectorySpace() !== null) {
+            $event->sender->addProvider(\humhub\modules\gewerbe\search\BetriebSearchProvider::class);
+        }
+    }
+
     /** Im Gewerbe-Space gibt es keine Stream-Beiträge: Menüpunkt „Stream“ ausblenden */
     public static function onSpaceMenuRun($event)
     {

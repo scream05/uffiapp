@@ -11,6 +11,7 @@ use humhub\modules\content\widgets\richtext\RichTextField;
 use humhub\modules\file\widgets\FilePreview;
 use humhub\modules\file\widgets\UploadButton;
 use humhub\modules\file\widgets\UploadProgress;
+use humhub\modules\gewerbe\components\Oeffnungszeiten;
 use humhub\modules\gewerbe\models\Betrieb;
 use humhub\modules\gewerbe\Module;
 use humhub\widgets\form\ActiveForm;
@@ -39,8 +40,24 @@ for ($i = count($socialRows); $i < min(Betrieb::MAX_SOCIAL, count($socialRows) +
         <?= $form->field($betrieb, 'angebot')->textInput(['maxlength' => 500, 'placeholder' => 'z. B. Brot, Torten, Catering, Frühstück'])
             ->hint('Mit Komma getrennt; danach wird auch gesucht.') ?>
         <?= $form->field($betrieb, 'adresse')->textInput(['placeholder' => 'z. B. Marktplatz 1, 97215 Uffenheim', 'autocomplete' => 'street-address']) ?>
-        <?= $form->field($betrieb, 'oeffnungszeiten')->textarea(['rows' => 4, 'maxlength' => 1000,
-            'placeholder' => "Mo–Fr 8–18 Uhr\nSa 8–12 Uhr"]) ?>
+        <fieldset class="form-group gw-zeiten-form">
+            <legend style="font-size:1rem;font-weight:600;margin-bottom:4px">Öffnungszeiten</legend>
+            <p class="help-block" style="margin-top:0">Je Tag bis zu zwei Zeitspannen, z. B. 08:00–12:00 und 14:00–18:00. Leer = geschlossen.
+                Daraus zeigen wir „Jetzt geöffnet“ an.</p>
+            <?php foreach (Oeffnungszeiten::TAGE as $tag => $name): $r = array_pad(array_values((array)($betrieb->zeitenRows[$tag] ?? [])), 4, ''); ?>
+                <div class="gw-tag">
+                    <span class="gw-tagname" id="gw-tag-<?= $tag ?>"><?= $name ?></span>
+                    <?php foreach ([0 => 'von', 1 => 'bis', 2 => 'von', 3 => 'bis'] as $i => $art): ?>
+                        <?php if ($i === 2): ?><span class="gw-und" aria-hidden="true">und</span><?php endif ?>
+                        <?= Html::input('time', "Betrieb[zeitenRows][$tag][$i]", $r[$i], ['class' => 'form-control', 'step' => 300,
+                            'aria-label' => "$name, " . ($i < 2 ? 'erste' : 'zweite') . " Spanne, $art"]) ?>
+                    <?php endforeach ?>
+                </div>
+            <?php endforeach ?>
+            <?= Html::error($betrieb, 'zeitenRows', ['class' => 'text-danger']) ?>
+        </fieldset>
+        <?= $form->field($betrieb, 'oeffnungszeiten')->textarea(['rows' => 2, 'maxlength' => 1000,
+            'placeholder' => 'z. B. Betriebsferien 1.–15. August, Termine nach Vereinbarung']) ?>
         <div class="row">
             <div class="col-sm-4"><?= $form->field($betrieb, 'telefon')->textInput(['type' => 'tel', 'autocomplete' => 'tel']) ?></div>
             <div class="col-sm-4"><?= $form->field($betrieb, 'email')->textInput(['type' => 'email', 'placeholder' => 'info@…']) ?></div>
@@ -129,3 +146,13 @@ for ($i = count($socialRows); $i < min(Betrieb::MAX_SOCIAL, count($socialRows) +
         <?php ActiveForm::end() ?>
     </div>
 </div>
+<style <?= Html::nonce() ?>>
+    .gw-tag { display: grid; grid-template-columns: 96px 1fr 1fr auto 1fr 1fr; gap: 6px; align-items: center; margin-bottom: 6px; }
+    .gw-tagname { font-weight: 600; }
+    .gw-und { font-size: .9em; }
+    @media (max-width: 575.98px) {
+        .gw-tag { grid-template-columns: 1fr 1fr; }
+        .gw-tagname { grid-column: 1 / -1; margin-top: 4px; }
+        .gw-und { display: none; }
+    }
+</style>

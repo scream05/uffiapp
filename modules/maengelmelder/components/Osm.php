@@ -100,6 +100,29 @@ class Osm
         return [round((float)$hit['lat'], 6), round((float)$hit['lon'], 6), (string)($hit['display_name'] ?? $query)];
     }
 
+    /**
+     * Wie search(), aber höchstens eine Anfrage pro Sekunde an Nominatim für die ganze Plattform (Nutzungsrichtlinie).
+     * @return array|null|false [lat, lng, Anzeigename], null = nicht gefunden, false = gerade belegt
+     */
+    public static function searchThrottled(string $query, array $bounds): array|null|false
+    {
+        $mutex = Yii::$app->mutex;
+        if (!$mutex->acquire('maengel-nominatim', 5)) {
+            return false;
+        }
+        try {
+            $warte = (float)Yii::$app->cache->get('maengel-nominatim-zuletzt') + 1.0 - microtime(true);
+            if ($warte > 0) {
+                usleep((int)($warte * 1e6));
+            }
+            $hit = self::search($query, $bounds);
+            Yii::$app->cache->set('maengel-nominatim-zuletzt', microtime(true), 10);
+            return $hit;
+        } finally {
+            $mutex->release('maengel-nominatim');
+        }
+    }
+
     /** Größe des Kachel-Zwischenspeichers in MB (stündlich neu gezählt) */
     private static function cacheMb(): int
     {

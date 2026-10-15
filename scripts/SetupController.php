@@ -1419,6 +1419,38 @@ class SetupController extends Controller
         return ExitCode::OK;
     }
 
+    /**
+     * Startliste des Gewerbeverzeichnisses: setup/gewerbe-import (idempotent, Status „offen“ mit Quelle)
+     * Quelle: Liste „Gastronomie und Unterkünfte“ der Stadt (modules/gewerbe/data/start.json, ohne Personennamen und
+     * private E-Mail-Adressen). Danach den Ort aller Betriebe ohne Kartenpunkt über Nominatim bestimmen (1 Abfrage/s).
+     */
+    public function actionGewerbeImport()
+    {
+        $quelle = 'https://www.uffenheim.de/erleben/tourismus/gastronomie-unterkuenfte';
+        $neu = 0;
+        foreach (json_decode(file_get_contents('/data/modules/gewerbe/data/start.json'), true) as $row) {
+            if (\humhub\modules\gewerbe\models\Betrieb::find()->where(['name' => $row['name']])->exists()) {
+                continue;
+            }
+            $b = new \humhub\modules\gewerbe\models\Betrieb(array_filter($row, fn($v) => $v !== null) + [
+                'status' => 'offen', 'quelle' => $quelle, 'recherchiert_am' => date('Y-m-d')]);
+            $b->geocodeAus = true;
+            if (!$b->save()) {
+                $this->stderr("! {$row['name']}: " . json_encode($b->getErrors(), JSON_UNESCAPED_UNICODE) . "\n");
+                continue;
+            }
+            $neu++;
+        }
+        $this->stdout("$neu Betriebe neu angelegt\n");
+        $ohne = \humhub\modules\gewerbe\models\Betrieb::find()->where(['lat' => null])->andWhere(['not', ['adresse' => null]])->all();
+        foreach ($ohne as $b) {
+            $b->ortBestimmen();
+            $this->stdout(($b->lat !== null ? '+' : '?') . " {$b->name}: " . ($b->lat !== null ? "{$b->lat}, {$b->lng}" : 'Ort nicht gefunden') . "\n");
+        }
+        Yii::$app->cache->delete('ki-link-domains');
+        return ExitCode::OK;
+    }
+
     public function actionVereine()
     {
         $space = Space::findOne(['url' => 'vereine-and-ehrenamt']);

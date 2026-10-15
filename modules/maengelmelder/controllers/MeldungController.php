@@ -372,20 +372,9 @@ class MeldungController extends ContentContainerController
             return $this->asJson(['fehler' => 'Zu viele Suchen. Bitte später noch einmal oder den Ort in der Karte markieren.']);
         }
         Yii::$app->cache->set($key, $n + 1, 3600);
-        // Nominatim erlaubt höchstens eine Anfrage pro Sekunde
-        $mutex = Yii::$app->mutex;
-        if (!$mutex->acquire('maengel-nominatim', 5)) {
+        $hit = Osm::searchThrottled($q, Osm::NAH_BOUNDS);
+        if ($hit === false) {
             return $this->asJson(['fehler' => 'Die Suche ist gerade belegt. Bitte gleich noch einmal versuchen.']);
-        }
-        try {
-            $warte = (float)Yii::$app->cache->get('maengel-nominatim-zuletzt') + 1.0 - microtime(true);
-            if ($warte > 0) {
-                usleep((int)($warte * 1e6));
-            }
-            $hit = Osm::search($q, Osm::NAH_BOUNDS);
-            Yii::$app->cache->set('maengel-nominatim-zuletzt', microtime(true), 10);
-        } finally {
-            $mutex->release('maengel-nominatim');
         }
         if ($hit === null) {
             return $this->asJson(['fehler' => 'Diese Adresse haben wir in Uffenheim nicht gefunden. Bitte anders schreiben oder den Ort in der Karte markieren.']);

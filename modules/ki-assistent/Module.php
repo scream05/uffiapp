@@ -162,13 +162,22 @@ class Module extends \humhub\components\Module
         }
     }
 
-    /** Hosts, deren Links im Chat klickbar sind (Domain-Endungen + Websites der Vereine) */
+    /** Hosts, deren Links im Chat klickbar sind (Domain-Endungen + Websites der Vereine und Betriebe) */
     public function getLinkDomains(): array
     {
         return \Yii::$app->cache->getOrSet('ki-link-domains', function () {
             $domains = $this->linkDomains;
             if (\Yii::$app->db->getTableSchema('verein') !== null) {
                 foreach ((new \yii\db\Query())->select('website')->from('verein')->where(['not', ['website' => null]])
+                             ->andWhere(['!=', 'status', 'vorgeschlagen'])->column() as $url) {
+                    $host = strtolower((string)parse_url($url, PHP_URL_HOST));
+                    if ($host !== '') {
+                        $domains[] = preg_replace('/^www\./', '', $host);
+                    }
+                }
+            }
+            if (\Yii::$app->db->getTableSchema('gewerbe_betrieb') !== null) {
+                foreach ((new \yii\db\Query())->select('website')->from('gewerbe_betrieb')->where(['not', ['website' => null]])
                              ->andWhere(['!=', 'status', 'vorgeschlagen'])->column() as $url) {
                     $host = strtolower((string)parse_url($url, PHP_URL_HOST));
                     if ($host !== '') {

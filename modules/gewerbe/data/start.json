@@ -1,0 +1,232 @@
+[
+ {
+  "name": "Alte Kelterei",
+  "kategorie": "Gastronomie & Café",
+  "ortsteil": "Uffenheim",
+  "angebot": "Essen & Trinken",
+  "adresse": "Amtsgartenweg 13, 97215 Uffenheim",
+  "telefon": "09842 951075",
+  "email": null,
+  "website": null
+ },
+ {
+  "name": "Anadolu-Imbiss",
+  "kategorie": "Gastronomie & Café",
+  "ortsteil": "Uffenheim",
+  "angebot": "Imbiss",
+  "adresse": "Bahnhofstraße 9, 97215 Uffenheim",
+  "telefon": "09842 8970",
+  "email": null,
+  "website": null
+ },
+ {
+  "name": "Biohof Kilian",
+  "kategorie": "Übernachtung",
+  "ortsteil": "Welbhausen",
+  "angebot": "Ferienwohnung auf dem Biohof",
+  "adresse": "Welbhausen, Schnappgasse 6, 97215 Uffenheim",
+  "telefon": "09842 97939",
+  "email": "fewo@biohofkilian.de",
+  "website": "https://www.biohofkilian.de"
+ },
+ {
+  "name": "Bäckerei Beigel",
+  "kategorie": "Lebensmittel & Hofladen",
+  "ortsteil": "Uffenheim",
+  "angebot": "Bäckerei",
+  "adresse": "Schloßstraße 1, 97215 Uffenheim",
+  "telefon": "09842 8182",
+  "email": null,
+  "website": null
+ },
+ {
+  "name": "Bäckerei Grammetbauer",
+  "kategorie": "Lebensmittel & Hofladen",
+  "ortsteil": "Uffenheim",
+  "angebot": "Bäckerei",
+  "adresse": "Luitpoldstraße 7, 97215 Uffenheim",
+  "telefon": "09842 8813",
+  "email": null,
+  "website": null
+ },
+ {
+  "name": "Café Einfach Wunderbar",
+  "kategorie": "Gastronomie & Café",
+  "ortsteil": "Uffenheim",
+  "angebot": "Café",
+  "adresse": "Luitpoldstraße 10, 97215 Uffenheim",
+  "telefon": "09842 9521222",
+  "email": null,
+  "website": null
+ },
+ {
+  "name": "Café Grammetbauer",
+  "kategorie": "Gastronomie & Café",
+  "ortsteil": "Uffenheim",
+  "angebot": "Café",
+  "adresse": "Luitpoldstraße 7 und Nürnberger Straße 5, 97215 Uffenheim",
+  "telefon": "09842 8813",
+  "email": null,
+  "website": null
+ },
+ {
+  "name": "Café Ritter",
+  "kategorie": "Gastronomie & Café",
+  "ortsteil": "Uffenheim",
+  "angebot": "Café",
+  "adresse": "Spitalplatz 10, 97215 Uffenheim",
+  "telefon": "09842 456",
+  "email": null,
+  "website": null
+ },
+ {
+  "name": "Campingplatz Uffenheim",
+  "kategorie": "Übernachtung",
+  "ortsteil": "Uffenheim",
+  "angebot": "Campingplatz",
+  "adresse": "Sportstraße 3, 97215 Uffenheim",
+  "telefon": "09842 1568",
+  "email": "info@camping-uffenheim.de",
+  "website": "https://www.camping-uffenheim.de"
+ },
+ {
+  "name": "Delphi",
+  "kategorie": "Gastronomie & Café",
+  "ortsteil": "Uffenheim",
+  "angebot": "Essen & Trinken",
+  "adresse": "Ansbacher Straße 7, 97215 Uffenheim",
+  "telefon": "09842 1478",
+  "email": null,
+  "website": null
+ },
+ {
+  "name": "Eiscafé Da Mauri",
+  "kategorie": "Gastronomie & Café",
+  "ortsteil": "Uffenheim",
+  "angebot": "Eiscafé",
+  "adresse": "Würzburger Straße 2, 97215 Uffenheim",
+  "telefon": "09842 953281",
+  "email": null,
+  "website": null
+ },
+ {
+  "name": "Eiscafé La Gelateria",
+  "kategorie": "Gastronomie & Café",
+  "ortsteil": "Uffenheim",
+  "angebot": "Eiscafé",
+  "adresse": "Ansbacher Straße 15, 97215 Uffenheim",
+  "telefon": "09842 9527686",
+  "email": null,
+  "website": null
+ },
+ {
+  "name": "Gasthaus zur Traube",
+  "kategorie": "Gastronomie & Café",
+  "ortsteil": "Uffenheim",
+  "angebot": "Gasthaus, Übernachtung",
+  "adresse": "Marktplatz 3, 97215 Uffenheim",
+  "telefon": "09842 9523410",
+  "email": "info@zur-traube-uffenheim.de",
+  "website": "https://www.zur-traube-uffenheim.de"
+ },
+ {
+  "name": "Gasthof Schwarzer Adler",
+  "kategorie": "Gastronomie & Café",
+  "ortsteil": "Uffenheim",
+  "angebot": "Gasthof, Übernachtung",
+  "adresse": "Adelhofer Straße 1, 97215 Uffenheim",
+  "telefon": "09842 9880-0",
+  "email": "info@gastsein.de",
+  "website": "https://www.gastsein.de"
+ },
+ {
+  "name": "Gasthof Zum goldenen Stern",
+  "kategorie": "Gastronomie & Café",
+  "ortsteil": "Rudolzhofen",
+  "angebot": "Gasthof",
+  "adresse": "Rudolzhofen 25, 97215 Uffenheim",
+  "telefon": "09842 8613",
+  "email": null,
+  "website": null
+ },
+ {
+  "name": "Gasthof Zur Sonne",
+  "kategorie": "Gastronomie & Café",
+  "ortsteil": "Custenlohr",
+  "angebot": "Gasthof",
+  "adresse": "Custenlohr 31, 97215 Uffenheim",
+  "telefon": "09842 2262",
+  "email": null,
+  "website": null
+ },
+ {
+  "name": "Glockenhäusle",
+  "kategorie": "Gastronomie & Café",
+  "ortsteil": "Uffenheim",
+  "angebot": "Essen & Trinken",
+  "adresse": "Kleinharbach 8, 97215 Uffenheim",
+  "telefon": "09865 9520",
+  "email": null,
+  "website": "https://www.glockenhaeusle.de"
+ },
+ {
+  "name": "Hotel Restaurant Lichterhof",
+  "kategorie": "Gastronomie & Café",
+  "ortsteil": "Uffenheim",
+  "angebot": "Hotel, Restaurant, Übernachtung",
+  "adresse": "Marktplatz 14, 97215 Uffenheim",
+  "telefon": "09842 9831-0",
+  "email": "info@lichterhof.com",
+  "website": "https://www.lichterhof.com"
+ },
+ {
+  "name": "Izmir Imbiss",
+  "kategorie": "Gastronomie & Café",
+  "ortsteil": "Uffenheim",
+  "angebot": "Imbiss",
+  "adresse": "Friedrich-Ebert-Straße 18, 97215 Uffenheim",
+  "telefon": "09842 952425",
+  "email": null,
+  "website": null
+ },
+ {
+  "name": "Korschhof",
+  "kategorie": "Übernachtung",
+  "ortsteil": "Langensteinach",
+  "angebot": "Ferienwohnung",
+  "adresse": "Langensteinach 44, 97215 Uffenheim",
+  "telefon": "09865 562",
+  "email": null,
+  "website": "https://www.korschhof.de"
+ },
+ {
+  "name": "Pizzeria Calabria",
+  "kategorie": "Gastronomie & Café",
+  "ortsteil": "Uffenheim",
+  "angebot": "Pizzeria",
+  "adresse": "Marktplatz 17, 97215 Uffenheim",
+  "telefon": "09842 7915",
+  "email": null,
+  "website": null
+ },
+ {
+  "name": "Pizzeria La Locanda",
+  "kategorie": "Gastronomie & Café",
+  "ortsteil": "Uffenheim",
+  "angebot": "Pizzeria",
+  "adresse": "Würzburger Straße 4, 97215 Uffenheim",
+  "telefon": "09842 953281",
+  "email": null,
+  "website": null
+ },
+ {
+  "name": "Restaurant Osteria da Pippo",
+  "kategorie": "Gastronomie & Café",
+  "ortsteil": "Uffenheim",
+  "angebot": "Restaurant",
+  "adresse": "Am Bahnhof 4, 97215 Uffenheim",
+  "telefon": "09842 9531760",
+  "email": null,
+  "website": null
+ }
+]

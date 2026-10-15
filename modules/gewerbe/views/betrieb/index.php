@@ -6,6 +6,7 @@
  * @var string $q
  * @var string $kategorie
  * @var string $ortsteil
+ * @var string $offen nicht leer = nur jetzt geöffnete
  * @var \humhub\modules\gewerbe\Module $module
  */
 
@@ -13,7 +14,7 @@ use humhub\helpers\Html;
 use humhub\modules\gewerbe\models\Betrieb;
 
 $space = $this->context->contentContainer;
-$filtered = trim($q) !== '' || $kategorie !== '' || $ortsteil !== '';
+$filtered = trim($q) !== '' || $kategorie !== '' || $ortsteil !== '' || $offen !== '';
 $url = fn(array $p = []) => $space->createUrl('/gewerbe/betrieb/index', array_filter($p, fn($v) => $v !== ''));
 ?>
 <?php if ($mine): ?>
@@ -37,6 +38,8 @@ $url = fn(array $p = []) => $space->createUrl('/gewerbe/betrieb/index', array_fi
         <p class="help-block">Geschäfte, Handwerk, Gastronomie und Dienstleister aus Uffenheim und den Ortsteilen.
             Du hast einen Betrieb? Trag ihn kostenlos ein und pflege deine Seite selbst.</p>
 
+        <?= $this->render('_ansicht', ['aktiv' => 'liste', 'q' => $q, 'kategorie' => $kategorie, 'ortsteil' => $ortsteil]) ?>
+
         <div class="gw-branchen" role="list" aria-label="Branchen">
             <?php foreach ($module->categories as $k): ?>
                 <?= Html::a(Html::encode($k) . (isset($anzahl[$k]) ? ' <span class="gw-zahl">' . (int)$anzahl[$k] . '</span>' : ''),
@@ -52,6 +55,7 @@ $url = fn(array $p = []) => $space->createUrl('/gewerbe/betrieb/index', array_fi
                 ['class' => 'form-control', 'prompt' => 'Alle Branchen', 'style' => 'flex:1 1 150px', 'aria-label' => 'Branche']) ?>
             <?= Html::dropDownList('ortsteil', $ortsteil, array_combine($module->ortsteile, $module->ortsteile),
                 ['class' => 'form-control', 'prompt' => 'Alle Orte', 'style' => 'flex:1 1 130px', 'aria-label' => 'Ort']) ?>
+            <label class="gw-offen-filter"><?= Html::checkbox('offen', $offen !== '', ['value' => 1]) ?> Jetzt geöffnet</label>
             <button type="submit" class="btn btn-light"><i class="fa fa-search" aria-hidden="true"></i> Filtern</button>
             <?php if ($filtered): ?>
                 <?= Html::a('Zurücksetzen', $url(), ['class' => 'btn btn-link']) ?>
@@ -68,6 +72,9 @@ $url = fn(array $p = []) => $space->createUrl('/gewerbe/betrieb/index', array_fi
                         <small class="text-muted" style="display:block"><?= Html::encode($b->kategorie) ?> · <?= Html::encode($b->ortsteil) ?></small>
                         <?php if ($b->angebot): ?>
                             <small style="display:block;margin-top:2px"><?= Html::encode(mb_strimwidth($b->angebot, 0, 90, '…')) ?></small>
+                        <?php endif ?>
+                        <?php if (($stand = $b->getStand()) !== null): ?>
+                            <small class="gw-stand <?= $stand['offen'] ? 'offen' : 'zu' ?>"><?= Html::encode($stand['text']) ?></small>
                         <?php endif ?>
                         <?php if ($b->status === Betrieb::STATUS_VORGESCHLAGEN): ?>
                             <small class="text-muted" style="display:block"><i class="fa fa-hourglass-half" aria-hidden="true"></i> wartet auf Freigabe</small>
@@ -86,6 +93,20 @@ $url = fn(array $p = []) => $space->createUrl('/gewerbe/betrieb/index', array_fi
 </div>
 <style <?= Html::nonce() ?>>
     .gw-branchen { display: flex; flex-wrap: wrap; gap: 6px; }
+    /* Handy: Branchen als eine waagerecht wischbare Zeile statt sieben Zeilen Kacheln */
+    @media (max-width: 575.98px) {
+        .gw-branchen { flex-wrap: nowrap; overflow-x: auto; margin: 0 -16px; padding: 2px 16px 8px; scroll-snap-type: x proximity;
+            -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        .gw-branchen::-webkit-scrollbar { display: none; }
+        .gw-branche { flex: 0 0 auto; scroll-snap-align: start; }
+    }
+    .gw-offen-filter { display: inline-flex; align-items: center; gap: 6px; margin: 0; font-weight: normal; min-height: 38px; }
+    .gw-offen-filter input { width: 20px; height: 20px; }
+    .gw-stand { display: block; margin-top: 3px; font-weight: 600; }
+    .gw-stand.offen { color: #3d5a06; }
+    .gw-stand.zu { color: #8a2a20; }
+    html[data-bs-theme="dark"] .gw-stand.offen { color: #b5d94a; }
+    html[data-bs-theme="dark"] .gw-stand.zu { color: #f0a49a; }
     .gw-branche { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 4px 12px; border-radius: 999px;
         border: 1px solid #8a8f94; color: inherit; text-decoration: none !important; font-size: .92em; }
     .gw-branche:hover, .gw-branche:focus { background: rgba(68, 110, 136, .1); }

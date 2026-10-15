@@ -7,6 +7,7 @@
 
 use humhub\helpers\Html;
 use humhub\modules\content\widgets\richtext\RichText;
+use humhub\modules\gewerbe\components\Oeffnungszeiten;
 use humhub\modules\gewerbe\models\Betrieb;
 use humhub\modules\gewerbe\models\BetriebVerwalter;
 use humhub\modules\gewerbe\Module;
@@ -15,6 +16,8 @@ $space = $this->context->contentContainer;
 $pending = $canManage ? $betrieb->getVerwalter()->where(['status' => BetriebVerwalter::STATUS_ANGEFRAGT])->count() : 0;
 $stichworte = array_filter(array_map('trim', preg_split('/[,;\n]+/u', (string)$betrieb->angebot)));
 $karte = $betrieb->getKartenUrl();
+$zeiten = $betrieb->getZeiten();
+$stand = $betrieb->getStand();
 ?>
 <div class="panel panel-default">
     <div class="panel-body">
@@ -24,6 +27,9 @@ $karte = $betrieb->getKartenUrl();
             <div style="flex:1;min-width:200px">
                 <h1 style="margin:0 0 4px;font-size:1.5em"><?= Html::encode($betrieb->name) ?></h1>
                 <span class="text-muted"><?= Html::encode($betrieb->kategorie) ?> · <?= Html::encode($betrieb->ortsteil) ?></span>
+                <?php if ($stand): ?>
+                    <div class="gw-stand <?= $stand['offen'] ? 'offen' : 'zu' ?>"><?= Html::encode($stand['text']) ?></div>
+                <?php endif ?>
             </div>
         </div>
 
@@ -41,6 +47,10 @@ $karte = $betrieb->getKartenUrl();
 
         <?php if ($betrieb->status === Betrieb::STATUS_VORGESCHLAGEN): ?>
             <div class="alert alert-warning" style="margin-top:14px">Dieser Eintrag wartet auf Freigabe. Erst danach ist er im Verzeichnis zu sehen.</div>
+        <?php elseif ($betrieb->isRecherchiert()): ?>
+            <div class="alert alert-info" style="margin-top:14px">Diese Angaben stammen aus einer öffentlichen Liste der Stadt Uffenheim
+                (<?= Html::a('Quelle', $betrieb->quelle, ['target' => '_blank', 'rel' => 'noopener nofollow']) ?><?= $betrieb->recherchiert_am ? ', Stand ' . Yii::$app->formatter->asDate($betrieb->recherchiert_am, 'medium') : '' ?>);
+                der Betrieb hat sie noch nicht bestätigt. Das ist dein Betrieb? Unten kannst du die Seite übernehmen.</div>
         <?php endif ?>
 
         <?php if ($stichworte): ?>
@@ -50,10 +60,20 @@ $karte = $betrieb->getKartenUrl();
         <?php endif ?>
 
         <div class="gw-infos">
-            <?php if (trim((string)$betrieb->oeffnungszeiten) !== ''): ?>
+            <?php if (Oeffnungszeiten::hatZeiten($zeiten) || trim((string)$betrieb->oeffnungszeiten) !== ''): ?>
                 <section>
                     <h2><i class="fa fa-clock-o" aria-hidden="true"></i> Öffnungszeiten</h2>
-                    <div style="white-space:pre-line"><?= Html::encode($betrieb->oeffnungszeiten) ?></div>
+                    <?php if (Oeffnungszeiten::hatZeiten($zeiten)): ?>
+                        <table class="gw-zeiten">
+                            <caption class="visually-hidden">Öffnungszeiten nach Wochentagen</caption>
+                            <?php foreach (Oeffnungszeiten::zeilen($zeiten) as [$tage, $text]): ?>
+                                <tr><th scope="row"><?= Html::encode($tage) ?></th><td><?= Html::encode($text) ?></td></tr>
+                            <?php endforeach ?>
+                        </table>
+                    <?php endif ?>
+                    <?php if (trim((string)$betrieb->oeffnungszeiten) !== ''): ?>
+                        <div style="white-space:pre-line;margin-top:6px"><?= Html::encode($betrieb->oeffnungszeiten) ?></div>
+                    <?php endif ?>
                 </section>
             <?php endif ?>
             <?php $social = $betrieb->getSocialList(); ?>
@@ -63,7 +83,8 @@ $karte = $betrieb->getKartenUrl();
                     <ul class="list-unstyled" style="line-height:1.9;margin:0">
                         <?php if ($betrieb->adresse): ?>
                             <li><i class="fa fa-map-marker fa-fw" aria-hidden="true"></i> <?= Html::encode($betrieb->adresse) ?>
-                                <?php if ($karte): ?> · <?= Html::a('Karte', $karte, ['target' => '_blank', 'rel' => 'noopener nofollow']) ?><?php endif ?></li>
+                                <?php if ($betrieb->lat !== null): ?> · <?= Html::a('Auf der Karte', $space->createUrl('/gewerbe/betrieb/karte', ['fokus' => $betrieb->id])) ?>
+                                <?php elseif ($karte): ?> · <?= Html::a('Karte', $karte, ['target' => '_blank', 'rel' => 'noopener nofollow']) ?><?php endif ?></li>
                         <?php endif ?>
                         <?php if ($betrieb->telefon): ?><li><i class="fa fa-phone fa-fw" aria-hidden="true"></i> <?= Html::a(Html::encode($betrieb->telefon), 'tel:' . preg_replace('/[^0-9+]/', '', $betrieb->telefon)) ?></li><?php endif ?>
                         <?php if ($betrieb->email): ?><li><i class="fa fa-envelope fa-fw" aria-hidden="true"></i> <?= Html::mailto(Html::encode($betrieb->email), $betrieb->email) ?></li><?php endif ?>
@@ -125,4 +146,11 @@ $karte = $betrieb->getKartenUrl();
     .gw-infos { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 16px; }
     .gw-infos h2 { font-size: 1.05em; margin: 0 0 6px; }
     .gw-infos a { text-decoration: underline; text-underline-offset: 2px; }
+    .gw-zeiten th { padding: 1px 14px 1px 0; font-weight: 600; vertical-align: top; white-space: nowrap; }
+    .gw-zeiten td { padding: 1px 0; }
+    .gw-stand { margin-top: 4px; font-weight: 600; }
+    .gw-stand.offen { color: #3d5a06; }
+    .gw-stand.zu { color: #8a2a20; }
+    html[data-bs-theme="dark"] .gw-stand.offen { color: #b5d94a; }
+    html[data-bs-theme="dark"] .gw-stand.zu { color: #f0a49a; }
 </style>

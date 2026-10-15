@@ -115,6 +115,30 @@ class Context
             }
         }
 
+        if (Yii::$app->hasModule('gewerbe') && Yii::$app->getModule('gewerbe') !== null
+            && Yii::$app->db->getTableSchema('gewerbe_betrieb') !== null) {
+            $lines = [];
+            foreach (\humhub\modules\gewerbe\models\Betrieb::find()->where(['!=', 'status', 'vorgeschlagen'])
+                         ->orderBy(['name' => SORT_ASC])->all() as $b) {
+                $zeiten = \humhub\modules\gewerbe\components\Oeffnungszeiten::zeilen($b->getZeiten());
+                $stand = $b->getStand();
+                $lines[] = "- {$b->name} ({$b->kategorie}, {$b->ortsteil})"
+                    . ($b->angebot ? '; Angebot: ' . self::plain($b->angebot, 200) : '')
+                    . ($b->adresse ? '; Adresse: ' . $b->adresse : '')
+                    . ($b->telefon ? '; Tel. ' . $b->telefon : '')
+                    . (\humhub\modules\gewerbe\components\Oeffnungszeiten::hatZeiten($b->getZeiten())
+                        ? '; Öffnungszeiten: ' . implode(', ', array_map(fn($z) => "$z[0] $z[1]", $zeiten)) : '')
+                    . ($b->oeffnungszeiten ? ' (' . self::plain($b->oeffnungszeiten, 150) . ')' : '')
+                    . ($stand ? '; gerade: ' . $stand['text'] : '')
+                    . ($b->website ? '; ' . $b->website : '')
+                    . ' – ' . $b->getUrl(true);
+            }
+            if ($lines) {
+                $parts[] = "## Gewerbeverzeichnis der Community (Geschäfte, Gastronomie, Handwerk, Dienstleister; „gerade“ = Stand jetzt)\n"
+                    . implode("\n", $lines);
+            }
+        }
+
         $lines = [];
         foreach (Space::find()->where(['!=', 'visibility', Space::VISIBILITY_NONE])->andWhere(['status' => Space::STATUS_ENABLED])->all() as $s) {
             $lines[] = "- {$s->name}: " . self::plain((string)$s->description, 200) . ' – ' . $s->createUrl('/space/space', [], true);
