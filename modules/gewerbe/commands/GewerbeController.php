@@ -16,6 +16,7 @@ use yii\console\ExitCode;
  *   /app/yii gewerbe/abgleich [1] wöchentlich: Startlisten-Einträge aus OSM aktualisieren, gepflegte nur prüfen,
  *                                 Websites prüfen, fehlende Logos holen (1 = Probelauf)
  *   /app/yii gewerbe/logos        Logos von den Websites holen (nur Einträge ohne Logo)
+ *   /app/yii gewerbe/loeschen <ids> Betriebe löschen, ihre OSM-Objekte künftig überspringen
  * Gepflegte Seiten (Status aktiv, vom Betrieb selbst) werden nie überschrieben; ihre Verwalter sehen Abweichungen als Hinweis.
  */
 class GewerbeController extends Controller
@@ -126,7 +127,7 @@ class GewerbeController extends Controller
             }
         }
         // Neue Betriebe in OSM melden, aber nicht selbst anlegen (das macht gewerbe/import nach Durchsicht)
-        $bekannt = array_flip(Betrieb::find()->select('osm_ref')->where(['not', ['osm_ref' => null]])->column());
+        $bekannt = array_flip(Betrieb::find()->select('osm_ref')->where(['not', ['osm_ref' => null]])->column()) + Betrieb::osmAusgeschlossen();
         $namen = array_flip(array_map([self::class, 'norm'], Betrieb::find()->select('name')->column()));
         $offen = array_filter(array_keys($elemente), fn($r) => !isset($bekannt[$r]) && OsmQuelle::art($elemente[$r]['tags']) !== null
             && ($elemente[$r]['tags']['addr:city'] ?? '') === 'Uffenheim' && !isset($namen[self::norm($elemente[$r]['tags']['name'])]));
@@ -205,6 +206,22 @@ class GewerbeController extends Controller
         return ExitCode::OK;
     }
 
+    /** Betriebe löschen (geschlossen, Dublette): /app/yii gewerbe/loeschen 34,47 – OSM-Objekte werden nicht wieder angelegt */
+    public function actionLoeschen($ids)
+    {
+        foreach (array_filter(array_map('intval', explode(',', $ids))) as $id) {
+            $b = Betrieb::findOne($id);
+            if ($b === null) {
+                $this->stderr("- $id: nicht gefunden\n");
+                continue;
+            }
+            BetriebVerwalter::deleteAll(['betrieb_id' => $b->id]);
+            $b->delete();
+            $this->stdout("- {$b->name} gelöscht" . ($b->osm_ref ? " ({$b->osm_ref} ausgeschlossen)" : '') . "\n");
+        }
+        return ExitCode::OK;
+    }
+
     public function actionLogos()
     {
         foreach (Betrieb::find()->where(['logo_guid' => null])->andWhere(['not', ['website' => null]])->orderBy('name')->all() as $b) {
@@ -231,9 +248,10 @@ class GewerbeController extends Controller
     private function kandidaten(array $elemente): array
     {
         $liste = [];
+        $ausgeschlossen = Betrieb::osmAusgeschlossen();
         foreach ($elemente as $ref => $e) {
             $art = OsmQuelle::art($e['tags']);
-            if ($art === null) {
+            if ($art === null || isset($ausgeschlossen[$ref])) {
                 continue;
             }
             $adresse = OsmQuelle::adresse($e['tags']);

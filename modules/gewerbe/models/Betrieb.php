@@ -257,7 +257,19 @@ class Betrieb extends ActiveRecord implements ViewableInterface
         foreach ($this->fileManager->findAll() as $file) {
             $file->delete();
         }
+        // Gelöschte Betriebe (geschlossen, Dublette, Widerspruch) nicht wieder aus OpenStreetMap anlegen
+        if ($this->osm_ref !== null) {
+            $liste = self::osmAusgeschlossen();
+            $liste[$this->osm_ref] = mb_substr($this->name, 0, 150);
+            Yii::$app->getModule('gewerbe')->settings->set('osmAusgeschlossen', json_encode($liste, JSON_UNESCAPED_UNICODE));
+        }
         parent::afterDelete();
+    }
+
+    /** @return array osm_ref => Name gelöschter Betriebe */
+    public static function osmAusgeschlossen(): array
+    {
+        return (array)json_decode((string)Yii::$app->getModule('gewerbe')->settings->get('osmAusgeschlossen', '[]'), true);
     }
 
     /** Wer Logo und Bilder (file/download) sehen darf: wie das Verzeichnis, auch Gäste bei Gastzugang */
