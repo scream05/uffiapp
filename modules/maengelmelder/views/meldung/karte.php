@@ -22,9 +22,37 @@ MapAsset::register($this);
             <?php endforeach ?>
             <label><input type="checkbox" id="maengel-erledigt"> Erledigte und abgelehnte zeigen</label>
         </div>
-        <div id="maengel-karte" style="height:70vh;min-height:400px;border-radius:4px"></div>
+        <div id="maengel-karte" style="height:70vh;min-height:400px;border-radius:4px" role="region" aria-label="Karte der Mängelmeldungen"></div>
+        <?php // Dieselben Meldungen als Liste: ohne Karte lesbar (Screenreader, Tastatur) ?>
+        <details class="mm-liste">
+            <summary>Meldungen als Liste anzeigen (<?= count($markers) ?>)</summary>
+            <?php if ($markers === []): ?>
+                <p class="text-muted">Noch keine Meldungen.</p>
+            <?php else: ?>
+            <div class="table-responsive" tabindex="0" role="region" aria-label="Liste der Mängelmeldungen">
+                <table class="table table-sm">
+                    <caption class="visually-hidden">Mängelmeldungen, neueste zuerst</caption>
+                    <thead><tr><th scope="col">Was</th><th scope="col">Ort</th><th scope="col">Stand</th><th scope="col">Gemeldet</th></tr></thead>
+                    <tbody>
+                    <?php foreach ($markers as $m): ?>
+                        <tr>
+                            <td><?= $m['url'] ? Html::a(Html::encode($m['titel']), $m['url']) : Html::encode($m['titel']) ?></td>
+                            <td><?= Html::encode($m['adresse'] !== '' ? $m['adresse'] : sprintf('%.5f, %.5f', $m['lat'], $m['lng'])) ?></td>
+                            <td><?= Html::encode($m['statusLabel']) ?></td>
+                            <td><?= Html::encode($m['datum']) ?></td>
+                        </tr>
+                    <?php endforeach ?>
+                    </tbody>
+                </table>
+            </div>
+            <?php endif ?>
+        </details>
     </div>
 </div>
+<style <?= Html::nonce() ?>>
+    .mm-liste { margin-top: 12px; }
+    .mm-liste summary { cursor: pointer; font-weight: 600; padding: 8px 0; min-height: 24px; }
+</style>
 
 <?= $this->render('_tiles') ?>
 <script <?= Html::nonce() ?>>

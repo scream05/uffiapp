@@ -173,6 +173,46 @@ class Events
         }
     }
 
+    /** Seitentitel, die HumHub englisch oder ohne Aussage lässt (2.4.2), je Controller/Aktion */
+    private const TITEL = [
+        'calendar/global' => 'Kalender',
+        'user/auth' => 'Anmelden',
+        'user/registration' => 'Registrieren',
+        'user/password-recovery' => 'Passwort vergessen',
+        'ki-assistent/chat' => 'Uffi – KI-Assistent',
+    ];
+    private const RECHTSTEXTE = ['privacy' => 'Datenschutzerklärung', 'imprint' => 'Impressum', 'terms' => 'Nutzungsbedingungen',
+        'cookies' => 'Cookies'];
+
+    /**
+     * Fertige HTML-Seite kurz vor dem Senden: Zoom erlauben (das Layout der Anmeldeseite im Kern und das des
+     * 2FA-Moduls sperren ihn mit maximum-scale=1, WCAG 1.4.4) und fehlende deutsche Seitentitel setzen.
+     */
+    public static function onResponseBeforeSend($event)
+    {
+        try {
+            $response = $event->sender;
+            // Vor dem Senden steht die Seite noch in data (content füllt Yii erst danach)
+            if (!is_string($response->data) || $response->format !== \yii\web\Response::FORMAT_HTML
+                || !str_contains($response->data, '<title>')) {
+                return;
+            }
+            $html = preg_replace('/(<meta name="viewport" content="[^"]*?),\s*maximum-scale=1(\.0)?/', '$1', $response->data, 1);
+            $controller = Yii::$app->controller;
+            $titel = $controller ? (self::TITEL[$controller->uniqueId] ?? null) : null;
+            if ($controller && $controller->uniqueId === 'legal/page') {
+                $titel = self::RECHTSTEXTE[Yii::$app->request->get('pageKey')] ?? null;
+            }
+            if ($titel !== null) {
+                $name = Yii::$app->name;
+                $html = preg_replace('#<title>[^<]*</title>#', '<title>' . \yii\helpers\Html::encode($titel . ' - ' . $name) . '</title>', $html, 1);
+            }
+            $response->data = $html;
+        } catch (\Throwable $e) {
+            Yii::error($e);
+        }
+    }
+
     public static function onLayoutAddons($event)
     {
         try {
@@ -181,6 +221,7 @@ class Events
             }
             /** @var Module $module */
             $module = Yii::$app->getModule('designwahl');
+            assets\BarrierefreiAsset::register(Yii::$app->view);
             if ($module->getDesign() === 'neu') {
                 $event->sender->addWidget(widgets\DesignNeu::class);
             }

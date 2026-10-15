@@ -7,6 +7,7 @@ use humhub\modules\content\models\Content;
 use humhub\modules\maengelmelder\components\Bauhof;
 use humhub\modules\maengelmelder\components\Buergerinfo;
 use humhub\modules\maengelmelder\components\GastFotos;
+use humhub\modules\maengelmelder\components\Osm;
 use humhub\modules\maengelmelder\models\MaengelAuch;
 use humhub\modules\maengelmelder\models\MaengelKontakt;
 use humhub\modules\maengelmelder\models\MaengelStatus;
@@ -354,6 +355,44 @@ class MeldungController extends ContentContainerController
         return $this->asJson(array_slice($near, 0, 5));
     }
 
+    /**
+     * Ort zu einer eingegebenen Adresse (Nominatim über unseren Server), damit der Ort auch ohne Karte und Ortung
+     * gesetzt werden kann (Tastatur, Screenreader). Nur Stadtgebiet; höchstens 30 Suchen je Anschluss und Stunde.
+     */
+    public function actionSuche($q)
+    {
+        $q = trim((string)$q);
+        if (mb_strlen($q) < 3) {
+            return $this->asJson(['fehler' => 'Bitte mindestens 3 Zeichen eingeben.']);
+        }
+        $ip = (string)Yii::$app->request->userIP;
+        $key = 'maengel-suche-' . hash('sha256', strpos($ip, ':') !== false ? implode(':', array_slice(explode(':', $ip), 0, 4)) : $ip);
+        $n = (int)Yii::$app->cache->get($key);
+        if ($n >= 30) {
+            return $this->asJson(['fehler' => 'Zu viele Suchen. Bitte später noch einmal oder den Ort in der Karte markieren.']);
+        }
+        Yii::$app->cache->set($key, $n + 1, 3600);
+        // Nominatim erlaubt höchstens eine Anfrage pro Sekunde
+        $mutex = Yii::$app->mutex;
+        if (!$mutex->acquire('maengel-nominatim', 5)) {
+            return $this->asJson(['fehler' => 'Die Suche ist gerade belegt. Bitte gleich noch einmal versuchen.']);
+        }
+        try {
+            $warte = (float)Yii::$app->cache->get('maengel-nominatim-zuletzt') + 1.0 - microtime(true);
+            if ($warte > 0) {
+                usleep((int)($warte * 1e6));
+            }
+            $hit = Osm::search($q, Osm::NAH_BOUNDS);
+            Yii::$app->cache->set('maengel-nominatim-zuletzt', microtime(true), 10);
+        } finally {
+            $mutex->release('maengel-nominatim');
+        }
+        if ($hit === null) {
+            return $this->asJson(['fehler' => 'Diese Adresse haben wir in Uffenheim nicht gefunden. Bitte anders schreiben oder den Ort in der Karte markieren.']);
+        }
+        return $this->asJson(['lat' => $hit[0], 'lng' => $hit[1], 'name' => $hit[2]]);
+    }
+
     /** „Betrifft mich auch“ setzen oder zurücknehmen, danach zur Meldung */
     public function actionAuch($id)
     {
@@ -392,11 +431,13 @@ class MeldungController extends ContentContainerController
                 continue;
             }
             preg_match('/^\*\*Mängelmeldung: (.+?)\*\*\s*(.*?)\s*📍/su', $post->message, $k);
+            preg_match('/📍 \*\*Ort:\*\* (.+?) – \[auf der Karte/u', $post->message, $o);
             $markers[] = [
                 'id' => $id,
                 'lat' => (float)$m[1],
                 'lng' => (float)$m[2],
                 'titel' => $k[1] ?? 'Meldung',
+                'adresse' => $o[1] ?? '',
                 'auszug' => $gast ? '' : mb_strimwidth(preg_replace('/\s+/u', ' ', $k[2] ?? ''), 0, 140, '…'),
                 'datum' => Yii::$app->formatter->asDate($post->content->created_at, 'short'),
                 'url' => $gast ? '' : $post->content->getUrl(),

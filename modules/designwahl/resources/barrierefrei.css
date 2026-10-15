@@ -1,0 +1,114 @@
+/*
+ * Barrierefreiheit (WCAG 2.1 AA), beide Designs, auch für Gäste und auf der Anmeldeseite.
+ * Farben nur im hellen Modus angepasst; der dunkle Modus hat eigene Werte.
+ */
+
+/* Sprunglink „Zum Inhalt“: erst bei Tastaturfokus sichtbar */
+.bf-skip {
+    position: fixed;
+    left: 8px;
+    top: -80px;
+    z-index: 10050;
+    padding: 10px 16px;
+    border-radius: 8px;
+    background: #fff;
+    color: #1f2a37 !important;
+    font-weight: 600;
+    text-decoration: underline;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .3);
+}
+.bf-skip:focus {
+    top: 8px;
+}
+#layout-content:focus {
+    outline: none;
+}
+
+/* Kontraste (1.4.3): gedämpfte Texte, Fehlermeldungen, Platzhalter */
+html:not([data-bs-theme="dark"]) {
+    --bs-secondary-color: rgba(60, 60, 60, .9);
+    --hh-text-color-danger: #a8231a;
+    --text-color-danger: #a8231a;
+}
+html:not([data-bs-theme="dark"]) .alert-danger {
+    color: #a8231a;
+}
+html:not([data-bs-theme="dark"]) .form-control::placeholder,
+html:not([data-bs-theme="dark"]) .select2-selection__placeholder {
+    color: #666 !important;
+    opacity: 1;
+}
+html:not([data-bs-theme="dark"]) .fc-other-month .fc-day-number {
+    color: #6f6f6f;
+}
+.fc-day-top.fc-other-month {
+    opacity: 1 !important; /* statt 30 % Deckkraft: Tage anderer Monate über die Farbe abgesetzt */
+}
+/* Beschriftung der Tab-Leiste am Handy (Design „Uffi frisch“) */
+html.design-neu:not([data-bs-theme="dark"]) {
+    --hh-ct-bottom-menu-text-color: #4f5a64;
+}
+html:not([data-bs-theme="dark"]) .label-light,
+html:not([data-bs-theme="dark"]) .badge.text-bg-light {
+    color: #4a5560 !important;
+}
+
+/* Eingabefelder mit sichtbarem Rahmen (1.4.11, mindestens 3:1 zum Hintergrund) */
+html:not([data-bs-theme="dark"]) .form-control:not(:focus),
+html:not([data-bs-theme="dark"]) .form-select:not(:focus),
+html:not([data-bs-theme="dark"]) .select2-container .select2-selection {
+    border-color: #8a8f94 !important;
+}
+html[data-bs-theme="dark"] .form-control:not(:focus),
+html[data-bs-theme="dark"] .form-select:not(:focus),
+html[data-bs-theme="dark"] .select2-container .select2-selection {
+    border-color: rgba(255, 255, 255, .45) !important;
+}
+
+/* Links im Text nicht nur über die Farbe erkennbar (1.4.1) */
+[data-ui-richtext] a:not(.btn):not(.label),
+.wall-entry-container-link,
+.help-block a,
+.alert a:not(.btn),
+.cc-message a,
+.panel-body p a:not(.btn) {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+/* Sichtbarer Fokus auch bei Auswahlfeldern (2.4.7), z. B. Sprachwahl in der Fußzeile */
+.select2-container--focus .select2-selection,
+.select2-container--open .select2-selection,
+.mm-liste summary:focus-visible,
+.ki-title:focus-visible {
+    outline: 3px solid #446e88 !important;
+    outline-offset: 2px;
+}
+html[data-bs-theme="dark"] .select2-container--focus .select2-selection,
+html[data-bs-theme="dark"] .select2-container--open .select2-selection {
+    outline-color: #9cc3dc !important;
+}
+
+/* Klickflächen mindestens 24 px (2.5.8) */
+.wall-entry-header-info h4 a,
+.wall-entry-header-info h5 a {
+    display: inline-block;
+    min-height: 24px;
+    line-height: 24px;
+}
+.fc-event {
+    min-height: 24px;
+}
+.showMore {
+    display: inline-block;
+    min-height: 24px;
+    line-height: 24px;
+}
+.ki-age .form-check-input,
+input[type="checkbox"][name="adult"] {
+    width: 24px;
+    height: 24px;
+}
+.form-button-search {
+    min-width: 24px;
+}

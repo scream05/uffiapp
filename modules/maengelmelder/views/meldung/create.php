@@ -95,11 +95,17 @@ $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '
                         'placeholder' => 'z. B. Tiefes Schlagloch am Fahrbahnrand, ca. 30 cm breit']) ?>
             </div>
             <div class="form-group">
-                <label>Ort <small class="text-muted">– in die Karte klicken oder die Markierung verschieben</small></label>
-                <div id="maengel-map" style="height:380px;border-radius:4px"></div>
+                <label for="maengel-adresse">Ort</label>
+                <p class="help-block" id="maengel-ort-hilfe" style="margin-top:0">Adresse eingeben und suchen, in die Karte tippen oder deinen Standort verwenden.</p>
+                <div class="maengel-adresse-zeile">
+                    <input type="text" id="maengel-adresse" class="form-control" autocomplete="street-address"
+                           aria-describedby="maengel-ort-hilfe maengel-coords" placeholder="z. B. Hauptstraße 5">
+                    <button type="button" class="btn btn-light" id="maengel-suchen"><i class="fa fa-search" aria-hidden="true"></i> Ort suchen</button>
+                </div>
+                <div id="maengel-map" style="height:380px;border-radius:4px;margin-top:8px" role="region" aria-label="Karte zum Markieren des Orts"></div>
                 <div style="margin-top:6px">
-                    <button type="button" class="btn btn-light btn-sm" id="maengel-locate"><i class="fa fa-crosshairs"></i> Meinen Standort verwenden</button>
-                    <span id="maengel-coords" class="text-muted" style="margin-left:8px"></span>
+                    <button type="button" class="btn btn-light btn-sm" id="maengel-locate"><i class="fa fa-crosshairs" aria-hidden="true"></i> Meinen Standort verwenden</button>
+                    <span id="maengel-coords" class="text-muted" style="margin-left:8px" role="status" aria-live="polite"></span>
                 </div>
                 <div id="maengel-nahe" class="alert alert-warning" style="display:none;margin-top:10px"></div>
                 <?= Html::hiddenInput('Meldung[lat]', $data['lat'], ['id' => 'maengel-lat']) ?>
@@ -232,6 +238,8 @@ $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '
 <style <?= Html::nonce() ?>>
     .maengel-kontakt { margin: 18px 0 10px; padding-top: 14px; border-top: 1px solid var(--hh-border-color, #e5e5e5); }
     .maengel-kontakt legend { font-size: 1rem; font-weight: 600; margin-bottom: 6px; }
+    .maengel-adresse-zeile { display: flex; gap: 8px; }
+    .maengel-adresse-zeile .form-control { flex: 1; min-width: 0; }
     .maengel-feld-website { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
 </style>
 <?= $this->render('_tiles') ?>
@@ -329,6 +337,26 @@ maengelReady(function () {
         if (pan) map.setView(ll, Math.max(map.getZoom(), 17));
     }
     map.on('click', function (e) { setPoint(e.latlng, false); });
+    // Ort per Adresse (ohne Karte bedienbar)
+    var adresse = document.getElementById('maengel-adresse'), suchen = document.getElementById('maengel-suchen');
+    var sucheUrl = <?= json_encode($space->createUrl('/maengelmelder/meldung/suche')) ?>;
+    function adresseSuchen() {
+        var q = adresse.value.trim();
+        if (q.length < 3) { coords.textContent = 'Bitte mindestens 3 Zeichen der Adresse eingeben.'; adresse.focus(); return; }
+        coords.textContent = 'Adresse wird gesucht …';
+        suchen.disabled = true;
+        fetch(sucheUrl + (sucheUrl.indexOf('?') < 0 ? '?' : '&') + 'q=' + encodeURIComponent(q),
+            {credentials: 'same-origin', headers: {'X-Requested-With': 'XMLHttpRequest'}})
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                suchen.disabled = false;
+                if (d.fehler) { coords.textContent = d.fehler; return; }
+                setPoint(L.latLng(d.lat, d.lng), true);
+                coords.textContent = 'Ort gesetzt: ' + d.name.split(',').slice(0, 3).join(',') + '. Bei Bedarf in der Karte verschieben.';
+            }, function () { suchen.disabled = false; coords.textContent = 'Die Suche hat nicht geklappt. Bitte noch einmal versuchen oder in die Karte tippen.'; });
+    }
+    suchen.addEventListener('click', adresseSuchen);
+    adresse.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); adresseSuchen(); } });
     if (lat.value && lng.value) setPoint(L.latLng(+lat.value, +lng.value), true);
     // Standort: erst genau (GPS), bei Zeitüberschreitung noch einmal ungenauer (WLAN/Funkzelle), Fehler verständlich melden
     var locateBtn = document.getElementById('maengel-locate');
@@ -369,7 +397,7 @@ maengelReady(function () {
         }, {enableHighAccuracy: true, timeout: 12000, maximumAge: 30000});
     });
     document.getElementById('maengel-form').addEventListener('submit', function (e) {
-        if (!lat.value) { e.preventDefault(); coords.textContent = 'Bitte zuerst den Ort auf der Karte markieren.'; el.scrollIntoView(); }
+        if (!lat.value) { e.preventDefault(); coords.textContent = 'Bitte zuerst den Ort angeben: Adresse suchen, in die Karte tippen oder Standort verwenden.'; adresse.focus(); }
     });
 });
 </script>

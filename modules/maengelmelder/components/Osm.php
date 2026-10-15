@@ -17,7 +17,7 @@ class Osm
     private const TILE_BOUNDS = ['south' => 49.35, 'west' => 9.95, 'north' => 49.75, 'east' => 10.55];
     /** Ab dieser Zoomstufe nur das Stadtgebiet mit Ortsteilen (sonst wären es Hunderttausende Kacheln) */
     private const NAH_ZOOM = 15;
-    private const NAH_BOUNDS = ['south' => 49.46, 'west' => 10.10, 'north' => 49.62, 'east' => 10.36];
+    public const NAH_BOUNDS = ['south' => 49.46, 'west' => 10.10, 'north' => 49.62, 'east' => 10.36];
     /** Höchstens so viele Abrufe bei openstreetmap.org pro Stunde (Tile Usage Policy, Schutz vor Sperre) */
     private const OSM_PRO_STUNDE = 2000;
     /** Zwischenspeicher höchstens so groß; darüber werden neue Kacheln geliefert, aber nicht mehr gespeichert */

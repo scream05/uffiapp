@@ -17,11 +17,11 @@ use yii\web\View;
 <div class="ki-panel" id="ki-panel" role="dialog" aria-label="Uffi – KI-Assistent">
     <div class="ki-panel-head">
         <img src="<?= Html::encode($avatar) ?>" alt="">
-        <div class="ki-title"><strong>Uffi</strong><small>KI-Assistent</small></div>
-        <a href="<?= Url::to(['/ki-assistent/chat']) ?>" title="Als Seite öffnen"><i class="fa fa-expand"></i></a>
+        <div class="ki-title" tabindex="-1"><strong>Uffi</strong><small>KI-Assistent</small></div>
+        <a href="<?= Url::to(['/ki-assistent/chat']) ?>" title="Als Seite öffnen" aria-label="Als Seite öffnen"><i class="fa fa-expand" aria-hidden="true"></i></a>
         <button type="button" class="ki-close" title="Schließen" aria-label="Schließen"><i class="fa fa-times"></i></button>
     </div>
-    <div class="ki-messages">
+    <div class="ki-messages" role="log" aria-live="polite" aria-relevant="additions" aria-label="Gespräch mit Uffi">
         <p class="ki-hello">Hallo, ich bin Uffi! Ich beantworte Fragen zu Uffenheim: Abfuhrtermine, Veranstaltungen, Vereine, Rathaus und Formulare.
             Ich kann auch eine Mängelmeldung vorbereiten. Meine Antworten kommen von Claude (Anthropic) und sind unverbindlich.</p>
     </div>
@@ -70,7 +70,8 @@ use yii\web\View;
         if (open) {
             var box = panel.querySelector('.ki-messages');
             box.scrollTop = mobile() ? 0 : box.scrollHeight;
-            if (!mobile() && !touch()) chat.focus();
+            // Fokus ins Fenster (Screenreader); am Handy auf den Titel, damit keine Tastatur aufspringt
+            if (!mobile() && !touch()) chat.focus(); else panel.querySelector('.ki-title').focus();
         } else {
             fab.focus();
         }

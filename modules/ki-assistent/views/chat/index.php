@@ -62,7 +62,7 @@ $this->registerJs('window.kiChatDomains = ' . json_encode(Yii::$app->getModule('
                 </div>
             <?php endif ?>
             <?php $enabled = $configured && $ageConfirmed ?>
-            <div id="ki-messages" class="ki-messages"></div>
+            <div id="ki-messages" class="ki-messages" role="log" aria-live="polite" aria-relevant="additions" aria-label="Gespräch mit Uffi"></div>
             <form id="ki-form" class="ki-form">
                 <div class="input-group">
                     <input type="text" id="ki-input" class="form-control ki-input" maxlength="2000" autocomplete="off"
