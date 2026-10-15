@@ -70,15 +70,25 @@ class Buergerinfo
             if (!$k || !$mangel || !self::module()->buergerInfoAktiv() || !($k->info_mail || $k->info_whatsapp)) {
                 return;
             }
+            $gemailt = null;
             if ($k->info_mail && $k->mailBestaetigt() && ($mail = $k->getMail())) {
                 self::mail($k, $mail, $mangel, $stand, $hinweis);
+                $gemailt = $mail;
             }
             if ($k->info_whatsapp && $k->waBestaetigt() && self::module()->buergerWhatsappAktiv()) {
                 $text = "Neuer Stand zu deiner Mängelmeldung Nr. {$content->id} ({$mangel->kategorie}): *$stand*"
                     . ($hinweis ? "\n💬 $hinweis" : '')
                     . "\n\nDu kannst auf diese Nachricht antworten; deine Antwort geht an den Bauhof. Keine Nachrichten mehr? Antworte mit STOPP.";
+                // Ersatz: dieselbe Status-Mail (nicht doppelt, wenn sie schon als E-Mail-Info rausging)
+                $ersatz = function () use ($k, $mangel, $stand, $hinweis, $gemailt): ?string {
+                    if ($gemailt !== null || ($an = self::bestaetigteMail($k)) === null) {
+                        return $gemailt;
+                    }
+                    self::mail($k, $an, $mangel, $stand, $hinweis);
+                    return $an;
+                };
                 self::whatsapp($k, $content->id, $text, self::module()->vorlagen['buergerStatus'],
-                    [(string)$content->id, $mangel->kategorie, $stand, $hinweis ?: '–'], 'status');
+                    [(string)$content->id, $mangel->kategorie, $stand, $hinweis ?: '–'], 'status', null, $ersatz);
             }
         } catch (\Throwable $e) {
             Yii::error("Bürgerinfo {$content->id}: " . $e->getMessage(), 'maengelmelder');
@@ -118,42 +128,93 @@ class Buergerinfo
                 . "\n\nDu kannst auf diese Nachricht antworten; deine Antwort geht an den Bauhof. Keine Nachrichten mehr? Antworte mit STOPP.";
             // Außerhalb des 24-Stunden-Fensters über die Status-Vorlage (Parameter ohne Zeilenumbrüche)
             $einzeilig = trim(preg_replace('/\s+/u', ' ', $text));
+            $ersatz = function () use ($k, $content, $mangel, $text): ?string {
+                $an = self::bestaetigteMail($k);
+                return $an !== null && self::nachrichtMail($content, $mangel, $text, $an) ? $an : null;
+            };
             $log = self::whatsapp($k, $content->id, $volltext, self::module()->vorlagen['buergerStatus'],
-                [(string)$content->id, $mangel->kategorie, 'Nachricht vom Bauhof', mb_substr($einzeilig, 0, 900)], 'text', $absender->id);
+                [(string)$content->id, $mangel->kategorie, 'Nachricht vom Bauhof', mb_substr($einzeilig, 0, 900)], 'text', $absender->id, $ersatz);
             return $log->zustellung === 'fehler' ? 'WhatsApp nicht gesendet: ' . $log->fehler : null;
         }
-        $k = MaengelKontakt::findOne($content->id);
-        $name = $k ? $k->getName() : $content->createdBy->displayName;
-        $mail = "Hallo $name,\n\nder Bauhof hat eine Nachricht zu deiner Mängelmeldung Nr. {$content->id} ({$mangel->kategorie}, "
-            . $mangel->getOrt() . "):\n\n$text\n\nDu kannst einfach auf diese E-Mail antworten; deine Antwort geht an den Bauhof.\n\n--\n"
-            . 'Rund um Uffni – Bürgerplattform der Bürgerliste Uffenheim e. V., kein Angebot der Stadt Uffenheim.';
-        $ok = self::mailSenden($weg[1], "Nachricht vom Bauhof zu deiner Mängelmeldung Nr. {$content->id}", $mail, $content->id);
+        $ok = self::nachrichtMail($content, $mangel, $text, $weg[1]);
         (new BauhofNachricht(['content_id' => $content->id, 'richtung' => BauhofNachricht::AUS, 'buerger' => 1,
             'typ' => 'mail', 'text' => $text, 'verarbeitet' => 1, 'user_id' => $absender->id,
             'zustellung' => $ok ? 'gesendet' : 'fehler', 'fehler' => $ok ? null : 'E-Mail-Versand fehlgeschlagen']))->save(false);
         return $ok ? null : 'E-Mail konnte nicht versendet werden.';
     }
 
+    private static function nachrichtMail(Content $content, Mangel $mangel, string $text, string $an): bool
+    {
+        $k = MaengelKontakt::findOne($content->id);
+        $name = $k ? $k->getName() : $content->createdBy->displayName;
+        $mail = "Hallo $name,\n\nder Bauhof hat eine Nachricht zu deiner Mängelmeldung Nr. {$content->id} ({$mangel->kategorie}, "
+            . $mangel->getOrt() . "):\n\n$text\n\nDu kannst einfach auf diese E-Mail antworten; deine Antwort geht an den Bauhof.\n\n--\n"
+            . 'Rund um Uffni – Bürgerplattform der Bürgerliste Uffenheim e. V., kein Angebot der Stadt Uffenheim.';
+        return self::mailSenden($an, "Nachricht vom Bauhof zu deiner Mängelmeldung Nr. {$content->id}", $mail, $content->id);
+    }
+
     /**
      * WhatsApp an die meldende Person: im offenen 24-Stunden-Fenster als Text, sonst als Vorlage. Wird im Verlauf
      * der Meldung gespeichert (Zustellstatus aktualisiert Bauhof::onStatus über die wamid).
+     * Ist das Fenster zu und die Vorlage (noch) nicht von Meta freigegeben oder scheitert sie, geht die Info über
+     * $ersatz per E-Mail (gibt die Adresse zurück oder null, wenn es keine bestätigte gibt).
      */
-    private static function whatsapp(MaengelKontakt $k, int $contentId, string $text, string $vorlage, array $parameter, string $typ, ?int $userId = null): BauhofNachricht
+    private static function whatsapp(MaengelKontakt $k, int $contentId, string $text, string $vorlage, array $parameter, string $typ, ?int $userId = null, ?callable $ersatz = null): BauhofNachricht
     {
         $log = new BauhofNachricht(['content_id' => $contentId, 'richtung' => BauhofNachricht::AUS, 'buerger' => 1,
             'typ' => $typ, 'text' => $text, 'verarbeitet' => 1, 'user_id' => $userId]);
+        $grund = null;
         try {
-            $log->wamid = self::fensterOffen($k->wa_id)
-                ? Api::sendeText($k->wa_id, $text)
-                : Api::sendeVorlage($k->wa_id, $vorlage, self::module()->vorlagenSprache, $parameter);
-            $log->zustellung = 'gesendet';
+            if (self::fensterOffen($k->wa_id)) {
+                $log->wamid = Api::sendeText($k->wa_id, $text);
+            } elseif (self::vorlageFreigegeben($vorlage)) {
+                $log->wamid = Api::sendeVorlage($k->wa_id, $vorlage, self::module()->vorlagenSprache, $parameter);
+            } else {
+                $grund = 'WhatsApp-Vorlage noch nicht von Meta freigegeben';
+            }
+            $log->zustellung = $grund ? null : 'gesendet';
         } catch (\Throwable $e) {
-            $log->zustellung = 'fehler';
-            $log->fehler = mb_substr($e->getMessage(), 0, 255);
+            $grund = $e->getMessage();
             Yii::warning("Bürger-WhatsApp $contentId: " . $e->getMessage(), 'maengelmelder');
+        }
+        if ($grund !== null) {
+            $an = null;
+            try {
+                $an = $ersatz ? $ersatz() : null;
+            } catch (\Throwable $e) {
+                Yii::warning("Bürger-WhatsApp $contentId, Ersatz-Mail: " . $e->getMessage(), 'maengelmelder');
+            }
+            $log->zustellung = $an ? 'per_mail' : 'fehler';
+            $log->fehler = mb_substr($grund . ($an ? " – stattdessen per E-Mail an $an" : ' – keine bestätigte E-Mail-Adresse als Ersatz'), 0, 255);
         }
         $log->save(false);
         return $log;
+    }
+
+    /** Hat Meta die Vorlage genehmigt? (15 Minuten zwischengespeichert, bei API-Fehler 2 Minuten „nein“) */
+    private static function vorlageFreigegeben(string $name): bool
+    {
+        $status = Yii::$app->cache->get('maengelmelder.vorlagenStatus');
+        if ($status === false) {
+            try {
+                $status = [];
+                foreach (Api::vorlagen() as $v) {
+                    $status[$v['name']] = $v['status'] ?? '';
+                }
+                Yii::$app->cache->set('maengelmelder.vorlagenStatus', $status, 900);
+            } catch (\Throwable $e) {
+                Yii::warning('Vorlagenstatus: ' . $e->getMessage(), 'maengelmelder');
+                Yii::$app->cache->set('maengelmelder.vorlagenStatus', [], 120);
+                return false;
+            }
+        }
+        return ($status[$name] ?? '') === 'APPROVED';
+    }
+
+    /** Bestätigte E-Mail-Adresse der meldenden Person (Ersatzweg für WhatsApp) */
+    private static function bestaetigteMail(MaengelKontakt $k): ?string
+    {
+        return $k->mailBestaetigt() ? $k->getMail() : null;
     }
 
     private static function fensterOffen(string $waId): bool

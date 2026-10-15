@@ -13,7 +13,7 @@ use humhub\modules\maengelmelder\models\BauhofNachricht;
 $fmt = Yii::$app->formatter;
 $haken = ['wartet' => ['fa-clock-o', 'wartet, bis der Mitarbeiter auf den Hinweis tippt'], 'gesendet' => ['fa-check', 'gesendet'],
     'zugestellt' => ['fa-check-circle-o', 'zugestellt'], 'gelesen' => ['fa-check-circle text-primary', 'gelesen'],
-    'fehler' => ['fa-exclamation-triangle text-danger', 'nicht zugestellt']];
+    'fehler' => ['fa-exclamation-triangle text-danger', 'nicht zugestellt'], 'per_mail' => ['fa-envelope-o', 'per E-Mail statt WhatsApp']];
 ?>
 <?php if ($verlauf === []): ?>
     <p class="text-muted small">Noch keine Nachrichten.</p>
@@ -56,8 +56,8 @@ $haken = ['wartet' => ['fa-clock-o', 'wartet, bis der Mitarbeiter auf den Hinwei
                 <?php if ($n->text !== null && $n->text !== ''): ?>
                     <div style="white-space:pre-line"><?= Html::encode($n->text) ?></div>
                 <?php endif ?>
-                <?php if ($n->zustellung === 'fehler' && $n->fehler): ?>
-                    <small class="text-danger"><?= Html::encode($n->fehler) ?></small>
+                <?php if (in_array($n->zustellung, ['fehler', 'per_mail'], true) && $n->fehler): ?>
+                    <small class="<?= $n->zustellung === 'fehler' ? 'text-danger' : 'text-muted' ?>"><?= Html::encode($n->fehler) ?></small>
                 <?php endif ?>
             <?php endif ?>
         </div>
