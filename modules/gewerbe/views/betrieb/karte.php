@@ -27,7 +27,7 @@ $fokus = (int)Yii::$app->request->get('fokus');
         <div id="gw-karte" style="height:65vh;min-height:380px;border-radius:12px" role="region" aria-label="Karte der Betriebe"></div>
         <p class="help-block" style="margin-top:8px"><?= count($punkte) ?> Betriebe auf der Karte<?= $ohneOrt ? ", $ohneOrt ohne bekannten Ort (nur in der Liste)" : '' ?>.
             Punkte: <span style="color:#3d5a06;font-weight:600">grün = jetzt geöffnet</span>, <span style="color:#8a2a20;font-weight:600">rot = geschlossen</span>,
-            blau = keine Öffnungszeiten hinterlegt. Dieselben Betriebe stehen auch in der <?= Html::a('Liste', $space->createUrl('/gewerbe/betrieb/index', array_filter(['q' => $q, 'kategorie' => $kategorie, 'ortsteil' => $ortsteil]))) ?>.</p>
+            blau = keine Öffnungszeiten hinterlegt. Viele Angaben stammen aus OpenStreetMap (© OpenStreetMap-Mitwirkende, ODbL). Dieselben Betriebe stehen auch in der <?= Html::a('Liste', $space->createUrl('/gewerbe/betrieb/index', array_filter(['q' => $q, 'kategorie' => $kategorie, 'ortsteil' => $ortsteil]))) ?>.</p>
     </div>
 </div>
 <?= $this->render('@maengelmelder/views/meldung/_tiles') ?>

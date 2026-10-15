@@ -76,6 +76,7 @@ class Betrieb extends ActiveRecord implements ViewableInterface
         return [
             [['name', 'kategorie', 'ortsteil'], 'required'],
             [['name', 'angebot', 'adresse', 'website', 'email', 'telefon'], 'trim'],
+            [['angebot', 'adresse', 'website', 'email', 'telefon', 'oeffnungszeiten', 'beschreibung'], 'default', 'value' => null],
             ['name', 'string', 'min' => 2, 'max' => 150],
             ['name', 'unique', 'message' => 'Diesen Betrieb gibt es schon im Verzeichnis.'],
             ['kategorie', 'in', 'range' => $module->categories],

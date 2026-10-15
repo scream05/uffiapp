@@ -47,10 +47,16 @@ $stand = $betrieb->getStand();
 
         <?php if ($betrieb->status === Betrieb::STATUS_VORGESCHLAGEN): ?>
             <div class="alert alert-warning" style="margin-top:14px">Dieser Eintrag wartet auf Freigabe. Erst danach ist er im Verzeichnis zu sehen.</div>
-        <?php elseif ($betrieb->isRecherchiert()): ?>
-            <div class="alert alert-info" style="margin-top:14px">Diese Angaben stammen aus einer öffentlichen Liste der Stadt Uffenheim
-                (<?= Html::a('Quelle', $betrieb->quelle, ['target' => '_blank', 'rel' => 'noopener nofollow']) ?><?= $betrieb->recherchiert_am ? ', Stand ' . Yii::$app->formatter->asDate($betrieb->recherchiert_am, 'medium') : '' ?>);
-                der Betrieb hat sie noch nicht bestätigt. Das ist dein Betrieb? Unten kannst du die Seite übernehmen.</div>
+        <?php elseif ($betrieb->isRecherchiert()): $osm = str_contains((string)$betrieb->quelle, 'openstreetmap.org'); ?>
+            <div class="alert alert-info" style="margin-top:14px">Diese Angaben stammen aus <?= $osm ? 'OpenStreetMap' : 'einer öffentlichen Liste der Stadt Uffenheim' ?>
+                (<?= Html::a('Quelle', $betrieb->quelle, ['target' => '_blank', 'rel' => 'noopener nofollow']) ?><?= $betrieb->recherchiert_am ? ', Stand ' . Yii::$app->formatter->asDate($betrieb->recherchiert_am, 'medium') : '' ?>)
+                und werden wöchentlich abgeglichen; der Betrieb hat sie noch nicht bestätigt. Das ist dein Betrieb? Unten kannst du die Seite übernehmen.</div>
+        <?php endif ?>
+        <?php if ($canManage && $betrieb->abgleich_hinweis): ?>
+            <div class="alert alert-warning" style="margin-top:14px"><strong>Hinweis aus dem wöchentlichen Abgleich</strong>
+                (<?= Yii::$app->formatter->asDate($betrieb->abgleich_am, 'medium') ?>):
+                <div style="white-space:pre-line;margin-top:4px"><?= Html::encode($betrieb->abgleich_hinweis) ?></div>
+                <small>Bitte prüfen und die Seite bei Bedarf anpassen. Angaben auf gepflegten Seiten ändern wir nicht selbst.</small></div>
         <?php endif ?>
 
         <?php if ($stichworte): ?>
@@ -116,6 +122,16 @@ $stand = $betrieb->getStand();
     </div>
 </div>
 
+<?php if ($betrieb->osm_ref || $betrieb->logo_quelle): ?>
+<p class="text-muted small gw-nachweis">
+    <?php if ($betrieb->osm_ref && $betrieb->status === Betrieb::STATUS_OFFEN): ?>
+        Daten: <?= Html::a('© OpenStreetMap-Mitwirkende', 'https://www.openstreetmap.org/copyright', ['target' => '_blank', 'rel' => 'noopener']) ?>, ODbL.
+    <?php endif ?>
+    <?php if ($betrieb->logo_quelle): ?>
+        Logo: <?= Html::a(Html::encode(parse_url($betrieb->logo_quelle, PHP_URL_HOST)), $betrieb->logo_quelle, ['target' => '_blank', 'rel' => 'noopener nofollow']) ?>.
+    <?php endif ?>
+</p>
+<?php endif ?>
 <?php if (!$canManage && $betrieb->status !== Betrieb::STATUS_VORGESCHLAGEN): ?>
 <div class="panel panel-default">
     <div class="panel-body">
@@ -146,7 +162,7 @@ $stand = $betrieb->getStand();
     .gw-infos { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 16px; }
     .gw-infos h2 { font-size: 1.05em; margin: 0 0 6px; }
     .gw-infos a { text-decoration: underline; text-underline-offset: 2px; }
-    .gw-zeiten th { padding: 1px 14px 1px 0; font-weight: 600; vertical-align: top; white-space: nowrap; }
+    .gw-zeiten th { padding: 1px 14px 1px 0; font-weight: 600; font-size: inherit; color: inherit; vertical-align: top; white-space: nowrap; }
     .gw-zeiten td { padding: 1px 0; }
     .gw-stand { margin-top: 4px; font-weight: 600; }
     .gw-stand.offen { color: #3d5a06; }

@@ -106,6 +106,17 @@ class Osm
      */
     public static function searchThrottled(string $query, array $bounds): array|null|false
     {
+        return self::gedrosselt(fn() => self::search($query, $bounds));
+    }
+
+    /** Wie address(), gedrosselt; false = gerade belegt */
+    public static function addressThrottled(float $lat, float $lng): string|null|false
+    {
+        return self::gedrosselt(fn() => self::address($lat, $lng));
+    }
+
+    private static function gedrosselt(callable $abfrage): mixed
+    {
         $mutex = Yii::$app->mutex;
         if (!$mutex->acquire('maengel-nominatim', 5)) {
             return false;
@@ -115,9 +126,9 @@ class Osm
             if ($warte > 0) {
                 usleep((int)($warte * 1e6));
             }
-            $hit = self::search($query, $bounds);
+            $ergebnis = $abfrage();
             Yii::$app->cache->set('maengel-nominatim-zuletzt', microtime(true), 10);
-            return $hit;
+            return $ergebnis;
         } finally {
             $mutex->release('maengel-nominatim');
         }

@@ -8,6 +8,9 @@ return [
     'id' => 'gewerbe',
     'class' => 'humhub\modules\gewerbe\Module',
     'namespace' => 'humhub\modules\gewerbe',
+    'consoleControllerMap' => [
+        'gewerbe' => 'humhub\modules\gewerbe\commands\GewerbeController',
+    ],
     'events' => [
         ['class' => Menu::class, 'event' => Menu::EVENT_INIT, 'callback' => [Events::class, 'onSpaceMenuInit']],
         ['class' => Menu::class, 'event' => Menu::EVENT_RUN, 'callback' => [Events::class, 'onSpaceMenuRun']],

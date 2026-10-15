@@ -71,7 +71,7 @@ class Oeffnungszeiten
                     $b += 1440;
                 }
                 if ($m >= $a && $m < $b) {
-                    return ['offen' => true, 'text' => 'Jetzt geöffnet · bis ' . self::zeit($bis) . ' Uhr'];
+                    return ['offen' => true, 'text' => $von === $bis ? 'Jetzt geöffnet · rund um die Uhr' : 'Jetzt geöffnet · bis ' . self::zeit($bis) . ' Uhr'];
                 }
             }
         }
@@ -89,11 +89,87 @@ class Oeffnungszeiten
         return ['offen' => false, 'text' => 'Geschlossen'];
     }
 
+    /**
+     * Öffnungszeiten im OpenStreetMap-Format („Mo-Fr 08:00-12:00,14:00-18:00; Sa 08:00-12:00; Su off“) in unser Format.
+     * Nur die einfache Form (Tage, Uhrzeiten, off, 24/7); Feiertage (PH) werden übergangen. Alles andere (Monate,
+     * Wochen, Kommentare, Sonnenzeiten …) → null, dann bleibt nur der Text als Hinweis.
+     */
+    public static function ausOsm(string $text): ?array
+    {
+        $kuerzel = ['Mo' => 1, 'Tu' => 2, 'We' => 3, 'Th' => 4, 'Fr' => 5, 'Sa' => 6, 'Su' => 7];
+        $text = trim(preg_replace('/\s+/', ' ', $text));
+        if ($text === '') {
+            return null;
+        }
+        $zeiten = array_fill(1, 7, []);
+        if ($text === '24/7') {
+            return array_fill(1, 7, [['00:00', '00:00']]);
+        }
+        $text = str_replace('+', '', $text); // offenes Ende („24:00+“) wie angegebenes Ende behandeln
+        foreach (array_filter(array_map('trim', explode(';', $text))) as $gruppe) {
+            // Mit Komma angehängte Zusatzregeln („Mo-Fr 9-12, Sa 9-13“) ergänzen sich, mit Semikolon getrennte überschreiben
+            $neu = [];
+            foreach (preg_split('/(?<=\d|f),\s*(?=(?:Mo|Tu|We|Th|Fr|Sa|Su|PH)\b)/', $gruppe) as $regel) {
+                $regel = trim($regel);
+                if ($regel === '' || preg_match('/^PH\b/', $regel)) {
+                    continue; // Feiertagsregeln („PH off“) übergehen
+                }
+                $r = self::osmRegel($regel, $kuerzel);
+                if ($r === null) {
+                    return null;
+                }
+                foreach ($r[0] as $tag) {
+                    $neu[$tag] = array_merge($neu[$tag] ?? [], $r[1]);
+                }
+            }
+            foreach ($neu as $tag => $spannen) {
+                usort($spannen, fn($x, $y) => strcmp($x[0], $y[0]));
+                $zeiten[$tag] = $spannen;
+            }
+        }
+        return self::hatZeiten($zeiten) ? $zeiten : null;
+    }
+
+    /** Eine Regel „Tage Zeiten“ → [[Tage], [[von, bis], …]] oder null */
+    private static function osmRegel(string $regel, array $kuerzel): ?array
+    {
+        if (!preg_match('/^(?:((?:Mo|Tu|We|Th|Fr|Sa|Su)(?:-(?:Mo|Tu|We|Th|Fr|Sa|Su))?(?:,(?:Mo|Tu|We|Th|Fr|Sa|Su)(?:-(?:Mo|Tu|We|Th|Fr|Sa|Su))?)*)(?:,PH)?\s*)?(off|closed|(?:\d{1,2}:\d{2}-\d{1,2}:\d{2}(?:,\s*\d{1,2}:\d{2}-\d{1,2}:\d{2})*))$/', $regel, $m)) {
+            return null;
+        }
+        $tage = [];
+        foreach ($m[1] !== '' ? explode(',', $m[1]) : ['Mo-Su'] as $teil) {
+            [$a, $b] = array_pad(explode('-', $teil), 2, null);
+            $von = $kuerzel[$a];
+            $bis = $b !== null ? $kuerzel[$b] : $von;
+            for ($i = 0, $t = $von; $i < 7; $i++, $t = $t % 7 + 1) {
+                $tage[] = $t;
+                if ($t === $bis) {
+                    break;
+                }
+            }
+        }
+        $spannen = [];
+        if (!in_array($m[2], ['off', 'closed'], true)) {
+            foreach (explode(',', str_replace(' ', '', $m[2])) as $spanne) {
+                [$a, $b] = explode('-', $spanne);
+                $a = str_pad($a, 5, '0', STR_PAD_LEFT);
+                $b = str_pad($b, 5, '0', STR_PAD_LEFT);
+                $b = $b === '24:00' ? '00:00' : $b;
+                if (!self::gueltig($a) || !self::gueltig($b)) {
+                    return null;
+                }
+                $spannen[] = [$a, $b];
+            }
+        }
+        return [array_values(array_unique($tage)), $spannen];
+    }
+
     /** Zeilen zur Anzeige: Tage mit gleichen Zeiten zusammengefasst, z. B. ['Mo–Fr', '8:00–12:00, 14:00–18:00 Uhr'] */
     public static function zeilen(array $zeiten): array
     {
         $zeilen = [];
-        $text = fn(array $s) => $s ? implode(', ', array_map(fn($p) => self::zeit($p[0]) . '–' . self::zeit($p[1]), $s)) . ' Uhr' : 'geschlossen';
+        $text = fn(array $s) => $s ? ($s[0][0] === $s[0][1] ? 'rund um die Uhr'
+            : implode(', ', array_map(fn($p) => self::zeit($p[0]) . '–' . self::zeit($p[1]), $s)) . ' Uhr') : 'geschlossen';
         $start = 1;
         for ($t = 1; $t <= 7; $t++) {
             if ($t === 7 || $text($zeiten[$t + 1]) !== $text($zeiten[$t])) {
