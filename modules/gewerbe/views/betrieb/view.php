@@ -112,8 +112,8 @@ $stand = $betrieb->getStand();
         <?php if ($gallery): ?>
             <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-top:16px">
                 <?php foreach ($gallery as $file): ?>
-                    <a href="<?= Html::encode($file->getUrl()) ?>" target="_blank" rel="noopener">
-                        <?= Html::img($file->getUrl(), ['alt' => 'Foto: ' . $betrieb->name, 'loading' => 'lazy',
+                    <a href="<?= Html::encode($file->getUrl([], false)) ?>" target="_blank" rel="noopener">
+                        <?= Html::img($file->getUrl([], false), ['alt' => 'Foto: ' . $betrieb->name, 'loading' => 'lazy',
                             'style' => 'width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;display:block']) ?>
                     </a>
                 <?php endforeach ?>

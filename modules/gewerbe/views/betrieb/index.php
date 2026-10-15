@@ -95,10 +95,11 @@ $url = fn(array $p = []) => $space->createUrl('/gewerbe/betrieb/index', array_fi
     .gw-branchen { display: flex; flex-wrap: wrap; gap: 6px; }
     /* Handy: Branchen als eine waagerecht wischbare Zeile statt sieben Zeilen Kacheln */
     @media (max-width: 575.98px) {
-        .gw-branchen { flex-wrap: nowrap; overflow-x: auto; margin: 0 -16px; padding: 2px 16px 8px; scroll-snap-type: x proximity;
-            -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        /* Kein negativer Rand, kein scroll-snap/-webkit-overflow-scrolling: das ließ in iOS-Safari die fixierte Tab-Leiste mitwandern */
+        .gw-branchen { flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; max-width: 100%; padding: 2px 0 8px;
+            overscroll-behavior-x: contain; scrollbar-width: none; }
         .gw-branchen::-webkit-scrollbar { display: none; }
-        .gw-branche { flex: 0 0 auto; scroll-snap-align: start; }
+        .gw-branche { flex: 0 0 auto; }
     }
     .gw-offen-filter { display: inline-flex; align-items: center; gap: 6px; margin: 0; font-weight: normal; min-height: 38px; }
     .gw-offen-filter input { width: 20px; height: 20px; }

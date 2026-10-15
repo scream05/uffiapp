@@ -84,7 +84,7 @@ for ($i = count($socialRows); $i < min(Betrieb::MAX_SOCIAL, count($socialRows) +
             <label>Logo</label>
             <?php if ($logo): ?>
                 <div style="margin-bottom:8px;display:flex;align-items:center;gap:12px">
-                    <?= Html::img($logo->getUrl(), ['alt' => 'Aktuelles Logo', 'style' => 'height:64px;border-radius:10px']) ?>
+                    <?= Html::img($logo->getUrl([], false), ['alt' => 'Aktuelles Logo', 'style' => 'height:64px;border-radius:10px']) ?>
                     <label style="font-weight:normal"><?= Html::checkbox('logoEntfernen', false) ?> Logo entfernen</label>
                 </div>
             <?php endif ?>
@@ -109,7 +109,7 @@ for ($i = count($socialRows); $i < min(Betrieb::MAX_SOCIAL, count($socialRows) +
                 <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px">
                     <?php foreach ($gallery as $file): ?>
                         <label style="font-weight:normal;width:140px">
-                            <?= Html::img($file->getUrl(), ['alt' => '', 'style' => 'width:140px;height:100px;object-fit:cover;border-radius:8px;display:block']) ?>
+                            <?= Html::img($file->getUrl([], false), ['alt' => '', 'style' => 'width:140px;height:100px;object-fit:cover;border-radius:8px;display:block']) ?>
                             <?= Html::checkbox('bildEntfernen[]', false, ['value' => $file->guid]) ?> entfernen
                         </label>
                     <?php endforeach ?>
