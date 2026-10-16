@@ -253,6 +253,15 @@ class Betrieb extends ActiveRecord implements ViewableInterface
         $this->updateAttributes(['lat' => $hit[0] ?? null, 'lng' => $hit[1] ?? null]);
     }
 
+    public function beforeDelete()
+    {
+        // Beiträge samt Bildern (die Zeilen löscht sonst nur der Fremdschlüssel, die Dateien blieben liegen)
+        foreach (BetriebBeitrag::findAll(['betrieb_id' => $this->id]) as $b) {
+            $b->delete();
+        }
+        return parent::beforeDelete();
+    }
+
     public function afterDelete()
     {
         foreach ($this->fileManager->findAll() as $file) {

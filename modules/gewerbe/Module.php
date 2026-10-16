@@ -14,6 +14,9 @@ class Module extends ContentContainerModule
 {
     public $resourcesPath = 'resources';
 
+    /** Antwortadresse für Mails an Verfasser (Ablehnung eines Beitrags) */
+    public string $kontaktMail = 'smartcity@buergerliste-uffenheim.de';
+
     public array $categories = [
         'Einzelhandel',
         'Lebensmittel & Hofladen',
@@ -57,7 +60,8 @@ class Module extends ContentContainerModule
 
     public function getNotifications()
     {
-        return [notifications\VerwaltungAngefragt::class, notifications\VerwaltungBestaetigt::class];
+        return [notifications\VerwaltungAngefragt::class, notifications\VerwaltungBestaetigt::class,
+            notifications\BeitragEingereicht::class, notifications\BeitragFreigegeben::class];
     }
 
     /** Space, in dem das Verzeichnis läuft */

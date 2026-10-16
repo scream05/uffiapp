@@ -2,9 +2,11 @@
 
 namespace humhub\modules\gewerbe\commands;
 
+use humhub\modules\gewerbe\components\BeitragDienst;
 use humhub\modules\gewerbe\components\Logo;
 use humhub\modules\gewerbe\components\OsmQuelle;
 use humhub\modules\gewerbe\models\Betrieb;
+use humhub\modules\gewerbe\models\BetriebBeitrag;
 use humhub\modules\gewerbe\models\BetriebVerwalter;
 use Yii;
 use yii\console\Controller;
@@ -17,6 +19,8 @@ use yii\console\ExitCode;
  *                                 Websites prüfen, fehlende Logos holen (1 = Probelauf)
  *   /app/yii gewerbe/logos        Logos von den Websites holen (nur Einträge ohne Logo)
  *   /app/yii gewerbe/loeschen <ids> Betriebe löschen, ihre OSM-Objekte künftig überspringen
+ *   /app/yii gewerbe/beitrag-test <autor> <leser> <betrieb-id> [1=behalten]  Probelauf Gewerbebeiträge
+ *   /app/yii gewerbe/beitrag-entfernen <id>  Gewerbebeitrag samt HumHub-Beitrag entfernen
  *   /app/yii gewerbe/osm-stand    einmalig: aktuellen OSM-Stand merken (Abgleich ändert dann nur, was OSM neu ändert)
  * Gepflegte Seiten (Status aktiv, vom Betrieb selbst) werden nie überschrieben; ihre Verwalter sehen Abweichungen als Hinweis.
  */
@@ -71,6 +75,60 @@ class GewerbeController extends Controller
         }
         $this->stdout(($probe ? 'Probelauf: ' : '') . "$neu neu, $verknuepft mit vorhandenen Einträgen verknüpft\n");
         Yii::$app->cache->delete('ki-link-domains');
+        return ExitCode::OK;
+    }
+
+    /**
+     * Probelauf Gewerbebeiträge: Testbeitrag von <autor> für Betrieb <id> anlegen, für Betriebsseite + Übersicht freigeben,
+     * prüfen, ob er in der Übersicht von <leser> (kein Mitglied des Gewerbe-Space) und von Gästen erscheint, wieder entfernen.
+     * Ohne Benachrichtigungen und Mails.
+     */
+    public function actionBeitragTest($autor, $leser, $betriebId, $behalten = 0)
+    {
+        $a = \humhub\modules\user\models\User::findOne(['username' => $autor]);
+        $l = \humhub\modules\user\models\User::findOne(['username' => $leser]);
+        $betrieb = Betrieb::findOne((int)$betriebId);
+        if (!$a || !$l || !$betrieb) {
+            $this->stderr("Autor, Leser oder Betrieb nicht gefunden\n");
+            return ExitCode::DATAERR;
+        }
+        Yii::$app->user->switchIdentity($a); // Verfasser = Prüfer → keine Glocke „freigegeben“
+        Yii::$app->getModule('dashboard')->memberFilterClass = \humhub\modules\uebersicht\filters\MeineUebersicht::class;
+        $b = new BetriebBeitrag(['betrieb_id' => $betrieb->id, 'user_id' => $a->id, 'status' => BetriebBeitrag::STATUS_EINGEREICHT,
+            'text' => 'TEST – bitte ignorieren (Probelauf Gewerbebeiträge)']);
+        $b->save(false);
+        BeitragDienst::freigeben($b, true, true);
+        $b->refresh();
+        $this->stdout("Beitrag {$b->id} für „{$betrieb->name}“: Status {$b->status}, Content {$b->content_id}\n");
+        $ids = function ($user) {
+            Yii::$app->user->switchIdentity($user);
+            $q = new \humhub\modules\dashboard\stream\DashboardStreamQuery(['user' => $user, 'limit' => 5, 'activity' => false]);
+            return array_map(fn($c) => $c->id, $q->all());
+        };
+        $this->stdout("Übersicht {$l->username}: " . (in_array($b->content_id, $ids($l)) ? 'sichtbar' : 'NICHT sichtbar') . "\n");
+        $this->stdout('Übersicht Gast: ' . (in_array($b->content_id, $ids(null)) ? 'sichtbar' : 'NICHT sichtbar') . "\n");
+        $b->begruendung = 'Beispiel-Begründung';
+        $this->stdout("--- Ablehnungs-Mail (Vorschau) ---\n" . Yii::$app->view->renderFile('@gewerbe/views/mail/abgelehnt_text.php', [
+            'beitrag' => $b, 'name' => $a->displayName, 'link' => $betrieb->getUrl(true), 'kontaktMail' => Yii::$app->getModule('gewerbe')->kontaktMail,
+        ]) . "---\n");
+        if ($behalten) {
+            $this->stdout("Behalten – entfernen mit: gewerbe/beitrag-entfernen {$b->id}\n");
+            return ExitCode::OK;
+        }
+        BeitragDienst::entfernen($b);
+        $this->stdout('Entfernt: ' . (\humhub\modules\content\models\Content::findOne($b->content_id) ? 'NEIN' : 'ja') . "\n");
+        return ExitCode::OK;
+    }
+
+    public function actionBeitragEntfernen($id)
+    {
+        $b = BetriebBeitrag::findOne((int)$id);
+        if ($b === null) {
+            $this->stderr("Beitrag $id nicht gefunden\n");
+            return ExitCode::DATAERR;
+        }
+        BeitragDienst::entfernen($b);
+        $this->stdout("Beitrag $id entfernt\n");
         return ExitCode::OK;
     }
 

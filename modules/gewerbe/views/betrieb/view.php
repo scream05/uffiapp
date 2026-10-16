@@ -3,6 +3,8 @@
  * @var \humhub\modules\gewerbe\models\Betrieb $betrieb
  * @var \humhub\modules\gewerbe\models\BetriebVerwalter|null $own
  * @var bool $canManage
+ * @var \humhub\modules\gewerbe\models\BetriebBeitrag[] $beitraege veröffentlicht auf der Betriebsseite
+ * @var \humhub\modules\gewerbe\models\BetriebBeitrag[] $eigene eingereichte/abgelehnte (nur für Verwalter)
  */
 
 use humhub\helpers\Html;
@@ -10,6 +12,7 @@ use humhub\modules\content\widgets\richtext\RichText;
 use humhub\modules\gewerbe\components\Logo;
 use humhub\modules\gewerbe\components\Oeffnungszeiten;
 use humhub\modules\gewerbe\models\Betrieb;
+use humhub\modules\gewerbe\models\BetriebBeitrag;
 use humhub\modules\gewerbe\models\BetriebVerwalter;
 use humhub\modules\gewerbe\Module;
 
@@ -37,6 +40,9 @@ $stand = $betrieb->getStand();
         <?php if ($canManage): ?>
             <div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:6px">
                 <?= Html::a('<i class="fa fa-pencil" aria-hidden="true"></i> Seite bearbeiten', $space->createUrl('/gewerbe/betrieb/edit', ['id' => $betrieb->id]), ['class' => 'btn btn-primary btn-sm']) ?>
+                <?php if ($betrieb->status !== Betrieb::STATUS_VORGESCHLAGEN): ?>
+                    <?= Html::a('<i class="fa fa-pencil-square-o" aria-hidden="true"></i> Beitrag schreiben', $space->createUrl('/gewerbe/beitrag/create', ['betrieb' => $betrieb->id]), ['class' => 'btn btn-primary btn-sm']) ?>
+                <?php endif ?>
                 <?= Html::a('<i class="fa fa-user-plus" aria-hidden="true"></i> Verwalter' . ($pending ? " ($pending neu)" : ''), $space->createUrl('/gewerbe/betrieb/verwalter', ['id' => $betrieb->id]), ['class' => 'btn btn-light btn-sm']) ?>
                 <?php if (Module::canManageAll()): ?>
                     <?= Html::a('<i class="fa fa-trash" aria-hidden="true"></i> Aus dem Verzeichnis löschen', $space->createUrl('/gewerbe/betrieb/delete', ['id' => $betrieb->id]), [
@@ -128,6 +134,40 @@ $stand = $betrieb->getStand();
         <?php endif ?>
     </div>
 </div>
+
+<?php if ($beitraege || $eigene): ?>
+<div class="panel panel-default">
+    <div class="panel-heading"><strong>Beiträge</strong></div>
+    <div class="panel-body">
+        <?php foreach ($eigene as $b): ?>
+            <div class="alert <?= $b->status === BetriebBeitrag::STATUS_ABGELEHNT ? 'alert-danger' : 'alert-warning' ?>" style="margin-bottom:12px">
+                <strong><?= $b->status === BetriebBeitrag::STATUS_ABGELEHNT ? 'Nicht veröffentlicht' : 'Wartet auf Prüfung' ?></strong>
+                (eingereicht <?= Yii::$app->formatter->asDatetime($b->created_at, 'short') ?> von <?= Html::encode($b->user->displayName ?? '') ?>):
+                <?= Html::encode(mb_strimwidth($b->text, 0, 120, '…')) ?>
+                <?php if ($b->status === BetriebBeitrag::STATUS_ABGELEHNT && $b->begruendung): ?>
+                    <br><small>Begründung: <?= Html::encode($b->begruendung) ?></small>
+                <?php endif ?>
+            </div>
+        <?php endforeach ?>
+        <?php foreach ($beitraege as $i => $b): ?>
+            <div style="padding:12px 0;<?= $i || $eigene ? 'border-top:1px solid rgba(0,0,0,.08)' : 'padding-top:0' ?>">
+                <small class="text-muted"><?= Yii::$app->formatter->asDate($b->geprueft_am ?? $b->created_at, 'medium') ?></small>
+                <?= $this->render('@gewerbe/views/beitrag/_beitrag', ['beitrag' => $b]) ?>
+                <div style="margin-top:6px;font-size:0.9em">
+                    <?php if ($b->content): ?>
+                        <?= Html::a('<i class="fa fa-comment-o" aria-hidden="true"></i> Kommentieren', $b->content->getUrl()) ?>
+                    <?php endif ?>
+                    <?php if (Module::canManageAll()): ?>
+                        <?= Html::a('<i class="fa fa-trash" aria-hidden="true"></i> Entfernen', $space->createUrl('/gewerbe/beitrag/entfernen', ['id' => $b->id]), [
+                            'class' => 'text-danger', 'style' => 'margin-left:12px', 'data-method' => 'post', 'data-params' => ['zurueck' => 'betrieb'],
+                            'data-confirm' => 'Diesen Beitrag ganz entfernen (auch aus der Übersicht)?']) ?>
+                    <?php endif ?>
+                </div>
+            </div>
+        <?php endforeach ?>
+    </div>
+</div>
+<?php endif ?>
 
 <?php if ($betrieb->osm_ref || $betrieb->logo_quelle): ?>
 <p class="text-muted small gw-nachweis">

@@ -2,16 +2,51 @@
 
 namespace humhub\modules\gewerbe;
 
+use humhub\modules\gewerbe\models\BetriebBeitrag;
 use humhub\modules\gewerbe\models\BetriebVerwalter;
+use humhub\modules\gewerbe\widgets\BetriebAddon;
+use humhub\modules\post\models\Post;
 use Yii;
 
 class Events
 {
+    /** Abgelehnte Gewerbebeiträge so viele Tage nach der Prüfung löschen */
+    public const ABGELEHNT_TAGE = 30;
+
     public static function onUserLoeschen($event)
     {
         try {
             $user = $event->user ?? $event->sender;
             BetriebVerwalter::deleteAll(['user_id' => $user->id]);
+            foreach (BetriebBeitrag::find()->where(['user_id' => $user->id])
+                         ->andWhere(['!=', 'status', BetriebBeitrag::STATUS_VEROEFFENTLICHT])->all() as $b) {
+                $b->delete(); // samt Bildern
+            }
+        } catch (\Throwable $e) {
+            Yii::error($e);
+        }
+    }
+
+    public static function onCronDaily($event)
+    {
+        try {
+            foreach (BetriebBeitrag::find()->where(['status' => BetriebBeitrag::STATUS_ABGELEHNT])
+                         ->andWhere(['<', 'geprueft_am', date('Y-m-d H:i:s', strtotime('-' . self::ABGELEHNT_TAGE . ' days'))])->all() as $b) {
+                $b->delete();
+            }
+        } catch (\Throwable $e) {
+            Yii::error($e);
+        }
+    }
+
+    /** „Beitrag von <Betrieb>“ unter Gewerbebeiträgen in der Übersicht */
+    public static function onWallEntryAddonsInit($event)
+    {
+        try {
+            $object = $event->sender->object;
+            if ($object instanceof Post && ($b = BetriebBeitrag::forContent($object->content->id)) !== null) {
+                $event->sender->addWidget(BetriebAddon::class, ['beitrag' => $b], ['sortOrder' => 5]);
+            }
         } catch (\Throwable $e) {
             Yii::error($e);
         }
@@ -57,7 +92,7 @@ class Events
                 'group' => 'modules',
                 'url' => $space->createUrl('/gewerbe/betrieb/index'),
                 'icon' => '<i class="fa fa-shopping-bag"></i>',
-                'isActive' => $active && Yii::$app->controller->action->id !== 'anfragen',
+                'isActive' => $active && !in_array(Yii::$app->controller->action->id, ['anfragen', 'pruefen'], true),
                 'sortOrder' => 90,
             ]);
             if (Module::canManageAll()) {
@@ -69,6 +104,15 @@ class Events
                     'icon' => '<i class="fa fa-inbox"></i>',
                     'isActive' => $active && Yii::$app->controller->action->id === 'anfragen',
                     'sortOrder' => 91,
+                ]);
+                $offen = BetriebBeitrag::find()->where(['status' => BetriebBeitrag::STATUS_EINGEREICHT])->count();
+                $event->sender->addItem([
+                    'label' => 'Gewerbe-Beiträge' . ($offen ? " ($offen)" : ''),
+                    'group' => 'modules',
+                    'url' => $space->createUrl('/gewerbe/beitrag/pruefen'),
+                    'icon' => '<i class="fa fa-check-square-o"></i>',
+                    'isActive' => $active && Yii::$app->controller->action->id === 'pruefen',
+                    'sortOrder' => 92,
                 ]);
             }
         } catch (\Throwable $e) {

@@ -4,6 +4,7 @@ namespace humhub\modules\gewerbe\controllers;
 
 use humhub\modules\content\components\ContentContainerController;
 use humhub\modules\gewerbe\models\Betrieb;
+use humhub\modules\gewerbe\models\BetriebBeitrag;
 use humhub\modules\gewerbe\models\BetriebVerwalter;
 use humhub\modules\gewerbe\Module;
 use humhub\modules\gewerbe\notifications\VerwaltungAngefragt;
@@ -91,6 +92,13 @@ class BetriebController extends ContentContainerController
             'betrieb' => $betrieb,
             'own' => Yii::$app->user->isGuest ? null : BetriebVerwalter::findOne(['betrieb_id' => $betrieb->id, 'user_id' => Yii::$app->user->id]),
             'canManage' => $betrieb->canManage(),
+            'beitraege' => BetriebBeitrag::find()->where(['betrieb_id' => $betrieb->id, 'status' => BetriebBeitrag::STATUS_VEROEFFENTLICHT,
+                'auf_betriebsseite' => 1])->orderBy(['geprueft_am' => SORT_DESC, 'id' => SORT_DESC])->limit(20)->all(),
+            // Eingereichte und (letzte 30 Tage) abgelehnte Beiträge sehen die Verwalter des Betriebs
+            'eigene' => $betrieb->canManage() ? BetriebBeitrag::find()->with('user')->where(['betrieb_id' => $betrieb->id])
+                ->andWhere(['or', ['status' => BetriebBeitrag::STATUS_EINGEREICHT],
+                    ['and', ['status' => BetriebBeitrag::STATUS_ABGELEHNT], ['>=', 'geprueft_am', date('Y-m-d H:i:s', strtotime('-30 days'))]]])
+                ->orderBy(['created_at' => SORT_DESC])->all() : [],
         ]);
     }
 
