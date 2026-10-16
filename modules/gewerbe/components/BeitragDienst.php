@@ -34,7 +34,7 @@ class BeitragDienst
      * Freigeben: auf der Betriebsseite und/oder als HumHub-Beitrag (Verfasser: Betriebsverwalter) im Space des
      * Verzeichnisses, der in der Übersicht erscheint (Bereich „Gewerbe & Einkaufen“ in „Meine Übersicht“).
      */
-    public static function freigeben(BetriebBeitrag $b, bool $betriebsseite, bool $uebersicht): void
+    public static function freigeben(BetriebBeitrag $b, bool $betriebsseite, bool $uebersicht, bool $benachrichtigen = true): void
     {
         if (!$betriebsseite && !$uebersicht) {
             throw new Exception('Mindestens ein Ort muss gewählt sein.');
@@ -69,7 +69,7 @@ class BeitragDienst
             $transaction->rollBack();
             throw $e;
         }
-        if ($b->user_id !== Yii::$app->user->id) {
+        if ($benachrichtigen && $b->user_id !== Yii::$app->user->id) {
             BeitragFreigegeben::instance()->from(Yii::$app->user->getIdentity())->about($b)->send($b->user);
         }
     }

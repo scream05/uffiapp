@@ -30,7 +30,7 @@ $space = $this->context->contentContainer;
                     <?= Html::hiddenInput('aktion', 'freigeben') ?>
                     <div style="display:flex;flex-wrap:wrap;gap:6px 18px;margin-bottom:8px">
                         <label style="font-weight:normal"><?= Html::checkbox('betriebsseite', true) ?> Auf der Betriebsseite zeigen</label>
-                        <label style="font-weight:normal"><?= Html::checkbox('uebersicht', false) ?> In der Übersicht (Stream) zeigen</label>
+                        <label style="font-weight:normal"><?= Html::checkbox('uebersicht', true) ?> In der Übersicht (Stream) zeigen</label>
                     </div>
                     <button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-check"></i> Freigeben</button>
                 <?= Html::endForm() ?>
@@ -67,7 +67,9 @@ $space = $this->context->contentContainer;
                                 abgelehnt: <?= Html::encode(mb_strimwidth((string)$b->begruendung, 0, 80, '…')) ?>
                             <?php else: ?>
                                 veröffentlicht <?= implode(' und ', array_filter([$b->auf_betriebsseite ? 'auf der Betriebsseite' : '', $b->uebersicht ? 'in der Übersicht' : ''])) ?>
-                                <?= $b->content ? ' · ' . Html::a('Beitrag ansehen', $b->content->getUrl()) : '' ?>
+                                <?= $b->content ? ' · ' . Html::a('Beitrag ansehen', $b->content->getUrl())
+                                    : ($b->status === BetriebBeitrag::STATUS_VEROEFFENTLICHT ? ' · ' . Html::a('Auch in der Übersicht zeigen',
+                                        $space->createUrl('/gewerbe/beitrag/uebersicht', ['id' => $b->id]), ['data-method' => 'post']) : '') ?>
                             <?php endif ?>
                             · <?= $b->geprueft_am ? Yii::$app->formatter->asDatetime($b->geprueft_am, 'short') : '' ?>
                         </small>

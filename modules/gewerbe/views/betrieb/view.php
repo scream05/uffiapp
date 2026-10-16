@@ -157,6 +157,10 @@ $stand = $betrieb->getStand();
                     <?php if ($b->content): ?>
                         <?= Html::a('<i class="fa fa-comment-o" aria-hidden="true"></i> Kommentieren', $b->content->getUrl()) ?>
                     <?php endif ?>
+                    <?php if (Module::canManageAll() && !$b->content_id): ?>
+                        <?= Html::a('<i class="fa fa-share" aria-hidden="true"></i> Auch in der Übersicht zeigen', $space->createUrl('/gewerbe/beitrag/uebersicht', ['id' => $b->id]), [
+                            'style' => 'margin-left:12px', 'data-method' => 'post', 'data-params' => ['zurueck' => 'betrieb']]) ?>
+                    <?php endif ?>
                     <?php if (Module::canManageAll()): ?>
                         <?= Html::a('<i class="fa fa-trash" aria-hidden="true"></i> Entfernen', $space->createUrl('/gewerbe/beitrag/entfernen', ['id' => $b->id]), [
                             'class' => 'text-danger', 'style' => 'margin-left:12px', 'data-method' => 'post', 'data-params' => ['zurueck' => 'betrieb'],

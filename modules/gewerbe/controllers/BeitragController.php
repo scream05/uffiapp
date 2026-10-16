@@ -96,6 +96,22 @@ class BeitragController extends ContentContainerController
         return $this->redirect($zurueck);
     }
 
+    /** Schon veröffentlichten Beitrag (nur Betriebsseite) nachträglich auch in der Übersicht zeigen */
+    public function actionUebersicht($id)
+    {
+        $this->forcePostRequest();
+        $this->nurPruefer();
+        $b = $this->finde($id);
+        if ($b->status !== BetriebBeitrag::STATUS_VEROEFFENTLICHT || $b->content_id) {
+            $this->view->info('Dieser Beitrag ist schon in der Übersicht oder nicht veröffentlicht.');
+        } else {
+            BeitragDienst::freigeben($b, (bool)$b->auf_betriebsseite, true, false);
+            $this->view->success('Der Beitrag steht jetzt auch in der Übersicht.');
+        }
+        return $this->redirect(Yii::$app->request->post('zurueck') === 'betrieb' ? $b->betrieb->getUrl()
+            : $this->contentContainer->createUrl('/gewerbe/beitrag/pruefen'));
+    }
+
     /** Veröffentlichten oder abgelehnten Beitrag entfernen (samt HumHub-Beitrag) */
     public function actionEntfernen($id)
     {
