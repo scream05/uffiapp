@@ -107,6 +107,13 @@ class GewerbeController extends Controller
         };
         $this->stdout("Übersicht {$l->username}: " . (in_array($b->content_id, $ids($l)) ? 'sichtbar' : 'NICHT sichtbar') . "\n");
         $this->stdout('Übersicht Gast: ' . (in_array($b->content_id, $ids(null)) ? 'sichtbar' : 'NICHT sichtbar') . "\n");
+        $alt = $b->content_id;
+        BeitragDienst::ausUebersicht($b);
+        $b->refresh();
+        $this->stdout('Aus der Übersicht genommen: ' . (\humhub\modules\content\models\Content::findOne($alt) ? 'NEIN' : 'ja')
+            . ", auf der Betriebsseite: " . ($b->auf_betriebsseite ? 'ja' : 'NEIN') . "\n");
+        BeitragDienst::freigeben($b, true, true, false);
+        $b->refresh();
         $b->begruendung = 'Beispiel-Begründung';
         $this->stdout("--- Ablehnungs-Mail (Vorschau) ---\n" . Yii::$app->view->renderFile('@gewerbe/views/mail/abgelehnt_text.php', [
             'beitrag' => $b, 'name' => $a->displayName, 'link' => $betrieb->getUrl(true), 'kontaktMail' => Yii::$app->getModule('gewerbe')->kontaktMail,

@@ -112,6 +112,20 @@ class BeitragController extends ContentContainerController
             : $this->contentContainer->createUrl('/gewerbe/beitrag/pruefen'));
     }
 
+    /** Aus der Übersicht nehmen, auf der Betriebsseite lassen */
+    public function actionAusUebersicht($id)
+    {
+        $this->forcePostRequest();
+        $this->nurPruefer();
+        $b = $this->finde($id);
+        if ($b->content_id) {
+            BeitragDienst::ausUebersicht($b);
+            $this->view->success('Der Beitrag steht nicht mehr in der Übersicht, nur noch auf der Betriebsseite.');
+        }
+        return $this->redirect(Yii::$app->request->post('zurueck') === 'betrieb' ? $b->betrieb->getUrl()
+            : $this->contentContainer->createUrl('/gewerbe/beitrag/pruefen'));
+    }
+
     /** Veröffentlichten oder abgelehnten Beitrag entfernen (samt HumHub-Beitrag) */
     public function actionEntfernen($id)
     {

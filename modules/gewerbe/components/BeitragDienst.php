@@ -88,6 +88,20 @@ class BeitragDienst
         return self::ablehnungsMail($b);
     }
 
+    /**
+     * Aus der Übersicht nehmen: HumHub-Beitrag löschen (samt Kommentaren), der Beitrag bleibt auf der Betriebsseite.
+     * Die Bilder hängen vorher wieder am Gewerbebeitrag, sonst würden sie mit dem HumHub-Beitrag gelöscht.
+     */
+    public static function ausUebersicht(BetriebBeitrag $b): void
+    {
+        $post = $b->content?->getModel();
+        if ($post !== null) {
+            $b->fileManager->attach($post->fileManager->findAll(), true);
+        }
+        $b->updateAttributes(['content_id' => null, 'uebersicht' => 0, 'auf_betriebsseite' => 1]);
+        $post?->hardDelete();
+    }
+
     /** Veröffentlichten Beitrag ganz entfernen (samt HumHub-Beitrag) */
     public static function entfernen(BetriebBeitrag $b): void
     {

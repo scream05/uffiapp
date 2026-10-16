@@ -67,7 +67,9 @@ $space = $this->context->contentContainer;
                                 abgelehnt: <?= Html::encode(mb_strimwidth((string)$b->begruendung, 0, 80, '…')) ?>
                             <?php else: ?>
                                 veröffentlicht <?= implode(' und ', array_filter([$b->auf_betriebsseite ? 'auf der Betriebsseite' : '', $b->uebersicht ? 'in der Übersicht' : ''])) ?>
-                                <?= $b->content ? ' · ' . Html::a('Beitrag ansehen', $b->content->getUrl())
+                                <?= $b->content ? ' · ' . Html::a('Beitrag ansehen', $b->content->getUrl()) . ' · ' . Html::a('Aus der Übersicht nehmen',
+                                        $space->createUrl('/gewerbe/beitrag/aus-uebersicht', ['id' => $b->id]), ['data-method' => 'post',
+                                        'data-confirm' => 'Aus der Übersicht nehmen? Kommentare dort werden gelöscht; auf der Betriebsseite bleibt der Beitrag.'])
                                     : ($b->status === BetriebBeitrag::STATUS_VEROEFFENTLICHT ? ' · ' . Html::a('Auch in der Übersicht zeigen',
                                         $space->createUrl('/gewerbe/beitrag/uebersicht', ['id' => $b->id]), ['data-method' => 'post']) : '') ?>
                             <?php endif ?>
