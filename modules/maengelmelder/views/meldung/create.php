@@ -265,7 +265,35 @@ maengelReady(function () {
             var text = fotos.files.length > max ? 'Bitte höchstens ' + max + ' Fotos auswählen.' : (zuGross ? 'Ein Foto ist größer als ' + maxMb + ' MB.' : '');
             document.getElementById('maengel-fotos-hinweis').textContent = text;
             fotos.setCustomValidity(text);
+            if (!text) verkleinern();
         });
+    }
+    // Handyfotos vor dem Senden auf höchstens 2000 px (JPEG) verkleinern: statt mehrerer MB je Foto nur einige hundert KB,
+    // das Absenden geht über das Mobilnetz viel schneller. Der Server bearbeitet die Bilder trotzdem (GastFotos).
+    function verkleinern() {
+        if (!window.DataTransfer || !window.createImageBitmap || !HTMLCanvasElement.prototype.toBlob) return;
+        var hinweis = document.getElementById('maengel-fotos-hinweis'), knopf = document.querySelector('#maengel-form [type=submit]');
+        var liste = [].slice.call(fotos.files);
+        if (!liste.some(function (f) { return /^image\/(jpeg|png|webp|heic|heif)$/.test(f.type) && f.size > 600 * 1024; })) return;
+        hinweis.textContent = 'Fotos werden verkleinert …';
+        if (knopf) knopf.disabled = true;
+        Promise.all(liste.map(function (f) {
+            if (!/^image\/(jpeg|png|webp|heic|heif)$/.test(f.type) || f.size <= 600 * 1024) return Promise.resolve(f);
+            return createImageBitmap(f, {imageOrientation: 'from-image'}).then(function (bild) {
+                var faktor = Math.min(1, 2000 / Math.max(bild.width, bild.height));
+                var c = document.createElement('canvas');
+                c.width = Math.round(bild.width * faktor); c.height = Math.round(bild.height * faktor);
+                c.getContext('2d').drawImage(bild, 0, 0, c.width, c.height);
+                return new Promise(function (ok) { c.toBlob(ok, 'image/jpeg', 0.85); });
+            }).then(function (blob) {
+                return blob && blob.size < f.size ? new File([blob], f.name.replace(/\.\w+$/, '') + '.jpg', {type: 'image/jpeg'}) : f;
+            }, function () { return f; }); // nicht lesbar (z. B. HEIC in manchen Browsern): Original senden
+        })).then(function (neu) {
+            var dt = new DataTransfer();
+            neu.forEach(function (f) { dt.items.add(f); });
+            fotos.files = dt.files;
+            hinweis.textContent = '';
+        }).finally(function () { if (knopf) knopf.disabled = false; });
     }
     var csrfParam = document.querySelector('meta[name=csrf-param]').content, csrfToken = document.querySelector('meta[name=csrf-token]').content;
     function esc(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
