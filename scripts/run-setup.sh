@@ -8,6 +8,11 @@ if [ "${1:-}" = ki-composer ]; then
   exec docker run --rm -u "$(id -u):$(id -g)" -v "$PWD/modules/ki-assistent:/app" -e COMPOSER_HOME=/tmp composer:2 \
     composer install --no-interaction --no-dev --optimize-autoloader
 fi
+# Abhängigkeiten des Gewerbeverzeichnisses (QR-Codes der Gutscheine, bacon/bacon-qr-code) nach modules/gewerbe/vendor (nicht im Git)
+if [ "${1:-}" = gewerbe-composer ]; then
+  exec docker run --rm -u "$(id -u):$(id -g)" -v "$PWD/modules/gewerbe:/app" -e COMPOSER_HOME=/tmp composer:2 \
+    composer install --no-interaction --no-dev --optimize-autoloader
+fi
 # PDF-Reader des Mitteilungsblatts (pdf.js, Legacy-Build für ältere Handys) nach modules/mitteilungsblatt/pdfjs (nicht im Git)
 if [ "${1:-}" = pdfjs ]; then
   V=6.4.299

@@ -1742,4 +1742,134 @@ class SetupController extends Controller
         $text = preg_replace(["/[ \t]+\n/", "/\n[ \t]+/", "/ +([.,;:!?])/", "/\n{3,}/"], ["\n", "\n", '$1', "\n\n"], $text);
         return [trim($text), array_values(array_unique($images))];
     }
+
+    /**
+     * Probelauf Gutscheine: setup/gutschein-test [behalten=0]
+     * Legt einen Testbetrieb und zwei Testkonten an (ohne Glocken an echte Personen), prüft Einlösen, Limits,
+     * Zurücknehmen, Nummer, automatische Pause und QR; räumt danach alles wieder ab. Mit behalten=1 bleiben
+     * Betrieb, Gutschein und Konten (mit Passwort) für einen Test im Browser; abräumen: setup/gutschein-test-aufraeumen
+     */
+    public function actionGutscheinTest($behalten = 0)
+    {
+        $D = \humhub\modules\gewerbe\components\GutscheinDienst::class;
+        $D::$stumm = true;
+        $this->actionGutscheinTestAufraeumen(true);
+        $ok = 0; $fehl = 0;
+        $pruefe = function (string $was, bool $bed) use (&$ok, &$fehl) {
+            $bed ? $ok++ : $fehl++;
+            $this->stdout(($bed ? '  ok   ' : '  FEHL ') . $was . "\n");
+        };
+        $konto = function (string $name) {
+            $u = new User(['scenario' => 'editAdmin']);
+            $u->username = $name;
+            $u->email = "$name@example.invalid";
+            $u->status = User::STATUS_ENABLED;
+            $u->save() || throw new \Exception(json_encode($u->getErrors()));
+            $u->profile->scenario = 'editAdmin';
+            $u->profile->firstname = 'Test';
+            $u->profile->lastname = $name;
+            $u->profile->save(false);
+            $pw = new \humhub\modules\user\models\Password();
+            $pw->user_id = $u->id;
+            $pw->setPassword('Gutschein-Test-2026!');
+            $pw->save(false);
+            return $u;
+        };
+        $verwalter = $konto('gs-test-verwalter');
+        $kunde = $konto('gs-test-kunde');
+        $b = new \humhub\modules\gewerbe\models\Betrieb(['name' => 'TEST Gutscheinbetrieb', 'kategorie' => 'Sonstiges',
+            'ortsteil' => 'Uffenheim', 'status' => 'aktiv', 'geocodeAus' => true]);
+        $b->save(false);
+        (new \humhub\modules\gewerbe\models\BetriebVerwalter(['betrieb_id' => $b->id, 'user_id' => $verwalter->id, 'status' => 'bestaetigt']))->save(false);
+        $D::theke($b);
+        $this->stdout("Betrieb {$b->id}, Theke {$b->theke_nummer}\n");
+        $g = new \humhub\modules\gewerbe\models\Gutschein(['betrieb_id' => $b->id, 'titel' => 'TEST 10 % auf alles', 'pro_person' => 'einmal',
+            'gueltig_ab' => date('Y-m-d'), 'gueltig_bis' => date('Y-m-d', strtotime('+7 days')), 'limit_gesamt' => 2, 'created_by' => $verwalter->id]);
+        $g->scenario = 'formular';
+        $pruefe('Formular ohne Bestätigung der Hinweise abgelehnt', !$g->validate() && $g->hasErrors('regelnOk'));
+        $g->regelnOk = 1;
+        $pruefe('Gutschein gespeichert', $g->save());
+        $zuLang = new \humhub\modules\gewerbe\models\Gutschein(['titel' => 'Zu lang', 'pro_person' => 'einmal', 'gueltig_ab' => date('Y-m-d'),
+            'gueltig_bis' => date('Y-m-d', strtotime('+400 days'))]);
+        $pruefe('Laufzeit über ein Jahr abgelehnt', !$zuLang->validate() && $zuLang->hasErrors('gueltig_bis'));
+        $pruefe('Gast: Anmeldung nötig', $D::grund($g, null) === 'Zum Einlösen musst du angemeldet sein.');
+        $pruefe('Falsche Nummer abgelehnt', $D::nummerPruefen($b, '0000' === $b->theke_nummer ? '1111' : '0000', $kunde->id) !== null);
+        $pruefe('Richtige Nummer angenommen', $D::nummerPruefen($b, $b->theke_nummer, $kunde->id) === null);
+        $pruefe('Token findet Betrieb', $D::betriebZuToken($b->theke_token)?->id === $b->id);
+        $pruefe('Falsches Token findet nichts', $D::betriebZuToken('x' . substr($b->theke_token, 1)) === null || $b->theke_token[0] === 'x');
+        $e = $D::einloesen($g, $kunde->id);
+        $pruefe('Kunde löst ein (Code ' . ($e->code ?? '-') . ')', $e instanceof \humhub\modules\gewerbe\models\Einloesung);
+        $g->refresh();
+        $pruefe('Zähler 1', $g->eingeloest === 1);
+        $pruefe('Zweites Mal abgelehnt (einmal pro Person)', is_string($D::einloesen($g, $kunde->id)));
+        $pruefe('Zurücknehmen klappt', $D::stornieren($e));
+        $g->refresh();
+        $pruefe('Zähler nach Rücknahme 0', $g->eingeloest === 0);
+        $pruefe('Nach Rücknahme wieder einlösbar', $D::einloesen($g, $kunde->id) instanceof \humhub\modules\gewerbe\models\Einloesung);
+        $pruefe('Verwalter löst ein (2 von 2)', $D::einloesen($g, $verwalter->id) instanceof \humhub\modules\gewerbe\models\Einloesung);
+        $g->refresh();
+        $pruefe('Limit erreicht: aufgebraucht', $g->istAufgebraucht() && $D::grundAllgemein($g) === 'Alle Gutscheine sind schon eingelöst.');
+        // Woche: zweite Einlösung erst nach 7 Tagen
+        $w = new \humhub\modules\gewerbe\models\Gutschein(['betrieb_id' => $b->id, 'titel' => 'TEST Wochenrabatt', 'pro_person' => 'woche',
+            'gueltig_ab' => date('Y-m-d'), 'gueltig_bis' => date('Y-m-d', strtotime('+30 days'))]);
+        $w->save();
+        $D::einloesen($w, $kunde->id);
+        $grund = $D::grund($w, $kunde->id);
+        $pruefe("Woche: Sperre mit Datum ($grund)", str_contains((string)$grund, 'Wieder möglich ab'));
+        // Pausiert / kommend
+        $D::pausieren($w, null);
+        $w->refresh();
+        $pruefe('Pausiert: nicht einlösbar', $D::grund($w, $verwalter->id) === 'Der Betrieb hat diesen Gutschein gerade pausiert.');
+        $k = new \humhub\modules\gewerbe\models\Gutschein(['betrieb_id' => $b->id, 'titel' => 'TEST kommt noch', 'pro_person' => 'unbegrenzt',
+            'gueltig_ab' => date('Y-m-d', strtotime('+3 days')), 'gueltig_bis' => date('Y-m-d', strtotime('+9 days'))]);
+        $k->save();
+        $pruefe('Kommend: noch nicht einlösbar', str_starts_with((string)$D::grund($k, $kunde->id), 'Der Gutschein gilt erst ab'));
+        // Automatische Pause bei auffällig vielen Einlösungen
+        $module = Yii::$app->getModule('gewerbe');
+        $alt = $module->sperreAnzahl;
+        $module->sperreAnzahl = 3;
+        $u = new \humhub\modules\gewerbe\models\Gutschein(['betrieb_id' => $b->id, 'titel' => 'TEST unbegrenzt', 'pro_person' => 'unbegrenzt',
+            'gueltig_ab' => date('Y-m-d'), 'gueltig_bis' => date('Y-m-d', strtotime('+3 days'))]);
+        $u->save();
+        for ($i = 0; $i < 3; $i++) {
+            $D::einloesen($u, $kunde->id);
+        }
+        $u->refresh();
+        $module->sperreAnzahl = $alt;
+        $pruefe('Viele Einlösungen: automatisch pausiert', $u->status === 'pausiert' && str_starts_with((string)$u->pause_grund, 'Automatisch'));
+        $svg = $D::qrSvg($D::thekeUrl($b));
+        $pruefe('QR-Code als SVG', str_contains($svg, '<svg') && strlen($svg) > 1000);
+        $this->stdout("Theken-Link: " . $D::thekeUrl($b) . "\n");
+        $pruefe('Sichtbar-Liste enthält Gutschein', \humhub\modules\gewerbe\models\Gutschein::sichtbar()->andWhere(['gewerbe_gutschein.id' => $g->id])->exists());
+        // Kontolöschung räumt Einlösungen ab
+        $n = \humhub\modules\gewerbe\models\Einloesung::find()->where(['user_id' => $kunde->id])->count();
+        \humhub\modules\gewerbe\Events::onUserLoeschen((object)['user' => $kunde]);
+        $pruefe("Kontolöschung entfernt $n Einlösungen", !\humhub\modules\gewerbe\models\Einloesung::find()->where(['user_id' => $kunde->id])->exists());
+        if ($behalten) {
+            $D::thekeErneuern($b);
+            $b->refresh();
+            $u->updateAttributes(['status' => 'aktiv', 'pause_grund' => null]);
+            $this->stdout("Behalten. Konten gs-test-verwalter / gs-test-kunde, Passwort Gutschein-Test-2026!\n"
+                . "Gutschein {$u->id}, Theken-Link " . $D::thekeUrl($b) . "\nAbräumen: setup/gutschein-test-aufraeumen\n");
+        } else {
+            $this->actionGutscheinTestAufraeumen(true);
+        }
+        $this->stdout("$ok ok, $fehl Fehler\n");
+        return $fehl ? ExitCode::UNSPECIFIED_ERROR : ExitCode::OK;
+    }
+
+    public function actionGutscheinTestAufraeumen($still = false)
+    {
+        foreach (\humhub\modules\gewerbe\models\Betrieb::findAll(['name' => 'TEST Gutscheinbetrieb']) as $b) {
+            $b->delete();
+            $still || $this->stdout("- Betrieb {$b->id}\n");
+        }
+        foreach (['gs-test-verwalter', 'gs-test-kunde'] as $name) {
+            if ($u = User::findOne(['username' => $name])) {
+                $u->delete();
+                $still || $this->stdout("- Konto $name\n");
+            }
+        }
+        return ExitCode::OK;
+    }
 }

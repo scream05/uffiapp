@@ -1,0 +1,11 @@
+{
+    "name": "blu/gewerbe",
+    "description": "Abhängigkeiten des Gewerbeverzeichnisses (QR-Codes der Gutscheine). Installieren: scripts/run-setup.sh gewerbe-composer",
+    "require": {
+        "php": "^8.4",
+        "bacon/bacon-qr-code": "^3.0"
+    },
+    "config": {
+        "platform": {"php": "8.4.25"}
+    }
+}

@@ -43,6 +43,9 @@ $stand = $betrieb->getStand();
                 <?php if ($betrieb->status !== Betrieb::STATUS_VORGESCHLAGEN): ?>
                     <?= Html::a('<i class="fa fa-pencil-square-o" aria-hidden="true"></i> Beitrag schreiben', $space->createUrl('/gewerbe/beitrag/create', ['betrieb' => $betrieb->id]), ['class' => 'btn btn-primary btn-sm']) ?>
                 <?php endif ?>
+                <?php if ($betrieb->status !== Betrieb::STATUS_VORGESCHLAGEN): ?>
+                    <?= Html::a('<i class="fa fa-ticket" aria-hidden="true"></i> Gutscheine', $space->createUrl('/gewerbe/gutschein/verwaltung', ['betrieb' => $betrieb->id]), ['class' => 'btn btn-primary btn-sm']) ?>
+                <?php endif ?>
                 <?= Html::a('<i class="fa fa-user-plus" aria-hidden="true"></i> Verwalter' . ($pending ? " ($pending neu)" : ''), $space->createUrl('/gewerbe/betrieb/verwalter', ['id' => $betrieb->id]), ['class' => 'btn btn-light btn-sm']) ?>
                 <?php if (Module::canManageAll()): ?>
                     <?= Html::a('<i class="fa fa-trash" aria-hidden="true"></i> Aus dem Verzeichnis löschen', $space->createUrl('/gewerbe/betrieb/delete', ['id' => $betrieb->id]), [
@@ -134,6 +137,22 @@ $stand = $betrieb->getStand();
         <?php endif ?>
     </div>
 </div>
+
+<?php $gutscheine = $betrieb->status === Betrieb::STATUS_VORGESCHLAGEN ? []
+    : \humhub\modules\gewerbe\models\Gutschein::sichtbar()->andWhere(['betrieb_id' => $betrieb->id])->orderBy(['created_at' => SORT_DESC])->all(); ?>
+<?php if ($gutscheine): ?>
+<?= $this->render('@gewerbe/views/gutschein/_stil') ?>
+<div class="panel panel-default">
+    <div class="panel-heading"><strong><i class="fa fa-ticket" aria-hidden="true"></i> Gutscheine</strong></div>
+    <div class="panel-body">
+        <div class="gs-liste">
+            <?php foreach ($gutscheine as $g): ?>
+                <?= $this->render('@gewerbe/views/gutschein/_ticket', ['g' => $g, 'mitBetrieb' => false]) ?>
+            <?php endforeach ?>
+        </div>
+    </div>
+</div>
+<?php endif ?>
 
 <?php if ($beitraege || $eigene): ?>
 <div class="panel panel-default">

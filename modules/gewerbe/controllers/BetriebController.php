@@ -47,6 +47,9 @@ class BetriebController extends ContentContainerController
             'offen' => $offen,
             'mine' => $mine,
             'anzahl' => $anzahl,
+            // Betriebe mit laufendem Gutschein (Hinweis in der Liste)
+            'mitGutschein' => array_flip(array_map('intval', \humhub\modules\gewerbe\models\Gutschein::sichtbar()
+                ->andWhere(['status' => \humhub\modules\gewerbe\models\Gutschein::STATUS_AKTIV])->select('betrieb_id')->distinct()->column())),
             'q' => $q,
             'kategorie' => $kategorie,
             'ortsteil' => $ortsteil,

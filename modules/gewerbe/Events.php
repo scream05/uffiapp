@@ -4,6 +4,8 @@ namespace humhub\modules\gewerbe;
 
 use humhub\modules\gewerbe\models\BetriebBeitrag;
 use humhub\modules\gewerbe\models\BetriebVerwalter;
+use humhub\modules\gewerbe\models\Einloesung;
+use humhub\modules\gewerbe\models\Gutschein;
 use humhub\modules\gewerbe\widgets\BetriebAddon;
 use humhub\modules\post\models\Post;
 use Yii;
@@ -18,6 +20,8 @@ class Events
         try {
             $user = $event->user ?? $event->sender;
             BetriebVerwalter::deleteAll(['user_id' => $user->id]);
+            // Einlösungen der Person (die Zähler der Gutscheine bleiben)
+            Einloesung::deleteAll(['user_id' => $user->id]);
             foreach (BetriebBeitrag::find()->where(['user_id' => $user->id])
                          ->andWhere(['!=', 'status', BetriebBeitrag::STATUS_VEROEFFENTLICHT])->all() as $b) {
                 $b->delete(); // samt Bildern
@@ -34,6 +38,14 @@ class Events
                          ->andWhere(['<', 'geprueft_am', date('Y-m-d H:i:s', strtotime('-' . self::ABGELEHNT_TAGE . ' days'))])->all() as $b) {
                 $b->delete();
             }
+            // Einlösungen braucht es nur für das Limit „pro Person“: einige Zeit nach Ende des Gutscheins löschen
+            $tage = Yii::$app->getModule('gewerbe')->einloesungTage;
+            $vorbei = Gutschein::find()->select('id')->where(['<', 'gueltig_bis', date('Y-m-d', strtotime("-$tage days"))])->column();
+            if ($vorbei) {
+                Einloesung::deleteAll(['gutschein_id' => $vorbei]);
+            }
+            // Zurückgenommene Einlösungen nach 30 Tagen
+            Einloesung::deleteAll(['<', 'storniert_am', date('Y-m-d H:i:s', strtotime('-30 days'))]);
         } catch (\Throwable $e) {
             Yii::error($e);
         }
@@ -92,8 +104,17 @@ class Events
                 'group' => 'modules',
                 'url' => $space->createUrl('/gewerbe/betrieb/index'),
                 'icon' => '<i class="fa fa-shopping-bag"></i>',
-                'isActive' => $active && !in_array(Yii::$app->controller->action->id, ['anfragen', 'pruefen'], true),
+                'isActive' => $active && Yii::$app->controller->id !== 'gutschein'
+                    && !in_array(Yii::$app->controller->action->id, ['anfragen', 'pruefen'], true),
                 'sortOrder' => 90,
+            ]);
+            $event->sender->addItem([
+                'label' => 'Gutscheine',
+                'group' => 'modules',
+                'url' => $space->createUrl('/gewerbe/gutschein/index'),
+                'icon' => '<i class="fa fa-ticket"></i>',
+                'isActive' => $active && Yii::$app->controller->id === 'gutschein',
+                'sortOrder' => 91,
             ]);
             if (Module::canManageAll()) {
                 $open = BetriebVerwalter::find()->where(['status' => BetriebVerwalter::STATUS_ANGEFRAGT])->count();
@@ -103,7 +124,7 @@ class Events
                     'url' => $space->createUrl('/gewerbe/betrieb/anfragen'),
                     'icon' => '<i class="fa fa-inbox"></i>',
                     'isActive' => $active && Yii::$app->controller->action->id === 'anfragen',
-                    'sortOrder' => 91,
+                    'sortOrder' => 92,
                 ]);
                 $offen = BetriebBeitrag::find()->where(['status' => BetriebBeitrag::STATUS_EINGEREICHT])->count();
                 $event->sender->addItem([
@@ -112,7 +133,7 @@ class Events
                     'url' => $space->createUrl('/gewerbe/beitrag/pruefen'),
                     'icon' => '<i class="fa fa-check-square-o"></i>',
                     'isActive' => $active && Yii::$app->controller->action->id === 'pruefen',
-                    'sortOrder' => 92,
+                    'sortOrder' => 93,
                 ]);
             }
         } catch (\Throwable $e) {

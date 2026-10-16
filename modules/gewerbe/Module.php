@@ -17,6 +17,16 @@ class Module extends ContentContainerModule
     /** Antwortadresse für Mails an Verfasser (Ablehnung eines Beitrags) */
     public string $kontaktMail = 'smartcity@buergerliste-uffenheim.de';
 
+    /** Gutscheine: so lange zeigt die Bestätigung nach dem Einlösen die Live-Ansicht */
+    public int $bestaetigungMinuten = 15;
+    /** Gutscheine: so lange kann der Betrieb eine Einlösung zurücknehmen */
+    public int $stornoMinuten = 10;
+    /** Gutscheine: mehr als so viele Einlösungen je Betrieb in sperreMinuten pausieren alle seine Gutscheine */
+    public int $sperreAnzahl = 30;
+    public int $sperreMinuten = 10;
+    /** Gutscheine: Einlösungen so viele Tage nach Ende des Gutscheins löschen (der Zähler bleibt) */
+    public int $einloesungTage = 90;
+
     public array $categories = [
         'Einzelhandel',
         'Lebensmittel & Hofladen',
@@ -61,7 +71,8 @@ class Module extends ContentContainerModule
     public function getNotifications()
     {
         return [notifications\VerwaltungAngefragt::class, notifications\VerwaltungBestaetigt::class,
-            notifications\BeitragEingereicht::class, notifications\BeitragFreigegeben::class];
+            notifications\BeitragEingereicht::class, notifications\BeitragFreigegeben::class,
+            notifications\GutscheinNeu::class, notifications\GutscheinPausiert::class];
     }
 
     /** Space, in dem das Verzeichnis läuft */

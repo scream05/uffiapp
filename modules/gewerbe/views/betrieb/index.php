@@ -3,6 +3,7 @@
  * @var \humhub\modules\gewerbe\models\Betrieb[] $betriebe
  * @var \humhub\modules\gewerbe\models\Betrieb[] $mine
  * @var array $anzahl Branche => Anzahl aktiver Betriebe
+ * @var array $mitGutschein betrieb_id => true bei laufendem Gutschein
  * @var string $q
  * @var string $kategorie
  * @var string $ortsteil
@@ -62,6 +63,10 @@ $url = fn(array $p = []) => $space->createUrl('/gewerbe/betrieb/index', array_fi
             <?php endif ?>
         <?= Html::endForm() ?>
 
+        <?php if ($mitGutschein): ?>
+            <p><?= Html::a('<i class="fa fa-ticket" aria-hidden="true"></i> Aktuelle Gutscheine (' . count($mitGutschein) . ' ' . (count($mitGutschein) === 1 ? 'Betrieb' : 'Betriebe') . ')',
+                $space->createUrl('/gewerbe/gutschein/index'), ['class' => 'btn btn-light btn-sm']) ?></p>
+        <?php endif ?>
         <p class="text-muted" role="status"><?= count($betriebe) ?> <?= count($betriebe) === 1 ? 'Betrieb' : 'Betriebe' ?></p>
         <div class="gw-liste">
             <?php foreach ($betriebe as $b): ?>
@@ -75,6 +80,9 @@ $url = fn(array $p = []) => $space->createUrl('/gewerbe/betrieb/index', array_fi
                         <?php endif ?>
                         <?php if (($stand = $b->getStand()) !== null): ?>
                             <small class="gw-stand <?= $stand['offen'] ? 'offen' : 'zu' ?>"><?= Html::encode($stand['text']) ?></small>
+                        <?php endif ?>
+                        <?php if (isset($mitGutschein[$b->id])): ?>
+                            <small class="gw-gutschein"><i class="fa fa-ticket" aria-hidden="true"></i> Gutschein</small>
                         <?php endif ?>
                         <?php if ($b->status === Betrieb::STATUS_VORGESCHLAGEN): ?>
                             <small class="text-muted" style="display:block"><i class="fa fa-hourglass-half" aria-hidden="true"></i> wartet auf Freigabe</small>
@@ -112,6 +120,7 @@ $url = fn(array $p = []) => $space->createUrl('/gewerbe/betrieb/index', array_fi
         border: 1px solid #8a8f94; color: inherit; text-decoration: none !important; font-size: .92em; }
     .gw-branche:hover, .gw-branche:focus { background: rgba(68, 110, 136, .1); }
     .gw-branche.aktiv { background: #446e88; border-color: #446e88; color: #fff; }
+    .gw-gutschein { display: inline-block; margin-top: 4px; padding: 1px 8px; border-radius: 999px; background: #91b80f; color: #1d2b05; font-weight: 700; }
     .gw-zahl { font-size: .8em; font-weight: 600; opacity: .85; }
     .gw-liste { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
     .gw-karte { display: flex; align-items: flex-start; gap: 12px; padding: 12px; border-radius: 14px;
