@@ -8,6 +8,7 @@ use humhub\modules\whatsapp\models\Entwurf;
 use humhub\modules\whatsapp\models\Nachricht;
 use humhub\modules\whatsapp\Module;
 use Yii;
+use yii\helpers\Url;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 
@@ -65,7 +66,7 @@ class EingangController extends ContentContainerController
             $aehnliche = $entwurf->trotzdem ? [] : $entwurf->aehnliche($space);
             if ($aehnliche === [] && ($entry = $entwurf->uebernehmen($space))) {
                 $gesendet = Verarbeitung::antworten($entwurf->wa_id, "✅ Ist jetzt im Kalender: {$entwurf->titel} – "
-                    . Verarbeitung::wann($entwurf) . "\n" . $entry->content->getUrl(true) . "\n\nDanke fürs Teilen!");
+                    . Verarbeitung::wann($entwurf) . "\n" . Url::to($entry->content->getUrl(), true) . "\n\nDanke fürs Teilen!");
                 $this->view->success('Termin übernommen.' . ($gesendet ? ' Absender wurde per WhatsApp informiert.' : ''));
                 return $this->redirect($space->createUrl('/whatsapp/eingang/index'));
             }
