@@ -37,6 +37,7 @@ use yii\helpers\Url;
  * @property string|null $logo_guid
  * @property string|null $web_quellen JSON-Liste der Seiten aus der einmaligen Web-Recherche
  * @property string|null $web_recherche_am
+ * @property string|null $osm_stand JSON: zuletzt aus OSM gelesene Werte (siehe GewerbeController::uebernehmen)
  * @property string $created_at
  * @property int|null $created_by
  * @property string|null $updated_at

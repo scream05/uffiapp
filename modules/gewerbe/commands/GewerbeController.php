@@ -17,6 +17,7 @@ use yii\console\ExitCode;
  *                                 Websites prüfen, fehlende Logos holen (1 = Probelauf)
  *   /app/yii gewerbe/logos        Logos von den Websites holen (nur Einträge ohne Logo)
  *   /app/yii gewerbe/loeschen <ids> Betriebe löschen, ihre OSM-Objekte künftig überspringen
+ *   /app/yii gewerbe/osm-stand    einmalig: aktuellen OSM-Stand merken (Abgleich ändert dann nur, was OSM neu ändert)
  * Gepflegte Seiten (Status aktiv, vom Betrieb selbst) werden nie überschrieben; ihre Verwalter sehen Abweichungen als Hinweis.
  */
 class GewerbeController extends Controller
@@ -70,6 +71,30 @@ class GewerbeController extends Controller
         }
         $this->stdout(($probe ? 'Probelauf: ' : '') . "$neu neu, $verknuepft mit vorhandenen Einträgen verknüpft\n");
         Yii::$app->cache->delete('ki-link-domains');
+        return ExitCode::OK;
+    }
+
+    /**
+     * Einmalig nach Migration m261016_000005: aktuellen OSM-Stand je Betrieb merken, ohne etwas zu übernehmen.
+     * Danach übernimmt der Abgleich nur noch echte OSM-Änderungen an unveränderten Feldern.
+     */
+    public function actionOsmStand()
+    {
+        $elemente = $this->osm();
+        if ($elemente === null) {
+            return ExitCode::UNAVAILABLE;
+        }
+        $n = 0;
+        foreach (Betrieb::find()->where(['not', ['osm_ref' => null]])->all() as $b) {
+            if (isset($elemente[$b->osm_ref])) {
+                $neu = OsmQuelle::felder($elemente[$b->osm_ref]['tags']);
+                $neu['email'] = self::geschaeftlich($neu['email'], $neu['website'] ?? $b->website);
+                $neu['adresse'] = OsmQuelle::adresse($elemente[$b->osm_ref]['tags']);
+                $b->updateAttributes(['osm_stand' => json_encode($neu, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)]);
+                $n++;
+            }
+        }
+        $this->stdout("OSM-Stand für $n Betriebe gemerkt\n");
         return ExitCode::OK;
     }
 
@@ -301,10 +326,16 @@ class GewerbeController extends Controller
         $neu = OsmQuelle::felder($e['tags']);
         $neu['email'] = self::geschaeftlich($neu['email'], $neu['website'] ?? $b->website);
         $neu['adresse'] = OsmQuelle::adresse($e['tags']) ?? $adresse;
+        // Mit Stand (seit dem letzten Lauf): nur Felder ändern, die OSM geändert hat und die noch den alten OSM-Wert haben.
+        // So bleiben Korrekturen von Hand und aus der Web-Recherche erhalten, auch geleerte Felder.
+        $stand = $b->osm_stand !== null ? (array)json_decode($b->osm_stand, true) : null;
         $aenderungen = [];
         $werte = [];
         foreach ($neu as $feld => $wert) {
             if ($wert === null || $wert === (string)$b->$feld) {
+                continue;
+            }
+            if ($stand !== null && (($stand[$feld] ?? null) === $wert || (string)($stand[$feld] ?? '') !== (string)$b->$feld)) {
                 continue;
             }
             // Eigene Hinweise (nicht aus OSM) nicht ersetzen
@@ -317,6 +348,9 @@ class GewerbeController extends Controller
         // Strukturierte Zeiten ersetzen den bisherigen OSM-Hinweis
         if (isset($werte['zeiten']) && str_starts_with((string)$b->oeffnungszeiten, 'Laut OpenStreetMap')) {
             $werte['oeffnungszeiten'] = null;
+        }
+        if (!$probe) {
+            $b->updateAttributes(['osm_stand' => json_encode($neu, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)]);
         }
         if ($werte && !$probe) {
             $werte['recherchiert_am'] = date('Y-m-d');
