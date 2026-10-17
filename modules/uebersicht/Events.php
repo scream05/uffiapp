@@ -27,6 +27,24 @@ class Events
         }
     }
 
+    /** Space „Rathaus Uffenheim“: Gäste sehen in der Seitenleiste keine „Letzten Aktivitäten“ */
+    public static function onSpaceSidebarInit($event)
+    {
+        try {
+            $sidebar = $event->sender;
+            if (!Yii::$app->user->isGuest || ($sidebar->space->url ?? null) !== 'rathaus-uffenheim') {
+                return;
+            }
+            foreach ($sidebar->widgets as $k => $widget) {
+                if (($widget[0] ?? null) === \humhub\modules\activity\widgets\ActivityStreamViewer::class) {
+                    unset($sidebar->widgets[$k]);
+                }
+            }
+        } catch (\Throwable $e) {
+            Yii::error($e);
+        }
+    }
+
     /** Seitenleiste der Übersicht: „Neue Spaces“ (Kern zeigt es nur Gästen) nur für Admins */
     public static function onDashboardSidebarInit($event)
     {
