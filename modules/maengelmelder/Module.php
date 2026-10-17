@@ -39,6 +39,12 @@ class Module extends ContentContainerModule
         // Bürger-Vorlagen in der Du-Form (seit 14.10.2026; die alten Sie-Vorlagen maengel_eingang/maengel_status werden nicht mehr genutzt)
         'buergerEingang' => 'maengel_eingang_du', 'buergerStatus' => 'maengel_status_du'];
     public string $vorlagenSprache = 'de';
+    /**
+     * Vorlagen außerhalb des 24-Std.-Fensters kosten bei Meta Geld (Zahlungsmethode nötig). false = kostenlos (seit 17.10.2026):
+     * keine Vorlagen; Mitarbeitern wird vorgemerkt (kommt, sobald sie wieder schreiben) und die Bauhofleitung
+     * bekommt „bitte anrufen“, Meldende bekommen die Info per E-Mail.
+     */
+    public bool $vorlagenNutzen = false;
 
     /** Verlauf und Fotos des Bauhofs so viele Tage nach Abschluss einer Meldung löschen */
     public int $bauhofAufbewahrungTage = 365;
@@ -74,7 +80,7 @@ class Module extends ContentContainerModule
 
     public function getNotifications()
     {
-        return [notifications\BauhofMeldung::class, notifications\GastmeldungNeu::class];
+        return [notifications\BauhofMeldung::class, notifications\GastmeldungNeu::class, notifications\BauhofNichtZugestellt::class];
     }
 
     public function getContentContainerTypes()

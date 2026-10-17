@@ -13,6 +13,7 @@ use humhub\modules\maengelmelder\models\Mangel;
 use humhub\modules\maengelmelder\models\Mitarbeiter;
 use humhub\modules\maengelmelder\Module;
 use humhub\modules\maengelmelder\notifications\BauhofMeldung;
+use humhub\modules\maengelmelder\notifications\BauhofNichtZugestellt;
 use humhub\modules\post\models\Post;
 use humhub\modules\user\models\Group;
 use humhub\modules\user\models\User;
@@ -93,6 +94,14 @@ class Bauhof
         try {
             if ($m->isFensterOffen()) {
                 self::sendeDetails($m, $mangel, $auftrag);
+            } elseif (!self::module()->vorlagenNutzen) {
+                // Kostenlos: vormerken (wartendeSenden() schickt den ganzen Auftrag, sobald der Mitarbeiter schreibt)
+                $log = self::neueAusgehende($m, $mangel->getContentId(), 'auftrag', 'Auftrag vorgemerkt – kommt, sobald '
+                    . $m->name . ' wieder an die Bauhof-Nummer schreibt', $user);
+                $log->updateAttributes(['zustellung' => 'wartet']);
+                self::nichtZugestellt($m, $log);
+                return 'Noch nicht zugestellt: ' . $m->name . ' hat seit über 24 Std. nicht geschrieben. Bitte anrufen ('
+                    . $m->getTelefonAnzeige() . ') – sobald wieder an die Bauhof-Nummer geschrieben wird, kommt der Auftrag automatisch.';
             } else {
                 $log = self::neueAusgehende($m, $mangel->getContentId(), 'auftrag', 'Auftrag per Vorlage angekündigt', $user);
                 $log->wamid = Api::sendeVorlage($m->telefon, self::module()->vorlagen['auftrag'], self::module()->vorlagenSprache,
@@ -242,11 +251,15 @@ class Bauhof
                 // Eine Vorlage genügt für mehrere wartende Nachrichten
                 $wartet = BauhofNachricht::find()->where(['mitarbeiter_id' => $m->id, 'richtung' => BauhofNachricht::AUS,
                     'zustellung' => 'wartet'])->andWhere(['not', ['id' => $log->id]])->exists();
-                if (!$wartet) {
+                $log->zustellung = 'wartet';
+                if (!$wartet && self::module()->vorlagenNutzen) {
                     Api::sendeVorlage($m->telefon, self::module()->vorlagen['nachricht'], self::module()->vorlagenSprache,
                         [$user ? $user->displayName : 'Bauhof'], ['m']);
+                } elseif (!$wartet) {
+                    // Kostenlos: keine Vorlage, Bauhofleitung soll anrufen (einmal je Wartezeit)
+                    $log->save(false);
+                    self::nichtZugestellt($m, $log);
                 }
-                $log->zustellung = 'wartet';
             }
             $log->save(false);
             return null;
@@ -606,6 +619,18 @@ class Bauhof
             ->orderBy('id')->all();
         foreach ($wartend as $w) {
             try {
+                if ($w->typ === 'auftrag') {
+                    // Vorgemerkter Auftrag (kostenlose Variante): jetzt den ganzen Auftrag schicken, falls noch zugewiesen
+                    $mangel = $w->content_id ? self::auftragDesMitarbeiters($m, (int)$w->content_id) : null;
+                    if ($mangel) {
+                        self::sendeDetails($m, $mangel);
+                        Auftrag::findOne($w->content_id)?->updateAttributes(['gesendet_at' => date('Y-m-d H:i:s')]);
+                    }
+                    $w->zustellung = $mangel ? 'gesendet' : 'fehler';
+                    $w->fehler = $mangel ? null : 'Auftrag ist nicht mehr zugewiesen';
+                    $w->save(false);
+                    continue;
+                }
                 $w->wamid = Api::sendeText($m->telefon, self::chatText($w));
                 $w->zustellung = 'gesendet';
             } catch (\Throwable $e) {
@@ -711,6 +736,20 @@ class Bauhof
         }
         if ($users) {
             BauhofMeldung::instance()->about($n)->sendBulk($users);
+        }
+    }
+
+    /** Glocke/Push an die Bauhofleitung (und wer zugewiesen hat): nicht kostenlos zustellbar, bitte anrufen */
+    private static function nichtZugestellt(Mitarbeiter $m, BauhofNachricht $n): void
+    {
+        $users = self::empfaenger();
+        $a = $n->content_id ? Auftrag::findOne($n->content_id) : null;
+        if ($a && $a->zugewiesen_by && !in_array((int)$a->zugewiesen_by, array_map(fn($u) => (int)$u->id, $users), true)
+            && ($u = User::findOne(['id' => $a->zugewiesen_by, 'status' => User::STATUS_ENABLED]))) {
+            $users[] = $u;
+        }
+        if ($users) {
+            BauhofNichtZugestellt::instance()->about($n)->sendBulk($users);
         }
     }
 

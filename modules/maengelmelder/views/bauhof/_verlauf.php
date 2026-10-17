@@ -11,7 +11,7 @@ use humhub\helpers\Html;
 use humhub\modules\maengelmelder\models\BauhofNachricht;
 
 $fmt = Yii::$app->formatter;
-$haken = ['wartet' => ['fa-clock-o', 'wartet, bis der Mitarbeiter auf den Hinweis tippt'], 'gesendet' => ['fa-check', 'gesendet'],
+$haken = ['wartet' => ['fa-clock-o', 'wartet, bis der Mitarbeiter wieder an die Bauhof-Nummer schreibt'], 'gesendet' => ['fa-check', 'gesendet'],
     'zugestellt' => ['fa-check-circle-o', 'zugestellt'], 'gelesen' => ['fa-check-circle text-primary', 'gelesen'],
     'fehler' => ['fa-exclamation-triangle text-danger', 'nicht zugestellt'], 'per_mail' => ['fa-envelope-o', 'per E-Mail statt WhatsApp']];
 ?>

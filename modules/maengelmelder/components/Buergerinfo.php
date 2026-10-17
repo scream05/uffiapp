@@ -167,6 +167,9 @@ class Buergerinfo
         try {
             if (self::fensterOffen($k->wa_id)) {
                 $log->wamid = Api::sendeText($k->wa_id, $text);
+            } elseif (!self::module()->vorlagenNutzen) {
+                // Kostenlose Variante: außerhalb des 24-Std.-Fensters keine (kostenpflichtige) Vorlage
+                $grund = 'Kein offenes 24-Std.-Fenster (WhatsApp-Vorlagen aus, kostenlos)';
             } elseif (self::vorlageFreigegeben($vorlage)) {
                 $log->wamid = Api::sendeVorlage($k->wa_id, $vorlage, self::module()->vorlagenSprache, $parameter);
             } else {

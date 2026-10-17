@@ -1749,6 +1749,66 @@ class SetupController extends Controller
      * Zurücknehmen, Nummer, automatische Pause und QR; räumt danach alles wieder ab. Mit behalten=1 bleiben
      * Betrieb, Gutschein und Konten (mit Passwort) für einen Test im Browser; abräumen: setup/gutschein-test-aufraeumen
      */
+    /**
+     * Kostenlose WhatsApp-Variante (Module::$vorlagenNutzen = false) prüfen, alles in einer Transaktion mit Rollback:
+     * Auftrag/Nachricht an einen Mitarbeiter mit geschlossenem Fenster werden vorgemerkt (keine Vorlage, kein API-Aufruf),
+     * die Bauhofleitung bekommt „bitte anrufen“ (Queue-Job, wird zurückgerollt), Meldende bekommen keine Vorlage.
+     *   scripts/run-setup.sh bauhof-kostenlos-test [content-id einer Meldung]
+     */
+    public function actionBauhofKostenlosTest($id = 478)
+    {
+        $B = \humhub\modules\maengelmelder\components\Bauhof::class;
+        $N = \humhub\modules\maengelmelder\models\BauhofNachricht::class;
+        $ok = 0;
+        $fehl = 0;
+        $pruefe = function (string $was, bool $bed) use (&$ok, &$fehl) {
+            $bed ? $ok++ : $fehl++;
+            $this->stdout(($bed ? '  ok   ' : '  FEHL ') . "$was\n");
+        };
+        $pruefe('Vorlagen aus (vorlagenNutzen = false)', Yii::$app->getModule('maengelmelder')->vorlagenNutzen === false);
+        $content = \humhub\modules\content\models\Content::findOne((int)$id);
+        $admin = User::findOne(['username' => 'admin']);
+        if (!$content || !$admin) {
+            $this->stderr("Meldung $id oder Konto admin fehlt.\n");
+            return ExitCode::UNSPECIFIED_ERROR;
+        }
+        $jobsVorher = (int)Yii::$app->db->createCommand('SELECT COUNT(*) FROM queue')->queryScalar();
+        $tx = Yii::$app->db->beginTransaction();
+        try {
+            $m = new \humhub\modules\maengelmelder\models\Mitarbeiter(['name' => 'Test Kostenlos', 'telefon' => '490000000001', 'aktiv' => 1]);
+            $m->save(false);
+            $pruefe('Fenster des Test-Mitarbeiters ist zu', !$m->isFensterOffen());
+            $auftrag = \humhub\modules\maengelmelder\models\Auftrag::forContentId($content->id);
+            $auftrag->mitarbeiter_id = $m->id;
+            $auftrag->zugewiesen_by = $admin->id;
+            $auftrag->save(false);
+            $hinweis = $B::sendeAuftrag($auftrag, $admin);
+            $this->stdout("       Hinweis: $hinweis\n");
+            $pruefe('Auftrag: Hinweis „bitte anrufen“ mit Nummer', $hinweis !== null && str_contains($hinweis, 'anrufen') && str_contains($hinweis, '+49 000'));
+            $pruefe('Auftrag vorgemerkt (wartet)', $N::find()->where(['mitarbeiter_id' => $m->id, 'typ' => 'auftrag', 'zustellung' => 'wartet'])->exists());
+            $pruefe('Auftrag nicht als gesendet markiert', \humhub\modules\maengelmelder\models\Auftrag::findOne($content->id)->gesendet_at === null);
+            $fehler = $B::nachricht($m, $content->id, 'Testnachricht', $admin);
+            $pruefe('Nachricht ohne Fehler vorgemerkt', $fehler === null
+                && $N::find()->where(['mitarbeiter_id' => $m->id, 'typ' => 'text', 'zustellung' => 'wartet'])->exists());
+            $jobs = (int)Yii::$app->db->createCommand('SELECT COUNT(*) FROM queue')->queryScalar() - $jobsVorher;
+            $pruefe("Glocke „bitte anrufen“ nur einmal je Wartezeit (Queue-Jobs: $jobs)", $jobs === 1);
+            $text = \humhub\modules\maengelmelder\notifications\BauhofNichtZugestellt::instance()
+                ->about($N::find()->where(['mitarbeiter_id' => $m->id, 'typ' => 'auftrag'])->one())->text();
+            $this->stdout("       Glocke: $text\n");
+            $pruefe('Glocke nennt Auftrag und Nummer', str_contains($text, "Auftrag Nr. {$content->id}") && str_contains($text, '+49 000'));
+            // Meldende Person: kein offenes Fenster → keine Vorlage, ohne Ersatz-Mail „fehler“ mit Grund
+            $k = new \humhub\modules\maengelmelder\models\MaengelKontakt(['content_id' => $content->id, 'wa_id' => '490000000002']);
+            $ref = new \ReflectionMethod(\humhub\modules\maengelmelder\components\Buergerinfo::class, 'whatsapp');
+            $log = $ref->invoke(null, $k, $content->id, 'Test', 'maengel_status_du', ['x'], 'status');
+            $pruefe('Meldende: keine Vorlage, Grund „kostenlos“', $log->wamid === null && str_contains((string)$log->fehler, 'kostenlos'));
+        } finally {
+            $tx->rollBack();
+        }
+        $pruefe('Alles zurückgerollt', !\humhub\modules\maengelmelder\models\Mitarbeiter::find()->where(['telefon' => '490000000001'])->exists());
+        $this->stdout("$ok ok, $fehl Fehler\n");
+        return $fehl ? ExitCode::UNSPECIFIED_ERROR : ExitCode::OK;
+    }
+
     public function actionGutscheinTest($behalten = 0)
     {
         $D = \humhub\modules\gewerbe\components\GutscheinDienst::class;

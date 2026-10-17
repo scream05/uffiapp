@@ -170,7 +170,9 @@ class BauhofController extends ContentContainerController
                         }
                         $fehler = Bauhof::meldeAenderung($content->id, $teile, implode(', ', $was), $user) ?? $fehler;
                     }
-                    $fehler ? $this->view->error('Gespeichert, aber WhatsApp-Versand fehlgeschlagen: ' . $fehler) : $this->view->saved();
+                    // „Noch nicht zugestellt …“ = kostenlose Variante (vorgemerkt, bitte anrufen), kein echter Fehler
+                    $fehler === null ? $this->view->saved() : (str_starts_with($fehler, 'Noch nicht zugestellt')
+                        ? $this->view->warn('Gespeichert. ' . $fehler) : $this->view->error('Gespeichert, aber WhatsApp-Versand fehlgeschlagen: ' . $fehler));
                     return $this->redirect($this->zu('mangel', ['id' => $content->id]));
                 }
             } elseif ($aktion === 'chat') {
@@ -196,7 +198,8 @@ class BauhofController extends ContentContainerController
                 return $this->redirect($this->zu('mangel', ['id' => $content->id]) . '#verlauf');
             } elseif ($aktion === 'senden' && $auftrag->mitarbeiter) {
                 $fehler = Bauhof::sendeAuftrag($auftrag, $user);
-                $fehler ? $this->view->error($fehler) : $this->view->success('Auftrag per WhatsApp geschickt.');
+                $fehler === null ? $this->view->success('Auftrag per WhatsApp geschickt.')
+                    : (str_starts_with($fehler, 'Noch nicht zugestellt') ? $this->view->warn($fehler) : $this->view->error($fehler));
                 return $this->redirect($this->zu('mangel', ['id' => $content->id]));
             }
         }
