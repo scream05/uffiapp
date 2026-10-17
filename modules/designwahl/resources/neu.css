@@ -800,8 +800,17 @@ html.design-neu .dn-wetter {
     border-radius: 999px;
     background: rgba(255, 255, 255, .16);
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .18);
+    border: 0;
+    color: inherit;
+    font: inherit;
     white-space: nowrap;
-    cursor: default;
+    cursor: pointer;
+    transition: background-color .15s ease;
+}
+
+html.design-neu .dn-wetter:hover,
+html.design-neu .dn-wetter[aria-expanded="true"] {
+    background: rgba(255, 255, 255, .26);
 }
 
 html.design-neu .dn-wetter[hidden] {
@@ -1161,6 +1170,282 @@ html.design-neu .dn-ziel-icon i {
 
     html.design-neu.dn-mehr-offen body {
         overflow: hidden;
+    }
+}
+
+/* ---------- Wetter-Fenster (Vorhersage heute und morgen), Rahmen wie Fach „Mehr“ ---------- */
+html.design-neu .dn-wetterfach {
+    z-index: 1050;
+}
+
+html.design-neu.dn-wetter-offen body {
+    overflow: hidden;
+}
+
+html.design-neu .dn-wetterfach svg {
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+html.design-neu .dn-wf-hinweis {
+    margin: 0;
+    padding: 24px 0;
+    text-align: center;
+    color: var(--dn-text-leise);
+}
+
+html.design-neu .dn-wf-jetzt {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding: 14px 16px;
+    border-radius: var(--dn-r-l);
+    color: #fff;
+    background: linear-gradient(130deg, var(--dn-blau-tief), var(--dn-blau) 70%, #5d8aa6);
+}
+
+html.design-neu .dn-wf-jetzt svg {
+    width: 44px;
+    height: 44px;
+}
+
+html.design-neu .dn-wf-grad {
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -.03em;
+    line-height: 1;
+}
+
+html.design-neu .dn-wf-jetzt strong,
+html.design-neu .dn-wf-warnung strong {
+    display: block;
+    font-weight: 800;
+}
+
+html.design-neu .dn-wf-jetzt small,
+html.design-neu .dn-wf-warnung small {
+    display: block;
+    font-size: 12px;
+    opacity: .8;
+}
+
+/* Amtliche Warnungen des DWD */
+html.design-neu .dn-wf-warnung {
+    margin-bottom: 10px;
+    border-radius: var(--dn-r-m);
+    background: var(--dn-gold-zart);
+    color: var(--dn-text);
+}
+
+html.design-neu .dn-wf-warnung summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    list-style: none;
+}
+
+html.design-neu .dn-wf-warnung summary::-webkit-details-marker {
+    display: none;
+}
+
+html.design-neu .dn-wf-warnung .fa {
+    font-size: 18px;
+    color: var(--dn-gold);
+}
+
+html.design-neu .dn-wf-warnung p {
+    margin: 0;
+    padding: 0 14px 12px 42px;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+html.design-neu .dn-wf-severe,
+html.design-neu .dn-wf-extreme {
+    background: var(--dn-rot-zart);
+}
+
+html.design-neu .dn-wf-severe .fa,
+html.design-neu .dn-wf-extreme .fa {
+    color: var(--dn-rot);
+}
+
+html.design-neu .dn-wf-ruhig {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 12px;
+    font-size: 13px;
+    color: var(--dn-text-leise);
+}
+
+html.design-neu .dn-wf-ruhig .fa {
+    color: var(--dn-gruen-tief);
+}
+
+/* Tageskarten */
+html.design-neu .dn-wf-tag {
+    margin-bottom: 10px;
+    padding: 12px 14px;
+    border-radius: var(--dn-r-l);
+    background: var(--dn-feld);
+}
+
+html.design-neu .dn-wf-tag h3 {
+    margin: 0 0 8px;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--dn-text-leise);
+}
+
+html.design-neu .dn-wf-uebersicht {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+html.design-neu .dn-wf-uebersicht svg {
+    width: 40px;
+    height: 40px;
+    color: var(--dn-blau);
+}
+
+html.design-neu .dn-wf-maxmin {
+    display: block;
+    font-size: 15px;
+    color: var(--dn-text-leise);
+}
+
+html.design-neu .dn-wf-maxmin strong {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--dn-text);
+}
+
+html.design-neu .dn-wf-lage {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+html.design-neu .dn-wf-werte {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    margin: 10px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 13px;
+    color: var(--dn-text-leise);
+}
+
+html.design-neu .dn-wf-werte .fa {
+    width: 16px;
+    margin-right: 4px;
+    text-align: center;
+    color: var(--dn-blau);
+}
+
+/* Stundenleiste (waagrecht wischen) und Tageszeiten */
+html.design-neu .dn-wf-stunden,
+html.design-neu .dn-wf-zeiten {
+    display: flex;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+html.design-neu .dn-wf-stunden {
+    overflow-x: auto;
+    margin: 0 0 10px;
+    padding: 2px 0 6px;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+}
+
+html.design-neu .dn-wf-zeiten {
+    margin-top: 10px;
+}
+
+html.design-neu .dn-wf-stunden li,
+html.design-neu .dn-wf-zeiten li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 8px 4px;
+    border-radius: var(--dn-r-s);
+    font-size: 15px;
+    scroll-snap-align: start;
+}
+
+html.design-neu .dn-wf-stunden li {
+    flex: none;
+    min-width: 56px;
+    background: var(--dn-feld);
+}
+
+html.design-neu .dn-wf-zeiten li {
+    flex: 1 1 0;
+    min-width: 0;
+    background: var(--dn-karte);
+}
+
+html.design-neu .dn-wf-stunden svg,
+html.design-neu .dn-wf-zeiten svg {
+    width: 26px;
+    height: 26px;
+    color: var(--dn-blau);
+}
+
+html.design-neu .dn-wf-stunden strong,
+html.design-neu .dn-wf-zeiten strong {
+    font-weight: 800;
+}
+
+html.design-neu .dn-wf-zeit {
+    font-size: 12px;
+    color: var(--dn-text-leise);
+    white-space: nowrap;
+}
+
+html.design-neu .dn-wf-regen {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--dn-tuerkis);
+}
+
+html.design-neu .dn-wf-leer {
+    color: var(--dn-text-leise);
+    opacity: .5;
+}
+
+html.design-neu .dn-wf-quelle {
+    margin: 6px 0 0;
+    font-size: 11px;
+    color: var(--dn-text-leise);
+}
+
+html.design-neu[data-bs-theme="dark"] .dn-wf-uebersicht svg,
+html.design-neu[data-bs-theme="dark"] .dn-wf-stunden svg,
+html.design-neu[data-bs-theme="dark"] .dn-wf-zeiten svg,
+html.design-neu[data-bs-theme="dark"] .dn-wf-werte .fa {
+    color: #8fb6cf;
+}
+
+@media (max-width: 575.98px) {
+    html.design-neu .dn-wf-zeiten .dn-wf-zeit {
+        font-size: 10.5px;
     }
 }
 

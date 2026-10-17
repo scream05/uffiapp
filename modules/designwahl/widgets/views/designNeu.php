@@ -8,12 +8,13 @@ use humhub\helpers\Html;
 use yii\helpers\Url;
 
 ?>
-<template id="dn-hero-vorlage" data-wetter-url="<?= Html::encode(Url::to(['/designwahl/wetter'])) ?>">
+<template id="dn-hero-vorlage" data-wetter-url="<?= Html::encode(Url::to(['/designwahl/wetter'])) ?>"
+          data-vorhersage-url="<?= Html::encode(Url::to(['/designwahl/wetter/vorhersage'])) ?>">
     <section class="dn-hero" aria-label="Begrüßung">
         <div class="dn-hero-text">
             <div class="dn-hero-zeile">
                 <p class="dn-hero-datum"></p>
-                <p class="dn-wetter" hidden></p>
+                <button type="button" class="dn-wetter" aria-haspopup="dialog" aria-expanded="false" aria-controls="dn-wetterfach" hidden></button>
             </div>
             <?php if ($vorname !== null): ?>
                 <h1 class="dn-hero-titel"><span class="dn-hero-gruss">Hallo</span> <strong><?= Html::encode($vorname) ?></strong></h1>
@@ -57,5 +58,17 @@ use yii\helpers\Url;
                 </a>
             <?php endforeach ?>
         </nav>
+    </div>
+</div>
+
+<div class="dn-mehr dn-wetterfach" id="dn-wetterfach" role="dialog" aria-modal="true" aria-label="Wetter in Uffenheim" hidden>
+    <div class="dn-mehr-hinter" data-dn-wetter-zu></div>
+    <div class="dn-mehr-fach">
+        <div class="dn-mehr-griff" aria-hidden="true"></div>
+        <div class="dn-mehr-kopf">
+            <strong>Wetter in Uffenheim</strong>
+            <button type="button" class="dn-mehr-zu" data-dn-wetter-zu aria-label="Schließen"><i class="fa fa-times"></i></button>
+        </div>
+        <div class="dn-wf-inhalt" aria-live="polite"></div>
     </div>
 </div>

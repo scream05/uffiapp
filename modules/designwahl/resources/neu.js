@@ -33,6 +33,18 @@
         'thunderstorm': wolkeOben + '<path d="M12.5 16l-2 3.5h3l-2 3.5"/>'
     };
 
+    function svg(icon) {
+        return '<svg viewBox="0 0 24 24" aria-hidden="true">' + (symbole[icon] || wolke) + '</svg>';
+    }
+
+    function esc(t) {
+        var d = document.createElement('div');
+        d.textContent = t == null ? '' : String(t);
+        return d.innerHTML;
+    }
+
+    var aktuell = null; // zuletzt geladenes aktuelles Wetter (für das Fenster)
+
     function wetter(teil, url) {
         var feld = teil.querySelector('.dn-wetter');
         if (!feld || !url) return;
@@ -40,16 +52,123 @@
             .then(function (r) { return r.json(); })
             .then(function (w) {
                 if (w.fehler || typeof w.temperatur !== 'number') return;
-                feld.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true">' + (symbole[w.icon] || wolke) + '</svg>'
+                aktuell = w;
+                feld.innerHTML = svg(w.icon)
                     + '<span class="dn-wetter-grad">' + w.temperatur + '°</span>'
-                    + '<span class="dn-wetter-text">' + w.text + '</span>';
-                feld.title = 'Uffenheim, ' + w.text + ', ' + w.temperatur + ' °C – Wetterstation ' + w.station
-                    + (w.zeit ? ', ' + w.zeit + ' Uhr' : '') + '. Quelle: Deutscher Wetterdienst (über Bright Sky)';
-                feld.setAttribute('aria-label', 'Wetter in Uffenheim: ' + w.text + ', ' + w.temperatur + ' Grad');
+                    + '<span class="dn-wetter-text">' + esc(w.text) + '</span>';
+                feld.title = 'Vorhersage für heute und morgen';
+                feld.setAttribute('aria-label', 'Wetter in Uffenheim: ' + w.text + ', ' + w.temperatur + ' Grad. Vorhersage öffnen');
                 feld.hidden = false;
             })
             .catch(function () { /* ohne Wetter weiter */ });
     }
+
+    // --- Fenster mit Vorhersage für heute und morgen (Handy: von unten, Computer: unter der Kopfleiste) ---
+    var vorhersage = null, vorhersageZeit = 0, wetterKnopf = null;
+
+    function wetterFach() { return document.getElementById('dn-wetterfach'); }
+
+    function prozent(p) {
+        return p > 0 ? '<span class="dn-wf-regen">' + p + ' %</span>' : '<span class="dn-wf-regen dn-wf-leer">–</span>';
+    }
+
+    function tagKarte(titel, t, mitZeiten) {
+        if (!t) return '';
+        var h = '<section class="dn-wf-tag"><h3>' + titel + '</h3>'
+            + '<div class="dn-wf-uebersicht">' + svg(t.icon)
+            + '<div><span class="dn-wf-maxmin"><strong>' + t.max + '°</strong> / ' + t.min + '°</span>'
+            + '<span class="dn-wf-lage">' + esc(t.text) + '</span></div></div>'
+            + '<ul class="dn-wf-werte">'
+            + '<li><i class="fa fa-tint" aria-hidden="true"></i>Regen ' + (t.regen > 0 ? 'bis ' + t.regen + ' %' : 'kaum')
+            + (t.niederschlag >= 0.1 ? ', ' + String(t.niederschlag).replace('.', ',') + ' l/m²' : '') + '</li>'
+            + '<li><i class="fa fa-flag-o" aria-hidden="true"></i>Wind bis ' + t.wind + ' km/h'
+            + (t.boeen >= 40 ? ', Böen ' + t.boeen + ' km/h' : '') + '</li>'
+            + (t.aufgang ? '<li><i class="fa fa-sun-o" aria-hidden="true"></i>' + t.aufgang + ' – ' + t.untergang + ' Uhr</li>' : '')
+            + '</ul>';
+        if (mitZeiten && t.zeiten.length) {
+            h += '<ul class="dn-wf-zeiten">' + t.zeiten.map(function (z) {
+                return '<li title="' + esc(z.text) + '"><span class="dn-wf-zeit">' + z.name + '</span>' + svg(z.icon)
+                    + '<strong>' + z.temperatur + '°</strong>' + prozent(z.regen) + '</li>';
+            }).join('') + '</ul>';
+        }
+        return h + '</section>';
+    }
+
+    function wetterZeigen(d) {
+        var morgen = new Date();
+        morgen.setDate(morgen.getDate() + 1);
+        var h = '';
+        if (aktuell) {
+            h += '<div class="dn-wf-jetzt">' + svg(aktuell.icon) + '<span class="dn-wf-grad">' + aktuell.temperatur + '°</span>'
+                + '<span><strong>' + esc(aktuell.text) + '</strong><small>Gemessen in ' + esc(aktuell.station)
+                + (aktuell.zeit ? ' um ' + esc(aktuell.zeit) + ' Uhr' : '') + '</small></span></div>';
+        }
+        if (d.warnungen && d.warnungen.length) {
+            h += d.warnungen.map(function (w) {
+                return '<details class="dn-wf-warnung dn-wf-' + esc(w.stufe) + '"><summary><i class="fa fa-exclamation-triangle" aria-hidden="true"></i>'
+                    + '<span><strong>' + esc(w.titel) + '</strong><small>' + esc(w.von) + (w.bis ? ' bis ' + esc(w.bis) : '') + ' Uhr</small></span></summary>'
+                    + '<p>' + esc(w.text) + '</p></details>';
+            }).join('');
+        } else if (d.warnungen) {
+            h += '<p class="dn-wf-ruhig"><i class="fa fa-check-circle" aria-hidden="true"></i>Keine Wetterwarnungen für Uffenheim</p>';
+        }
+        h += tagKarte('Heute', d.heute, false);
+        if (d.stunden.length) {
+            h += '<ul class="dn-wf-stunden" aria-label="Stündliche Vorhersage">' + d.stunden.map(function (s) {
+                return '<li title="' + esc(s.text) + '"><span class="dn-wf-zeit">' + s.zeit + '</span>' + svg(s.icon)
+                    + '<strong>' + s.temperatur + '°</strong>' + prozent(s.regen) + '</li>';
+            }).join('') + '</ul>';
+        }
+        h += tagKarte('Morgen, ' + tage[morgen.getDay()] + ' ' + morgen.getDate() + '. ' + monate[morgen.getMonth()], d.morgen, true);
+        h += '<p class="dn-wf-quelle">Vorhersage und Warnungen: Deutscher Wetterdienst (über Bright Sky), Stand ' + esc(d.stand)
+            + ' Uhr. Prozentwerte: Regenwahrscheinlichkeit.</p>';
+        return h;
+    }
+
+    function wetterFenster(auf) {
+        var f = wetterFach();
+        if (!f) return;
+        f.hidden = !auf;
+        document.documentElement.classList.toggle('dn-wetter-offen', auf);
+        if (wetterKnopf) wetterKnopf.setAttribute('aria-expanded', auf ? 'true' : 'false');
+        if (!auf) {
+            if (wetterKnopf && document.contains(wetterKnopf)) wetterKnopf.focus({preventScroll: true});
+            return;
+        }
+        f.querySelector('.dn-mehr-zu').focus({preventScroll: true});
+        var inhalt = f.querySelector('.dn-wf-inhalt');
+        if (vorhersage && Date.now() - vorhersageZeit < 15 * 60 * 1000) {
+            inhalt.innerHTML = wetterZeigen(vorhersage);
+            return;
+        }
+        var vorlage = document.getElementById('dn-hero-vorlage');
+        inhalt.innerHTML = '<p class="dn-wf-hinweis"><i class="fa fa-spinner fa-spin" aria-hidden="true"></i> Vorhersage wird geladen …</p>';
+        fetch(vorlage.getAttribute('data-vorhersage-url'), {credentials: 'same-origin'})
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                if (d.fehler) throw new Error();
+                vorhersage = d;
+                vorhersageZeit = Date.now();
+                inhalt.innerHTML = wetterZeigen(d);
+            })
+            .catch(function () {
+                inhalt.innerHTML = '<p class="dn-wf-hinweis">Die Vorhersage ist gerade nicht erreichbar. Bitte später noch einmal versuchen.</p>';
+            });
+    }
+
+    document.addEventListener('click', function (e) {
+        var knopf = e.target.closest('.dn-wetter');
+        if (knopf) {
+            wetterKnopf = knopf;
+            wetterFenster(true);
+        } else if (e.target.closest('[data-dn-wetter-zu]')) {
+            wetterFenster(false);
+        }
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && wetterFach() && !wetterFach().hidden) wetterFenster(false);
+    });
 
     // Gäste: Hinweis in der Begrüßungskarte einklappbar, Zustand bleibt im Browser gespeichert
     function klappe(karte) {
