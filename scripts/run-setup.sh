@@ -58,5 +58,7 @@ docker compose exec -T humhub sh -c '
   cp /data/config/console.php /tmp/console.php.orig
   printf "<?php\nrequire_once \"/tmp/SetupController.php\";\nreturn [\"controllerMap\" => [\"setup\" => \"SetupController\"]];\n" > /data/config/console.php
 '
-trap 'docker compose exec -T humhub sh -c "cp /tmp/console.php.orig /data/config/console.php && chown www-data:www-data /data/config/console.php"' EXIT
+# Zusätzlich /app/runtime zurück an www-data: Cache-Dateien, die ein Befehl als root angelegt hat,
+# kann HumHub nicht überschreiben und liest dann veraltete Werte (am 17.10.2026: 2FA-Code galt sofort als abgelaufen)
+trap 'docker compose exec -T humhub sh -c "cp /tmp/console.php.orig /data/config/console.php && chown www-data:www-data /data/config/console.php; chown -R www-data:www-data /app/runtime"' EXIT
 docker compose exec -T -u www-data humhub /app/yii "setup/$1" "${@:2}"
