@@ -23,6 +23,9 @@ return [
         ['class' => 'humhub\modules\whatsapp\components\Verarbeitung', 'event' => 'status',
             'callback' => ['humhub\modules\maengelmelder\components\Bauhof', 'onStatus']],
         ['class' => Menu::class, 'event' => Menu::EVENT_INIT, 'callback' => [Events::class, 'onSpaceMenuInit']],
+        // Gäste: kein Stream im Mängelmelder (nur Melden + Karte)
+        ['class' => Menu::class, 'event' => Menu::EVENT_RUN, 'callback' => [Events::class, 'onSpaceMenuRun']],
+        ['class' => 'humhub\modules\space\controllers\SpaceController', 'event' => 'beforeAction', 'callback' => [Events::class, 'onSpaceBeforeAction']],
         ['class' => WallEntryAddons::class, 'event' => WallEntryAddons::EVENT_INIT, 'callback' => [Events::class, 'onWallEntryAddonsInit']],
     ],
 ];

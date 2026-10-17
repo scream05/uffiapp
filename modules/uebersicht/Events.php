@@ -27,6 +27,25 @@ class Events
         }
     }
 
+    /** Seitenleiste der Übersicht: „Neue Spaces“ (Kern zeigt es nur Gästen) nur für Admins */
+    public static function onDashboardSidebarInit($event)
+    {
+        try {
+            $sidebar = $event->sender;
+            $neueSpaces = \humhub\modules\space\widgets\NewSpaces::class;
+            foreach ($sidebar->widgets as $k => $widget) {
+                if (($widget[0] ?? null) === $neueSpaces) {
+                    unset($sidebar->widgets[$k]);
+                }
+            }
+            if (!Yii::$app->user->isGuest && Yii::$app->user->isAdmin()) {
+                $sidebar->addWidget($neueSpaces, ['showMoreButton' => true], ['sortOrder' => 400]);
+            }
+        } catch (\Throwable $e) {
+            Yii::error($e);
+        }
+    }
+
     /** Übersicht angemeldeter Nutzer nach „Meine Übersicht“ (filters/MeineUebersicht) */
     public static function onBeforeRequest($event)
     {

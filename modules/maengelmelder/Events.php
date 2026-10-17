@@ -39,6 +39,50 @@ class Events
         }
     }
 
+    /** Gäste sehen im Mängelmelder keinen Stream: Menüpunkt „Stream“ ausblenden */
+    public static function onSpaceMenuRun($event)
+    {
+        try {
+            $menu = $event->sender;
+            if (!Yii::$app->user->isGuest || !$menu->space->moduleManager->isEnabled('maengelmelder')) {
+                return;
+            }
+            $stream = $menu->space->createUrl('/space/space/home');
+            foreach ($menu->getEntries() as $entry) {
+                if ($entry instanceof \humhub\modules\ui\menu\MenuLink && $entry->getUrl() === $stream) {
+                    $menu->removeEntry($entry);
+                }
+            }
+        } catch (\Throwable $e) {
+            Yii::error($e);
+        }
+    }
+
+    /** Gäste: Stream des Mängelmelders (Seite, Nachladen, Einzelbeitrag) führt zur Karte */
+    public static function onSpaceBeforeAction($event)
+    {
+        try {
+            $id = $event->action->id;
+            if (!Yii::$app->user->isGuest
+                || !($id === 'home' || $id === 'stream' || ($id === 'index' && Yii::$app->request->get('contentId')))) {
+                return;
+            }
+            $space = $event->action->controller->contentContainer ?? null;
+            if (!$space instanceof Space || !$space->moduleManager->isEnabled('maengelmelder')) {
+                return;
+            }
+            $event->isValid = false;
+            if ($id === 'stream') {
+                throw new \yii\web\ForbiddenHttpException();
+            }
+            $event->action->controller->redirect($space->createUrl('/maengelmelder/meldung/karte'));
+        } catch (\yii\web\HttpException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            Yii::error($e);
+        }
+    }
+
     public static function onSpaceMenuInit($event)
     {
         try {
