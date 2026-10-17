@@ -27,12 +27,12 @@ class Events
         }
     }
 
-    /** Space „Rathaus Uffenheim“: Gäste sehen in der Seitenleiste keine „Letzten Aktivitäten“ */
+    /** Spaces: Gäste sehen in der Seitenleiste keine „Letzten Aktivitäten“ */
     public static function onSpaceSidebarInit($event)
     {
         try {
             $sidebar = $event->sender;
-            if (!Yii::$app->user->isGuest || ($sidebar->space->url ?? null) !== 'rathaus-uffenheim') {
+            if (!Yii::$app->user->isGuest) {
                 return;
             }
             foreach ($sidebar->widgets as $k => $widget) {

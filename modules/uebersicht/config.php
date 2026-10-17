@@ -19,7 +19,7 @@ return [
         ['class' => 'humhub\modules\space\widgets\HeaderControlsMenu', 'event' => 'run', 'callback' => [Events::class, 'onSpaceHeaderControlsRun']],
         ['class' => 'humhub\modules\dashboard\stream\DashboardStreamQuery', 'event' => 'beforeFilter', 'callback' => [Events::class, 'onDashboardStreamBeforeFilter']],
         ['class' => 'humhub\modules\content\widgets\WallEntryControls', 'event' => 'init', 'callback' => [Events::class, 'onWallEntryControlsInit']],
-        // „Letzte Aktivitäten“ im Space Rathaus nur für Angemeldete
+        // „Letzte Aktivitäten“ in Spaces nur für Angemeldete
         ['class' => 'humhub\modules\space\widgets\Sidebar', 'event' => 'init', 'callback' => [Events::class, 'onSpaceSidebarInit']],
         // „Neue Spaces“ in der Seitenleiste der Übersicht nur für Admins
         ['class' => 'humhub\modules\dashboard\widgets\Sidebar', 'event' => 'init', 'callback' => [Events::class, 'onDashboardSidebarInit']],
