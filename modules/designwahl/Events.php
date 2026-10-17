@@ -439,10 +439,20 @@ JS, \yii\web\View::POS_END);
                     'types' => $legend->getCalendarTypes(),
                 ]);
             }
-            $event->result .= self::kalenderAbo($legend);
+            $event->result .= self::oeffnungszeiten($legend) . self::kalenderAbo($legend);
         } catch (\Throwable $e) {
             Yii::error($e, 'designwahl');
         }
+    }
+
+    /** Abfallkalender: Kasten mit Öffnungszeiten von Wertstoffhof und Kompostplatz */
+    private static function oeffnungszeiten($legend): string
+    {
+        $space = $legend->contentContainer;
+        if (!$space instanceof \humhub\modules\space\models\Space || $space->url !== 'abfall-and-termine') {
+            return '';
+        }
+        return $legend->view->render('@designwahl/widgets/views/oeffnungszeiten');
     }
 
     /** Kasten „Kalender abonnieren“ (öffentliche Abos ohne Konto) für Veranstaltungen und Abfuhrtermine */
