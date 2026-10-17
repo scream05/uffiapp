@@ -177,7 +177,14 @@ html.design-neu #topbar > .container .notifications .btn-group > .badge {
     font-weight: 800;
 }
 
+/* Ring direkt am Bild: der umgebende Span ist durch margin-left breiter und wäre oval */
 html.design-neu #topbar #user-account-image {
+    box-shadow: none !important;
+    background: transparent !important;
+}
+
+html.design-neu #topbar #user-account-image > img {
+    border-radius: 50% !important;
     box-shadow: 0 0 0 2px rgba(255, 255, 255, .85);
 }
 
