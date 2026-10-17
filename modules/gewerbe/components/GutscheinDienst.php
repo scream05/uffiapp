@@ -10,6 +10,7 @@ use humhub\modules\gewerbe\models\Betrieb;
 use humhub\modules\gewerbe\models\Einloesung;
 use humhub\modules\gewerbe\models\Gutschein;
 use humhub\modules\gewerbe\Module;
+use humhub\modules\gewerbe\notifications\GutscheinFuerAlle;
 use humhub\modules\gewerbe\notifications\GutscheinNeu;
 use humhub\modules\gewerbe\notifications\GutscheinPausiert;
 use humhub\modules\gewerbe\permissions\ManageGewerbe;
@@ -203,19 +204,27 @@ class GutscheinDienst
         }
     }
 
-    /** Glocke an Admins / „Gewerbe verwalten“: neuer Gutschein (er ist schon sichtbar, nur zur Kenntnis) */
+    /**
+     * Neuer Gutschein: Glocke an Admins / „Gewerbe verwalten“ (zur Kenntnis), alle übrigen Konten
+     * bekommen „Neue Gutscheine“ (Glocke + Push, je Person abschaltbar; per Queue)
+     */
     public static function neu(Gutschein $g): void
     {
         if (self::$stumm) {
             return;
         }
         $von = $g->ersteller;
-        $empfaenger = array_values(array_filter(self::pruefer(), fn(User $u) => $u->id !== $g->created_by));
+        $pruefer = array_values(array_filter(self::pruefer(), fn(User $u) => $u->id !== $g->created_by));
         $n = GutscheinNeu::instance()->about($g);
         if ($von) {
             $n->from($von);
         }
-        $n->sendBulk($empfaenger);
+        $n->sendBulk($pruefer);
+
+        $ohne = array_merge(array_map(fn(User $u) => $u->id, self::pruefer()), [(int)$g->created_by]);
+        GutscheinFuerAlle::instance()->about($g)->sendBulk(
+            User::find()->active()->andWhere(['not in', 'user.id', $ohne])->andWhere(['!=', 'user.username', 'gastmeldung'])
+        );
     }
 
     /** @return User[] */

@@ -137,6 +137,28 @@ class Context
                 $parts[] = "## Gewerbeverzeichnis der Community (Geschäfte, Gastronomie, Handwerk, Dienstleister; „gerade“ = Stand jetzt; Vorstellung und Leistungen passender Betriebe ggf. weiter unten bei den Informationen)\n"
                     . implode("\n", $lines);
             }
+
+            // Laufende Rabatt-Gutscheine (aktiv, Zeitraum nicht vorbei; pausierte nicht anbieten)
+            if (Yii::$app->db->getTableSchema('gewerbe_gutschein') !== null) {
+                $lines = [];
+                $f = Yii::$app->formatter;
+                foreach (\humhub\modules\gewerbe\models\Gutschein::sichtbar()
+                             ->andWhere(['gewerbe_gutschein.status' => \humhub\modules\gewerbe\models\Gutschein::STATUS_AKTIV])
+                             ->orderBy(['gueltig_bis' => SORT_ASC])->with('betrieb')->all() as $g) {
+                    if ($g->istAufgebraucht()) {
+                        continue;
+                    }
+                    $lines[] = "- „{$g->titel}“ bei {$g->betrieb->name}"
+                        . ($g->bedingungen ? '; Bedingungen: ' . self::plain($g->bedingungen, 200) : '')
+                        . ($g->gueltig_ab > date('Y-m-d') ? '; gilt ab ' . $f->asDate($g->gueltig_ab, 'php:j.n.Y') : '')
+                        . '; gültig bis ' . $f->asDate($g->gueltig_bis, 'php:j.n.Y')
+                        . '; pro Person ' . (\humhub\modules\gewerbe\models\Gutschein::PRO_PERSON[$g->pro_person] ?? $g->pro_person)
+                        . ($g->nur_geoeffnet ? '; nur während der Öffnungszeiten' : '')
+                        . ' – ' . $g->getUrl(true);
+                }
+                $parts[] = "## Rabatt-Gutscheine der Betriebe (nur in der Community: angemeldet an der Theke den QR-Code des Betriebs scannen und den Gutschein einlösen; keine Geldwerte)\n"
+                    . ($lines ? implode("\n", $lines) : '- Gerade gibt es keine laufenden Gutscheine.');
+            }
         }
 
         $lines = [];

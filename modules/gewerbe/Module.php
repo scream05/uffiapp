@@ -72,7 +72,7 @@ class Module extends ContentContainerModule
     {
         return [notifications\VerwaltungAngefragt::class, notifications\VerwaltungBestaetigt::class,
             notifications\BeitragEingereicht::class, notifications\BeitragFreigegeben::class,
-            notifications\GutscheinNeu::class, notifications\GutscheinPausiert::class];
+            notifications\GutscheinNeu::class, notifications\GutscheinPausiert::class, notifications\GutscheinFuerAlle::class];
     }
 
     /** Space, in dem das Verzeichnis läuft */

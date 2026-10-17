@@ -30,7 +30,7 @@ $space = $this->context->contentContainer;
                     <?= Html::hiddenInput('aktion', 'freigeben') ?>
                     <div style="display:flex;flex-wrap:wrap;gap:6px 18px;margin-bottom:8px">
                         <label style="font-weight:normal"><?= Html::checkbox('vereinsseite', true) ?> Auf der Vereinsseite zeigen</label>
-                        <label style="font-weight:normal"><?= Html::checkbox('uebersicht', false) ?> In der Übersicht (Stream) zeigen</label>
+                        <label style="font-weight:normal"><?= Html::checkbox('uebersicht', true) ?> In der Übersicht (Stream) zeigen</label>
                     </div>
                     <button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-check"></i> Freigeben</button>
                 <?= Html::endForm() ?>

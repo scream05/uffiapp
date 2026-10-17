@@ -122,6 +122,31 @@ class BauhofController extends Controller
         return ExitCode::OK;
     }
 
+    /**
+     * Status einer Meldung setzen wie im Bauhof (Kommentar, Mitarbeiter, Infos an Meldende):
+     * bauhof/status <content-id> <gemeldet|pruefung|arbeit|erledigt|abgelehnt> [hinweis] [als-benutzer=admin]
+     * Danach zeigt es die Bürger-Nachrichten der Meldung samt Zustellweg.
+     */
+    public function actionStatus($id, $status, $hinweis = null, $als = 'admin')
+    {
+        $content = Content::findOne((int)$id);
+        $user = User::findOne(['username' => $als]);
+        if (!$content || !$user) {
+            $this->stderr("Meldung oder Benutzer nicht gefunden.\n");
+            return ExitCode::UNSPECIFIED_ERROR;
+        }
+        if (!\humhub\modules\maengelmelder\components\Bauhof::statusSetzen($content, (string)$status, $hinweis, $user)) {
+            $this->stderr("Status nicht gesetzt (unbekannt oder unverändert).\n");
+            return ExitCode::UNSPECIFIED_ERROR;
+        }
+        $this->stdout("Status von $id: " . MaengelStatus::forContent($content)->getLabel() . "\n");
+        foreach (BauhofNachricht::find()->where(['content_id' => $content->id, 'buerger' => 1])->orderBy(['id' => SORT_DESC])->limit(3)->all() as $n) {
+            $this->stdout(sprintf("  #%d %s %s %s zustellung=%s fehler=%s\n", $n->id, $n->created_at, $n->richtung, $n->typ,
+                $n->zustellung ?? '-', $n->fehler ?? '-'));
+        }
+        return ExitCode::OK;
+    }
+
     /** Antwortadresse einer Meldung anzeigen: bauhof/antwortadresse <content-id> */
     public function actionAntwortadresse($id)
     {

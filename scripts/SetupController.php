@@ -1841,6 +1841,10 @@ class SetupController extends Controller
         $pruefe('QR-Code als SVG', str_contains($svg, '<svg') && strlen($svg) > 1000);
         $this->stdout("Theken-Link: " . $D::thekeUrl($b) . "\n");
         $pruefe('Sichtbar-Liste enthält Gutschein', \humhub\modules\gewerbe\models\Gutschein::sichtbar()->andWhere(['gewerbe_gutschein.id' => $g->id])->exists());
+        // Benachrichtigung „Neue Gutscheine“ an alle (nur aufbauen, nicht senden)
+        $fuerAlle = \humhub\modules\gewerbe\notifications\GutscheinFuerAlle::instance()->about($g);
+        $pruefe('Benachrichtigung „Neue Gutscheine“: Text und Kategorie',
+            str_contains($fuerAlle->html(), $g->titel) && $fuerAlle->getCategory()->id === 'gutscheine');
         // Kontolöschung räumt Einlösungen ab
         $n = \humhub\modules\gewerbe\models\Einloesung::find()->where(['user_id' => $kunde->id])->count();
         \humhub\modules\gewerbe\Events::onUserLoeschen((object)['user' => $kunde]);
