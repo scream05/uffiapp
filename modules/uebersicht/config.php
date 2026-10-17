@@ -21,6 +21,7 @@ return [
         ['class' => 'humhub\modules\content\widgets\WallEntryControls', 'event' => 'init', 'callback' => [Events::class, 'onWallEntryControlsInit']],
         // „Letzte Aktivitäten“ in Spaces nur für Angemeldete
         ['class' => 'humhub\modules\space\widgets\Sidebar', 'event' => 'init', 'callback' => [Events::class, 'onSpaceSidebarInit']],
+        ['class' => 'humhub\modules\space\widgets\Sidebar', 'event' => 'afterRun', 'callback' => [Events::class, 'onSpaceSidebarAfterRun']],
         // „Neue Spaces“ in der Seitenleiste der Übersicht nur für Admins
         ['class' => 'humhub\modules\dashboard\widgets\Sidebar', 'event' => 'init', 'callback' => [Events::class, 'onDashboardSidebarInit']],
         ['class' => LayoutAddons::class, 'event' => LayoutAddons::EVENT_BEFORE_RUN, 'callback' => [Events::class, 'onLayoutAddons']],

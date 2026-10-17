@@ -45,6 +45,17 @@ class Events
         }
     }
 
+    /**
+     * Leere Space-Seitenleiste ganz weglassen: View::hasSidebar() zählt einen leeren Block als Seitenleiste, dann
+     * stünde rechts nur die Fußzeile. Nur Leerzeichen gelten als keine Seitenleiste → Fußzeile unten, Inhalt breit.
+     */
+    public static function onSpaceSidebarAfterRun($event)
+    {
+        if (trim((string)$event->result) === '') {
+            $event->result = ' ';
+        }
+    }
+
     /** Seitenleiste der Übersicht: „Neue Spaces“ (Kern zeigt es nur Gästen) nur für Admins */
     public static function onDashboardSidebarInit($event)
     {
