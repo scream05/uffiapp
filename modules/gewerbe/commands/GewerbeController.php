@@ -18,6 +18,7 @@ use yii\console\ExitCode;
  *   /app/yii gewerbe/abgleich [1] wöchentlich: Startlisten-Einträge aus OSM aktualisieren, gepflegte nur prüfen,
  *                                 Websites prüfen, fehlende Logos holen (1 = Probelauf)
  *   /app/yii gewerbe/logos        Logos von den Websites holen (nur Einträge ohne Logo)
+ *   /app/yii gewerbe/logo <id> <url>  Logo gezielt setzen/ersetzen (z. B. Markenlogo von Commons)
  *   /app/yii gewerbe/loeschen <ids> Betriebe löschen, ihre OSM-Objekte künftig überspringen
  *   /app/yii gewerbe/beitrag-test <autor> <leser> <betrieb-id> [1=behalten]  Probelauf Gewerbebeiträge
  *   /app/yii gewerbe/beitrag-entfernen <id>  Gewerbebeitrag samt HumHub-Beitrag entfernen
@@ -319,6 +320,19 @@ class GewerbeController extends Controller
             $this->stdout(($grund === null ? '+ ' : '- ') . $b->name . ($grund ? ": $grund" : '') . "\n");
         }
         return ExitCode::OK;
+    }
+
+    /** Logo gezielt setzen/ersetzen (z. B. Markenlogo von Wikimedia Commons): /app/yii gewerbe/logo <id> <bild-url> */
+    public function actionLogo($id, $url)
+    {
+        $b = Betrieb::findOne((int)$id);
+        if ($b === null) {
+            $this->stderr("Betrieb $id nicht gefunden\n");
+            return ExitCode::DATAERR;
+        }
+        $grund = Logo::vonUrl($b, $url);
+        $this->stdout(($grund === null ? '+ ' : '- ') . $b->name . ($grund ? ": $grund" : '') . "\n");
+        return $grund === null ? ExitCode::OK : ExitCode::DATAERR;
     }
 
     private function osm(): ?array
