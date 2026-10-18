@@ -280,7 +280,7 @@ CSS);
 JS, \yii\web\View::POS_END);
     }
 
-    /** Kommentare: einfaches Textfeld statt Richtext-Editor (beide Designs) */
+    /** Kommentare: eigenes Formular mit Richtext-Editor ohne Anhänge (beide Designs) */
     public static function onCommentFormCreate($event)
     {
         if (($event->config['class'] ?? null) === \humhub\modules\comment\widgets\Form::class) {

@@ -1,11 +1,12 @@
 <?php
 
 use humhub\helpers\Html;
+use humhub\modules\content\widgets\richtext\RichTextField;
 use humhub\widgets\bootstrap\Button;
 use humhub\widgets\form\ActiveForm;
 use yii\helpers\Url;
 
-/* Nachbau von comment/widgets/views/form.php, nur mit <textarea> statt RichTextField und ohne Anhänge */
+/* Nachbau von comment/widgets/views/form.php: Richtext-Editor mit Werkzeugleiste wie bei Umfragen, ohne Anhänge */
 
 $submitUrl = Url::to(['/comment/comment/post']);
 
@@ -14,7 +15,7 @@ $placeholder = ($isNestedComment)
     : Yii::t('CommentModule.base', 'Write a new comment...');
 ?>
 
-<div id="comment_create_form_<?= $id ?>" class="comment_create content_create kommentar-einfach" data-ui-widget="comment.Form"
+<div id="comment_create_form_<?= $id ?>" class="comment_create content_create" data-ui-widget="comment.Form"
      style="<?php if ($isHidden): ?>display:none<?php endif; ?>">
 
     <hr>
@@ -27,26 +28,27 @@ $placeholder = ($isNestedComment)
     <?= Html::hiddenInput('objectModel', $objectModel) ?>
     <?= Html::hiddenInput('objectId', $objectId) ?>
 
-    <div class="richtext-create-input-group input-group">
-        <?= $form->field($model, 'message')->textarea([
-            'id' => 'newCommentForm_' . $id,
-            'rows' => 2,
-            'placeholder' => $placeholder,
-            'class' => 'form-control kommentar-textfeld',
-            // 16px: iOS zoomt sonst beim Antippen in die Seite
-            'style' => 'font-size:16px;resize:vertical;min-height:2.6em',
-        ])->label(false) ?>
-        <?php /* comment.js erwartet ein Richtext-Element (getRichtext/clear, Fokus beim Aufklappen) */ ?>
-        <div class="humhub-ui-richtext" style="display:none"></div>
-        <?php /* … und nach dem Absenden einen Upload-Knopf (getUpload().reset()) */ ?>
-        <div class="main_comment_upload" data-ui-widget="designwahl.textfeld" style="display:none"></div>
+    <?= $form->field($model, 'message')->widget(RichTextField::class, [
+        'id' => 'newCommentForm_' . $id,
+        'form' => $form,
+        'layout' => RichTextField::LAYOUT_BLOCK,
+        'exclude' => ['upload', 'file_handler'],
+        'pluginOptions' => ['maxHeight' => '300px'],
+        'mentioningUrl' => $mentioningUrl ?? null,
+        'placeholder' => $placeholder,
+        'events' => [
+            'scroll-active' => 'comment.scrollActive',
+            'scroll-inactive' => 'comment.scrollInactive',
+        ],
+    ])->label(false) ?>
+    <?php /* comment.js ruft nach dem Absenden getUpload().reset() auf */ ?>
+    <div class="main_comment_upload" data-ui-widget="designwahl.textfeld" style="display:none"></div>
 
-        <div class="richtext-create-buttons">
-            <?= Button::accent()
-                ->icon('send')
-                ->cssClass('btn-comment-submit')->sm()
-                ->action('submit', $submitUrl)->submit() ?>
-        </div>
+    <div class="text-end">
+        <?= Button::accent(Yii::t('CommentModule.base', 'Send'))
+            ->icon('send')
+            ->cssClass('btn-comment-submit')->sm()
+            ->action('submit', $submitUrl)->submit() ?>
     </div>
 
     <?php ActiveForm::end() ?>

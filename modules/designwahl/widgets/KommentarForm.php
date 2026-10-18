@@ -5,8 +5,8 @@ namespace humhub\modules\designwahl\widgets;
 use humhub\modules\comment\widgets\Form;
 
 /**
- * Kommentarformular mit einfachem Textfeld statt Richtext-Editor
- * (der Editor nimmt auf manchen Handys keine Eingabe an).
+ * Kommentarformular mit Richtext-Editor wie bei Umfragen (Werkzeugleiste, ohne Anhänge)
+ * (bis 18.10. einfaches Textfeld, weil der Editor auf manchen Handys keine Eingabe annahm).
  * Wird über Events::onCommentFormCreate statt des Standard-Formulars erzeugt.
  */
 class KommentarForm extends Form
