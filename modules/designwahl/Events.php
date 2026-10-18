@@ -226,7 +226,6 @@ class Events
                 $event->sender->addWidget(widgets\DesignNeu::class);
             }
             if (!Yii::$app->user->isGuest) {
-                assets\TextfeldAsset::register(Yii::$app->view);
                 assets\KalenderAsset::register(Yii::$app->view);
             } else {
                 self::abbrechenKnopf();
@@ -280,35 +279,11 @@ CSS);
 JS, \yii\web\View::POS_END);
     }
 
-    /** Kommentare: eigenes Formular mit Richtext-Editor ohne Anhänge (beide Designs) */
-    public static function onCommentFormCreate($event)
-    {
-        if (($event->config['class'] ?? null) === \humhub\modules\comment\widgets\Form::class) {
-            $event->config['class'] = widgets\KommentarForm::class;
-        }
-    }
-
-    /** Eigene Views (einfache Textfelder, keine Anhänge): Original-Ordner => Ordner in designwahl */
+    /** Eigene Views: Original-Ordner => Ordner in designwahl */
     const ANSICHTEN = [
-        '@humhub/modules/comment/views/comment' => '@designwahl/views/comment',
-        '@humhub/modules/post/views/post' => '@designwahl/views/post/post',
-        '@humhub/modules/post/widgets/views' => '@designwahl/views/post/widgets',
-        '@humhub/modules/content/widgets/views' => '@designwahl/views/content/widgets',
-        '@mail/views/mail' => '@designwahl/views/mail',
-        '@questions/views/question' => '@designwahl/views/questions/question',
-        '@questions/widgets/views' => '@designwahl/views/questions/widgets',
         '@calendar/widgets/views' => '@designwahl/views/calendar/widgets', // nur wallEntry.php (Teilnahme-Knöpfe) + participants.php (Liste nur für Bearbeiter), Rest Original
         '@calendar/views/common' => '@designwahl/views/calendar/common', // nur defaultConfig.php (ohne Reiter „Erinnerung“)
         '@humhub/modules/space/widgets/views' => '@designwahl/views/space/widgets', // nur profileHeaderControls.php (Leiste nur für Admins)
-    ];
-
-    /** Aktionen, deren Formulardaten nur Text sein dürfen (Controller-ID => Aktionen) */
-    const NUR_TEXT = [
-        'comment/comment' => ['post', 'edit'],
-        'mail/mail' => ['reply', 'create', 'edit-entry'],
-        'post/post' => ['post', 'edit'],
-        'questions/question' => ['create', 'edit'],
-        'questions/answer' => ['edit'],
     ];
 
     /** Teilnehmerliste eines Termins: nur wer ihn bearbeiten darf (Ersteller, Space-Admins, Admins) */
@@ -321,10 +296,7 @@ JS, \yii\web\View::POS_END);
         return $eintrag !== null && $eintrag->content->canEdit();
     }
 
-    /**
-     * Kommentare, Nachrichten, Beiträge und Fragen nur als Text (beide Designs): eigene Views mit
-     * einfachem Textfeld ohne Anhänge einbinden und beim Speichern nur Text annehmen
-     */
+    /** Vor jeder Aktion: Termin-Teilnehmerlisten schützen, Gastsprache, eigene Views (ANSICHTEN) einbinden */
     public static function onControllerBeforeAction($event)
     {
         // Teilnehmerlisten von Terminen (Namen der Teilnehmer) nur für alle, die den Termin bearbeiten dürfen
@@ -348,10 +320,6 @@ JS, \yii\web\View::POS_END);
                         $theme->pathMap[$original] = [$eigene];
                     }
                 }
-            }
-            $aktionen = self::NUR_TEXT[$event->action->controller->uniqueId] ?? [];
-            if (in_array($event->action->id, $aktionen, true)) {
-                self::nurText();
             }
         } catch (\Throwable $e) {
             Yii::error($e);
@@ -396,32 +364,6 @@ JS, \yii\web\View::POS_END);
             return;
         }
         Yii::$app->i18n->setDefaultLocale();
-    }
-
-    /**
-     * Formulardaten auf reinen Text beschränken: Dateilisten (fileList, files) entfernen und
-     * Markdown-Bilder ![…](…) zu normalen Links machen – außer Verweisen auf vorhandene HumHub-Dateien
-     * (file-guid:), damit z. B. importierte Beiträge beim Bearbeiten ihr Bild behalten
-     */
-    private static function nurText()
-    {
-        $request = Yii::$app->request;
-        if (!$request->isPost) {
-            return;
-        }
-        $bereinigen = function ($daten) use (&$bereinigen) {
-            foreach ($daten as $name => $wert) {
-                if ($name === 'fileList' || $name === 'files') {
-                    unset($daten[$name]);
-                } elseif (is_array($wert)) {
-                    $daten[$name] = $bereinigen($wert);
-                } elseif (is_string($wert)) {
-                    $daten[$name] = preg_replace('/!(\[[^\]]*\]\()(?!file-guid:)/', '$1', $wert);
-                }
-            }
-            return $daten;
-        };
-        $request->setBodyParams($bereinigen($request->getBodyParams()));
     }
 
     /**

@@ -23,7 +23,6 @@ return [
         // Klasse als Text: das Kalendermodul ist beim Laden dieser Konfiguration evtl. noch nicht registriert
         ['class' => 'humhub\modules\calendar\widgets\CalendarTypeLegend', 'event' => 'afterRun', 'callback' => [Events::class, 'onCalendarTypeLegend']],
         ['class' => 'humhub\modules\calendar\widgets\CalendarFilterBar', 'event' => 'beforeRun', 'callback' => [Events::class, 'onCalendarFilterBar']],
-        ['class' => 'humhub\modules\comment\widgets\Form', 'event' => 'create', 'callback' => [Events::class, 'onCommentFormCreate']],
         ['class' => 'humhub\components\Controller', 'event' => 'beforeAction', 'callback' => [Events::class, 'onControllerBeforeAction']],
         ['class' => 'humhub\modules\content\widgets\WallEntryControls', 'event' => 'run', 'callback' => [Events::class, 'onWallEntryControlsRun']],
         ['class' => 'yii\web\Response', 'event' => 'beforeSend', 'callback' => [Events::class, 'onResponseBeforeSend']],
