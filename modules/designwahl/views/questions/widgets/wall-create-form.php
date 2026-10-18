@@ -1,8 +1,9 @@
 <?php
 
-/* Nachbau von questions/widgets/views/wall-create-form.php: einfaches Textfeld statt Richtext-Editor
+/* Nachbau von questions/widgets/views/wall-create-form.php: Richtext-Editor wie bei Umfragen, ohne Hochladen
    (eingebunden über Events::onControllerBeforeAction) */
 
+use humhub\modules\content\widgets\richtext\RichTextField;
 use humhub\modules\content\widgets\WallCreateContentFormFooter;
 use humhub\modules\questions\models\Question;
 use humhub\widgets\form\ActiveForm;
@@ -17,12 +18,9 @@ use humhub\widgets\form\ActiveForm;
     ->label(false) ?>
 
 <div class="contentForm_options">
-    <?= $form->field($model, 'description')->textarea([
-        'rows' => 3,
+    <?= $form->field($model, 'description')->widget(RichTextField::class, [
         'placeholder' => Yii::t('QuestionsModule.base', 'Questions details...'),
-        'class' => 'form-control textfeld-einfach',
-        // 16px: iOS zoomt sonst beim Antippen in die Seite
-        'style' => 'font-size:16px;resize:vertical',
+        'exclude' => ['upload', 'file_handler'],
     ])->label(false) ?>
 </div>
 

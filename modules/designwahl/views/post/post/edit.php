@@ -1,9 +1,10 @@
 <?php
 
-/* Nachbau von post/views/post/edit.php: einfaches Textfeld statt Richtext-Editor, keine Anhänge
+/* Nachbau von post/views/post/edit.php: Richtext-Editor mit Werkzeugleiste wie bei Umfragen, keine Anhänge
    (eingebunden über Events::onControllerBeforeAction) */
 
 use humhub\helpers\Html;
+use humhub\modules\content\widgets\richtext\RichTextField;
 use humhub\modules\post\models\forms\PostEditForm;
 use humhub\widgets\bootstrap\Button;
 use humhub\widgets\form\ActiveForm;
@@ -15,24 +16,21 @@ use humhub\widgets\form\ActiveForm;
 <div class="content content_edit" id="post_edit_<?= $model->post->id; ?>">
     <?php $form = ActiveForm::begin(['id' => 'post-edit-form_' . $model->post->id]); ?>
 
-    <div class="richtext-create-input-group">
-        <?= $form->field($model->post, 'message')->textarea([
-            'id' => 'post_input_' . $model->post->id,
-            'rows' => 4,
-            'autofocus' => true,
-            'placeholder' => Yii::t('PostModule.base', 'Edit your post...'),
-            'class' => 'form-control textfeld-einfach',
-            // 16px: iOS zoomt sonst beim Antippen in die Seite
-            'style' => 'font-size:16px;resize:vertical',
-        ])->label(false) ?>
+    <?= $form->field($model->post, 'message')->widget(RichTextField::class, [
+        'id' => 'post_input_' . $model->post->id,
+        'layout' => RichTextField::LAYOUT_BLOCK,
+        'exclude' => ['upload', 'file_handler'],
+        'focus' => true,
+        'pluginOptions' => ['maxHeight' => '300px'],
+        'placeholder' => Yii::t('PostModule.base', 'Edit your post...'),
+    ])->label(false) ?>
 
-        <div class="richtext-create-buttons">
-            <?= Button::accent()
-                ->icon('send')
-                ->action('editSubmit', $submitUrl)
-                ->cssClass(' btn-comment-submit')->sm()
-                ->submit() ?>
-        </div>
+    <div class="text-end">
+        <?= Button::accent(Yii::t('base', 'Save'))
+            ->icon('send')
+            ->action('editSubmit', $submitUrl)
+            ->sm()
+            ->submit() ?>
     </div>
 
     <?= Html::hiddenInput('viewContext', $viewContext) ?>

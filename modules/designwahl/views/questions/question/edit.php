@@ -1,9 +1,10 @@
 <?php
 
-/* Nachbau von questions/views/question/edit.php: einfaches Textfeld statt Richtext-Editor
+/* Nachbau von questions/views/question/edit.php: Richtext-Editor wie bei Umfragen, ohne Hochladen
    (eingebunden über Events::onControllerBeforeAction) */
 
 use humhub\helpers\Html;
+use humhub\modules\content\widgets\richtext\RichTextField;
 use humhub\modules\questions\assets\QuestionsAssets;
 use humhub\modules\questions\helpers\Url;
 use humhub\modules\questions\models\Question;
@@ -28,12 +29,9 @@ QuestionsAssets::register($this);
             'placeholder' => Yii::t('QuestionsModule.base', 'Question headline...')
         ]) ?>
 
-    <?= $form->field($question, 'description')->textarea([
-            'rows' => 4,
+    <?= $form->field($question, 'description')->widget(RichTextField::class, [
             'placeholder' => Yii::t('QuestionsModule.base', 'Question details...'),
-            'class' => 'form-control textfeld-einfach',
-            // 16px: iOS zoomt sonst beim Antippen in die Seite
-            'style' => 'font-size:16px;resize:vertical',
+            'exclude' => ['upload', 'file_handler'],
         ]) ?>
 
     <?= Button::light(Yii::t('QuestionsModule.base', 'Cancel'))
