@@ -180,15 +180,19 @@
     "erwartet": [
       "sperrmuell\\.kreis-nea\\.de|Knopf|online",
       "9394"
-    ]
+    ],
+    "karte": "link"
   },
   {
     "frage": "Ich möchte nachschauen, wie oft meine Restmülltonne dieses Jahr geleert wurde.",
     "erwartet": [
       "Kundenkonto|Debitorennummer",
-      "Landkreis|Landratsamt",
-      "^(?![\\s\\S]*Gebührenbescheid)"
-    ]
+      "Landkreis|Landratsamt"
+    ],
+    "nicht": [
+      "Gebührenbescheid"
+    ],
+    "karte": "link"
   },
   {
     "frage": "Wann kommt das Schadstoffmobil nach Uffenheim?",
@@ -214,5 +218,38 @@
     "erwartet": [
       "ZBFS|Zentrum Bayern Familie|Landratsamt|Versorgungsamt"
     ]
+  },
+  {
+    "frage": "In welchem Ortsteil liegt die Klosterhofstraße?",
+    "erwartet": [
+      "Welbhausen"
+    ]
+  },
+  {
+    "frage": "Ich wohne in der Steigerwaldstraße. Wann kommt meine Gelbe Tonne?",
+    "erwartet": [
+      "Kernstadt",
+      "\\d{1,2}\\.\\s?\\d{1,2}\\.|\\d{1,2}\\. (Oktober|November|Dezember|Januar)"
+    ]
+  },
+  {
+    "frage": "Wann wird in Kleinharbach die Gelbe Tonne geleert?",
+    "erwartet": [
+      "Ortsteil",
+      "\\d{1,2}\\.\\s?\\d{1,2}\\.|\\d{1,2}\\. (Oktober|November|Dezember|Januar)"
+    ]
+  },
+  {
+    "frage": "Welche Straßen kreuzen die Bahnhofstraße?",
+    "erwartet": [
+      "Luitpoldstra(ß|ss)e|Ringstra(ß|ss)e|Steigerwaldstra(ß|ss)e"
+    ]
+  },
+  {
+    "frage": "Wie komme ich zu Fuß vom Marktplatz zum Freibad?",
+    "erwartet": [
+      "openstreetmap|Route|Karte"
+    ],
+    "karte": "link"
   }
 ]

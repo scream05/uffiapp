@@ -16,6 +16,8 @@ class Aktionen
 {
     /** Online-Dienste der Abfallwirtschaft des Landkreises (Servlet des Landratsamts): [Titel, Knopf, Adresse, Zeilen] */
     private const PORTAL = 'https://sperrmuell.kreis-nea.de/WasteManagementNeustadt/WasteManagementServlet?SubmitAction=';
+    /** Routenplanung auf openstreetmap.org (Dienste der FOSSGIS) je Verkehrsmittel */
+    private const ROUTING = ['zu_fuss' => 'fossgis_osrm_foot', 'rad' => 'fossgis_osrm_bike', 'auto' => 'fossgis_osrm_car'];
     private const ABFALLPORTAL = [
         'sperrmuell' => ['Sperrmüll abrufen (Landkreis)', 'Sperrmüll online abrufen', 'disposalOnCall', [
             'Im Formular „Uffenheim“, Straße und Hausnummer wählen und die Gegenstände angeben.',
@@ -93,6 +95,22 @@ class Aktionen
                 'required' => ['dienst'],
             ],
         ];
+        if (class_exists(\humhub\modules\maengelmelder\components\Osm::class)) {
+            $tools[] = [
+                'name' => 'weg_zeigen',
+                'description' => 'Zeigt einen Knopf zur Routenplanung auf OpenStreetMap von einem Ort zu einem Ziel in Uffenheim und Umgebung '
+                    . '(zu Fuß, Rad oder Auto), mit Luftlinie. Start leer lassen, wenn der Nutzer keinen genannt hat – dann trägt er ihn auf der Karte ein.',
+                'inputSchema' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'ziel' => ['type' => 'string', 'description' => 'Straße mit Hausnummer, Straße oder markanter Ort, mit Ortsteil, falls nicht Kernstadt'],
+                        'start' => ['type' => 'string', 'description' => 'Wie ziel; leer, wenn nicht genannt'],
+                        'verkehrsmittel' => ['type' => 'string', 'enum' => array_keys(self::ROUTING)],
+                    ],
+                    'required' => ['ziel', 'verkehrsmittel'],
+                ],
+            ];
+        }
         if (Formulare::all()) {
             $ids = array_keys(Formulare::all());
             $tools[] = [
@@ -141,6 +159,7 @@ class Aktionen
                 'formular_info' => self::formularInfo($args),
                 'rathaus_termin' => self::rathausTermin($args),
                 'abfallportal' => self::abfallportal($args),
+                'weg_zeigen' => self::weg($args),
                 'formular_ausfuellen' => self::formularAusfuellen($args),
                 default => [['fehler' => "Unbekannte Aktion $name"], null],
             };
@@ -255,6 +274,57 @@ class Aktionen
             . 'Frag nie nach Kundenkonto oder Debitorennummer im Chat und verarbeite sie nicht; das gibt der Nutzer nur beim Landkreis ein. '
             . 'Wo die Nummer steht, ist nicht belegt: nicht raten, bei Bedarf auf die Abfallwirtschaft (abfall@kreis-nea.de, 09161 92-6310) verweisen. '
             . 'Die Zahl der Restmüll-Entleerungen steht laut Landkreis auch in der Jahresabrechnung.'], $karte];
+    }
+
+    private static function weg(array $args): array
+    {
+        $bounds = Yii::$app->hasModule('maengelmelder') ? Yii::$app->getModule('maengelmelder')->bounds
+            : ['south' => 49.45, 'west' => 10.08, 'north' => 49.64, 'east' => 10.40];
+        $finde = function (string $ort) use ($bounds) {
+            for ($i = 0; $i < 3; $i++) {
+                $hit = \humhub\modules\maengelmelder\components\Osm::searchThrottled($ort, $bounds);
+                if ($hit !== false) {
+                    return $hit;
+                }
+                usleep(1100000); // Nominatim: höchstens eine Anfrage pro Sekunde
+            }
+            return null;
+        };
+        $zielText = mb_substr(trim((string)($args['ziel'] ?? '')), 0, 150);
+        $startText = mb_substr(trim((string)($args['start'] ?? '')), 0, 150);
+        $ziel = $zielText !== '' ? $finde($zielText) : null;
+        if ($ziel === null) {
+            return [['fehler' => "Ziel „{$zielText}“ nicht gefunden. Nach Straße/Ort genauer fragen."], null];
+        }
+        $start = $startText !== '' ? $finde($startText) : null;
+        $engine = self::ROUTING[$args['verkehrsmittel'] ?? ''] ?? 'fossgis_osrm_foot';
+        $url = 'https://www.openstreetmap.org/directions?engine=' . $engine . '&route='
+            . rawurlencode(($start ? "$start[0],$start[1]" : '') . ';' . "$ziel[0],$ziel[1]");
+        $luft = $start ? (int)round(self::meter($start, $ziel) / 50) * 50 : null;
+        $mittel = ['fossgis_osrm_foot' => 'zu Fuß', 'fossgis_osrm_bike' => 'mit dem Rad', 'fossgis_osrm_car' => 'mit dem Auto'][$engine];
+        $karte = [
+            'typ' => 'link',
+            'icon' => 'map-signs',
+            'titel' => 'Weg ' . $mittel . ($startText !== '' ? " von {$startText}" : '') . " nach {$zielText}",
+            'zeilen' => array_values(array_filter([
+                $startText !== '' && $start === null ? "Start „{$startText}“ nicht gefunden – bitte auf der Karte eintragen." : null,
+                $startText === '' ? 'Startpunkt auf der Karte eintragen (oder Standort nutzen).' : null,
+                $luft ? "Luftlinie etwa {$luft} m." : null,
+                'Route von OpenStreetMap (FOSSGIS); bitte vor Ort auf Beschilderung achten.',
+            ])),
+            'knopf' => 'Route auf der Karte',
+            'url' => $url,
+        ];
+        return [['ok' => true, 'ziel_gefunden' => true, 'start_gefunden' => $start !== null, 'luftlinie_m' => $luft,
+            'hinweis' => 'Der Routen-Knopf erscheint unter deiner Antwort. Beschreibe den Weg höchstens grob anhand des Straßenverzeichnisses '
+                . '(Lage, Kreuzungen); keine Abbiegeanweisungen erfinden.'], $karte];
+    }
+
+    private static function meter(array $a, array $b): float
+    {
+        $dy = ($a[0] - $b[0]) * 111320;
+        $dx = ($a[1] - $b[1]) * 111320 * cos(deg2rad($a[0]));
+        return sqrt($dx * $dx + $dy * $dy);
     }
 
     private static function formularInfo(array $args): array

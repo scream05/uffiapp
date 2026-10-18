@@ -321,6 +321,223 @@ def landkreis():
     return found
 
 
+# Straßenverzeichnis: Straßen aus OpenStreetMap (Overpass, ODbL) mit Ortsteil, Verlauf, Kreuzungen und Einrichtungen in der
+# Nähe, abgeglichen mit der Straßenliste der Abfallwirtschaft des Landkreises (amtliche Schreibweise und Ortsteil).
+# Für die Gelbe Tonne gelten alle Adressen mit Ortsteil-Zusatz in der Landkreisliste als „Ortsteile“ (Abgleich 2026-09/10).
+OVERPASS = 'https://overpass-api.de/api/interpreter'
+OSM_QUERY = """[out:json][timeout:180];
+area["boundary"="administrative"]["admin_level"="8"]["name"="Uffenheim"]->.a;
+way(area.a)["highway"]["name"]["highway"!~"bus_stop|platform|footway|path|cycleway|track"];out body geom;
+(node(area.a)["place"];way(area.a)["place"];);out center tags;
+(nwr(area.a)["amenity"]["name"];nwr(area.a)["shop"]["name"];nwr(area.a)["tourism"]["name"];nwr(area.a)["leisure"]["name"];
+ nwr(area.a)["office"]["name"];nwr(area.a)["healthcare"]["name"];nwr(area.a)["highway"="bus_stop"]["name"];);out center tags;"""
+ABFALL_SERVLET = 'https://sperrmuell.kreis-nea.de/WasteManagementNeustadt/WasteManagementServlet'
+OSM_HINWEIS = 'Daten: © OpenStreetMap-Mitwirkende (ODbL), Straßenliste der Abfallwirtschaft des Landkreises.'
+# Einrichtungen in der Nähe: OSM-Merkmal → Bezeichnung (andere werden ohne Art genannt)
+POI_ART = {'school': 'Schule', 'kindergarten': 'Kindergarten', 'townhall': 'Rathaus', 'place_of_worship': 'Kirche',
+           'pharmacy': 'Apotheke', 'doctors': 'Arztpraxis', 'dentist': 'Zahnarzt', 'hospital': 'Klinik', 'supermarket': 'Supermarkt',
+           'bakery': 'Bäckerei', 'butcher': 'Metzgerei', 'restaurant': 'Gaststätte', 'cafe': 'Café', 'fuel': 'Tankstelle',
+           'bank': 'Bank', 'post_office': 'Post', 'fire_station': 'Feuerwehr', 'police': 'Polizei', 'library': 'Bücherei',
+           'bus_stop': 'Bushaltestelle', 'swimming_pool': 'Bad', 'sports_centre': 'Sportanlage', 'pitch': 'Sportplatz',
+           'playground': 'Spielplatz', 'park': 'Park', 'hotel': 'Hotel', 'guest_house': 'Pension', 'museum': 'Museum',
+           'community_centre': 'Gemeinschaftshaus', 'recycling': 'Wertstoffsammelstelle', 'parking': 'Parkplatz',
+           'pub': 'Gaststätte', 'fast_food': 'Imbiss', 'veterinary': 'Tierarzt', 'nursing_home': 'Pflegeheim'}
+STRASSENART = {'primary': 'Hauptverkehrsstraße', 'secondary': 'Hauptverkehrsstraße', 'tertiary': 'Verbindungsstraße',
+               'residential': 'Wohnstraße', 'living_street': 'verkehrsberuhigter Bereich', 'pedestrian': 'Fußgängerzone',
+               'unclassified': 'Nebenstraße', 'service': 'Zufahrt'}
+RICHTUNG = ['Norden', 'Nordosten', 'Osten', 'Südosten', 'Süden', 'Südwesten', 'Westen', 'Nordwesten']
+RICHTUNG_ADJ = ['nördlich', 'nordöstlich', 'östlich', 'südöstlich', 'südlich', 'südwestlich', 'westlich', 'nordwestlich']
+# Abweichende Schreibweisen OpenStreetMap → Landkreisliste (Schlüssel aus strassen_key)
+STRASSEN_ALIAS = {'aeyringstr': 'albrechteyringstr'}
+
+
+def overpass(query):
+    for versuch in range(1, 6):
+        try:
+            req = urllib.request.Request(OVERPASS, data=urllib.parse.urlencode({'data': query}).encode(),
+                                         headers={'User-Agent': 'community.rundumuffni.de Stadtwissen'})
+            with urllib.request.urlopen(req, timeout=240) as r:
+                return json.load(r)
+        except Exception as e:
+            if versuch == 5:
+                raise RuntimeError(f'Overpass: {e}')
+            time.sleep(30 * versuch)  # Overpass bremst bei schnellen Folgeanfragen
+
+
+def abfall_strassen():
+    """Straßenliste der Abfallwirtschaft für Uffenheim: [(Name, Ortsteil oder None)]"""
+    import http.cookiejar
+    opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar()))
+
+    def form(page):
+        f = {}
+        for tag in re.findall(r'<INPUT[^>]*>', page, re.I):
+            n, v = re.search(r'NAME="([^"]+)"', tag, re.I), re.search(r'VALUE="([^"]*)"', tag, re.I)
+            if n and not re.search(r'TYPE="checkbox"', tag, re.I):
+                f[n.group(1)] = html.unescape(v.group(1)) if v else ''
+        return f
+
+    with opener.open(ABFALL_SERVLET + '?SubmitAction=wasteDisposalServices&InFrameMode=TRUE', timeout=60) as r:
+        f = form(r.read().decode('utf-8', 'replace'))
+    f.update(Ort='Uffenheim', SubmitAction='CITYCHANGED')
+    with opener.open(ABFALL_SERVLET, urllib.parse.urlencode(f).encode(), timeout=60) as r:
+        page = r.read().decode('utf-8', 'replace')
+    select = re.search(r'<SELECT NAME="Strasse".*?</SELECT>', page, re.S | re.I)
+    out = []
+    for o in re.findall(r'<OPTION[^>]*>([^<]*)', select.group(0) if select else '', re.I):
+        o = html.unescape(o).replace('\xa0', ' ').strip()
+        m = re.fullmatch(r'(.+?) \((.+)\)', o)
+        if o:
+            out.append((m.group(1), m.group(2)) if m else (o, None))
+    if len(out) < 100:
+        raise RuntimeError(f'nur {len(out)} Straßen in der Liste des Landkreises')
+    return out
+
+
+def strassen_key(name):
+    n = name.lower().replace('ß', 'ss').replace('ü', 'ue').replace('ö', 'oe').replace('ä', 'ae')
+    n = re.sub(r'\bsankt\b', 'st', n)
+    n = re.sub(r'(strasse|str\.?)$', 'str', n)
+    n = re.sub(r'[^a-z0-9]', '', n)
+    return STRASSEN_ALIAS.get(n, n)
+
+
+def slug(name):
+    for a, b in (('ä', 'ae'), ('ö', 'oe'), ('ü', 'ue'), ('ß', 'ss')):
+        name = name.lower().replace(a, b)
+    return re.sub(r'[^a-z0-9]+', '-', name).strip('-')
+
+
+def entfernung(a, b):
+    """Meter zwischen zwei (lat, lon)"""
+    import math
+    dy = (a[0] - b[0]) * 111320
+    dx = (a[1] - b[1]) * 111320 * math.cos(math.radians(a[0]))
+    return math.hypot(dx, dy)
+
+
+def richtung(von, nach, liste=RICHTUNG):
+    import math
+    dy = nach[0] - von[0]
+    dx = (nach[1] - von[1]) * math.cos(math.radians(von[0]))
+    return liste[round(math.degrees(math.atan2(dx, dy)) % 360 / 45) % 8]
+
+
+def strassen():
+    """Straßenverzeichnis: [(rel, titel, url, text, immer)]"""
+    lk = abfall_strassen()
+    data = overpass(OSM_QUERY)['elements']
+    ways = [e for e in data if e['type'] == 'way' and 'geometry' in e and 'highway' in e.get('tags', {})]
+    orte = {}
+    for e in data:
+        t = e.get('tags', {})
+        if t.get('place') in ('town', 'village', 'hamlet', 'isolated_dwelling', 'locality', 'farm') and t.get('name'):
+            c = (e['lat'], e['lon']) if 'lat' in e else (e['center']['lat'], e['center']['lon'])
+            orte[t['name']] = c
+    if 'Uffenheim' not in orte or len(ways) < 100:
+        raise RuntimeError(f'OpenStreetMap: {len(ways)} Straßen, Uffenheim {"fehlt" if "Uffenheim" not in orte else "da"}')
+    pois = []
+    for e in data:
+        t = e.get('tags', {})
+        if 'place' in t or (e['type'] == 'way' and 'highway' in t and t['highway'] != 'bus_stop'):
+            continue
+        c = (e['lat'], e['lon']) if 'lat' in e else (e['center']['lat'], e['center']['lon']) if 'center' in e else None
+        if c and t.get('name'):
+            art = next((POI_ART[t[k]] for k in ('amenity', 'shop', 'tourism', 'leisure', 'highway', 'healthcare')
+                        if t.get(k) in POI_ART), None)
+            pois.append((t['name'], art, c))
+
+    # Ortsteil eines Wegs: nächstgelegener Ort; Weiler der Landkreisliste zählen als eigener Ortsteil
+    def ortsteil(c):
+        return min(orte, key=lambda o: entfernung(c, orte[o]))
+
+    lk_ort = {}
+    for name, ot in lk:
+        lk_ort.setdefault(strassen_key(name), []).append((name, ot))
+    groups = {}
+    for w in ways:
+        pts = [(g['lat'], g['lon']) for g in w['geometry']]
+        mid = pts[len(pts) // 2]
+        key = strassen_key(w['tags']['name'])
+        ot = ortsteil(mid)
+        # Amtlicher Ortsteil laut Landkreis hat Vorrang, wenn die Straße dort nur einmal vorkommt
+        if len(lk_ort.get(key, [])) == 1:
+            ot = lk_ort[key][0][1] or 'Uffenheim'
+        groups.setdefault((key, ot), []).append(w)
+
+    node_names = {}
+    for (key, ot), ws in groups.items():
+        for w in ws:
+            for n in w.get('nodes', []):
+                node_names.setdefault(n, set()).add((key, ot))
+    namen = {k: ws[0]['tags']['name'] for k, ws in groups.items()}
+    for k in namen:  # amtliche Schreibweise des Landkreises bevorzugen (ohne Abkürzung)
+        for name, ot in lk_ort.get(k[0], []):
+            if (ot or 'Uffenheim') == k[1]:
+                namen[k] = re.sub(r'str\.$', 'straße', re.sub(r'Str\.$', 'Straße', name))
+
+    found, verzeichnis = [], {}
+    for k, ws in sorted(groups.items(), key=lambda x: namen[x[0]]):
+        name, ot = namen[k], k[1]
+        pts = [(g['lat'], g['lon']) for w in ws for g in w['geometry']]
+        laenge = sum(entfernung((w['geometry'][i]['lat'], w['geometry'][i]['lon']),
+                                (w['geometry'][i + 1]['lat'], w['geometry'][i + 1]['lon']))
+                     for w in ws for i in range(len(w['geometry']) - 1))
+        a, b = max(((p, q) for p in pts[::max(1, len(pts) // 30)] for q in pts[::max(1, len(pts) // 30)]),
+                   key=lambda pq: entfernung(*pq))
+        mid = (sum(p[0] for p in pts) / len(pts), sum(p[1] for p in pts) / len(pts))
+        zentrum = orte.get(ot, orte['Uffenheim'])
+        kreuz = {}
+        for w in ws:
+            for n in w.get('nodes', []):
+                for other in node_names.get(n, ()):
+                    if other != k and other in namen:
+                        kreuz.setdefault(namen[other], None)
+        arten = sorted({STRASSENART.get(w['tags']['highway'], 'Straße') for w in ws})
+        refs = sorted({w['tags']['ref'] for w in ws if w['tags'].get('ref')})
+        nah = sorted(((entfernung(c, min(pts, key=lambda p: entfernung(c, p))), n, art) for n, art, c in pois), key=lambda x: x[0])
+        nah = list(dict.fromkeys(f'{n} ({art})' if art else n for d, n, art in nah if d <= 120))[:10]
+        gelb = 'Kernstadt' if ot == 'Uffenheim' else 'Ortsteile'
+        ort_text = 'Kernstadt Uffenheim' if ot == 'Uffenheim' else f'Ortsteil {ot}'
+        lage = (f'etwa {round(entfernung(mid, zentrum) / 50) * 50:.0f} m {richtung(zentrum, mid, RICHTUNG_ADJ)} der Ortsmitte'
+                if entfernung(mid, zentrum) > 150 else 'in der Ortsmitte')
+        karte = f'https://www.openstreetmap.org/?mlat={mid[0]:.5f}&mlon={mid[1]:.5f}#map=17/{mid[0]:.5f}/{mid[1]:.5f}'
+        zeilen = [f'- Ort: {ort_text}, 97215 Uffenheim',
+                  f'- Lage: {lage}; verläuft von {richtung(mid, a)} nach {richtung(mid, b)}, ca. {round(laenge / 10) * 10:.0f} m lang',
+                  f'- Art: {", ".join(arten)}' + (f' ({", ".join(refs)})' if refs else ''),
+                  f'- Kreuzungen/Einmündungen: {", ".join(sorted(kreuz)) if kreuz else "keine benannten Straßen"}',
+                  f'- In der Nähe: {", ".join(nah)}' if nah else None,
+                  f'- Abfuhr: Restmüll, Bio und Papier wie überall in Uffenheim; Gelbe Tonne: Termine „{gelb}“'
+                  if lk_ort.get(k[0]) else None,
+                  '- Adressen dort nur mit Hausnummer (z. B. „' + name + ' 5“)' if name == ot else None,
+                  f'- Karte: {karte}',
+                  f'- Lagekoordinaten (Mitte): {mid[0]:.5f}, {mid[1]:.5f}']
+        if not lk_ort.get(k[0]):
+            zeilen.append('- Nicht in der Straßenliste der Abfallwirtschaft (z. B. Weg ohne Wohnadressen oder andere Schreibweise).')
+        found.append((f'strassen/{slug(ot)}/{slug(name)}.md',
+                      f'Straße: {name} ({ort_text})', karte,
+                      '\n'.join(z for z in zeilen if z) + f'\n\n{OSM_HINWEIS}', False))
+        if lk_ort.get(k[0]):  # Wege ohne Wohnadressen (nur in OpenStreetMap) nicht ins Verzeichnis
+            verzeichnis.setdefault(ort_text, []).append(name if name != ot else f'{name} (Adressen ohne Straßennamen, nur Hausnummer)')
+
+    # Adressen ohne Straßennamen (Weiler: „Custenlohr 5“) und Straßen nur in der Landkreisliste
+    osm_keys = {k[0] for k in groups}
+    for name, ot in lk:
+        o = f'Ortsteil {ot}' if ot else 'Kernstadt Uffenheim'
+        if strassen_key(name) not in osm_keys and name not in verzeichnis.get(o, []):
+            name = re.sub(r'str\.$', 'straße', re.sub(r'Str\.$', 'Straße', name))
+            verzeichnis.setdefault(o, []).append(name if name != ot else f'{name} (Adressen ohne Straßennamen, nur Hausnummer)')
+    teile = []
+    for o in sorted(verzeichnis, key=lambda x: (x != 'Kernstadt Uffenheim', x)):
+        gelb = 'Kernstadt' if o == 'Kernstadt Uffenheim' else 'Ortsteile'
+        teile.append(f'## {o} (Gelbe Tonne: „{gelb}“)\n' + ', '.join(sorted(set(verzeichnis[o]))))
+    found.append(('strassen/strassenverzeichnis.md', 'Straßenverzeichnis Uffenheim mit Ortsteilen',
+                  'https://www.openstreetmap.org/search?query=Uffenheim',
+                  'Welche Straße liegt in welchem Ortsteil. Details zu einer Straße (Lage, Kreuzungen, was in der Nähe ist, '
+                  'Karte) stehen auf der Seite der Straße.\n\n' + '\n\n'.join(teile) + f'\n\n{OSM_HINWEIS}', True))
+    return found
+
+
 def links_below(path, html_text):
     """Unterseiten-Links im Inhaltsbereich, die mit path beginnen."""
     main = html_text[html_text.find('<main'):html_text.find('</main>')]
@@ -848,6 +1065,16 @@ def main():
         for d, _, files in os.walk(os.path.join(ROOT, 'landkreis')):
             written += [(os.path.relpath(os.path.join(d, f), ROOT), False, False) for f in files if f.endswith('.md')]
 
+    # Straßenverzeichnis (bei Störung bisherige Dateien behalten)
+    try:
+        st = strassen()
+        written += [write(rel, title, url, text, always=immer) for rel, title, url, text, immer in st]
+    except Exception as e:
+        st = []
+        print(f'! Straßenverzeichnis nicht erstellt: {e}', file=sys.stderr)
+        for d, _, files in os.walk(os.path.join(ROOT, 'strassen')):
+            written += [(os.path.relpath(os.path.join(d, f), ROOT), False, False) for f in files if f.endswith('.md')]
+
     # Vereinsverzeichnis der Community (Seiten mit Ansprechpartnern, daher wissen/community/ nicht im Git)
     try:
         for rel, title, url, text in community_vereine():
@@ -879,7 +1106,7 @@ def main():
     except Exception as e:
         embedded = 0
         print(f'! Suchindex nicht aktualisiert: {e}', file=sys.stderr)
-    summary = (f'{len(written)} Seiten ({n} Mitarbeiter, {len(found)} Satzungen, {len(lk)} Landkreis, {ocr_count} per Texterkennung neu), '
+    summary = (f'{len(written)} Seiten ({n} Mitarbeiter, {len(found)} Satzungen, {len(lk)} Landkreis, {len(st)} Straßen, {ocr_count} per Texterkennung neu), '
                f'{new} neu, {changed} geändert, {removed} gelöscht')
     exclude_personal(keep)
     # Commit nur, wenn sich versionierte Dateien geändert haben (Seiten mit Personendaten sind ausgenommen)
