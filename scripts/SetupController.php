@@ -285,13 +285,28 @@ class SetupController extends Controller
             return ExitCode::DATAERR;
         }
         \humhub\modules\fcmPush\Module::registerAutoloader();
-        $service = new \humhub\modules\fcmPush\services\MessagingService(Yii::$app->getModule('fcm-push')->getConfigureForm());
-        $tokens = (new \yii\db\Query())->from('fcmpush_user')->where(['user_id' => $user->id])->count();
-        $start = time();
-        $service->processMessage($user, Yii::$app->name, $text, \yii\helpers\Url::to(['/notification/overview'], true), null);
-        $fehler = (new \yii\db\Query())->from('log')->where(['category' => 'fcm-push'])->andWhere(['>=', 'log_time', $start - 1])->count();
-        $this->stdout("Gesendet an $tokens Gerät(e) von $username, Kennzeichen-Zahl " . $service->getNotificationCount($user)
-            . ($fehler ? ", $fehler Fehler im Log (Kategorie fcm-push)" : ', keine Fehler') . "\n");
+        $config = Yii::$app->getModule('fcm-push')->getConfigureForm();
+        $service = new \humhub\modules\fcmPush\services\MessagingService($config);
+        $count = $service->getNotificationCount($user);
+        $url = \yii\helpers\Url::to(['/notification/overview'], true);
+        $this->stdout("Kennzeichen-Zahl $count\n");
+        // Je Weg einzeln senden und die Antwort zeigen (processMessage schluckt Fehler)
+        foreach ((new \humhub\modules\fcmPush\services\DriverService($config))->getConfiguredDrivers() as $driver) {
+            $tokens = (new \humhub\modules\fcmPush\services\TokenService())->getTokensForUser($user, $driver);
+            $name = (new \ReflectionClass($driver))->getShortName();
+            $this->stdout("$name (Sender {$driver->getSenderId()}): " . count($tokens) . " Gerät(e)\n");
+            if (!$tokens) {
+                continue;
+            }
+            if ($driver instanceof \humhub\modules\fcmPush\drivers\Proxy) {
+                $response = $driver->post('/push', ['tokens' => $tokens, 'title' => Yii::$app->name, 'body' => $text,
+                    'iconUrl' => null, 'url' => $url, 'notificationCount' => $count])->send();
+                $this->stdout("  HTTP {$response->statusCode}: " . json_encode($response->data, JSON_UNESCAPED_UNICODE) . "\n");
+            } else {
+                $report = $driver->processCloudMessage($tokens, Yii::$app->name, $text, $url, null, $count);
+                $this->stdout('  ' . json_encode($report, JSON_UNESCAPED_UNICODE) . "\n");
+            }
+        }
         return ExitCode::OK;
     }
 
