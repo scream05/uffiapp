@@ -274,6 +274,28 @@ class SetupController extends Controller
     }
 
     /**
+     * Test-Push an alle Geräte eines Kontos (App und Browser), mit der Zahl ungelesener Glockenmeldungen als Kennzeichen:
+     * setup/pushtest <benutzername> ["Text"]. Fehler stehen im HumHub-Log (Kategorie fcm-push).
+     */
+    public function actionPushtest($username, $text = 'Test-Push von Rund um Uffni')
+    {
+        $user = User::findOne(['username' => $username]);
+        if ($user === null) {
+            $this->stderr("Konto $username nicht gefunden\n");
+            return ExitCode::DATAERR;
+        }
+        \humhub\modules\fcmPush\Module::registerAutoloader();
+        $service = new \humhub\modules\fcmPush\services\MessagingService(Yii::$app->getModule('fcm-push')->getConfigureForm());
+        $tokens = (new \yii\db\Query())->from('fcmpush_user')->where(['user_id' => $user->id])->count();
+        $start = time();
+        $service->processMessage($user, Yii::$app->name, $text, \yii\helpers\Url::to(['/notification/overview'], true), null);
+        $fehler = (new \yii\db\Query())->from('log')->where(['category' => 'fcm-push'])->andWhere(['>=', 'log_time', $start - 1])->count();
+        $this->stdout("Gesendet an $tokens Gerät(e) von $username, Kennzeichen-Zahl " . $service->getNotificationCount($user)
+            . ($fehler ? ", $fehler Fehler im Log (Kategorie fcm-push)" : ', keine Fehler') . "\n");
+        return ExitCode::OK;
+    }
+
+    /**
      * Abfallkalender im Space „Abfall & Termine“ anlegen/abgleichen und alle Nutzer aufnehmen:
      * setup/abfall  (die ICS-Datei erzeugt scripts/abfall-kalender.py)
      */
