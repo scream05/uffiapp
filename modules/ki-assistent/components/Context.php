@@ -69,6 +69,8 @@ class Context
             $parts[] = \humhub\modules\notdienst\components\Notdienst::forAssistant();
         }
 
+        $parts[] = Warnungen::forAssistant();
+
         $space = Space::findOne(['url' => 'veranstaltungen']);
         if ($space !== null) {
             $lines = [];

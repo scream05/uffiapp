@@ -14,6 +14,23 @@ use yii\helpers\Url;
  */
 class Aktionen
 {
+    /** Online-Dienste der Abfallwirtschaft des Landkreises (Servlet des Landratsamts): [Titel, Knopf, Adresse, Zeilen] */
+    private const PORTAL = 'https://sperrmuell.kreis-nea.de/WasteManagementNeustadt/WasteManagementServlet?SubmitAction=';
+    private const ABFALLPORTAL = [
+        'sperrmuell' => ['Sperrmüll abrufen (Landkreis)', 'Sperrmüll online abrufen', 'disposalOnCall', [
+            'Im Formular „Uffenheim“, Straße und Hausnummer wählen und die Gegenstände angeben.',
+            'Den Abholtermin teilt der Entsorger per E-Mail oder Telefon mit; bitte bestätigen.',
+        ]],
+        'tonnenleerungen' => ['Meine Tonnenleerungen (Landkreis)', 'Tonnenleerungen ansehen', 'binClearances', [
+            'Ort „Uffenheim“, Straße und Hausnummer wählen und das Kundenkonto (Debitorennummer der Abfallwirtschaft) eingeben.',
+            'Danach zeigt der Landkreis, wann welche deiner Tonnen geleert wurde.',
+            'Kundenkonto nicht zur Hand? Abfallwirtschaft: abfall@kreis-nea.de, Tel. 09161 92-6310.',
+        ]],
+        'kundenportal' => ['Kundenportal der Abfallwirtschaft (Landkreis)', 'Kundenportal öffnen', 'login', [
+            'Mit den Zugangsdaten der Abfallwirtschaft anmelden: alle Online-Dienste des Landkreises an einer Stelle.',
+        ]],
+    ];
+
     /** @return array Werkzeuge für Claude (name, description, inputSchema) */
     public static function declarations(): array
     {
@@ -65,6 +82,17 @@ class Aktionen
                 'required' => ['amt', 'anliegen'],
             ],
         ];
+        $tools[] = [
+            'name' => 'abfallportal',
+            'description' => 'Zeigt einen Knopf zum Online-Dienst der Abfallwirtschaft des Landkreises Neustadt a.d.Aisch-Bad Windsheim '
+                . 'mit kurzer Anleitung: Sperrmüll abrufen, eigene Tonnenleerungen ansehen (wann welche Tonne geleert wurde) '
+                . 'oder das Kundenportal. Die Eingaben (Adresse, Kundenkonto) macht der Nutzer selbst beim Landkreis.',
+            'inputSchema' => [
+                'type' => 'object',
+                'properties' => ['dienst' => ['type' => 'string', 'enum' => array_keys(self::ABFALLPORTAL)]],
+                'required' => ['dienst'],
+            ],
+        ];
         if (Formulare::all()) {
             $ids = array_keys(Formulare::all());
             $tools[] = [
@@ -112,6 +140,7 @@ class Aktionen
                 'termin_merken' => self::termin($args),
                 'formular_info' => self::formularInfo($args),
                 'rathaus_termin' => self::rathausTermin($args),
+                'abfallportal' => self::abfallportal($args),
                 'formular_ausfuellen' => self::formularAusfuellen($args),
                 default => [['fehler' => "Unbekannte Aktion $name"], null],
             };
@@ -205,6 +234,27 @@ class Aktionen
             'url' => $ki->terminlandUrl,
         ];
         return [['ok' => true, 'hinweis' => 'Der Buchungsknopf erscheint unter deiner Antwort. Nenne kurz Adresse (Bürgerbüro, Marktplatz 9) und dass man ohne Termin mit Wartezeit rechnen muss.'], $karte];
+    }
+
+    private static function abfallportal(array $args): array
+    {
+        $dienst = self::ABFALLPORTAL[$args['dienst'] ?? ''] ?? null;
+        if ($dienst === null) {
+            return [['fehler' => 'Unbekannter Dienst'], null];
+        }
+        [$titel, $knopf, $action, $zeilen] = $dienst;
+        $karte = [
+            'typ' => 'link',
+            'icon' => 'trash',
+            'titel' => $titel,
+            'zeilen' => array_merge($zeilen, ['Die Seite gehört dem Landratsamt; Rund um Uffni erhält deine Eingaben nicht.']),
+            'knopf' => $knopf,
+            'url' => self::PORTAL . $action,
+        ];
+        return [['ok' => true, 'hinweis' => 'Der Knopf zum Landkreis erscheint unter deiner Antwort. Erkläre kurz, was der Nutzer dort eingibt. '
+            . 'Frag nie nach Kundenkonto oder Debitorennummer im Chat und verarbeite sie nicht; das gibt der Nutzer nur beim Landkreis ein. '
+            . 'Wo die Nummer steht, ist nicht belegt: nicht raten, bei Bedarf auf die Abfallwirtschaft (abfall@kreis-nea.de, 09161 92-6310) verweisen. '
+            . 'Die Zahl der Restmüll-Entleerungen steht laut Landkreis auch in der Jahresabrechnung.'], $karte];
     }
 
     private static function formularInfo(array $args): array

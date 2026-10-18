@@ -98,6 +98,20 @@ TREES = [
     ('/rathaus-buergerservice/buergerservice/organisation', False),
     ('/unsere-stadt/leben-findet-stadt/stadtteile', False),
 ]
+# Landkreis Neustadt a.d.Aisch-Bad Windsheim: eigene Seiten des Landratsamts (Abfallwirtschaft, Gesundheit, Soziales,
+# Öffnungszeiten …) nach wissen/landkreis/. Die Lebenslagen-/Behördenwegweiser-Seiten (BayernPortal, per Skript
+# eingebettet) dienen nur zum Finden der Links. Neuigkeiten und Seiten mit Personenlisten bleiben außen vor.
+LK_BASE = 'https://www.kreis-nea.de'
+LK_HUBS = ['/', '/lebenslagen', '/online-services', '/amt-verwaltung/oeffnungszeiten-co']
+LK_PREFIXES = ('/lebenslagen/', '/amt-verwaltung/oeffnungszeiten-co', '/amt-verwaltung/veroeffentlichungen-formulare-co/formulare',
+               '/online-services', '/infos-fuer-gefluechtete', '/sternenkinder', '/service/kontakt',
+               '/region-wirtschaft/energie-und-klima', '/region-wirtschaft/radwegemanagement', '/region-wirtschaft/tourismus')
+LK_SKIP = re.compile(r'^/lebenslagen/lebenslage(/|$)|/aktuelles(/|$)|/www[.-]|abteilungsleiter|/kontakt-und-zustaendigkeitsbereiche'
+                     r'|\.(pdf|docx?|xlsx?|zip|jpe?g|png)$')
+LK_MAX = 250
+# Von diesen Seiten auch die verlinkten PDFs als Text (Termine der Problemmüllsammlung, Problemabfälle A-Z)
+LK_PDF_PAGES = ('/lebenslagen/abfallwirtschaft/problemmuell', '/lebenslagen/abfallwirtschaft/mobile-abfall-sammlungen')
+
 # Kontaktangaben, deren Bezeichnung nur im aria-label steht („Telefonnummer: 09842 207-0“)
 LABELS = {'Telefonnummer': 'Tel.', 'Faxnummer': 'Fax', 'E-Mail-Adresse': 'E-Mail', 'Raum': 'Raum'}
 # Abschnitte der Leistungsbeschreibungen (BayernPortal), die für Bürgerfragen nichts bringen
@@ -242,6 +256,69 @@ def page_markdown(path, html_text):
     m = re.match(r'# (.+)\n?', md)
     title = m.group(1).strip() if m else path.rsplit('/', 1)[-1]
     return title, (md[m.end():].strip() if m else md)
+
+
+def landkreis():
+    """Seiten des Landratsamts: [(rel, titel, url, text)]. Breitensuche ab LK_HUBS, gespeichert wird nur unter LK_PREFIXES."""
+    def get(path):
+        req = urllib.request.Request(LK_BASE + path, headers={'User-Agent': 'community.rundumuffni.de Stadtwissen'})
+        with urllib.request.urlopen(req, timeout=30) as r:
+            body = r.read().decode('utf-8', 'replace')
+        time.sleep(1)
+        return body
+
+    def wanted(path):
+        return path.startswith(LK_PREFIXES) and not LK_SKIP.search(path)
+
+    queue, seen, found, pdfs = list(LK_HUBS), set(), [], []
+    while queue and len(seen) < LK_MAX:
+        path = queue.pop(0)
+        if path in seen:
+            continue
+        seen.add(path)
+        try:
+            text = get(path)
+        except Exception as e:
+            print(f'! Landkreis {path}: {e}', file=sys.stderr)
+            continue
+        hub = path in LK_HUBS or path.startswith('/lebenslagen/lebenslage/')
+        for href in re.findall(r'href="([^"#?]+)"', text):
+            u = urlparse(urljoin(LK_BASE + path, html.unescape(href)))
+            link = u.path.rstrip('/') or '/'
+            if u.netloc in ('', 'www.kreis-nea.de') and link not in seen and link not in queue \
+                    and (wanted(link) or (path in LK_HUBS and link.startswith('/lebenslagen/lebenslage/'))):
+                queue.append(link)
+        if path in LK_PDF_PAGES:
+            main = text[text.find('<main'):text.find('</main>')]
+            pdfs += [u for u in (urljoin(LK_BASE, html.unescape(h)) for h in re.findall(r'href="([^"]+\.pdf)"', main))
+                     if u not in pdfs]
+        if hub and not wanted(path) or '<main' not in text:
+            continue
+        p = MainToMarkdown(LK_BASE + path)
+        p.feed(text)
+        body = p.markdown()
+        m = re.search(r'<title>(.*?)</title>', text, re.S)
+        title = clean(m.group(1)).split(' | ')[0].strip() if m else path.rsplit('/', 1)[-1]
+        if title.startswith('Seite nicht gefunden') or len(body) < 200:
+            continue
+        found.append((f"landkreis{path}.md", f'Landkreis Neustadt a.d.Aisch-Bad Windsheim: {title}', LK_BASE + path,
+                      'Information des Landratsamts Neustadt a.d.Aisch-Bad Windsheim (zuständig für den ganzen Landkreis, '
+                      'auch für Uffenheim).\n\n' + body))
+    if len(found) < 20:
+        raise RuntimeError(f'nur {len(found)} Seiten gefunden, Seitenaufbau geändert?')
+    for url in pdfs[:10]:
+        try:
+            text, _ = pdf_text(url)
+        except Exception as e:
+            print(f'! Landkreis-PDF {url}: {e}', file=sys.stderr)
+            continue
+        text = re.sub(r'[ \t]{2,}', '  ', text.replace('\f', '\n')).strip()
+        name = urllib.parse.unquote(url.rsplit('/', 1)[-1])[:-4]
+        if len(text) >= 100:
+            found.append((f"landkreis/dokumente/{re.sub(r'[^a-z0-9]+', '-', name.lower()).strip('-')}.md",
+                          f'Landkreis Neustadt a.d.Aisch-Bad Windsheim (Abfallwirtschaft): {name.replace("_", " ")}', url,
+                          'Text aus dem PDF des Landratsamts, verbindlich ist das Original.\n\n' + text))
+    return found
 
 
 def links_below(path, html_text):
@@ -761,6 +838,16 @@ def main():
             continue
         written.append(write(rel, title, url, f'{SATZUNG_HINWEIS}\nÜbersicht aller Satzungen: {BASE + SATZUNGEN}\n\n{text}'))
 
+    # Landratsamt (bei Störung bisherige Dateien behalten)
+    try:
+        lk = landkreis()
+        written += [write(rel, title, url, text) for rel, title, url, text in lk]
+    except Exception as e:
+        lk = []
+        print(f'! Landkreis nicht gelesen: {e}', file=sys.stderr)
+        for d, _, files in os.walk(os.path.join(ROOT, 'landkreis')):
+            written += [(os.path.relpath(os.path.join(d, f), ROOT), False, False) for f in files if f.endswith('.md')]
+
     # Vereinsverzeichnis der Community (Seiten mit Ansprechpartnern, daher wissen/community/ nicht im Git)
     try:
         for rel, title, url, text in community_vereine():
@@ -792,7 +879,7 @@ def main():
     except Exception as e:
         embedded = 0
         print(f'! Suchindex nicht aktualisiert: {e}', file=sys.stderr)
-    summary = (f'{len(written)} Seiten ({n} Mitarbeiter, {len(found)} Satzungen, {ocr_count} per Texterkennung neu), '
+    summary = (f'{len(written)} Seiten ({n} Mitarbeiter, {len(found)} Satzungen, {len(lk)} Landkreis, {ocr_count} per Texterkennung neu), '
                f'{new} neu, {changed} geändert, {removed} gelöscht')
     exclude_personal(keep)
     # Commit nur, wenn sich versionierte Dateien geändert haben (Seiten mit Personendaten sind ausgenommen)

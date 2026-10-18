@@ -125,7 +125,7 @@
     "karte": "link"
   },
   {
-    "frage": "Trag mir bitte die Kirchweih in Welbhausen in meinen Kalender ein.",
+    "frage": "Trag mir bitte die Kirchweih in Reusch in meinen Kalender ein.",
     "karte": "termin"
   },
   {
@@ -173,6 +173,46 @@
       "18\\. ?Dezember|18\\.12\\.",
       "24\\. ?November|24\\.11\\.",
       "7\\. ?Dezember|07\\.12\\."
+    ]
+  },
+  {
+    "frage": "Wie melde ich Sperrmüll an?",
+    "erwartet": [
+      "sperrmuell\\.kreis-nea\\.de|Knopf|online",
+      "9394"
+    ]
+  },
+  {
+    "frage": "Ich möchte nachschauen, wie oft meine Restmülltonne dieses Jahr geleert wurde.",
+    "erwartet": [
+      "Kundenkonto|Debitorennummer",
+      "Landkreis|Landratsamt",
+      "^(?![\\s\\S]*Gebührenbescheid)"
+    ]
+  },
+  {
+    "frage": "Wann kommt das Schadstoffmobil nach Uffenheim?",
+    "erwartet": [
+      "Uffenheim",
+      "\\d{1,2}\\.\\s?\\d{1,2}\\.|\\d{1,2}\\. (März|April|Mai|September|Oktober)|Dettendorf"
+    ]
+  },
+  {
+    "frage": "Gibt es gerade Unwetterwarnungen bei uns?",
+    "erwartet": [
+      "Warn|NINA"
+    ]
+  },
+  {
+    "frage": "Wann hat der Wertstoffhof in Uffenheim offen?",
+    "erwartet": [
+      "Uhr"
+    ]
+  },
+  {
+    "frage": "Wo beantrage ich einen Schwerbehindertenausweis?",
+    "erwartet": [
+      "ZBFS|Zentrum Bayern Familie|Landratsamt|Versorgungsamt"
     ]
   }
 ]
