@@ -170,11 +170,23 @@ html.design-neu #topbar > .container #search-menu:hover {
     background-color: rgba(255, 255, 255, .24) !important;
 }
 
+/* Lupe erbte einen Rechtsabstand und saß dadurch links im Kreis */
+html.design-neu #topbar > .container #search-menu > i {
+    margin: 0 !important;
+}
+
+/* Zahl an der Glocke: gleich breit wie hoch, Ziffer mittig (war 18 × 23 px, oval) */
 html.design-neu #topbar > .container .notifications .btn-group > .badge {
     background-color: var(--dn-gruen) !important;
     color: #1f2a00 !important;
     border-color: var(--dn-blau) !important;
     font-weight: 800;
+    box-sizing: border-box;
+    height: 22px;
+    min-width: 22px;
+    padding: 0 5px;
+    line-height: 18px;
+    text-align: center;
 }
 
 /* Ring direkt am Bild: der umgebende Span ist durch margin-left breiter und wäre oval */
