@@ -5,6 +5,7 @@ namespace humhub\modules\vereine\notifications;
 use humhub\helpers\Html;
 use humhub\modules\notification\components\BaseNotification;
 use humhub\modules\vereine\models\VereinBeitrag;
+use Yii;
 
 /**
  * An den Verfasser: der Vereinsbeitrag ist veröffentlicht.
@@ -26,11 +27,11 @@ class BeitragFreigegeben extends BaseNotification
 
     public function getMailSubject()
     {
-        return "Dein Beitrag für {$this->source->verein->name} ist veröffentlicht";
+        return Yii::t('VereineModule.base', 'Dein Beitrag für {verein} ist veröffentlicht', ['verein' => $this->source->verein->name]);
     }
 
     public function html()
     {
-        return 'Dein Beitrag für ' . Html::tag('strong', Html::encode($this->source->verein->name)) . ' ist jetzt veröffentlicht.';
+        return Yii::t('VereineModule.base', 'Dein Beitrag für {verein} ist jetzt veröffentlicht.', ['verein' => Html::tag('strong', Html::encode($this->source->verein->name))]);
     }
 }

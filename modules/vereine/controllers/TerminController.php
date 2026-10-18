@@ -44,7 +44,7 @@ class TerminController extends ContentContainerController
         $this->forcePostRequest();
         [$entry, $verein] = $this->findEntry($id);
         $entry->delete();
-        $this->view->success('Termin gelöscht.');
+        $this->view->success(Yii::t('VereineModule.base', 'Termin gelöscht.'));
         return $this->redirect($verein->getUrl());
     }
 
@@ -71,7 +71,7 @@ class TerminController extends ContentContainerController
     {
         $space = $this->module->getCalendarSpace();
         if ($space === null || !$space->moduleManager->isEnabled('calendar')) {
-            throw new NotFoundHttpException('Der gemeinsame Kalender ist nicht eingerichtet.');
+            throw new NotFoundHttpException(Yii::t('VereineModule.base', 'Der gemeinsame Kalender ist nicht eingerichtet.'));
         }
         return $space;
     }
@@ -82,7 +82,7 @@ class TerminController extends ContentContainerController
         $entry = CalendarEntry::findOne((int)$id);
         $verein = $entry && $entry->content->state === \humhub\modules\content\models\Content::STATE_PUBLISHED ? Verein::forEntry($entry) : null;
         if ($verein === null) {
-            throw new NotFoundHttpException('Termin nicht gefunden.');
+            throw new NotFoundHttpException(Yii::t('VereineModule.base', 'Termin nicht gefunden.'));
         }
         return [$entry, $this->manageable($verein)];
     }
@@ -90,10 +90,10 @@ class TerminController extends ContentContainerController
     private function manageable(?Verein $verein): Verein
     {
         if ($verein === null || $verein->status === Verein::STATUS_VORGESCHLAGEN) {
-            throw new NotFoundHttpException('Verein nicht gefunden.');
+            throw new NotFoundHttpException(Yii::t('VereineModule.base', 'Verein nicht gefunden.'));
         }
         if (!$verein->canManage()) {
-            throw new ForbiddenHttpException('Nur Verwalter dieses Vereins können Termine eintragen.');
+            throw new ForbiddenHttpException(Yii::t('VereineModule.base', 'Nur Verwalter dieses Vereins können Termine eintragen.'));
         }
         return $verein;
     }

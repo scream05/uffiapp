@@ -12,6 +12,7 @@ class Events
     {
         try {
             \humhub\modules\kiAssistent\models\Feedback::cleanup();
+            components\Uebersetzer::cleanup();
         } catch (\Throwable $e) {
             Yii::error($e);
         }
@@ -40,6 +41,10 @@ class Events
                 return;
             }
             $event->sender->addWidget(widgets\FloatingChat::class);
+            // „Übersetzen“ unter Inhalten, wenn die eingestellte Sprache nicht Deutsch ist
+            if (components\Uebersetzer::ziel() !== null && Yii::$app->getModule('ki-assistent')->getApiKey() !== null) {
+                $event->sender->addWidget(widgets\UebersetzenConfig::class);
+            }
         } catch (\Throwable $e) {
             Yii::error($e);
         }

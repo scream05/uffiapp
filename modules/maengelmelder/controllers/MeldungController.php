@@ -69,15 +69,15 @@ class MeldungController extends ContentContainerController
             $lat = (float)str_replace(',', '.', $data['lat']);
             $lng = (float)str_replace(',', '.', $data['lng']);
             if (!in_array($data['kategorie'], $this->module->categories, true)) {
-                $errors[] = 'Bitte eine Kategorie wählen.';
+                $errors[] = Yii::t('MaengelmelderModule.base', 'Bitte eine Kategorie wählen.');
             }
             if (mb_strlen($data['beschreibung']) < 5) {
-                $errors[] = 'Bitte kurz beschreiben, was kaputt ist.';
+                $errors[] = Yii::t('MaengelmelderModule.base', 'Bitte kurz beschreiben, was kaputt ist.');
             }
             if ($data['lat'] === '' || $data['lng'] === '') {
-                $errors[] = 'Bitte den Ort auf der Karte markieren.';
+                $errors[] = Yii::t('MaengelmelderModule.base', 'Bitte den Ort auf der Karte markieren.');
             } elseif (!$this->module->inBounds($lat, $lng)) {
-                $errors[] = 'Der markierte Ort liegt nicht im Stadtgebiet von Uffenheim.';
+                $errors[] = Yii::t('MaengelmelderModule.base', 'Der markierte Ort liegt nicht im Stadtgebiet von Uffenheim.');
             }
             $kontakt->load(Yii::$app->request->post());
             if (!$kontakt->validate()) {
@@ -91,8 +91,7 @@ class MeldungController extends ContentContainerController
                 [$fotos, $fotoFehler] = GastFotos::pruefen($this->module);
                 $errors = array_merge($errors, $fotoFehler);
                 if (!$errors && !$this->gastZaehlen(false)) {
-                    $errors[] = 'Von deinem Anschluss kamen heute schon mehrere Meldungen. Bitte versuch es morgen wieder '
-                        . 'oder leg ein kostenloses Konto an.';
+                    $errors[] = Yii::t('MaengelmelderModule.base', 'Von deinem Anschluss kamen heute schon mehrere Meldungen. Bitte versuch es morgen wieder oder leg ein kostenloses Konto an.');
                 }
                 if (!$errors) {
                     return $this->gastMeldungSpeichern($space, $data, $lat, $lng, $kontakt, $fotos);
@@ -176,7 +175,7 @@ class MeldungController extends ContentContainerController
         } catch (\Throwable $e) {
             $transaction->rollBack();
             Yii::error('Gastmeldung: ' . $e->getMessage(), 'maengelmelder');
-            throw new \yii\web\ServerErrorHttpException('Die Meldung konnte nicht gespeichert werden. Bitte später noch einmal versuchen.');
+            throw new \yii\web\ServerErrorHttpException(Yii::t('MaengelmelderModule.base', 'Die Meldung konnte nicht gespeichert werden. Bitte später noch einmal versuchen.'));
         } finally {
             $user->setIdentity(null);
         }
@@ -193,7 +192,7 @@ class MeldungController extends ContentContainerController
             $this->bestaetigungsMail($kontaktZeile);
         }
         if ($fotoFehler) {
-            $this->view->warn(implode(' ', $fotoFehler) . ' Die Meldung wurde ohne diese Fotos gespeichert.');
+            $this->view->warn(implode(' ', $fotoFehler) . ' ' . Yii::t('MaengelmelderModule.base', 'Die Meldung wurde ohne diese Fotos gespeichert.'));
         }
         return $this->redirect($space->createUrl('/maengelmelder/meldung/create', ['danke' => $post->content->id,
             'wa' => $kontaktZeile->info_whatsapp && $kontaktZeile->wa_id ? 1 : null, 'mail' => $kontaktZeile->email ? 1 : null]));
@@ -290,13 +289,13 @@ class MeldungController extends ContentContainerController
             $lat = (float)str_replace(',', '.', $data['lat']);
             $lng = (float)str_replace(',', '.', $data['lng']);
             if (!in_array($data['kategorie'], $this->module->categories, true)) {
-                $errors[] = 'Bitte eine Kategorie wählen.';
+                $errors[] = Yii::t('MaengelmelderModule.base', 'Bitte eine Kategorie wählen.');
             }
             if (mb_strlen($data['beschreibung']) < 5) {
-                $errors[] = 'Bitte kurz beschreiben, was kaputt ist.';
+                $errors[] = Yii::t('MaengelmelderModule.base', 'Bitte kurz beschreiben, was kaputt ist.');
             }
             if (!$this->module->inBounds($lat, $lng)) {
-                $errors[] = 'Der markierte Ort liegt nicht im Stadtgebiet von Uffenheim.';
+                $errors[] = Yii::t('MaengelmelderModule.base', 'Der markierte Ort liegt nicht im Stadtgebiet von Uffenheim.');
             }
             if (!$errors) {
                 $post = $mangel->post;
@@ -363,21 +362,21 @@ class MeldungController extends ContentContainerController
     {
         $q = trim((string)$q);
         if (mb_strlen($q) < 3) {
-            return $this->asJson(['fehler' => 'Bitte mindestens 3 Zeichen eingeben.']);
+            return $this->asJson(['fehler' => Yii::t('MaengelmelderModule.base', 'Bitte mindestens 3 Zeichen eingeben.')]);
         }
         $ip = (string)Yii::$app->request->userIP;
         $key = 'maengel-suche-' . hash('sha256', strpos($ip, ':') !== false ? implode(':', array_slice(explode(':', $ip), 0, 4)) : $ip);
         $n = (int)Yii::$app->cache->get($key);
         if ($n >= 30) {
-            return $this->asJson(['fehler' => 'Zu viele Suchen. Bitte später noch einmal oder den Ort in der Karte markieren.']);
+            return $this->asJson(['fehler' => Yii::t('MaengelmelderModule.base', 'Zu viele Suchen. Bitte später noch einmal oder den Ort in der Karte markieren.')]);
         }
         Yii::$app->cache->set($key, $n + 1, 3600);
         $hit = Osm::searchThrottled($q, Osm::NAH_BOUNDS);
         if ($hit === false) {
-            return $this->asJson(['fehler' => 'Die Suche ist gerade belegt. Bitte gleich noch einmal versuchen.']);
+            return $this->asJson(['fehler' => Yii::t('MaengelmelderModule.base', 'Die Suche ist gerade belegt. Bitte gleich noch einmal versuchen.')]);
         }
         if ($hit === null) {
-            return $this->asJson(['fehler' => 'Diese Adresse haben wir in Uffenheim nicht gefunden. Bitte anders schreiben oder den Ort in der Karte markieren.']);
+            return $this->asJson(['fehler' => Yii::t('MaengelmelderModule.base', 'Diese Adresse haben wir in Uffenheim nicht gefunden. Bitte anders schreiben oder den Ort in der Karte markieren.')]);
         }
         return $this->asJson(['lat' => $hit[0], 'lng' => $hit[1], 'name' => $hit[2]]);
     }
@@ -391,7 +390,7 @@ class MeldungController extends ContentContainerController
             throw new NotFoundHttpException();
         }
         $on = MaengelAuch::toggle($content, Yii::$app->user->id);
-        $this->view->success($on ? 'Danke! Wir haben vermerkt, dass dich das auch betrifft.' : 'Vermerk zurückgenommen.');
+        $this->view->success($on ? Yii::t('MaengelmelderModule.base', 'Danke! Wir haben vermerkt, dass dich das auch betrifft.') : Yii::t('MaengelmelderModule.base', 'Vermerk zurückgenommen.'));
         return $this->redirect($content->getUrl());
     }
 
@@ -425,13 +424,14 @@ class MeldungController extends ContentContainerController
                 'id' => $id,
                 'lat' => (float)$m[1],
                 'lng' => (float)$m[2],
-                'titel' => $k[1] ?? 'Meldung',
+                // Kategorie aus dem (deutschen) Beitragstext, angezeigt übersetzt
+                'titel' => isset($k[1]) ? $this->module->kategorieLabel($k[1]) : Yii::t('MaengelmelderModule.base', 'Meldung'),
                 'adresse' => $o[1] ?? '',
                 'auszug' => $gast ? '' : mb_strimwidth(preg_replace('/\s+/u', ' ', $k[2] ?? ''), 0, 140, '…'),
                 'datum' => Yii::$app->formatter->asDate($post->content->created_at, 'short'),
                 'url' => $gast ? '' : $post->content->getUrl(),
                 'status' => $status->status,
-                'statusLabel' => $status->getLabel(),
+                'statusLabel' => $status->getAnzeigeLabel(),
                 'farbe' => $status->getColor(),
                 'auch' => $auch[$id] ?? 0,
                 'auchMeins' => in_array($id, $mine, true),

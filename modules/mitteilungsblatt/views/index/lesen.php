@@ -8,11 +8,13 @@ use yii\helpers\Url;
 /** @var int|null $seite */
 /** @var string|null $q */
 
-$this->title = 'Mitteilungsblatt ' . $ausgabe->titel;
+$this->title = Yii::t('MitteilungsblattModule.base', 'Mitteilungsblatt {titel}', ['titel' => $ausgabe->titelAnzeige]);
 $hash = array_filter(['page' => $seite, 'search' => $q]);
 $viewer = PdfjsAsset::register($this)->baseUrl . '/web/viewer.html?file='
     . rawurlencode($this->context->url('/mitteilungsblatt/index/pdf', ['id' => $ausgabe->id]))
     . ($hash ? '#' . http_build_query($hash, '', '&', PHP_QUERY_RFC3986) : '');
+// Sprache der Bedienelemente von pdf.js (pdfjs/web/locale/<lang>)
+$pdfLang = in_array(Yii::$app->language, ['de', 'en-US', 'uk', 'ar', 'tr', 'ru'], true) ? Yii::$app->language : 'de';
 ?>
 <style <?= Html::nonce() ?>>
     .mb-kopf { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-bottom: 10px; }
@@ -33,18 +35,18 @@ $viewer = PdfjsAsset::register($this)->baseUrl . '/web/viewer.html?file='
 </style>
 <div class="<?= $this->context->contentContainer ? 'panel panel-default' : 'container' ?>"><div class="<?= $this->context->contentContainer ? 'panel-body' : '' ?>">
     <div class="mb-kopf">
-        <?= Html::a('<i class="fa fa-arrow-left"></i><span class="mb-text"> Alle Ausgaben</span>', $this->context->url('/mitteilungsblatt/index'),
-            ['class' => 'btn btn-light', 'title' => 'Alle Ausgaben']) ?>
-        <h1>Mitteilungsblatt <?= Html::encode($ausgabe->titel) ?> <small><?= Html::encode($ausgabe->datumText) ?></small></h1>
-        <button type="button" class="btn btn-light" id="mb-vollbild" title="Vollbild">
-            <i class="fa fa-expand"></i><span class="mb-text"> Vollbild</span></button>
-        <?= Html::a('<i class="fa fa-download"></i><span class="mb-text"> Herunterladen</span>',
+        <?= Html::a('<i class="fa fa-arrow-left"></i><span class="mb-text"> ' . Yii::t('MitteilungsblattModule.base', 'Alle Ausgaben') . '</span>', $this->context->url('/mitteilungsblatt/index'),
+            ['class' => 'btn btn-light', 'title' => Yii::t('MitteilungsblattModule.base', 'Alle Ausgaben')]) ?>
+        <h1><?= Html::encode(Yii::t('MitteilungsblattModule.base', 'Mitteilungsblatt {titel}', ['titel' => $ausgabe->titelAnzeige])) ?> <small><?= Html::encode($ausgabe->datumAnzeige) ?></small></h1>
+        <button type="button" class="btn btn-light" id="mb-vollbild" title="<?= Html::encode(Yii::t('MitteilungsblattModule.base', 'Vollbild')) ?>">
+            <i class="fa fa-expand"></i><span class="mb-text"> <?= Yii::t('MitteilungsblattModule.base', 'Vollbild') ?></span></button>
+        <?= Html::a('<i class="fa fa-download"></i><span class="mb-text"> ' . Yii::t('MitteilungsblattModule.base', 'Herunterladen') . '</span>',
             $this->context->url('/mitteilungsblatt/index/pdf', ['id' => $ausgabe->id, 'download' => 1]),
-            ['class' => 'btn btn-light', 'title' => 'Herunterladen', 'data-pjax-prevent' => 1]) ?>
+            ['class' => 'btn btn-light', 'title' => Yii::t('MitteilungsblattModule.base', 'Herunterladen'), 'data-pjax-prevent' => 1]) ?>
     </div>
-    <div id="mb-reader" data-src="<?= Html::encode($viewer) ?>">
-        <iframe title="Mitteilungsblatt <?= Html::encode($ausgabe->titel) ?>" allow="fullscreen"></iframe>
-        <button type="button" class="btn btn-primary mb-schliessen"><i class="fa fa-compress"></i> Schließen</button>
+    <div id="mb-reader" data-src="<?= Html::encode($viewer) ?>" data-lang="<?= Html::encode($pdfLang) ?>">
+        <iframe title="<?= Html::encode(Yii::t('MitteilungsblattModule.base', 'Mitteilungsblatt {titel}', ['titel' => $ausgabe->titelAnzeige])) ?>" allow="fullscreen"></iframe>
+        <button type="button" class="btn btn-primary mb-schliessen"><i class="fa fa-compress"></i> <?= Yii::t('MitteilungsblattModule.base', 'Schließen') ?></button>
     </div>
     <p class="text-muted" style="margin-top:8px;font-size:.85em">
         Herausgeberin: Stadt Uffenheim. <?= Html::a('Original auf uffenheim.de', $ausgabe->quelle_url, ['target' => '_blank', 'rel' => 'noopener']) ?>
@@ -63,7 +65,8 @@ $viewer = PdfjsAsset::register($this)->baseUrl . '/web/viewer.html?file='
             if (!w || !w.PDFViewerApplicationOptions) return;
             var o = w.PDFViewerApplicationOptions;
             o.set('disablePreferences', true);
-            o.set('localeProperties', {lang: 'de'});
+            var r = document.getElementById('mb-reader');
+            o.set('localeProperties', {lang: (r && r.dataset.lang) || 'de'});
             o.set('annotationEditorMode', -1); // nur lesen, keine Zeichen-/Notizwerkzeuge
             o.set('enableSignatureEditor', false);
             o.set('enableComment', false);

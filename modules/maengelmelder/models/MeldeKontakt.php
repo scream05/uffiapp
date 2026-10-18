@@ -42,14 +42,14 @@ class MeldeKontakt extends Model
     {
         return [
             [['vorname', 'nachname', 'email', 'telefon', 'website'], 'trim'],
-            [['vorname', 'nachname'], 'required', 'message' => 'Bitte {attribute} angeben.'],
+            [['vorname', 'nachname'], 'required', 'message' => Yii::t('MaengelmelderModule.base', 'Bitte {attribute} angeben.')],
             [['vorname', 'nachname'], 'string', 'max' => 60],
-            [['vorname', 'nachname'], 'match', 'pattern' => '/^[\p{L}][\p{L} .\'-]*$/u', 'message' => 'Bitte einen gültigen {attribute} angeben.'],
+            [['vorname', 'nachname'], 'match', 'pattern' => '/^[\p{L}][\p{L} .\'-]*$/u', 'message' => Yii::t('MaengelmelderModule.base', 'Bitte einen gültigen {attribute} angeben.')],
             ['email', 'string', 'max' => 150],
-            ['email', 'email', 'message' => 'Bitte eine gültige E-Mail-Adresse angeben.'],
-            ['telefon', 'match', 'pattern' => '/^\+?[0-9][0-9 ()\/-]{4,28}$/', 'message' => 'Bitte eine gültige Telefonnummer angeben (nur Ziffern, Leerzeichen, + / - ( )).'],
+            ['email', 'email', 'message' => Yii::t('MaengelmelderModule.base', 'Bitte eine gültige E-Mail-Adresse angeben.')],
+            ['telefon', 'match', 'pattern' => '/^\+?[0-9][0-9 ()\/-]{4,28}$/', 'message' => Yii::t('MaengelmelderModule.base', 'Bitte eine gültige Telefonnummer angeben (nur Ziffern, Leerzeichen, + / - ( )).')],
             ['email', 'kontaktNoetig', 'skipOnEmpty' => false, 'on' => self::SCENARIO_GAST],
-            ['datenschutz', 'compare', 'compareValue' => '1', 'message' => 'Bitte bestätige die Datenschutzhinweise.'],
+            ['datenschutz', 'compare', 'compareValue' => '1', 'message' => Yii::t('MaengelmelderModule.base', 'Bitte bestätige die Datenschutzhinweise.')],
             ['captcha', Yii::$app->captcha->getValidatorClass(), 'on' => self::SCENARIO_GAST],
             [['info_mail', 'info_whatsapp'], 'boolean'],
             ['info_mail', 'infoMailPruefen'],
@@ -60,14 +60,14 @@ class MeldeKontakt extends Model
     public function infoMailPruefen($attribute)
     {
         if ($this->info_mail && $this->scenario === self::SCENARIO_GAST && $this->email === '') {
-            $this->addError('info_mail', 'Für Infos per E-Mail bitte deine E-Mail-Adresse angeben.');
+            $this->addError('info_mail', Yii::t('MaengelmelderModule.base', 'Für Infos per E-Mail bitte deine E-Mail-Adresse angeben.'));
         }
     }
 
     public function infoWhatsappPruefen($attribute)
     {
         if ($this->info_whatsapp && self::waId($this->telefon) === null) {
-            $this->addError('info_whatsapp', 'Für Infos per WhatsApp bitte deine Handynummer angeben (z. B. 0171 1234567 oder +49 171 1234567).');
+            $this->addError('info_whatsapp', Yii::t('MaengelmelderModule.base', 'Für Infos per WhatsApp bitte deine Handynummer angeben (z. B. 0171 1234567 oder +49 171 1234567).'));
         }
     }
 
@@ -103,17 +103,17 @@ class MeldeKontakt extends Model
     public function kontaktNoetig($attribute)
     {
         if ($this->email === '' && $this->telefon === '') {
-            $this->addError('email', 'Bitte mindestens eine E-Mail-Adresse oder eine Telefonnummer angeben, damit der Bauhof bei Rückfragen nachfragen kann.');
+            $this->addError('email', Yii::t('MaengelmelderModule.base', 'Bitte mindestens eine E-Mail-Adresse oder eine Telefonnummer angeben, damit der Bauhof bei Rückfragen nachfragen kann.'));
         }
     }
 
     public function attributeLabels()
     {
         return [
-            'vorname' => 'Vorname',
-            'nachname' => 'Nachname',
-            'email' => 'E-Mail',
-            'telefon' => 'Telefon',
+            'vorname' => Yii::t('MaengelmelderModule.base', 'Vorname'),
+            'nachname' => Yii::t('MaengelmelderModule.base', 'Nachname'),
+            'email' => Yii::t('MaengelmelderModule.base', 'E-Mail'),
+            'telefon' => Yii::t('MaengelmelderModule.base', 'Telefon'),
         ];
     }
 

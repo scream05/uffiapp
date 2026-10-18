@@ -5,6 +5,7 @@ namespace humhub\modules\gewerbe\notifications;
 use humhub\helpers\Html;
 use humhub\modules\gewerbe\models\Gutschein;
 use humhub\modules\notification\components\BaseNotification;
+use Yii;
 
 /**
  * An Admins / „Gewerbe verwalten“: ein Betrieb hat einen Gutschein veröffentlicht (ohne Prüfung, nur zur Kenntnis).
@@ -28,7 +29,7 @@ class GutscheinNeu extends BaseNotification
 
     public function html()
     {
-        return Html::tag('strong', Html::encode($this->source->betrieb->name)) . ' hat einen Gutschein veröffentlicht: „'
-            . Html::encode($this->source->titel) . '“.';
+        return Yii::t('GewerbeModule.base', '{betrieb} hat einen Gutschein veröffentlicht: „{titel}“.', [
+            'betrieb' => Html::tag('strong', Html::encode($this->source->betrieb->name)), 'titel' => Html::encode($this->source->titel)]);
     }
 }

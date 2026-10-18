@@ -32,7 +32,7 @@ class StatusAddon extends Widget
         $status = MaengelStatus::forContent($this->post->content);
         $since = $status->isNewRecord ? $this->post->content->created_at : $status->updated_at;
         $html = '<div class="mm-statuszeile">' . $status->getEtikett()
-            . '<span class="mm-seit">seit ' . Yii::$app->formatter->asDate($since, 'short') . '</span>';
+            . '<span class="mm-seit">' . Yii::t('MaengelmelderModule.base', 'seit {datum}', ['datum' => Yii::$app->formatter->asDate($since, 'short')]) . '</span>';
 
         $html .= $this->auch($status);
 
@@ -66,14 +66,14 @@ JS);
         $content = $this->post->content;
         $count = MaengelAuch::counts([$content->id])[$content->id] ?? 0;
         $mine = in_array($content->id, MaengelAuch::mine([$content->id]), true);
-        $html = $count ? '<span class="mm-auch-zahl"><i class="fa fa-users"></i> ' . ($count === 1 ? '1 weitere Person' : "$count weitere Personen")
-            . ' betroffen</span>' : '';
+        $html = $count ? '<span class="mm-auch-zahl"><i class="fa fa-users"></i> ' . ($count === 1 ? Yii::t('MaengelmelderModule.base', '1 weitere Person betroffen') : Yii::t('MaengelmelderModule.base', '{n} weitere Personen betroffen', ['n' => $count]))
+            . '</span>' : '';
         $own = (int)$content->created_by === (int)Yii::$app->user->id;
         if (!Yii::$app->user->isGuest && !$own && ($mine || !in_array($status->status, MaengelStatus::CLOSED, true))) {
             $html .= Html::beginForm($content->container->createUrl('/maengelmelder/meldung/auch', ['id' => $content->id]), 'post')
-                . Html::submitButton($mine ? '<i class="fa fa-check"></i> Betrifft mich auch' : 'Betrifft mich auch',
+                . Html::submitButton(($mine ? '<i class="fa fa-check"></i> ' : '') . Yii::t('MaengelmelderModule.base', 'Betrifft mich auch'),
                     ['class' => 'btn btn-sm mm-auch-knopf ' . ($mine ? 'btn-primary' : 'btn-light'),
-                        'title' => $mine ? 'Zurücknehmen' : 'Ich habe denselben Mangel bemerkt']) . Html::endForm();
+                        'title' => $mine ? Yii::t('MaengelmelderModule.base', 'Zurücknehmen') : Yii::t('MaengelmelderModule.base', 'Ich habe denselben Mangel bemerkt')]) . Html::endForm();
         }
         return $html;
     }

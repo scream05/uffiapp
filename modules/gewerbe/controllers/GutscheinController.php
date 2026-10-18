@@ -73,7 +73,7 @@ class GutscheinController extends ContentContainerController
         $token = (string)$request->post('t', '');
         if ($token !== '') {
             if (GutscheinDienst::betriebZuToken($token)?->id !== $g->betrieb_id) {
-                $this->view->error('Dieser QR-Code gehört nicht zu diesem Betrieb oder ist nicht mehr gültig. Bitte scanne den Aufsteller an der Kasse.');
+                $this->view->error(Yii::t('GewerbeModule.base', 'Dieser QR-Code gehört nicht zu diesem Betrieb oder ist nicht mehr gültig. Bitte scanne den Aufsteller an der Kasse.'));
                 return $this->redirect($g->getUrl());
             }
         } elseif (($fehler = GutscheinDienst::nummerPruefen($g->betrieb, (string)$request->post('nummer', ''), Yii::$app->user->id)) !== null) {
@@ -93,7 +93,7 @@ class GutscheinController extends ContentContainerController
     {
         $e = Einloesung::findOne((int)$id);
         if ($e === null || $e->user_id !== Yii::$app->user->id) {
-            throw new NotFoundHttpException('Einlösung nicht gefunden.');
+            throw new NotFoundHttpException(Yii::t('GewerbeModule.base', 'Einlösung nicht gefunden.'));
         }
         return $this->render('bestaetigung', [
             'e' => $e,
@@ -111,7 +111,7 @@ class GutscheinController extends ContentContainerController
         if ($g->load(Yii::$app->request->post()) && $g->save()) {
             GutscheinDienst::theke($b);
             GutscheinDienst::neu($g);
-            $this->view->success('Dein Gutschein ist veröffentlicht. Druck jetzt den Theken-Aufsteller aus, damit deine Kunden ihn einlösen können.');
+            $this->view->success(Yii::t('GewerbeModule.base', 'Dein Gutschein ist veröffentlicht. Druck jetzt den Theken-Aufsteller aus, damit deine Kunden ihn einlösen können.'));
             return $this->redirect($this->contentContainer->createUrl('/gewerbe/gutschein/verwaltung', ['betrieb' => $b->id]));
         }
         return $this->render('edit', ['g' => $g, 'betrieb' => $b, 'isNew' => true]);
@@ -138,26 +138,26 @@ class GutscheinController extends ContentContainerController
         switch (Yii::$app->request->post('aktion')) {
             case 'pausieren':
                 GutscheinDienst::pausieren($g, null);
-                $this->view->success('Pausiert. Der Gutschein bleibt sichtbar, lässt sich aber nicht einlösen.');
+                $this->view->success(Yii::t('GewerbeModule.base', 'Pausiert. Der Gutschein bleibt sichtbar, lässt sich aber nicht einlösen.'));
                 break;
             case 'starten':
                 if ($g->istAbgelaufen()) {
-                    $this->view->error('Der Zeitraum ist vorbei. Bitte zuerst „Gültig bis“ ändern.');
+                    $this->view->error(Yii::t('GewerbeModule.base', 'Der Zeitraum ist vorbei. Bitte zuerst „Gültig bis“ ändern.'));
                     break;
                 }
                 $g->updateAttributes(['status' => Gutschein::STATUS_AKTIV, 'pause_grund' => null]);
-                $this->view->success('Der Gutschein lässt sich wieder einlösen.');
+                $this->view->success(Yii::t('GewerbeModule.base', 'Der Gutschein lässt sich wieder einlösen.'));
                 break;
             case 'beenden':
                 $g->updateAttributes(['status' => Gutschein::STATUS_BEENDET, 'pause_grund' => null]);
-                $this->view->success('Beendet. Der Gutschein ist nicht mehr zu sehen.');
+                $this->view->success(Yii::t('GewerbeModule.base', 'Beendet. Der Gutschein ist nicht mehr zu sehen.'));
                 break;
             case 'loeschen':
                 $g->delete();
-                $this->view->success('Gutschein gelöscht.');
+                $this->view->success(Yii::t('GewerbeModule.base', 'Gutschein gelöscht.'));
                 break;
             default:
-                throw new BadRequestHttpException('Unbekannte Aktion.');
+                throw new BadRequestHttpException(Yii::t('GewerbeModule.base', 'Unbekannte Aktion.'));
         }
         return $this->redirect($zurueck);
     }
@@ -190,8 +190,8 @@ class GutscheinController extends ContentContainerController
         }
         $this->betriebVerwalten($e->betrieb_id);
         GutscheinDienst::stornieren($e)
-            ? $this->view->success("Einlösung {$e->code} zurückgenommen. Die Person kann den Gutschein erneut nutzen.")
-            : $this->view->error("Zurücknehmen geht nur in den ersten {$this->module->stornoMinuten} Minuten.");
+            ? $this->view->success(Yii::t('GewerbeModule.base', 'Einlösung {code} zurückgenommen. Die Person kann den Gutschein erneut nutzen.', ['code' => $e->code]))
+            : $this->view->error(Yii::t('GewerbeModule.base', 'Zurücknehmen geht nur in den ersten {minuten} Minuten.', ['minuten' => $this->module->stornoMinuten]));
         return $this->redirect($this->contentContainer->createUrl('/gewerbe/gutschein/verwaltung', ['betrieb' => $e->betrieb_id]));
     }
 
@@ -200,7 +200,7 @@ class GutscheinController extends ContentContainerController
         $this->forcePostRequest();
         $b = $this->betriebVerwalten($betrieb);
         GutscheinDienst::thekeErneuern($b);
-        $this->view->success('Neuer Theken-QR und neue Nummer. Bitte den neuen Aufsteller ausdrucken; der alte gilt nicht mehr.');
+        $this->view->success(Yii::t('GewerbeModule.base', 'Neuer Theken-QR und neue Nummer. Bitte den neuen Aufsteller ausdrucken; der alte gilt nicht mehr.'));
         return $this->redirect($this->contentContainer->createUrl('/gewerbe/gutschein/verwaltung', ['betrieb' => $b->id]));
     }
 
@@ -265,10 +265,10 @@ class GutscheinController extends ContentContainerController
     {
         $b = Betrieb::findOne((int)$id);
         if ($b === null || $b->status === Betrieb::STATUS_VORGESCHLAGEN) {
-            throw new NotFoundHttpException('Betrieb nicht gefunden.');
+            throw new NotFoundHttpException(Yii::t('GewerbeModule.base', 'Betrieb nicht gefunden.'));
         }
         if (!$b->canManage()) {
-            throw new ForbiddenHttpException('Nur Verwalter dieses Betriebs können Gutscheine verwalten.');
+            throw new ForbiddenHttpException(Yii::t('GewerbeModule.base', 'Nur Verwalter dieses Betriebs können Gutscheine verwalten.'));
         }
         return $b;
     }
@@ -277,7 +277,7 @@ class GutscheinController extends ContentContainerController
     {
         $g = Gutschein::findOne((int)$id);
         if ($g === null || $g->betrieb->status === Betrieb::STATUS_VORGESCHLAGEN) {
-            throw new NotFoundHttpException('Gutschein nicht gefunden.');
+            throw new NotFoundHttpException(Yii::t('GewerbeModule.base', 'Gutschein nicht gefunden.'));
         }
         return $g;
     }

@@ -92,7 +92,7 @@ class Events
             }
             $active = Yii::$app->controller->module && Yii::$app->controller->module->id === 'maengelmelder';
             $event->sender->addItem([
-                'label' => 'Mangel melden',
+                'label' => Yii::t('MaengelmelderModule.base', 'Mangel melden'),
                 'group' => 'modules',
                 'url' => $space->createUrl('/maengelmelder/meldung/create'),
                 'icon' => '<i class="fa fa-map-marker"></i>',
@@ -100,7 +100,7 @@ class Events
                 'sortOrder' => 150,
             ]);
             $event->sender->addItem([
-                'label' => 'Karte',
+                'label' => Yii::t('MaengelmelderModule.base', 'Karte'),
                 'group' => 'modules',
                 'url' => $space->createUrl('/maengelmelder/meldung/karte'),
                 'icon' => '<i class="fa fa-map"></i>',

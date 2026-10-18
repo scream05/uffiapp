@@ -18,7 +18,7 @@ class PinLink extends Widget
     {
         $id = $this->record->content->id;
         $an = Yii::$app->getModule('uebersicht')->istAngepinnt($id);
-        $link = Button::asLink($an ? 'Aus Übersicht lösen' : 'In Übersicht anpinnen')
+        $link = Button::asLink($an ? Yii::t('UebersichtModule.base', 'Aus Übersicht lösen') : Yii::t('UebersichtModule.base', 'In Übersicht anpinnen'))
             ->action('uebersicht.umschalten', Url::to(['/uebersicht/pin/umschalten', 'id' => $id]))
             ->cssClass('dropdown-item')
             ->icon('thumb-tack');

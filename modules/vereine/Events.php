@@ -56,7 +56,7 @@ class Events
             }
             $active = Yii::$app->controller->module && Yii::$app->controller->module->id === 'vereine';
             $event->sender->addItem([
-                'label' => 'Vereinsverzeichnis',
+                'label' => Yii::t('VereineModule.base', 'Vereinsverzeichnis'),
                 'group' => 'modules',
                 'url' => $space->createUrl('/vereine/verein/index'),
                 'icon' => '<i class="fa fa-users"></i>',

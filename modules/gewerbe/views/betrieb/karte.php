@@ -10,6 +10,7 @@
  */
 
 use humhub\helpers\Html;
+use humhub\modules\gewerbe\Module;
 use humhub\modules\maengelmelder\assets\MapAsset;
 
 MapAsset::register($this);
@@ -18,16 +19,21 @@ $mm = Yii::$app->getModule('maengelmelder');
 $fokus = (int)Yii::$app->request->get('fokus');
 ?>
 <div class="panel panel-default">
-    <div class="panel-heading"><strong>Gewerbe &amp; Einkaufen – Karte</strong></div>
+    <div class="panel-heading"><strong><?= Yii::t('GewerbeModule.base', 'Gewerbe &amp; Einkaufen – Karte') ?></strong></div>
     <div class="panel-body">
         <?= $this->render('_ansicht', ['aktiv' => 'karte', 'q' => $q, 'kategorie' => $kategorie, 'ortsteil' => $ortsteil]) ?>
         <?php if ($kategorie !== '' || $ortsteil !== '' || $q !== ''): ?>
-            <p class="text-muted">Gefiltert: <?= Html::encode(implode(' · ', array_filter([$kategorie, $ortsteil, $q !== '' ? "„{$q}“" : '']))) ?></p>
+            <p class="text-muted"><?= Yii::t('GewerbeModule.base', 'Gefiltert:') ?> <?= Html::encode(implode(' · ', array_filter([Module::kategorieLabel($kategorie), Module::ortLabel($ortsteil), $q !== '' ? "„{$q}“" : '']))) ?></p>
         <?php endif ?>
-        <div id="gw-karte" style="height:65vh;min-height:380px;border-radius:12px" role="region" aria-label="Karte der Betriebe"></div>
-        <p class="help-block" style="margin-top:8px"><?= count($punkte) ?> Betriebe auf der Karte<?= $ohneOrt ? ", $ohneOrt ohne bekannten Ort (nur in der Liste)" : '' ?>.
-            Punkte: <span style="color:#3d5a06;font-weight:600">grün = jetzt geöffnet</span>, <span style="color:#8a2a20;font-weight:600">rot = geschlossen</span>,
-            blau = keine Öffnungszeiten hinterlegt. Viele Angaben stammen aus OpenStreetMap (© OpenStreetMap-Mitwirkende, ODbL). Dieselben Betriebe stehen auch in der <?= Html::a('Liste', $space->createUrl('/gewerbe/betrieb/index', array_filter(['q' => $q, 'kategorie' => $kategorie, 'ortsteil' => $ortsteil]))) ?>.</p>
+        <div id="gw-karte" style="height:65vh;min-height:380px;border-radius:12px" role="region" aria-label="<?= Html::encode(Yii::t('GewerbeModule.base', 'Karte der Betriebe')) ?>"></div>
+        <p class="help-block" style="margin-top:8px"><?= $ohneOrt
+                ? Yii::t('GewerbeModule.base', '{anzahl} Betriebe auf der Karte, {ohne} ohne bekannten Ort (nur in der Liste).', ['anzahl' => count($punkte), 'ohne' => $ohneOrt])
+                : Yii::t('GewerbeModule.base', '{anzahl} Betriebe auf der Karte.', ['anzahl' => count($punkte)]) ?>
+            <?= Yii::t('GewerbeModule.base', 'Punkte: {gruen}, {rot}, blau = keine Öffnungszeiten hinterlegt.', [
+                'gruen' => '<span style="color:#3d5a06;font-weight:600">' . Yii::t('GewerbeModule.base', 'grün = jetzt geöffnet') . '</span>',
+                'rot' => '<span style="color:#8a2a20;font-weight:600">' . Yii::t('GewerbeModule.base', 'rot = geschlossen') . '</span>']) ?>
+            <?= Yii::t('GewerbeModule.base', 'Viele Angaben stammen aus OpenStreetMap (© OpenStreetMap-Mitwirkende, ODbL).') ?>
+            <?= Yii::t('GewerbeModule.base', 'Dieselben Betriebe stehen auch in der {liste}.', ['liste' => Html::a(Yii::t('GewerbeModule.base', 'Liste'), $space->createUrl('/gewerbe/betrieb/index', array_filter(['q' => $q, 'kategorie' => $kategorie, 'ortsteil' => $ortsteil])))]) ?></p>
     </div>
 </div>
 <?= $this->render('@maengelmelder/views/meldung/_tiles') ?>

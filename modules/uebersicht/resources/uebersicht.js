@@ -2,6 +2,10 @@
 humhub.module('uebersicht', function (module, require, $) {
     var client = require('client');
 
+    var text = function (key, fallback) {
+        return (module.config.text && module.config.text[key]) || fallback;
+    };
+
     var markieren = function () {
         var ids = module.config.ids || [];
         $('[data-content-key]').each(function () {
@@ -9,7 +13,7 @@ humhub.module('uebersicht', function (module, require, $) {
             var an = ids.indexOf(parseInt($e.attr('data-content-key'), 10)) !== -1;
             $e.toggleClass('uebersicht-angepinnt', an);
             if (an && !$e.children('.uebersicht-pin').length) {
-                $e.prepend('<div class="uebersicht-pin"><i class="fa fa-thumb-tack"></i> Angepinnt</div>');
+                $e.prepend($('<div class="uebersicht-pin"><i class="fa fa-thumb-tack"></i> </div>').append(document.createTextNode(text('angepinnt', 'Angepinnt'))));
             } else if (!an) {
                 $e.children('.uebersicht-pin').remove();
             }
@@ -23,8 +27,9 @@ humhub.module('uebersicht', function (module, require, $) {
         }
         var $stream = $('#wallStream.dashboard-wall-stream');
         if ($stream.length) {
-            $stream.before('<div class="uebersicht-anpassen"><a href="' + module.config.einstellungen + '">'
-                + '<i class="fa fa-sliders"></i> Übersicht anpassen</a></div>');
+            var $a = $('<a><i class="fa fa-sliders"></i> </a>').attr('href', module.config.einstellungen)
+                .append(document.createTextNode(text('anpassen', 'Übersicht anpassen')));
+            $stream.before($('<div class="uebersicht-anpassen"></div>').append($a));
         }
     };
 

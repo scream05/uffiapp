@@ -114,6 +114,13 @@ class Notdienst
         return self::DAYS[(int)date('w', $ts)] . ' ' . date('d.m.', $ts) . ', ' . date('G:i', $ts) . ' Uhr';
     }
 
+    /** Wie time(), in der Sprache des Nutzers („Fr 09.10., 8:30 Uhr“ bzw. z. B. „Fri 09.10., 08:30“) */
+    public static function zeit(int $ts): string
+    {
+        return str_starts_with(Yii::$app->language, 'de') ? self::time($ts)
+            : Yii::$app->formatter->asDatetime($ts, 'EEE dd.MM., HH:mm');
+    }
+
     public static function address(array $e): string
     {
         return $e['strasse'] . ', ' . $e['plz'] . ' ' . $e['ort'] . ($e['ortsteil'] !== '' ? '-' . $e['ortsteil'] : '');

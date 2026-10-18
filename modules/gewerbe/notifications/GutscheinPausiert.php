@@ -5,6 +5,7 @@ namespace humhub\modules\gewerbe\notifications;
 use humhub\helpers\Html;
 use humhub\modules\gewerbe\models\Gutschein;
 use humhub\modules\notification\components\BaseNotification;
+use Yii;
 
 /**
  * An die Verwalter des Betriebs und Admins: ein Gutschein wurde wegen auffällig vieler Einlösungen pausiert.
@@ -29,7 +30,7 @@ class GutscheinPausiert extends BaseNotification
 
     public function html()
     {
-        return 'Der Gutschein „' . Html::encode($this->source->titel) . '“ von ' . Html::tag('strong', Html::encode($this->source->betrieb->name))
-            . ' wurde wegen auffällig vieler Einlösungen automatisch pausiert.';
+        return Yii::t('GewerbeModule.base', 'Der Gutschein „{titel}“ von {betrieb} wurde wegen auffällig vieler Einlösungen automatisch pausiert.', [
+            'titel' => Html::encode($this->source->titel), 'betrieb' => Html::tag('strong', Html::encode($this->source->betrieb->name))]);
     }
 }

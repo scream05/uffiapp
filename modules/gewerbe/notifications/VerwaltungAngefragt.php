@@ -5,6 +5,7 @@ namespace humhub\modules\gewerbe\notifications;
 use humhub\helpers\Html;
 use humhub\modules\gewerbe\models\Betrieb;
 use humhub\modules\notification\components\BaseNotification;
+use Yii;
 
 /**
  * An Admins und bisherige Verwalter: jemand möchte einen Betrieb verwalten (oder hat einen neuen eingetragen).
@@ -29,8 +30,10 @@ class VerwaltungAngefragt extends BaseNotification
 
     public function html()
     {
-        return $this->infoText(Html::tag('strong', Html::encode($this->originator->displayName)),
-            Html::tag('strong', Html::encode($this->source->name)));
+        $params = ['user' => Html::tag('strong', Html::encode($this->originator->displayName)), 'betrieb' => Html::tag('strong', Html::encode($this->source->name))];
+        return $this->source->status === Betrieb::STATUS_VORGESCHLAGEN
+            ? Yii::t('GewerbeModule.base', '{user} hat den Betrieb {betrieb} im Gewerbeverzeichnis eingetragen und möchte ihn verwalten.', $params)
+            : Yii::t('GewerbeModule.base', '{user} möchte den Betrieb {betrieb} im Gewerbeverzeichnis verwalten.', $params);
     }
 
     private function infoText($user, $betrieb)

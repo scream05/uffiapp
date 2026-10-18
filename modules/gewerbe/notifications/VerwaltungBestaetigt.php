@@ -5,6 +5,7 @@ namespace humhub\modules\gewerbe\notifications;
 use humhub\helpers\Html;
 use humhub\modules\gewerbe\models\Betrieb;
 use humhub\modules\notification\components\BaseNotification;
+use Yii;
 
 /**
  * An den Nutzer: Verwaltung eines Betriebs bestätigt.
@@ -28,7 +29,7 @@ class VerwaltungBestaetigt extends BaseNotification
 
     public function html()
     {
-        return Html::tag('strong', Html::encode($this->originator->displayName)) . ' hat bestätigt: Du kannst jetzt die Seite von '
-            . Html::tag('strong', Html::encode($this->source->name)) . ' im Gewerbeverzeichnis pflegen.';
+        return Yii::t('GewerbeModule.base', '{name} hat bestätigt: Du kannst jetzt die Seite von {betrieb} im Gewerbeverzeichnis pflegen.', [
+            'name' => Html::tag('strong', Html::encode($this->originator->displayName)), 'betrieb' => Html::tag('strong', Html::encode($this->source->name))]);
     }
 }

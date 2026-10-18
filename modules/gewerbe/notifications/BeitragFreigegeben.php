@@ -4,6 +4,7 @@ namespace humhub\modules\gewerbe\notifications;
 
 use humhub\helpers\Html;
 use humhub\modules\notification\components\BaseNotification;
+use Yii;
 use humhub\modules\gewerbe\models\BetriebBeitrag;
 
 /**
@@ -31,6 +32,6 @@ class BeitragFreigegeben extends BaseNotification
 
     public function html()
     {
-        return 'Dein Beitrag für ' . Html::tag('strong', Html::encode($this->source->betrieb->name)) . ' ist jetzt veröffentlicht.';
+        return Yii::t('GewerbeModule.base', 'Dein Beitrag für {betrieb} ist jetzt veröffentlicht.', ['betrieb' => Html::tag('strong', Html::encode($this->source->betrieb->name))]);
     }
 }

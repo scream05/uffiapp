@@ -19,7 +19,7 @@ class BetriebSearchProvider implements MetaSearchProviderInterface
 
     public function getName(): string
     {
-        return 'Gewerbe & Einkaufen';
+        return Yii::t('GewerbeModule.base', 'Gewerbe & Einkaufen');
     }
 
     public function getSortOrder(): int
@@ -35,7 +35,7 @@ class BetriebSearchProvider implements MetaSearchProviderInterface
 
     public function getAllResultsText(): string
     {
-        return $this->getService()->hasResults() ? Yii::t('base', 'Show all results') : 'Zum Gewerbeverzeichnis';
+        return $this->getService()->hasResults() ? Yii::t('base', 'Show all results') : Yii::t('GewerbeModule.base', 'Zum Gewerbeverzeichnis');
     }
 
     public function getIsHiddenWhenEmpty(): bool

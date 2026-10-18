@@ -69,15 +69,15 @@ class Verein extends ActiveRecord implements ViewableInterface
             [['name', 'kategorie', 'ortsteil'], 'required'],
             [['name', 'treffpunkt', 'website', 'email', 'telefon'], 'trim'],
             ['name', 'string', 'min' => 3, 'max' => 150],
-            ['name', 'unique', 'message' => 'Diesen Verein gibt es schon im Verzeichnis.'],
+            ['name', 'unique', 'message' => Yii::t('VereineModule.base', 'Diesen Verein gibt es schon im Verzeichnis.')],
             ['kategorie', 'in', 'range' => $module->categories],
             ['ortsteil', 'in', 'range' => $module->ortsteile],
             ['beschreibung', 'string', 'max' => 20000],
             ['treffpunkt', 'string', 'max' => 255],
-            ['website', 'url', 'defaultScheme' => 'https', 'enableIDN' => true, 'message' => 'Bitte eine gültige Internetadresse angeben.'],
+            ['website', 'url', 'defaultScheme' => 'https', 'enableIDN' => true, 'message' => Yii::t('VereineModule.base', 'Bitte eine gültige Internetadresse angeben.')],
             ['website', 'string', 'max' => 255],
-            ['email', 'email', 'enableIDN' => true, 'message' => 'Bitte eine gültige E-Mail-Adresse angeben.'],
-            ['telefon', 'match', 'pattern' => '/^[0-9 +\/()-]{5,50}$/', 'message' => 'Bitte nur Ziffern, Leerzeichen und + / - ( ).'],
+            ['email', 'email', 'enableIDN' => true, 'message' => Yii::t('VereineModule.base', 'Bitte eine gültige E-Mail-Adresse angeben.')],
+            ['telefon', 'match', 'pattern' => '/^[0-9 +\/()-]{5,50}$/', 'message' => Yii::t('VereineModule.base', 'Bitte nur Ziffern, Leerzeichen und + / - ( ).')],
             [['apRows', 'socialRows'], 'safe'],
             ['apRows', 'validateAnsprechpartner'],
             ['socialRows', 'validateSocial'],
@@ -87,16 +87,16 @@ class Verein extends ActiveRecord implements ViewableInterface
     public function attributeLabels()
     {
         return [
-            'name' => 'Name des Vereins',
-            'kategorie' => 'Kategorie',
-            'ortsteil' => 'Ort / Ortsteil',
-            'beschreibung' => 'Vorstellung',
-            'treffpunkt' => 'Vereinsheim / Treffpunkt',
-            'website' => 'Website',
-            'email' => 'E-Mail des Vereins',
-            'telefon' => 'Telefon des Vereins',
-            'apRows' => 'Ansprechpartner',
-            'socialRows' => 'Social Media',
+            'name' => Yii::t('VereineModule.base', 'Name des Vereins'),
+            'kategorie' => Yii::t('VereineModule.base', 'Kategorie'),
+            'ortsteil' => Yii::t('VereineModule.base', 'Ort / Ortsteil'),
+            'beschreibung' => Yii::t('VereineModule.base', 'Vorstellung'),
+            'treffpunkt' => Yii::t('VereineModule.base', 'Vereinsheim / Treffpunkt'),
+            'website' => Yii::t('VereineModule.base', 'Website'),
+            'email' => Yii::t('VereineModule.base', 'E-Mail des Vereins'),
+            'telefon' => Yii::t('VereineModule.base', 'Telefon des Vereins'),
+            'apRows' => Yii::t('VereineModule.base', 'Ansprechpartner'),
+            'socialRows' => Yii::t('VereineModule.base', 'Social Media'),
         ];
     }
 
@@ -110,10 +110,10 @@ class Verein extends ActiveRecord implements ViewableInterface
                 continue;
             }
             if ($row['email'] !== '' && !(new \yii\validators\EmailValidator(['enableIDN' => true]))->validate($row['email'])) {
-                $this->addError('apRows', "Ungültige E-Mail-Adresse: {$row['email']}");
+                $this->addError('apRows', Yii::t('VereineModule.base', 'Ungültige E-Mail-Adresse: {wert}', ['wert' => $row['email']]));
             }
             if ($row['telefon'] !== '' && !preg_match('/^[0-9 +\/()-]{5,50}$/', $row['telefon'])) {
-                $this->addError('apRows', "Ungültige Telefonnummer: {$row['telefon']}");
+                $this->addError('apRows', Yii::t('VereineModule.base', 'Ungültige Telefonnummer: {wert}', ['wert' => $row['telefon']]));
             }
             $rows[] = $row;
         }
@@ -130,7 +130,7 @@ class Verein extends ActiveRecord implements ViewableInterface
                 continue;
             }
             if (!preg_match('#^https://[^\s"<>]{4,300}$#', $url)) {
-                $this->addError('socialRows', "Bitte vollständige Adressen mit https:// angeben: $url");
+                $this->addError('socialRows', Yii::t('VereineModule.base', 'Bitte vollständige Adressen mit https:// angeben: {wert}', ['wert' => $url]));
                 continue;
             }
             $rows[] = ['typ' => mb_substr(trim((string)($row['typ'] ?? '')), 0, 30) ?: self::socialType($url), 'url' => $url];
@@ -213,10 +213,10 @@ class Verein extends ActiveRecord implements ViewableInterface
             }
         }
         if ($best !== null) {
-            return 'Ansprechpartner: ' . $best;
+            return Yii::t('VereineModule.base', 'Ansprechpartner') . ': ' . $best;
         }
         if ($count((string)$this->treffpunkt)) {
-            return 'Treffpunkt: ' . $this->treffpunkt;
+            return Yii::t('VereineModule.base', 'Treffpunkt') . ': ' . $this->treffpunkt;
         }
         $text = preg_replace('/[*_#>\[\]()`]+/', '', (string)$this->beschreibung);
         foreach ($words as $word) {
@@ -334,8 +334,8 @@ class Verein extends ActiveRecord implements ViewableInterface
     public function getStatusLabel(): string
     {
         return match ($this->status) {
-            self::STATUS_OFFEN => $this->recherchiert_am ? 'aus öffentlichen Quellen' : 'noch nicht gepflegt',
-            self::STATUS_VORGESCHLAGEN => 'wartet auf Freigabe',
+            self::STATUS_OFFEN => $this->recherchiert_am ? Yii::t('VereineModule.base', 'aus öffentlichen Quellen') : Yii::t('VereineModule.base', 'noch nicht gepflegt'),
+            self::STATUS_VORGESCHLAGEN => Yii::t('VereineModule.base', 'wartet auf Freigabe'),
             default => '',
         };
     }

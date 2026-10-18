@@ -4,6 +4,7 @@ namespace humhub\modules\maengelmelder;
 
 use humhub\modules\content\components\ContentContainerModule;
 use humhub\modules\space\models\Space;
+use Yii;
 
 class Module extends ContentContainerModule
 {
@@ -19,6 +20,7 @@ class Module extends ContentContainerModule
     /** Umkreis in Metern, in dem beim Melden offene Meldungen angezeigt werden */
     public int $nearRadius = 75;
 
+    /** Gespeichert (Beitragstext, URL, KI-Assistent) werden immer diese deutschen Werte; Anzeige über kategorieLabel() */
     public array $categories = [
         'Straße / Gehweg',
         'Straßenbeleuchtung',
@@ -90,12 +92,18 @@ class Module extends ContentContainerModule
 
     public function getContentContainerName($container)
     {
-        return 'Mängelmelder-Karte';
+        return Yii::t('MaengelmelderModule.base', 'Mängelmelder-Karte');
     }
 
     public function getContentContainerDescription($container)
     {
-        return 'Mängel mit Ort auf der Karte melden und alle Meldungen auf einer Karte anzeigen.';
+        return Yii::t('MaengelmelderModule.base', 'Mängel mit Ort auf der Karte melden und alle Meldungen auf einer Karte anzeigen.');
+    }
+
+    /** Angezeigte (übersetzte) Bezeichnung einer Kategorie; der gespeicherte Wert bleibt deutsch */
+    public function kategorieLabel(string $kategorie): string
+    {
+        return Yii::t('MaengelmelderModule.base', $kategorie);
     }
 
     /** Globales Recht „Mängelstatus bearbeiten“ (an Gruppen vergeben) */

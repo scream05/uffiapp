@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'Notdienste' => 'خدمات الطوارئ',
+    'Notrufnummern' => 'أرقام الطوارئ',
+    'Notruf (Rettungsdienst, Feuerwehr)' => 'الطوارئ (الإسعاف، الإطفاء)',
+    'Lebensgefahr, Unfall, Brand – auch ohne Guthaben/SIM' => 'خطر على الحياة، حادث، حريق – حتى بدون رصيد/شريحة',
+    'Polizei' => 'الشرطة',
+    'Ärztlicher Bereitschaftsdienst' => 'الخدمة الطبية المناوبة',
+    'außerhalb der Sprechzeiten, wenn es nicht lebensbedrohlich ist' => 'خارج ساعات العيادة، إذا لم تكن الحالة خطيرة على الحياة',
+    'Giftnotruf München' => 'مركز السموم في ميونخ',
+    'bei Vergiftungen, rund um die Uhr' => 'في حالات التسمم، على مدار الساعة',
+    'Zahnärztlicher Notdienst' => 'طوارئ الأسنان',
+    '<strong>Apotheken-Notdienst</strong> rund um Uffenheim' => '<strong>الصيدلية المناوبة</strong> حول أوفنهايم',
+    'Die Notdienstdaten sind gerade nicht aktuell. Bitte nutze die {link}.' => 'بيانات الصيدليات المناوبة غير محدثة حاليًا. يرجى استخدام {link}.',
+    'Notdienstsuche der Landesapothekerkammer' => 'بحث غرفة الصيادلة البافارية',
+    'Jetzt' => 'الآن',
+    'Danach' => 'بعد ذلك',
+    'Anschließend' => 'ثم',
+    '{von} bis {bis}' => '{von} حتى {bis}',
+    'Entfernung über die Straße ab Uffenheim. Vor dem Losfahren am besten kurz anrufen.' => 'المسافة بالطريق من أوفنهايم. يُفضل الاتصال قبل الانطلاق.',
+    'Weitere Tage und andere Orte: {link}.' => 'أيام وأماكن أخرى: {link}.',
+    'Notdienstsuche der Kammer' => 'بحث الغرفة',
+    'Stand: {zeit}.' => 'حتى تاريخ: {zeit}.',
+    'Notruf' => 'الطوارئ',
+    'Apotheken-Notdienst bis {zeit}:' => 'الصيدلية المناوبة حتى {zeit}:',
+    'Alle Notdienste' => 'جميع خدمات الطوارئ',
+];

@@ -16,13 +16,13 @@ $filtered = trim($q) !== '' || $kategorie !== '' || $ortsteil !== '';
 ?>
 <?php if ($mine): ?>
 <div class="panel panel-default">
-    <div class="panel-heading"><strong>Meine Vereine</strong></div>
+    <div class="panel-heading"><strong><?= Yii::t('VereineModule.base', 'Meine Vereine') ?></strong></div>
     <div class="panel-body">
         <?php foreach ($mine as $v): ?>
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
                 <?= $this->render('_logo', ['verein' => $v, 'size' => 32]) ?>
                 <span style="flex:1"><?= Html::a(Html::encode($v->name), $v->getUrl()) ?></span>
-                <?= Html::a('<i class="fa fa-calendar-plus-o"></i> Termin eintragen', $space->createUrl('/vereine/termin/create', ['verein' => $v->id]), ['class' => 'btn btn-sm btn-primary']) ?>
+                <?= Html::a('<i class="fa fa-calendar-plus-o"></i> ' . Yii::t('VereineModule.base', 'Termin eintragen'), $space->createUrl('/vereine/termin/create', ['verein' => $v->id]), ['class' => 'btn btn-sm btn-primary']) ?>
             </div>
         <?php endforeach ?>
     </div>
@@ -30,24 +30,23 @@ $filtered = trim($q) !== '' || $kategorie !== '' || $ortsteil !== '';
 <?php endif ?>
 
 <div class="panel panel-default">
-    <div class="panel-heading"><strong>Vereinsverzeichnis</strong></div>
+    <div class="panel-heading"><strong><?= Yii::t('VereineModule.base', 'Vereinsverzeichnis') ?></strong></div>
     <div class="panel-body">
-        <p class="help-block">Vereine, Gruppen und Initiativen in Uffenheim und den Ortsteilen. Ihre Termine stehen im gemeinsamen Kalender
-            unter „Veranstaltungen“. Du bist im Vorstand eines Vereins? Öffne die Seite deines Vereins und frag dort an, ob du ihn verwalten darfst.</p>
+        <p class="help-block"><?= Yii::t('VereineModule.base', 'Vereine, Gruppen und Initiativen in Uffenheim und den Ortsteilen. Ihre Termine stehen im gemeinsamen Kalender unter „Veranstaltungen“. Du bist im Vorstand eines Vereins? Öffne die Seite deines Vereins und frag dort an, ob du ihn verwalten darfst.') ?></p>
         <?= Html::beginForm($space->createUrl('/vereine/verein/index'), 'get', ['class' => 'verein-filter', 'style' => 'display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px']) ?>
             <?= Html::hiddenInput('cguid', $space->guid) ?>
-            <?= Html::textInput('q', $q, ['class' => 'form-control', 'placeholder' => 'Suchen …', 'style' => 'flex:2 1 180px', 'aria-label' => 'Suchen']) ?>
-            <?= Html::dropDownList('kategorie', $kategorie, array_combine($module->categories, $module->categories),
-                ['class' => 'form-control', 'prompt' => 'Alle Kategorien', 'style' => 'flex:1 1 150px', 'aria-label' => 'Kategorie']) ?>
-            <?= Html::dropDownList('ortsteil', $ortsteil, array_combine($module->ortsteile, $module->ortsteile),
-                ['class' => 'form-control', 'prompt' => 'Alle Orte', 'style' => 'flex:1 1 130px', 'aria-label' => 'Ort']) ?>
-            <button type="submit" class="btn btn-light"><i class="fa fa-search"></i> Filtern</button>
+            <?= Html::textInput('q', $q, ['class' => 'form-control', 'placeholder' => Yii::t('VereineModule.base', 'Suchen …'), 'style' => 'flex:2 1 180px', 'aria-label' => Yii::t('VereineModule.base', 'Suchen')]) ?>
+            <?= Html::dropDownList('kategorie', $kategorie, array_combine($module->categories, array_map([$module, 'kategorieLabel'], $module->categories)),
+                ['class' => 'form-control', 'prompt' => Yii::t('VereineModule.base', 'Alle Kategorien'), 'style' => 'flex:1 1 150px', 'aria-label' => Yii::t('VereineModule.base', 'Kategorie')]) ?>
+            <?= Html::dropDownList('ortsteil', $ortsteil, array_combine($module->ortsteile, array_map([$module, 'ortLabel'], $module->ortsteile)),
+                ['class' => 'form-control', 'prompt' => Yii::t('VereineModule.base', 'Alle Orte'), 'style' => 'flex:1 1 130px', 'aria-label' => Yii::t('VereineModule.base', 'Ort')]) ?>
+            <button type="submit" class="btn btn-light"><i class="fa fa-search"></i> <?= Yii::t('VereineModule.base', 'Filtern') ?></button>
             <?php if ($filtered): ?>
-                <?= Html::a('Zurücksetzen', $space->createUrl('/vereine/verein/index'), ['class' => 'btn btn-link']) ?>
+                <?= Html::a(Yii::t('VereineModule.base', 'Zurücksetzen'), $space->createUrl('/vereine/verein/index'), ['class' => 'btn btn-link']) ?>
             <?php endif ?>
         <?= Html::endForm() ?>
 
-        <p class="text-muted"><?= count($vereine) ?> <?= count($vereine) === 1 ? 'Eintrag' : 'Einträge' ?></p>
+        <p class="text-muted"><?= Yii::t('VereineModule.base', '{n, plural, =1{# Eintrag} other{# Einträge}}', ['n' => count($vereine)]) ?></p>
         <style <?= Html::nonce() ?>>
             /* HumHub macht unter 992 px jede .list-group waagerecht scrollbar (gedacht fürs Space-Menü) – hier senkrecht lassen */
             .verein-liste.list-group { flex-direction: column; overflow-x: visible; margin-left: 0; gap: 0; }
@@ -68,9 +67,9 @@ $filtered = trim($q) !== '' || $kategorie !== '' || $ortsteil !== '';
                     <?= $this->render('_logo', ['verein' => $v, 'size' => 44]) ?>
                     <span style="flex:1;min-width:0">
                         <strong style="display:block"><?= Html::encode($v->name) ?></strong>
-                        <small class="text-muted"><?= Html::encode($v->kategorie) ?> · <?= Html::encode($v->ortsteil) ?></small>
+                        <small class="text-muted"><?= Html::encode($module->kategorieLabel($v->kategorie)) ?> · <?= Html::encode($module->ortLabel($v->ortsteil)) ?></small>
                         <?php if (isset($verwalter[$v->id])): ?>
-                            <small class="text-muted" style="display:block"><i class="fa fa-user"></i> Verwalter: <?= Html::encode($verwalter[$v->id]) ?></small>
+                            <small class="text-muted" style="display:block"><i class="fa fa-user"></i> <?= Yii::t('VereineModule.base', 'Verwalter') ?>: <?= Html::encode($verwalter[$v->id]) ?></small>
                         <?php endif ?>
                         <?php if ($label): ?>
                             <small class="text-muted verein-status-zeile"><?= Html::encode($label) ?></small>
@@ -83,8 +82,8 @@ $filtered = trim($q) !== '' || $kategorie !== '' || $ortsteil !== '';
             <?php endforeach ?>
         </div>
         <?php if (!$vereine): ?>
-            <p>Nichts gefunden.</p>
+            <p><?= Yii::t('VereineModule.base', 'Nichts gefunden.') ?></p>
         <?php endif ?>
-        <p style="margin-top:12px">Dein Verein fehlt? <?= Html::a('Verein vorschlagen', $space->createUrl('/vereine/verein/create')) ?></p>
+        <p style="margin-top:12px"><?= Yii::t('VereineModule.base', 'Dein Verein fehlt?') ?> <?= Html::a(Yii::t('VereineModule.base', 'Verein vorschlagen'), $space->createUrl('/vereine/verein/create')) ?></p>
     </div>
 </div>

@@ -49,14 +49,14 @@ class BetriebBeitrag extends ActiveRecord implements ViewableInterface
     {
         return [
             ['text', 'trim'],
-            ['text', 'required', 'message' => 'Bitte einen Text schreiben.'],
+            ['text', 'required', 'message' => Yii::t('GewerbeModule.base', 'Bitte einen Text schreiben.')],
             ['text', 'string', 'min' => 10, 'max' => 5000],
         ];
     }
 
     public function attributeLabels()
     {
-        return ['text' => 'Text'];
+        return ['text' => Yii::t('GewerbeModule.base', 'Text')];
     }
 
     public function beforeSave($insert)
@@ -109,9 +109,9 @@ class BetriebBeitrag extends ActiveRecord implements ViewableInterface
     public function getStatusLabel(): string
     {
         return match ($this->status) {
-            self::STATUS_EINGEREICHT => 'wartet auf Prüfung',
-            self::STATUS_ABGELEHNT => 'abgelehnt',
-            default => 'veröffentlicht',
+            self::STATUS_EINGEREICHT => Yii::t('GewerbeModule.base', 'wartet auf Prüfung'),
+            self::STATUS_ABGELEHNT => Yii::t('GewerbeModule.base', 'abgelehnt'),
+            default => Yii::t('GewerbeModule.base', 'veröffentlicht'),
         };
     }
 

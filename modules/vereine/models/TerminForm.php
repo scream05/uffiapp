@@ -8,6 +8,7 @@ use humhub\modules\calendar\helpers\CalendarUtils;
 use humhub\modules\calendar\models\CalendarEntry;
 use humhub\modules\calendar\models\CalendarEntryType;
 use humhub\modules\space\models\Space;
+use Yii;
 use yii\base\Model;
 
 /**
@@ -58,8 +59,8 @@ class TerminForm extends Model
             ['ort', 'string', 'max' => 255],
             ['beschreibung', 'string', 'max' => 20000],
             [['start_datum', 'ende_datum'], 'date', 'format' => 'php:Y-m-d'],
-            [['start_zeit', 'ende_zeit'], 'match', 'pattern' => '/^\d{1,2}:\d{2}$/', 'message' => 'Bitte als hh:mm angeben.'],
-            ['start_zeit', 'required', 'when' => fn() => !$this->ganztaegig, 'message' => 'Bitte eine Uhrzeit angeben oder „ganztägig“ wählen.'],
+            [['start_zeit', 'ende_zeit'], 'match', 'pattern' => '/^\d{1,2}:\d{2}$/', 'message' => Yii::t('VereineModule.base', 'Bitte als hh:mm angeben.')],
+            ['start_zeit', 'required', 'when' => fn() => !$this->ganztaegig, 'message' => Yii::t('VereineModule.base', 'Bitte eine Uhrzeit angeben oder „ganztägig“ wählen.')],
             [['ganztaegig', 'trotzdem'], 'boolean'],
             ['ende_datum', 'validateEnd', 'skipOnEmpty' => false],
         ];
@@ -68,14 +69,14 @@ class TerminForm extends Model
     public function attributeLabels()
     {
         return [
-            'titel' => 'Titel',
-            'start_datum' => 'Datum',
-            'start_zeit' => 'Beginn',
-            'ende_datum' => 'Ende (Datum)',
-            'ende_zeit' => 'Ende (Uhrzeit)',
-            'ganztaegig' => 'ganztägig',
-            'ort' => 'Ort',
-            'beschreibung' => 'Beschreibung',
+            'titel' => Yii::t('VereineModule.base', 'Titel'),
+            'start_datum' => Yii::t('VereineModule.base', 'Datum'),
+            'start_zeit' => Yii::t('VereineModule.base', 'Beginn'),
+            'ende_datum' => Yii::t('VereineModule.base', 'Ende (Datum)'),
+            'ende_zeit' => Yii::t('VereineModule.base', 'Ende (Uhrzeit)'),
+            'ganztaegig' => Yii::t('VereineModule.base', 'ganztägig'),
+            'ort' => Yii::t('VereineModule.base', 'Ort'),
+            'beschreibung' => Yii::t('VereineModule.base', 'Beschreibung'),
         ];
     }
 
@@ -83,7 +84,7 @@ class TerminForm extends Model
     {
         [$start, $end] = $this->range();
         if ($start && $end && $end <= $start) {
-            $this->addError('ende_datum', 'Das Ende muss nach dem Beginn liegen.');
+            $this->addError('ende_datum', Yii::t('VereineModule.base', 'Das Ende muss nach dem Beginn liegen.'));
         }
     }
 

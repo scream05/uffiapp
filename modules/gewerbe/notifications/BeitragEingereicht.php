@@ -4,6 +4,7 @@ namespace humhub\modules\gewerbe\notifications;
 
 use humhub\helpers\Html;
 use humhub\modules\notification\components\BaseNotification;
+use Yii;
 use humhub\modules\gewerbe\models\BetriebBeitrag;
 
 /**
@@ -29,7 +30,8 @@ class BeitragEingereicht extends BaseNotification
 
     public function html()
     {
-        return Html::tag('strong', Html::encode($this->originator->displayName)) . ' hat einen Beitrag für '
-            . Html::tag('strong', Html::encode($this->source->betrieb->name)) . ' zur Prüfung eingereicht.';
+        return Yii::t('GewerbeModule.base', '{name} hat einen Beitrag für {betrieb} zur Prüfung eingereicht.', [
+            'name' => Html::tag('strong', Html::encode($this->originator->displayName)),
+            'betrieb' => Html::tag('strong', Html::encode($this->source->betrieb->name))]);
     }
 }

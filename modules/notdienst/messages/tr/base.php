@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'Notdienste' => 'Acil servisler',
+    'Notrufnummern' => 'Acil numaralar',
+    'Notruf (Rettungsdienst, Feuerwehr)' => 'Acil çağrı (ambulans, itfaiye)',
+    'Lebensgefahr, Unfall, Brand – auch ohne Guthaben/SIM' => 'Hayati tehlike, kaza, yangın – kontörsüz/SIM kartsız da',
+    'Polizei' => 'Polis',
+    'Ärztlicher Bereitschaftsdienst' => 'Nöbetçi doktor hizmeti',
+    'außerhalb der Sprechzeiten, wenn es nicht lebensbedrohlich ist' => 'muayene saatleri dışında, hayati tehlike yoksa',
+    'Giftnotruf München' => 'Münih Zehir Danışma Merkezi',
+    'bei Vergiftungen, rund um die Uhr' => 'zehirlenmelerde, 7/24',
+    'Zahnärztlicher Notdienst' => 'Nöbetçi diş hekimi',
+    '<strong>Apotheken-Notdienst</strong> rund um Uffenheim' => 'Uffenheim çevresinde <strong>nöbetçi eczane</strong>',
+    'Die Notdienstdaten sind gerade nicht aktuell. Bitte nutze die {link}.' => 'Nöbetçi eczane verileri şu anda güncel değil. Lütfen {link} kullanın.',
+    'Notdienstsuche der Landesapothekerkammer' => 'Bavyera Eczacılar Odası aramasını',
+    'Jetzt' => 'Şimdi',
+    'Danach' => 'Sonra',
+    'Anschließend' => 'Ardından',
+    '{von} bis {bis}' => '{von} – {bis}',
+    'Entfernung über die Straße ab Uffenheim. Vor dem Losfahren am besten kurz anrufen.' => 'Uffenheim\'dan karayolu mesafesi. Yola çıkmadan önce aramanız önerilir.',
+    'Weitere Tage und andere Orte: {link}.' => 'Diğer günler ve yerler: {link}.',
+    'Notdienstsuche der Kammer' => 'Oda aramasını',
+    'Stand: {zeit}.' => 'Güncelleme: {zeit}.',
+    'Notruf' => 'Acil çağrı',
+    'Apotheken-Notdienst bis {zeit}:' => 'Nöbetçi eczane ({zeit} saatine kadar):',
+    'Alle Notdienste' => 'Tüm acil servisler',
+];

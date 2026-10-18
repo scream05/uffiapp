@@ -23,7 +23,7 @@ $gast = Yii::$app->user->isGuest;
 $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '';
 ?>
 <div class="panel panel-default">
-    <div class="panel-heading"><strong><?= $bearbeiten ? 'Meldung Nr. ' . $bearbeiten->getContentId() . ' bearbeiten' : 'Mangel melden' ?></strong>
+    <div class="panel-heading"><strong><?= $bearbeiten ? 'Meldung Nr. ' . $bearbeiten->getContentId() . ' bearbeiten' : Yii::t('MaengelmelderModule.base', 'Mangel melden') ?></strong>
         <?php if ($bearbeiten || Yii::$app->request->get('bauhof')): ?>
             <?= Html::a('<i class="fa fa-arrow-left"></i> Zurück zum Bauhof', $bearbeiten
                 ? $space->createUrl('/maengelmelder/bauhof/mangel', ['id' => $bearbeiten->getContentId()])
@@ -34,49 +34,44 @@ $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '
         <?php if ($danke !== null): ?>
             <?php $nr = (int)$danke; $req = Yii::$app->request ?>
             <div class="alert alert-success" role="status">
-                <strong>Vielen Dank<?= $nr ? ", deine Meldung Nr. $nr ist eingegangen" : ', deine Meldung ist eingegangen' ?>.</strong><br>
+                <strong><?= $nr ? Yii::t('MaengelmelderModule.base', 'Vielen Dank, deine Meldung Nr. {nr} ist eingegangen.', ['nr' => $nr]) : Yii::t('MaengelmelderModule.base', 'Vielen Dank, deine Meldung ist eingegangen.') ?></strong><br>
                 <?php if ($gast): ?>
-                    Der Bauhof prüft sie und schaltet sie danach auf der Karte frei. Bei Rückfragen meldet er sich über die angegebenen Kontaktdaten.
+                    <?= Yii::t('MaengelmelderModule.base', 'Der Bauhof prüft sie und schaltet sie danach auf der Karte frei. Bei Rückfragen meldet er sich über die angegebenen Kontaktdaten.') ?>
                 <?php else: ?>
-                    <?= Html::a('Zur Meldung', ['/content/perma', 'id' => $nr]) ?>
+                    <?= Html::a(Yii::t('MaengelmelderModule.base', 'Zur Meldung'), ['/content/perma', 'id' => $nr]) ?>
                 <?php endif ?>
             </div>
             <?php if ($nr && $req->get('mail')): ?>
-                <div class="alert alert-info" role="status"><i class="fa fa-envelope-o"></i> Wir haben dir eine E-Mail geschickt.
-                    Bitte bestätige darin deine Adresse – erst dann bekommst du Infos und Rückfragen per E-Mail.</div>
+                <div class="alert alert-info" role="status"><i class="fa fa-envelope-o"></i> <?= Yii::t('MaengelmelderModule.base', 'Wir haben dir eine E-Mail geschickt. Bitte bestätige darin deine Adresse – erst dann bekommst du Infos und Rückfragen per E-Mail.') ?></div>
             <?php endif ?>
             <?php if ($nr && $req->get('wa') && $module->buergerWhatsappAktiv()): ?>
                 <div class="alert alert-info">
-                    <strong><i class="fa fa-whatsapp"></i> Noch ein Schritt für WhatsApp-Infos:</strong>
-                    Schick uns „START <?= $nr ?>“ von der angegebenen Handynummer. Erst dann schreiben wir dir per WhatsApp.<br>
+                    <strong><i class="fa fa-whatsapp"></i> <?= Yii::t('MaengelmelderModule.base', 'Noch ein Schritt für WhatsApp-Infos:') ?></strong>
+                    <?= Yii::t('MaengelmelderModule.base', 'Schick uns „START {nr}“ von der angegebenen Handynummer. Erst dann schreiben wir dir per WhatsApp.', ['nr' => $nr]) ?><br>
                     <?php // Die HumHub-App öffnet wa.me-Links in ihrem eigenen Browser; whatsapp:// gibt sie direkt an WhatsApp weiter
                     $inApp = \humhub\helpers\DeviceDetectorHelper::isAppRequest(); ?>
-                    <?= Html::a('<i class="fa fa-whatsapp"></i> WhatsApp-Infos einschalten',
+                    <?= Html::a('<i class="fa fa-whatsapp"></i> ' . Yii::t('MaengelmelderModule.base', 'WhatsApp-Infos einschalten'),
                         ($inApp ? 'whatsapp://send?phone=' : 'https://wa.me/') . $module->whatsappNummer
                             . ($inApp ? '&text=' : '?text=') . rawurlencode("START $nr"),
                         ['class' => 'btn btn-success btn-sm', 'style' => 'margin-top:8px', 'data-pjax-prevent' => 1]
                             + ($inApp ? [] : ['target' => '_blank', 'rel' => 'noopener'])) ?>
-                    <small class="d-block text-muted" style="margin-top:6px">Am Computer: Nachricht „START <?= $nr ?>“ an
-                        +<?= Html::encode(preg_replace('/^49(\d{3})(\d+)$/', '49 $1 $2', $module->whatsappNummer)) ?> schicken.</small>
+                    <small class="d-block text-muted" style="margin-top:6px"><?= Yii::t('MaengelmelderModule.base', 'Am Computer: Nachricht „START {nr}“ an {nummer} schicken.', ['nr' => $nr,
+                        'nummer' => '+' . Html::encode(preg_replace('/^49(\d{3})(\d+)$/', '49 $1 $2', $module->whatsappNummer))]) ?></small>
                 </div>
             <?php endif ?>
         <?php endif ?>
         <?php if (!$canPost && $gast): ?>
-            <div class="alert alert-info">Um einen Mangel zu melden, melde dich bitte an oder leg ein kostenloses Konto an.
-                <?= Html::a('Anmelden', ['/user/auth/login'], ['class' => 'alert-link', 'data-pjax-prevent' => 1]) ?></div>
+            <div class="alert alert-info"><?= Yii::t('MaengelmelderModule.base', 'Um einen Mangel zu melden, melde dich bitte an oder leg ein kostenloses Konto an.') ?>
+                <?= Html::a(Yii::t('MaengelmelderModule.base', 'Anmelden'), ['/user/auth/login'], ['class' => 'alert-link', 'data-pjax-prevent' => 1]) ?></div>
         <?php elseif (!$canPost): ?>
-            <div class="alert alert-info">Um einen Mangel zu melden, tritt bitte zuerst dem Bereich „<?= Html::encode($space->name) ?>“ bei.</div>
+            <div class="alert alert-info"><?= Yii::t('MaengelmelderModule.base', 'Um einen Mangel zu melden, tritt bitte zuerst dem Bereich „{bereich}“ bei.', ['bereich' => Html::encode($space->name)]) ?></div>
         <?php else: ?>
             <?php if ($bearbeiten): ?>
             <p class="help-block">Änderungen erscheinen direkt im Beitrag. Neue Fotos werden hinzugefügt; vorhandene bleiben.</p>
             <?php elseif ($gast): ?>
-            <p class="help-block">Schlagloch, defekte Laterne, wilder Müll? Beschreib den Mangel, markier den Ort auf der Karte
-                und füg gern ein Foto hinzu. Du brauchst dafür kein Konto: Der Bauhof prüft deine Meldung und schaltet sie
-                danach auf der Karte frei. Bitte keine Personen oder Kfz-Kennzeichen erkennbar fotografieren.</p>
+            <p class="help-block"><?= Yii::t('MaengelmelderModule.base', 'Schlagloch, defekte Laterne, wilder Müll? Beschreib den Mangel, markier den Ort auf der Karte und füg gern ein Foto hinzu. Du brauchst dafür kein Konto: Der Bauhof prüft deine Meldung und schaltet sie danach auf der Karte frei. Bitte keine Personen oder Kfz-Kennzeichen erkennbar fotografieren.') ?></p>
             <?php else: ?>
-            <p class="help-block">Schlagloch, defekte Laterne, wilder Müll? Beschreib den Mangel, markier den Ort auf der Karte
-                und füg gern ein Foto hinzu. Die Meldung erscheint als Beitrag in diesem Bereich.
-                Bitte keine Personen oder Kfz-Kennzeichen erkennbar fotografieren.</p>
+            <p class="help-block"><?= Yii::t('MaengelmelderModule.base', 'Schlagloch, defekte Laterne, wilder Müll? Beschreib den Mangel, markier den Ort auf der Karte und füg gern ein Foto hinzu. Die Meldung erscheint als Beitrag in diesem Bereich. Bitte keine Personen oder Kfz-Kennzeichen erkennbar fotografieren.') ?></p>
             <?php endif ?>
             <?php if ($errors): ?>
                 <div class="alert alert-danger"><?= implode('<br>', array_map([Html::class, 'encode'], $errors)) ?></div>
@@ -84,27 +79,28 @@ $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '
 
             <?= Html::beginForm('', 'post', ['id' => 'maengel-form'] + ($gast ? ['enctype' => 'multipart/form-data'] : [])) ?>
             <div class="form-group">
-                <label for="maengel-kategorie">Kategorie</label>
-                <?= Html::dropDownList('Meldung[kategorie]', $data['kategorie'], array_combine($module->categories, $module->categories),
-                    ['id' => 'maengel-kategorie', 'class' => 'form-control', 'prompt' => 'Bitte wählen …', 'required' => true]) ?>
+                <label for="maengel-kategorie"><?= Yii::t('MaengelmelderModule.base', 'Kategorie') ?></label>
+                <?php // Gespeichert wird der deutsche Wert (Beitragstext, KI-Assistent), angezeigt die Übersetzung ?>
+                <?= Html::dropDownList('Meldung[kategorie]', $data['kategorie'], array_combine($module->categories, array_map([$module, 'kategorieLabel'], $module->categories)),
+                    ['id' => 'maengel-kategorie', 'class' => 'form-control', 'prompt' => Yii::t('MaengelmelderModule.base', 'Bitte wählen …'), 'required' => true]) ?>
             </div>
             <div class="form-group">
-                <label for="maengel-beschreibung">Was ist kaputt?</label>
+                <label for="maengel-beschreibung"><?= Yii::t('MaengelmelderModule.base', 'Was ist kaputt?') ?></label>
                 <?= Html::textarea('Meldung[beschreibung]', $data['beschreibung'],
                     ['id' => 'maengel-beschreibung', 'class' => 'form-control', 'rows' => 4, 'maxlength' => 3000, 'required' => true,
-                        'placeholder' => 'z. B. Tiefes Schlagloch am Fahrbahnrand, ca. 30 cm breit']) ?>
+                        'placeholder' => Yii::t('MaengelmelderModule.base', 'z. B. Tiefes Schlagloch am Fahrbahnrand, ca. 30 cm breit')]) ?>
             </div>
             <div class="form-group">
-                <label for="maengel-adresse">Ort</label>
-                <p class="help-block" id="maengel-ort-hilfe" style="margin-top:0">Adresse eingeben und suchen, in die Karte tippen oder deinen Standort verwenden.</p>
+                <label for="maengel-adresse"><?= Yii::t('MaengelmelderModule.base', 'Ort') ?></label>
+                <p class="help-block" id="maengel-ort-hilfe" style="margin-top:0"><?= Yii::t('MaengelmelderModule.base', 'Adresse eingeben und suchen, in die Karte tippen oder deinen Standort verwenden.') ?></p>
                 <div class="maengel-adresse-zeile">
                     <input type="text" id="maengel-adresse" class="form-control" autocomplete="street-address"
-                           aria-describedby="maengel-ort-hilfe maengel-coords" placeholder="z. B. Hauptstraße 5">
-                    <button type="button" class="btn btn-light" id="maengel-suchen"><i class="fa fa-search" aria-hidden="true"></i> Ort suchen</button>
+                           aria-describedby="maengel-ort-hilfe maengel-coords" placeholder="<?= Html::encode(Yii::t('MaengelmelderModule.base', 'z. B. Hauptstraße 5')) ?>">
+                    <button type="button" class="btn btn-light" id="maengel-suchen"><i class="fa fa-search" aria-hidden="true"></i> <?= Yii::t('MaengelmelderModule.base', 'Ort suchen') ?></button>
                 </div>
-                <div id="maengel-map" style="height:380px;border-radius:4px;margin-top:8px" role="region" aria-label="Karte zum Markieren des Orts"></div>
+                <div id="maengel-map" style="height:380px;border-radius:4px;margin-top:8px" role="region" aria-label="<?= Html::encode(Yii::t('MaengelmelderModule.base', 'Karte zum Markieren des Orts')) ?>"></div>
                 <div style="margin-top:6px">
-                    <button type="button" class="btn btn-light btn-sm" id="maengel-locate"><i class="fa fa-crosshairs" aria-hidden="true"></i> Meinen Standort verwenden</button>
+                    <button type="button" class="btn btn-light btn-sm" id="maengel-locate"><i class="fa fa-crosshairs" aria-hidden="true"></i> <?= Yii::t('MaengelmelderModule.base', 'Meinen Standort verwenden') ?></button>
                     <span id="maengel-coords" class="text-muted" style="margin-left:8px" role="status" aria-live="polite"></span>
                 </div>
                 <div id="maengel-nahe" class="alert alert-warning" style="display:none;margin-top:10px"></div>
@@ -113,7 +109,7 @@ $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '
             </div>
             <?php if ($gast): ?>
             <div class="form-group">
-                <label for="maengel-fotos">Fotos <small class="text-muted">– freiwillig, höchstens <?= $module->gastFotos ?></small></label>
+                <label for="maengel-fotos"><?= Yii::t('MaengelmelderModule.base', 'Fotos') ?> <small class="text-muted"><?= Yii::t('MaengelmelderModule.base', '– freiwillig, höchstens {max}', ['max' => $module->gastFotos]) ?></small></label>
                 <input type="file" name="fotos[]" id="maengel-fotos" class="form-control" accept="image/*" multiple
                        data-max="<?= $module->gastFotos ?>" data-max-mb="<?= $module->gastFotoMaxMb ?>">
                 <small class="text-muted" id="maengel-fotos-hinweis"></small>
@@ -122,7 +118,7 @@ $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '
             <div class="form-group">
                 <?= UploadButton::widget([
                     'id' => 'maengel-upload',
-                    'label' => 'Foto hinzufügen',
+                    'label' => Yii::t('MaengelmelderModule.base', 'Foto hinzufügen'),
                     'tooltip' => false,
                     'cssButtonClass' => 'btn-light',
                     'progress' => '#maengel-progress',
@@ -137,62 +133,59 @@ $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '
 
             <?php if ($kontakt && $gast): ?>
             <fieldset class="maengel-kontakt">
-                <legend>Deine Kontaktdaten <small class="text-muted">– für Rückfragen des Bauhofs</small></legend>
-                <p class="help-block">Deine Angaben sehen nur die Bauhofleitung und die Administratoren dieser Plattform, nicht die Öffentlichkeit.
-                    Sie werden nur für Rückfragen zu dieser Meldung verwendet und <?= round($module->kontaktAufbewahrungTage / 30) ?> Monate
-                    nach ihrer Erledigung gelöscht.</p>
+                <legend><?= Yii::t('MaengelmelderModule.base', 'Deine Kontaktdaten') ?> <small class="text-muted"><?= Yii::t('MaengelmelderModule.base', '– für Rückfragen des Bauhofs') ?></small></legend>
+                <p class="help-block"><?= Yii::t('MaengelmelderModule.base', 'Deine Angaben sehen nur die Bauhofleitung und die Administratoren dieser Plattform, nicht die Öffentlichkeit. Sie werden nur für Rückfragen zu dieser Meldung verwendet und {monate} Monate nach ihrer Erledigung gelöscht.', ['monate' => round($module->kontaktAufbewahrungTage / 30)]) ?></p>
                 <div class="row">
                     <div class="col-sm-6 form-group">
-                        <label for="kontakt-vorname">Vorname</label>
+                        <label for="kontakt-vorname"><?= Yii::t('MaengelmelderModule.base', 'Vorname') ?></label>
                         <?= Html::activeTextInput($kontakt, 'vorname', ['id' => 'kontakt-vorname', 'class' => 'form-control' . $feld('vorname'),
                             'required' => true, 'maxlength' => 60, 'autocomplete' => 'given-name']) ?>
                     </div>
                     <div class="col-sm-6 form-group">
-                        <label for="kontakt-nachname">Nachname</label>
+                        <label for="kontakt-nachname"><?= Yii::t('MaengelmelderModule.base', 'Nachname') ?></label>
                         <?= Html::activeTextInput($kontakt, 'nachname', ['id' => 'kontakt-nachname', 'class' => 'form-control' . $feld('nachname'),
                             'required' => true, 'maxlength' => 60, 'autocomplete' => 'family-name']) ?>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-sm-6 form-group">
-                        <label for="kontakt-email">E-Mail</label>
+                        <label for="kontakt-email"><?= Yii::t('MaengelmelderModule.base', 'E-Mail') ?></label>
                         <?= Html::activeInput('email', $kontakt, 'email', ['id' => 'kontakt-email', 'class' => 'form-control' . $feld('email'),
                             'maxlength' => 150, 'autocomplete' => 'email']) ?>
                     </div>
                     <div class="col-sm-6 form-group">
-                        <label for="kontakt-telefon">Telefon</label>
+                        <label for="kontakt-telefon"><?= Yii::t('MaengelmelderModule.base', 'Telefon') ?></label>
                         <?= Html::activeInput('tel', $kontakt, 'telefon', ['id' => 'kontakt-telefon', 'class' => 'form-control' . $feld('telefon'),
                             'maxlength' => 30, 'autocomplete' => 'tel']) ?>
                     </div>
                 </div>
-                <p class="help-block">Bitte mindestens E-Mail oder Telefon angeben.</p>
+                <p class="help-block"><?= Yii::t('MaengelmelderModule.base', 'Bitte mindestens E-Mail oder Telefon angeben.') ?></p>
                 <?php if ($module->buergerInfoAktiv()): ?>
                 <div class="form-group maengel-info">
-                    <label>Über den Bearbeitungsstand informieren <small class="text-muted">– freiwillig, bei jeder Statusänderung</small></label>
+                    <label><?= Yii::t('MaengelmelderModule.base', 'Über den Bearbeitungsstand informieren') ?> <small class="text-muted"><?= Yii::t('MaengelmelderModule.base', '– freiwillig, bei jeder Statusänderung') ?></small></label>
                     <div class="form-check">
                         <?= Html::activeCheckbox($kontakt, 'info_mail', ['id' => 'kontakt-info-mail', 'class' => 'form-check-input' . $feld('info_mail'), 'label' => false]) ?>
-                        <label class="form-check-label" for="kontakt-info-mail">per E-Mail<?= $gast ? '' : ' (' . Html::encode(Yii::$app->user->getIdentity()->email) . ')' ?></label>
+                        <label class="form-check-label" for="kontakt-info-mail"><?= Yii::t('MaengelmelderModule.base', 'per E-Mail') ?><?= $gast ? '' : ' (' . Html::encode(Yii::$app->user->getIdentity()->email) . ')' ?></label>
                     </div>
                     <?php if ($module->buergerWhatsappAktiv()): ?>
                     <div class="form-check">
                         <?= Html::activeCheckbox($kontakt, 'info_whatsapp', ['id' => 'kontakt-info-whatsapp', 'class' => 'form-check-input' . $feld('info_whatsapp'), 'label' => false]) ?>
-                        <label class="form-check-label" for="kontakt-info-whatsapp">per WhatsApp an meine Handynummer
-                            <small class="text-muted">– danach schickst du uns einmal „START“ per WhatsApp; antworten geht auch, Abbestellen mit STOPP.</small></label>
+                        <label class="form-check-label" for="kontakt-info-whatsapp"><?= Yii::t('MaengelmelderModule.base', 'per WhatsApp an meine Handynummer') ?>
+                            <small class="text-muted"><?= Yii::t('MaengelmelderModule.base', '– danach schickst du uns einmal „START“ per WhatsApp; antworten geht auch, Abbestellen mit STOPP.') ?></small></label>
                     </div>
                     <?php endif ?>
                 </div>
                 <?php endif ?>
 
                 <div class="maengel-feld-website" aria-hidden="true">
-                    <label for="kontakt-website">Website (bitte leer lassen)</label>
+                    <label for="kontakt-website"><?= Yii::t('MaengelmelderModule.base', 'Website (bitte leer lassen)') ?></label>
                     <?= Html::activeTextInput($kontakt, 'website', ['id' => 'kontakt-website', 'tabindex' => -1, 'autocomplete' => 'off']) ?>
                 </div>
                 <div class="form-check form-group">
                     <?= Html::activeCheckbox($kontakt, 'datenschutz', ['id' => 'kontakt-datenschutz', 'class' => 'form-check-input' . $feld('datenschutz'),
                         'label' => false, 'uncheck' => '0', 'required' => true]) ?>
-                    <label class="form-check-label" for="kontakt-datenschutz">Ich bin einverstanden, dass meine Angaben zur Bearbeitung dieser
-                        Meldung gespeichert werden. Einzelheiten in der
-                        <?= Html::a('Datenschutzerklärung', Url::to(['/legal/page/view', 'pageKey' => 'privacy']), ['target' => '_blank', 'rel' => 'noopener']) ?>.</label>
+                    <label class="form-check-label" for="kontakt-datenschutz"><?= Yii::t('MaengelmelderModule.base', 'Ich bin einverstanden, dass meine Angaben zur Bearbeitung dieser Meldung gespeichert werden. Einzelheiten in der {link}.', [
+                        'link' => Html::a(Yii::t('MaengelmelderModule.base', 'Datenschutzerklärung'), Url::to(['/legal/page/view', 'pageKey' => 'privacy']), ['target' => '_blank', 'rel' => 'noopener'])]) ?></label>
                 </div>
                 <div class="form-group">
                     <?= CaptchaField::widget(['model' => $kontakt, 'attribute' => 'captcha']) ?>
@@ -201,27 +194,27 @@ $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '
             <?php elseif ($kontakt): ?>
             <?php $ich = Yii::$app->user->getIdentity() ?>
             <fieldset class="maengel-kontakt">
-                <legend>Deine Kontaktdaten <small class="text-muted">– für Rückfragen des Bauhofs</small></legend>
+                <legend><?= Yii::t('MaengelmelderModule.base', 'Deine Kontaktdaten') ?> <small class="text-muted"><?= Yii::t('MaengelmelderModule.base', '– für Rückfragen des Bauhofs') ?></small></legend>
                 <p style="margin-bottom:8px"><i class="fa fa-user"></i> <?= Html::encode($ich->displayName) ?>
                     &nbsp; <i class="fa fa-envelope-o"></i> <?= Html::encode($ich->email) ?></p>
                 <div class="form-group" style="max-width:360px">
-                    <label for="kontakt-telefon">Telefon <small class="text-muted">– freiwillig, für WhatsApp-Infos eine Handynummer</small></label>
+                    <label for="kontakt-telefon"><?= Yii::t('MaengelmelderModule.base', 'Telefon') ?> <small class="text-muted"><?= Yii::t('MaengelmelderModule.base', '– freiwillig, für WhatsApp-Infos eine Handynummer') ?></small></label>
                     <?= Html::activeInput('tel', $kontakt, 'telefon', ['id' => 'kontakt-telefon', 'class' => 'form-control' . $feld('telefon'),
                         'maxlength' => 30, 'autocomplete' => 'tel']) ?>
-                    <small class="text-muted">Nur für Rückfragen zu dieser Meldung; sieht nur der Bauhof.</small>
+                    <small class="text-muted"><?= Yii::t('MaengelmelderModule.base', 'Nur für Rückfragen zu dieser Meldung; sieht nur der Bauhof.') ?></small>
                 </div>
                 <?php if ($module->buergerInfoAktiv()): ?>
                 <div class="form-group maengel-info">
-                    <label>Über den Bearbeitungsstand informieren <small class="text-muted">– freiwillig, bei jeder Statusänderung</small></label>
+                    <label><?= Yii::t('MaengelmelderModule.base', 'Über den Bearbeitungsstand informieren') ?> <small class="text-muted"><?= Yii::t('MaengelmelderModule.base', '– freiwillig, bei jeder Statusänderung') ?></small></label>
                     <div class="form-check">
                         <?= Html::activeCheckbox($kontakt, 'info_mail', ['id' => 'kontakt-info-mail', 'class' => 'form-check-input' . $feld('info_mail'), 'label' => false]) ?>
-                        <label class="form-check-label" for="kontakt-info-mail">per E-Mail<?= $gast ? '' : ' (' . Html::encode(Yii::$app->user->getIdentity()->email) . ')' ?></label>
+                        <label class="form-check-label" for="kontakt-info-mail"><?= Yii::t('MaengelmelderModule.base', 'per E-Mail') ?><?= $gast ? '' : ' (' . Html::encode(Yii::$app->user->getIdentity()->email) . ')' ?></label>
                     </div>
                     <?php if ($module->buergerWhatsappAktiv()): ?>
                     <div class="form-check">
                         <?= Html::activeCheckbox($kontakt, 'info_whatsapp', ['id' => 'kontakt-info-whatsapp', 'class' => 'form-check-input' . $feld('info_whatsapp'), 'label' => false]) ?>
-                        <label class="form-check-label" for="kontakt-info-whatsapp">per WhatsApp an meine Handynummer (oben)
-                            <small class="text-muted">– danach schickst du uns einmal „START“ per WhatsApp; antworten geht auch, Abbestellen mit STOPP.</small></label>
+                        <label class="form-check-label" for="kontakt-info-whatsapp"><?= Yii::t('MaengelmelderModule.base', 'per WhatsApp an meine Handynummer (oben)') ?>
+                            <small class="text-muted"><?= Yii::t('MaengelmelderModule.base', '– danach schickst du uns einmal „START“ per WhatsApp; antworten geht auch, Abbestellen mit STOPP.') ?></small></label>
                     </div>
                     <?php endif ?>
                 </div>
@@ -229,7 +222,7 @@ $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '
 
             </fieldset>
             <?php endif ?>
-            <button type="submit" class="btn btn-primary"><?= $bearbeiten ? 'Speichern' : 'Meldung absenden' ?></button>
+            <button type="submit" class="btn btn-primary"><?= $bearbeiten ? 'Speichern' : Yii::t('MaengelmelderModule.base', 'Meldung absenden') ?></button>
             <?= Html::endForm() ?>
         <?php endif ?>
     </div>
@@ -259,10 +252,42 @@ maengelReady(function () {
     var naheUrl = <?= json_encode($space->createUrl('/maengelmelder/meldung/nahe')) ?>;
     var bearbeiten = <?= $bearbeiten ? 'true' : 'false' ?>, gast = <?= $gast ? 'true' : 'false' ?>;
     var fotos = document.getElementById('maengel-fotos');
+    // Übersetzte Texte (Platzhalter {name} ersetzt fmt)
+    var t = <?= json_encode([
+        'fotosMax' => Yii::t('MaengelmelderModule.base', 'Bitte höchstens {max} Fotos auswählen.'),
+        'fotoGross' => Yii::t('MaengelmelderModule.base', 'Ein Foto ist größer als {mb} MB.'),
+        'verkleinern' => Yii::t('MaengelmelderModule.base', 'Fotos werden verkleinert …'),
+        'naheTitel' => Yii::t('MaengelmelderModule.base', 'In der Nähe wurde schon etwas gemeldet.'),
+        'naheText' => Yii::t('MaengelmelderModule.base', 'Ist es derselbe Mangel? Dann schließ dich bitte an, statt ihn noch einmal zu melden.'),
+        'entfernt' => Yii::t('MaengelmelderModule.base', 'ca. {m} m entfernt'),
+        'gemeldet' => Yii::t('MaengelmelderModule.base', 'gemeldet {datum}'),
+        'weitere' => Yii::t('MaengelmelderModule.base', '{n} weitere betroffen'),
+        'ansehen' => Yii::t('MaengelmelderModule.base', 'Ansehen'),
+        'naheGast' => Yii::t('MaengelmelderModule.base', 'Ist es derselbe Mangel? Dann ist keine neue Meldung nötig.'),
+        'eigene' => Yii::t('MaengelmelderModule.base', '(deine eigene Meldung)'),
+        'angeschlossen' => Yii::t('MaengelmelderModule.base', 'Du hast dich bereits angeschlossen'),
+        'auch' => Yii::t('MaengelmelderModule.base', 'Betrifft mich auch'),
+        'ausserhalb' => Yii::t('MaengelmelderModule.base', 'Dieser Ort liegt außerhalb von Uffenheim.'),
+        'markiert' => Yii::t('MaengelmelderModule.base', 'Markiert: {koordinaten}'),
+        'zuKurz' => Yii::t('MaengelmelderModule.base', 'Bitte mindestens 3 Zeichen der Adresse eingeben.'),
+        'sucht' => Yii::t('MaengelmelderModule.base', 'Adresse wird gesucht …'),
+        'gesetzt' => Yii::t('MaengelmelderModule.base', 'Ort gesetzt: {ort}. Bei Bedarf in der Karte verschieben.'),
+        'sucheFehler' => Yii::t('MaengelmelderModule.base', 'Die Suche hat nicht geklappt. Bitte noch einmal versuchen oder in die Karte tippen.'),
+        'https' => Yii::t('MaengelmelderModule.base', 'Die Ortung geht nur über eine sichere Verbindung (https).'),
+        'verweigert' => Yii::t('MaengelmelderModule.base', 'Der Standortzugriff ist nicht erlaubt. Bitte in den Einstellungen des Browsers bzw. der App und des Handys (Ortungsdienste) erlauben – oder den Ort in der Karte antippen.'),
+        'zeit' => Yii::t('MaengelmelderModule.base', 'Der Standort konnte nicht rechtzeitig ermittelt werden. Bitte noch einmal versuchen oder in die Karte tippen.'),
+        'nichtVerfuegbar' => Yii::t('MaengelmelderModule.base', 'Standort nicht verfügbar (Ortungsdienste aus?) – bitte in die Karte tippen.'),
+        'standortAusserhalb' => Yii::t('MaengelmelderModule.base', 'Dein Standort liegt außerhalb von Uffenheim. Bitte den Ort des Mangels in der Karte antippen.'),
+        'keinGps' => Yii::t('MaengelmelderModule.base', 'Standort wird von diesem Browser nicht unterstützt – bitte in die Karte tippen.'),
+        'ermittelt' => Yii::t('MaengelmelderModule.base', 'Standort wird ermittelt …'),
+        'ermitteltUngenau' => Yii::t('MaengelmelderModule.base', 'Standort wird ermittelt (ungenauer) …'),
+        'ortFehlt' => Yii::t('MaengelmelderModule.base', 'Bitte zuerst den Ort angeben: Adresse suchen, in die Karte tippen oder Standort verwenden.'),
+    ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+    function fmt(s, p) { return s.replace(/\{(\w+)\}/g, function (a, k) { return p[k] !== undefined ? p[k] : a; }); }
     if (fotos) {
         fotos.addEventListener('change', function () {
             var max = +fotos.dataset.max, maxMb = +fotos.dataset.maxMb, zuGross = [].some.call(fotos.files, function (f) { return f.size > maxMb * 1048576; });
-            var text = fotos.files.length > max ? 'Bitte höchstens ' + max + ' Fotos auswählen.' : (zuGross ? 'Ein Foto ist größer als ' + maxMb + ' MB.' : '');
+            var text = fotos.files.length > max ? fmt(t.fotosMax, {max: max}) : (zuGross ? fmt(t.fotoGross, {mb: maxMb}) : '');
             document.getElementById('maengel-fotos-hinweis').textContent = text;
             fotos.setCustomValidity(text);
             if (!text) verkleinern();
@@ -275,7 +300,7 @@ maengelReady(function () {
         var hinweis = document.getElementById('maengel-fotos-hinweis'), knopf = document.querySelector('#maengel-form [type=submit]');
         var liste = [].slice.call(fotos.files);
         if (!liste.some(function (f) { return /^image\/(jpeg|png|webp|heic|heif)$/.test(f.type) && f.size > 600 * 1024; })) return;
-        hinweis.textContent = 'Fotos werden verkleinert …';
+        hinweis.textContent = t.verkleinern;
         if (knopf) knopf.disabled = true;
         Promise.all(liste.map(function (f) {
             if (!/^image\/(jpeg|png|webp|heic|heif)$/.test(f.type) || f.size <= 600 * 1024) return Promise.resolve(f);
@@ -310,27 +335,27 @@ maengelReady(function () {
     function showNahe(list) {
         naheLayer.clearLayers();
         if (!list.length) { nahe.style.display = 'none'; nahe.innerHTML = ''; return; }
-        var html = '<strong><i class="fa fa-info-circle"></i> In der Nähe wurde schon etwas gemeldet.</strong> '
-            + 'Ist es derselbe Mangel? Dann schließ dich bitte an, statt ihn noch einmal zu melden.'
+        var html = '<strong><i class="fa fa-info-circle"></i> ' + esc(t.naheTitel) + '</strong> '
+            + esc(t.naheText)
             + '<ul class="list-unstyled" style="margin:8px 0 0">';
         list.forEach(function (m) {
             L.circleMarker([m.lat, m.lng], {radius: 8, color: '#fff', weight: 2, fillColor: m.farbe, fillOpacity: 0.9})
                 .bindPopup('<strong>' + esc(m.titel) + '</strong><br>' + esc(m.auszug)).addTo(naheLayer);
             html += '<li style="padding:6px 0;border-top:1px solid rgba(0,0,0,.08)">'
-                + '<strong>' + esc(m.titel) + '</strong> <small class="text-muted">· ca. ' + m.entfernung + ' m entfernt · '
-                + esc(m.statusLabel) + ' · gemeldet ' + esc(m.datum)
-                + (m.auch ? ' · ' + m.auch + ' weitere betroffen' : '') + '</small><br>'
+                + '<strong>' + esc(m.titel) + '</strong> <small class="text-muted">· ' + esc(fmt(t.entfernt, {m: m.entfernung})) + ' · '
+                + esc(m.statusLabel) + ' · ' + esc(fmt(t.gemeldet, {datum: m.datum}))
+                + (m.auch ? ' · ' + esc(fmt(t.weitere, {n: m.auch})) : '') + '</small><br>'
                 + '<span>' + esc(m.auszug) + '</span><br>'
-                + (m.url ? '<a href="' + esc(m.url) + '" target="_blank" rel="noopener">Ansehen</a>' : '');
+                + (m.url ? '<a href="' + esc(m.url) + '" target="_blank" rel="noopener">' + esc(t.ansehen) + '</a>' : '');
             if (gast) {
-                html += ' <small class="text-muted">Ist es derselbe Mangel? Dann ist keine neue Meldung nötig.</small>';
+                html += ' <small class="text-muted">' + esc(t.naheGast) + '</small>';
             } else if (m.eigene) {
-                html += ' <small class="text-muted">(deine eigene Meldung)</small>';
+                html += ' <small class="text-muted">' + esc(t.eigene) + '</small>';
             } else if (m.auchMeins) {
-                html += ' <small class="text-muted"><i class="fa fa-check"></i> Du hast dich bereits angeschlossen</small>';
+                html += ' <small class="text-muted"><i class="fa fa-check"></i> ' + esc(t.angeschlossen) + '</small>';
             } else {
                 html += ' <button type="button" class="btn btn-primary btn-sm" style="margin-left:8px" data-auch-url="'
-                    + esc(m.auchUrl) + '">Betrifft mich auch</button>';
+                    + esc(m.auchUrl) + '">' + esc(t.auch) + '</button>';
             }
             html += '</li>';
         });
@@ -351,7 +376,7 @@ maengelReady(function () {
         f.submit();
     });
     function setPoint(ll, pan) {
-        if (!bounds.contains(ll)) { coords.textContent = 'Dieser Ort liegt außerhalb von Uffenheim.'; return; }
+        if (!bounds.contains(ll)) { coords.textContent = t.ausserhalb; return; }
         if (!marker) {
             marker = L.marker(ll, {draggable: true}).addTo(map);
             marker.on('dragend', function () { setPoint(marker.getLatLng(), false); });
@@ -360,7 +385,7 @@ maengelReady(function () {
         }
         lat.value = ll.lat.toFixed(6);
         lng.value = ll.lng.toFixed(6);
-        coords.textContent = 'Markiert: ' + lat.value + ', ' + lng.value;
+        coords.textContent = fmt(t.markiert, {koordinaten: lat.value + ', ' + lng.value});
         loadNahe(ll);
         if (pan) map.setView(ll, Math.max(map.getZoom(), 17));
     }
@@ -370,8 +395,8 @@ maengelReady(function () {
     var sucheUrl = <?= json_encode($space->createUrl('/maengelmelder/meldung/suche')) ?>;
     function adresseSuchen() {
         var q = adresse.value.trim();
-        if (q.length < 3) { coords.textContent = 'Bitte mindestens 3 Zeichen der Adresse eingeben.'; adresse.focus(); return; }
-        coords.textContent = 'Adresse wird gesucht …';
+        if (q.length < 3) { coords.textContent = t.zuKurz; adresse.focus(); return; }
+        coords.textContent = t.sucht;
         suchen.disabled = true;
         fetch(sucheUrl + (sucheUrl.indexOf('?') < 0 ? '?' : '&') + 'q=' + encodeURIComponent(q),
             {credentials: 'same-origin', headers: {'X-Requested-With': 'XMLHttpRequest'}})
@@ -380,8 +405,8 @@ maengelReady(function () {
                 suchen.disabled = false;
                 if (d.fehler) { coords.textContent = d.fehler; return; }
                 setPoint(L.latLng(d.lat, d.lng), true);
-                coords.textContent = 'Ort gesetzt: ' + d.name.split(',').slice(0, 3).join(',') + '. Bei Bedarf in der Karte verschieben.';
-            }, function () { suchen.disabled = false; coords.textContent = 'Die Suche hat nicht geklappt. Bitte noch einmal versuchen oder in die Karte tippen.'; });
+                coords.textContent = fmt(t.gesetzt, {ort: d.name.split(',').slice(0, 3).join(',')});
+            }, function () { suchen.disabled = false; coords.textContent = t.sucheFehler; });
     }
     suchen.addEventListener('click', adresseSuchen);
     adresse.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); adresseSuchen(); } });
@@ -391,32 +416,31 @@ maengelReady(function () {
     function locateFehler(err) {
         locateBtn.disabled = false;
         if (!window.isSecureContext) {
-            coords.textContent = 'Die Ortung geht nur über eine sichere Verbindung (https).';
+            coords.textContent = t.https;
         } else if (err && err.code === 1) {
-            coords.textContent = 'Der Standortzugriff ist nicht erlaubt. Bitte in den Einstellungen des Browsers bzw. der App '
-                + 'und des Handys (Ortungsdienste) erlauben – oder den Ort in der Karte antippen.';
+            coords.textContent = t.verweigert;
         } else if (err && err.code === 3) {
-            coords.textContent = 'Der Standort konnte nicht rechtzeitig ermittelt werden. Bitte noch einmal versuchen oder in die Karte tippen.';
+            coords.textContent = t.zeit;
         } else {
-            coords.textContent = 'Standort nicht verfügbar (Ortungsdienste aus?) – bitte in die Karte tippen.';
+            coords.textContent = t.nichtVerfuegbar;
         }
     }
     function locateTreffer(p) {
         locateBtn.disabled = false;
         var ll = L.latLng(p.coords.latitude, p.coords.longitude);
         if (!bounds.contains(ll)) {
-            coords.textContent = 'Dein Standort liegt außerhalb von Uffenheim. Bitte den Ort des Mangels in der Karte antippen.';
+            coords.textContent = t.standortAusserhalb;
             return;
         }
         setPoint(ll, true);
     }
     locateBtn.addEventListener('click', function () {
-        if (!navigator.geolocation) { coords.textContent = 'Standort wird von diesem Browser nicht unterstützt – bitte in die Karte tippen.'; return; }
-        coords.textContent = 'Standort wird ermittelt …';
+        if (!navigator.geolocation) { coords.textContent = t.keinGps; return; }
+        coords.textContent = t.ermittelt;
         locateBtn.disabled = true;
         navigator.geolocation.getCurrentPosition(locateTreffer, function (err) {
             if (err && (err.code === 3 || err.code === 2)) {
-                coords.textContent = 'Standort wird ermittelt (ungenauer) …';
+                coords.textContent = t.ermitteltUngenau;
                 navigator.geolocation.getCurrentPosition(locateTreffer, locateFehler,
                     {enableHighAccuracy: false, timeout: 15000, maximumAge: 120000});
             } else {
@@ -425,7 +449,7 @@ maengelReady(function () {
         }, {enableHighAccuracy: true, timeout: 12000, maximumAge: 30000});
     });
     document.getElementById('maengel-form').addEventListener('submit', function (e) {
-        if (!lat.value) { e.preventDefault(); coords.textContent = 'Bitte zuerst den Ort angeben: Adresse suchen, in die Karte tippen oder Standort verwenden.'; adresse.focus(); }
+        if (!lat.value) { e.preventDefault(); coords.textContent = t.ortFehlt; adresse.focus(); }
     });
 });
 </script>

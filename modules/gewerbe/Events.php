@@ -100,7 +100,7 @@ class Events
             }
             $active = Yii::$app->controller->module && Yii::$app->controller->module->id === 'gewerbe';
             $event->sender->addItem([
-                'label' => 'Gewerbeverzeichnis',
+                'label' => Yii::t('GewerbeModule.base', 'Gewerbeverzeichnis'),
                 'group' => 'modules',
                 'url' => $space->createUrl('/gewerbe/betrieb/index'),
                 'icon' => '<i class="fa fa-shopping-bag"></i>',
@@ -109,7 +109,7 @@ class Events
                 'sortOrder' => 90,
             ]);
             $event->sender->addItem([
-                'label' => 'Gutscheine',
+                'label' => Yii::t('GewerbeModule.base', 'Gutscheine'),
                 'group' => 'modules',
                 'url' => $space->createUrl('/gewerbe/gutschein/index'),
                 'icon' => '<i class="fa fa-ticket"></i>',
@@ -119,7 +119,8 @@ class Events
             if (Module::canManageAll()) {
                 $open = BetriebVerwalter::find()->where(['status' => BetriebVerwalter::STATUS_ANGEFRAGT])->count();
                 $event->sender->addItem([
-                    'label' => 'Gewerbe-Anfragen' . ($open ? " ($open)" : ''),
+                    'label' => $open ? Yii::t('GewerbeModule.base', 'Gewerbe-Anfragen ({anzahl})', ['anzahl' => $open])
+                        : Yii::t('GewerbeModule.base', 'Gewerbe-Anfragen'),
                     'group' => 'modules',
                     'url' => $space->createUrl('/gewerbe/betrieb/anfragen'),
                     'icon' => '<i class="fa fa-inbox"></i>',
@@ -128,7 +129,8 @@ class Events
                 ]);
                 $offen = BetriebBeitrag::find()->where(['status' => BetriebBeitrag::STATUS_EINGEREICHT])->count();
                 $event->sender->addItem([
-                    'label' => 'Gewerbe-Beiträge' . ($offen ? " ($offen)" : ''),
+                    'label' => $offen ? Yii::t('GewerbeModule.base', 'Gewerbe-Beiträge ({anzahl})', ['anzahl' => $offen])
+                        : Yii::t('GewerbeModule.base', 'Gewerbe-Beiträge'),
                     'group' => 'modules',
                     'url' => $space->createUrl('/gewerbe/beitrag/pruefen'),
                     'icon' => '<i class="fa fa-check-square-o"></i>',

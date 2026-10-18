@@ -13,6 +13,7 @@
 
 use humhub\helpers\Html;
 use humhub\modules\gewerbe\models\Betrieb;
+use humhub\modules\gewerbe\Module;
 
 $space = $this->context->contentContainer;
 $filtered = trim($q) !== '' || $kategorie !== '' || $ortsteil !== '' || $offen !== '';
@@ -20,13 +21,13 @@ $url = fn(array $p = []) => $space->createUrl('/gewerbe/betrieb/index', array_fi
 ?>
 <?php if ($mine): ?>
 <div class="panel panel-default">
-    <div class="panel-heading"><strong>Meine Betriebe</strong></div>
+    <div class="panel-heading"><strong><?= Yii::t('GewerbeModule.base', 'Meine Betriebe') ?></strong></div>
     <div class="panel-body">
         <?php foreach ($mine as $b): ?>
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
                 <?= $this->render('_logo', ['betrieb' => $b, 'size' => 32]) ?>
                 <span style="flex:1"><?= Html::a(Html::encode($b->name), $b->getUrl()) ?></span>
-                <?= Html::a('<i class="fa fa-pencil" aria-hidden="true"></i> Seite bearbeiten', $space->createUrl('/gewerbe/betrieb/edit', ['id' => $b->id]), ['class' => 'btn btn-sm btn-light']) ?>
+                <?= Html::a('<i class="fa fa-pencil" aria-hidden="true"></i> ' . Yii::t('GewerbeModule.base', 'Seite bearbeiten'), $space->createUrl('/gewerbe/betrieb/edit', ['id' => $b->id]), ['class' => 'btn btn-sm btn-light']) ?>
             </div>
         <?php endforeach ?>
     </div>
@@ -34,16 +35,16 @@ $url = fn(array $p = []) => $space->createUrl('/gewerbe/betrieb/index', array_fi
 <?php endif ?>
 
 <div class="panel panel-default">
-    <div class="panel-heading"><strong>Gewerbe &amp; Einkaufen in Uffenheim</strong></div>
+    <div class="panel-heading"><strong><?= Yii::t('GewerbeModule.base', 'Gewerbe &amp; Einkaufen in Uffenheim') ?></strong></div>
     <div class="panel-body">
-        <p class="help-block">Geschäfte, Handwerk, Gastronomie und Dienstleister aus Uffenheim und den Ortsteilen.
-            Du hast einen Betrieb? Trag ihn kostenlos ein und pflege deine Seite selbst.</p>
+        <p class="help-block"><?= Yii::t('GewerbeModule.base', 'Geschäfte, Handwerk, Gastronomie und Dienstleister aus Uffenheim und den Ortsteilen.') ?>
+            <?= Yii::t('GewerbeModule.base', 'Du hast einen Betrieb? Trag ihn kostenlos ein und pflege deine Seite selbst.') ?></p>
 
         <?= $this->render('_ansicht', ['aktiv' => 'liste', 'q' => $q, 'kategorie' => $kategorie, 'ortsteil' => $ortsteil]) ?>
 
-        <div class="gw-branchen" role="list" aria-label="Branchen">
+        <div class="gw-branchen" role="list" aria-label="<?= Html::encode(Yii::t('GewerbeModule.base', 'Branchen')) ?>">
             <?php foreach ($module->categories as $k): ?>
-                <?= Html::a(Html::encode($k) . (isset($anzahl[$k]) ? ' <span class="gw-zahl">' . (int)$anzahl[$k] . '</span>' : ''),
+                <?= Html::a(Html::encode(Module::kategorieLabel($k)) . (isset($anzahl[$k]) ? ' <span class="gw-zahl">' . (int)$anzahl[$k] . '</span>' : ''),
                     $url(['kategorie' => $kategorie === $k ? '' : $k, 'ortsteil' => $ortsteil, 'q' => $q]),
                     ['class' => 'gw-branche' . ($kategorie === $k ? ' aktiv' : ''), 'role' => 'listitem', 'aria-current' => $kategorie === $k ? 'true' : null]) ?>
             <?php endforeach ?>
@@ -51,51 +52,52 @@ $url = fn(array $p = []) => $space->createUrl('/gewerbe/betrieb/index', array_fi
 
         <?= Html::beginForm($url(), 'get', ['style' => 'display:flex;flex-wrap:wrap;gap:8px;margin:12px 0']) ?>
             <?= Html::hiddenInput('cguid', $space->guid) ?>
-            <?= Html::textInput('q', $q, ['class' => 'form-control', 'placeholder' => 'Suchen, z. B. Bäcker, Fahrrad, Friseur …', 'style' => 'flex:2 1 200px', 'aria-label' => 'Suchen']) ?>
-            <?= Html::dropDownList('kategorie', $kategorie, array_combine($module->categories, $module->categories),
-                ['class' => 'form-control', 'prompt' => 'Alle Branchen', 'style' => 'flex:1 1 150px', 'aria-label' => 'Branche']) ?>
-            <?= Html::dropDownList('ortsteil', $ortsteil, array_combine($module->ortsteile, $module->ortsteile),
-                ['class' => 'form-control', 'prompt' => 'Alle Orte', 'style' => 'flex:1 1 130px', 'aria-label' => 'Ort']) ?>
-            <label class="gw-offen-filter"><?= Html::checkbox('offen', $offen !== '', ['value' => 1]) ?> Jetzt geöffnet</label>
-            <button type="submit" class="btn btn-light"><i class="fa fa-search" aria-hidden="true"></i> Filtern</button>
+            <?= Html::textInput('q', $q, ['class' => 'form-control', 'placeholder' => Yii::t('GewerbeModule.base', 'Suchen, z. B. Bäcker, Fahrrad, Friseur …'), 'style' => 'flex:2 1 200px', 'aria-label' => Yii::t('GewerbeModule.base', 'Suchen')]) ?>
+            <?= Html::dropDownList('kategorie', $kategorie, $module->kategorieOptionen(),
+                ['class' => 'form-control', 'prompt' => Yii::t('GewerbeModule.base', 'Alle Branchen'), 'style' => 'flex:1 1 150px', 'aria-label' => Yii::t('GewerbeModule.base', 'Branche')]) ?>
+            <?= Html::dropDownList('ortsteil', $ortsteil, $module->ortOptionen(),
+                ['class' => 'form-control', 'prompt' => Yii::t('GewerbeModule.base', 'Alle Orte'), 'style' => 'flex:1 1 130px', 'aria-label' => Yii::t('GewerbeModule.base', 'Ort')]) ?>
+            <label class="gw-offen-filter"><?= Html::checkbox('offen', $offen !== '', ['value' => 1]) ?> <?= Yii::t('GewerbeModule.base', 'Jetzt geöffnet') ?></label>
+            <button type="submit" class="btn btn-light"><i class="fa fa-search" aria-hidden="true"></i> <?= Yii::t('GewerbeModule.base', 'Filtern') ?></button>
             <?php if ($filtered): ?>
-                <?= Html::a('Zurücksetzen', $url(), ['class' => 'btn btn-link']) ?>
+                <?= Html::a(Yii::t('GewerbeModule.base', 'Zurücksetzen'), $url(), ['class' => 'btn btn-link']) ?>
             <?php endif ?>
         <?= Html::endForm() ?>
 
         <?php if ($mitGutschein): ?>
-            <p><?= Html::a('<i class="fa fa-ticket" aria-hidden="true"></i> Aktuelle Gutscheine (' . count($mitGutschein) . ' ' . (count($mitGutschein) === 1 ? 'Betrieb' : 'Betriebe') . ')',
+            <p><?= Html::a('<i class="fa fa-ticket" aria-hidden="true"></i> ' . (count($mitGutschein) === 1
+                    ? Yii::t('GewerbeModule.base', 'Aktuelle Gutscheine (1 Betrieb)') : Yii::t('GewerbeModule.base', 'Aktuelle Gutscheine ({anzahl} Betriebe)', ['anzahl' => count($mitGutschein)])),
                 $space->createUrl('/gewerbe/gutschein/index'), ['class' => 'btn btn-light btn-sm']) ?></p>
         <?php endif ?>
-        <p class="text-muted" role="status"><?= count($betriebe) ?> <?= count($betriebe) === 1 ? 'Betrieb' : 'Betriebe' ?></p>
+        <p class="text-muted" role="status"><?= count($betriebe) === 1 ? Yii::t('GewerbeModule.base', '1 Betrieb') : Yii::t('GewerbeModule.base', '{anzahl} Betriebe', ['anzahl' => count($betriebe)]) ?></p>
         <div class="gw-liste">
             <?php foreach ($betriebe as $b): ?>
                 <a href="<?= Html::encode($b->getUrl()) ?>" class="gw-karte">
                     <?= $this->render('_logo', ['betrieb' => $b, 'size' => 52]) ?>
                     <span style="flex:1;min-width:0">
                         <strong><?= Html::encode($b->name) ?></strong>
-                        <small class="text-muted" style="display:block"><?= Html::encode($b->kategorie) ?> · <?= Html::encode($b->ortsteil) ?></small>
+                        <small class="text-muted" style="display:block"><?= Html::encode(Module::kategorieLabel($b->kategorie)) ?> · <?= Html::encode(Module::ortLabel($b->ortsteil)) ?></small>
                         <?php if ($b->angebot): ?>
                             <small style="display:block;margin-top:2px"><?= Html::encode(mb_strimwidth($b->angebot, 0, 90, '…')) ?></small>
                         <?php endif ?>
-                        <?php if (($stand = $b->getStand()) !== null): ?>
+                        <?php if (($stand = $b->getStand(true)) !== null): ?>
                             <small class="gw-stand <?= $stand['offen'] ? 'offen' : 'zu' ?>"><?= Html::encode($stand['text']) ?></small>
                         <?php endif ?>
                         <?php if (isset($mitGutschein[$b->id])): ?>
-                            <small class="gw-gutschein"><i class="fa fa-ticket" aria-hidden="true"></i> Gutschein</small>
+                            <small class="gw-gutschein"><i class="fa fa-ticket" aria-hidden="true"></i> <?= Yii::t('GewerbeModule.base', 'Gutschein') ?></small>
                         <?php endif ?>
                         <?php if ($b->status === Betrieb::STATUS_VORGESCHLAGEN): ?>
-                            <small class="text-muted" style="display:block"><i class="fa fa-hourglass-half" aria-hidden="true"></i> wartet auf Freigabe</small>
+                            <small class="text-muted" style="display:block"><i class="fa fa-hourglass-half" aria-hidden="true"></i> <?= Yii::t('GewerbeModule.base', 'wartet auf Freigabe') ?></small>
                         <?php endif ?>
                     </span>
                 </a>
             <?php endforeach ?>
         </div>
         <?php if (!$betriebe): ?>
-            <p><?= $filtered ? 'Nichts gefunden.' : 'Noch keine Betriebe eingetragen. Mach den Anfang!' ?></p>
+            <p><?= $filtered ? Yii::t('GewerbeModule.base', 'Nichts gefunden.') : Yii::t('GewerbeModule.base', 'Noch keine Betriebe eingetragen. Mach den Anfang!') ?></p>
         <?php endif ?>
         <p style="margin-top:14px">
-            <?= Html::a('<i class="fa fa-plus" aria-hidden="true"></i> Betrieb eintragen', $space->createUrl('/gewerbe/betrieb/create'), ['class' => 'btn btn-primary']) ?>
+            <?= Html::a('<i class="fa fa-plus" aria-hidden="true"></i> ' . Yii::t('GewerbeModule.base', 'Betrieb eintragen'), $space->createUrl('/gewerbe/betrieb/create'), ['class' => 'btn btn-primary']) ?>
         </p>
     </div>
 </div>

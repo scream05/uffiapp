@@ -3,6 +3,7 @@
 namespace humhub\modules\abfuhr;
 
 use humhub\modules\abfuhr\notifications\AbfuhrMorgen;
+use Yii;
 
 class Module extends \humhub\components\Module
 {
@@ -23,6 +24,18 @@ class Module extends \humhub\components\Module
         '20' => ['am Vorabend um 20 Uhr', 20, 1],
         '6' => ['am Abfuhrtag um 6 Uhr', 6, 0],
     ];
+
+    /** Anzeigename einer Tonne in der Sprache des Nutzers (die deutschen Namen oben bleiben für den Kalenderabgleich) */
+    public function tonneLabel(string $key): string
+    {
+        return isset($this->tonnen[$key]) ? Yii::t('AbfuhrModule.base', $this->tonnen[$key]) : $key;
+    }
+
+    /** Bezeichnung eines Zeitpunkts in der Sprache des Nutzers */
+    public function zeitLabel(string $key): string
+    {
+        return isset($this->zeiten[$key]) ? Yii::t('AbfuhrModule.base', $this->zeiten[$key][0]) : $key;
+    }
 
     public function getNotifications()
     {

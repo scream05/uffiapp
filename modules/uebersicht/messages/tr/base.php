@@ -1,0 +1,16 @@
+<?php
+
+return [
+    'Meine Übersicht' => 'Genel bakışım',
+    'In meiner Übersicht anzeigen …' => 'Genel bakışımda göster …',
+    'Angepinnt' => 'Sabitlendi',
+    'Übersicht anpassen' => 'Genel bakışı düzenle',
+    'Aus Übersicht lösen' => 'Genel bakıştan sabitlemeyi kaldır',
+    'In Übersicht anpinnen' => 'Genel bakışa sabitle',
+    'Wähle, aus welchen Bereichen Beiträge in deiner Übersicht erscheinen. Das gilt nur für dich. Beiträge, die wir oben anpinnen, siehst du immer. Deine Benachrichtigungen ändern sich dadurch nicht.' => 'Genel bakışında hangi alanlardan gönderilerin görüneceğini seç. Bu sadece senin için geçerli. Yukarıya sabitlediğimiz gönderileri her zaman görürsün. Bildirimlerin bundan etkilenmez.',
+    'Beiträge hier sehen nur Mitglieder –' => 'Buradaki gönderileri sadece üyeler görebilir –',
+    'Bereich öffnen und beitreten' => 'alanı aç ve katıl',
+    'Beiträge aus {bereich} in meiner Übersicht' => '{bereich} gönderileri genel bakışımda',
+    'Speichern' => 'Kaydet',
+    'Abbrechen' => 'İptal',
+];

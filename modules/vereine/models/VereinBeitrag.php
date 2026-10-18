@@ -49,14 +49,14 @@ class VereinBeitrag extends ActiveRecord implements ViewableInterface
     {
         return [
             ['text', 'trim'],
-            ['text', 'required', 'message' => 'Bitte einen Text schreiben.'],
+            ['text', 'required', 'message' => Yii::t('VereineModule.base', 'Bitte einen Text schreiben.')],
             ['text', 'string', 'min' => 10, 'max' => 5000],
         ];
     }
 
     public function attributeLabels()
     {
-        return ['text' => 'Text'];
+        return ['text' => Yii::t('VereineModule.base', 'Text')];
     }
 
     public function beforeSave($insert)
@@ -109,9 +109,9 @@ class VereinBeitrag extends ActiveRecord implements ViewableInterface
     public function getStatusLabel(): string
     {
         return match ($this->status) {
-            self::STATUS_EINGEREICHT => 'wartet auf Prüfung',
-            self::STATUS_ABGELEHNT => 'abgelehnt',
-            default => 'veröffentlicht',
+            self::STATUS_EINGEREICHT => Yii::t('VereineModule.base', 'wartet auf Prüfung'),
+            self::STATUS_ABGELEHNT => Yii::t('VereineModule.base', 'abgelehnt'),
+            default => Yii::t('VereineModule.base', 'veröffentlicht'),
         };
     }
 

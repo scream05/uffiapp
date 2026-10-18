@@ -19,7 +19,7 @@ class VereinSearchProvider implements MetaSearchProviderInterface
 
     public function getName(): string
     {
-        return 'Vereine';
+        return Yii::t('VereineModule.base', 'Vereine');
     }
 
     public function getSortOrder(): int
@@ -35,7 +35,7 @@ class VereinSearchProvider implements MetaSearchProviderInterface
 
     public function getAllResultsText(): string
     {
-        return $this->getService()->hasResults() ? Yii::t('base', 'Show all results') : 'Zum Vereinsverzeichnis';
+        return $this->getService()->hasResults() ? Yii::t('base', 'Show all results') : Yii::t('VereineModule.base', 'Zum Vereinsverzeichnis');
     }
 
     public function getIsHiddenWhenEmpty(): bool

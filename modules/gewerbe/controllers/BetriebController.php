@@ -34,7 +34,7 @@ class BetriebController extends ContentContainerController
         $query = $this->filterQuery($q, $kategorie, $ortsteil);
         $betriebe = $query->all();
         if ($offen !== '') {
-            $betriebe = array_values(array_filter($betriebe, fn(Betrieb $b) => ($b->getStand()['offen'] ?? false)));
+            $betriebe = array_values(array_filter($betriebe, fn(Betrieb $b) => ($b->getStand(true)['offen'] ?? false)));
         }
         $mine = Yii::$app->user->isGuest ? [] : Betrieb::find()->innerJoin('gewerbe_verwalter gv', 'gv.betrieb_id = gewerbe_betrieb.id')
             ->where(['gv.user_id' => Yii::$app->user->id, 'gv.status' => BetriebVerwalter::STATUS_BESTAETIGT])
@@ -62,8 +62,8 @@ class BetriebController extends ContentContainerController
     {
         $punkte = [];
         foreach ($this->filterQuery($q, $kategorie, $ortsteil)->andWhere(['not', ['lat' => null]])->all() as $b) {
-            $stand = $b->getStand();
-            $punkte[] = ['lat' => (float)$b->lat, 'lng' => (float)$b->lng, 'name' => $b->name, 'kategorie' => $b->kategorie,
+            $stand = $b->getStand(true);
+            $punkte[] = ['lat' => (float)$b->lat, 'lng' => (float)$b->lng, 'name' => $b->name, 'kategorie' => Module::kategorieLabel($b->kategorie),
                 'adresse' => (string)$b->adresse, 'url' => $b->getUrl(), 'stand' => $stand['text'] ?? '', 'offen' => $stand['offen'] ?? null];
         }
         return $this->render('karte', ['punkte' => $punkte, 'q' => $q, 'kategorie' => $kategorie, 'ortsteil' => $ortsteil,
@@ -117,7 +117,7 @@ class BetriebController extends ContentContainerController
                 $this->saveImages($betrieb);
                 if (!Module::canManageAll()) {
                     $this->request($betrieb, $nachricht);
-                    $this->view->success('Danke! Dein Eintrag wird kurz geprüft. Danach erscheint er im Verzeichnis und du kannst ihn pflegen.');
+                    $this->view->success(Yii::t('GewerbeModule.base', 'Danke! Dein Eintrag wird kurz geprüft. Danach erscheint er im Verzeichnis und du kannst ihn pflegen.'));
                 }
                 return $this->redirect($betrieb->getUrl());
             }
@@ -129,7 +129,7 @@ class BetriebController extends ContentContainerController
     {
         $betrieb = $this->findBetrieb($id);
         if (!$betrieb->canManage()) {
-            throw new ForbiddenHttpException('Nur Verwalter dieses Betriebs können die Seite bearbeiten.');
+            throw new ForbiddenHttpException(Yii::t('GewerbeModule.base', 'Nur Verwalter dieses Betriebs können die Seite bearbeiten.'));
         }
         if ($betrieb->load(Yii::$app->request->post())) {
             // Umbenennen nur durch Admins (der Name ist das Erkennungsmerkmal im Verzeichnis)
@@ -159,7 +159,7 @@ class BetriebController extends ContentContainerController
         }
         $betrieb = $this->findBetrieb($id);
         $betrieb->delete();
-        $this->view->success("„{$betrieb->name}“ wurde aus dem Verzeichnis entfernt.");
+        $this->view->success(Yii::t('GewerbeModule.base', '„{name}“ wurde aus dem Verzeichnis entfernt.', ['name' => $betrieb->name]));
         return $this->redirect($this->contentContainer->createUrl('/gewerbe/betrieb/index'));
     }
 
@@ -172,7 +172,7 @@ class BetriebController extends ContentContainerController
             return $this->redirect($betrieb->getUrl());
         }
         $this->request($betrieb, trim((string)Yii::$app->request->post('nachricht', '')));
-        $this->view->success('Deine Anfrage wurde verschickt. Du bekommst eine Benachrichtigung, sobald sie bestätigt ist.');
+        $this->view->success(Yii::t('GewerbeModule.base', 'Deine Anfrage wurde verschickt. Du bekommst eine Benachrichtigung, sobald sie bestätigt ist.'));
         return $this->redirect($betrieb->getUrl());
     }
 
@@ -181,7 +181,7 @@ class BetriebController extends ContentContainerController
     {
         $betrieb = $this->findBetrieb($id);
         if (!$betrieb->canManage()) {
-            throw new ForbiddenHttpException('Nur Verwalter dieses Betriebs können das sehen.');
+            throw new ForbiddenHttpException(Yii::t('GewerbeModule.base', 'Nur Verwalter dieses Betriebs können das sehen.'));
         }
         if (Yii::$app->request->isPost) {
             $row = BetriebVerwalter::findOne(['betrieb_id' => $betrieb->id, 'user_id' => (int)Yii::$app->request->post('user_id')]);
@@ -196,10 +196,10 @@ class BetriebController extends ContentContainerController
                     $betrieb->updateAttributes(['status' => Betrieb::STATUS_AKTIV]);
                 }
                 VerwaltungBestaetigt::instance()->from(Yii::$app->user->getIdentity())->about($betrieb)->send($row->user);
-                $this->view->success("{$row->user->displayName} kann den Betrieb jetzt verwalten.");
+                $this->view->success(Yii::t('GewerbeModule.base', '{name} kann den Betrieb jetzt verwalten.', ['name' => $row->user->displayName]));
             } elseif ($row && in_array($aktion, ['ablehnen', 'entfernen'], true)) {
                 $row->delete();
-                $this->view->success($aktion === 'ablehnen' ? 'Anfrage abgelehnt.' : 'Verwalter entfernt.');
+                $this->view->success($aktion === 'ablehnen' ? Yii::t('GewerbeModule.base', 'Anfrage abgelehnt.') : Yii::t('GewerbeModule.base', 'Verwalter entfernt.'));
                 if ($row->user_id === Yii::$app->user->id && !$betrieb->canManage()) {
                     return $this->redirect($betrieb->getUrl());
                 }
@@ -283,7 +283,7 @@ class BetriebController extends ContentContainerController
         $betrieb = Betrieb::findOne((int)$id);
         if ($betrieb === null || ($betrieb->status === Betrieb::STATUS_VORGESCHLAGEN && !$betrieb->canManage()
                 && !BetriebVerwalter::find()->where(['betrieb_id' => $betrieb->id, 'user_id' => Yii::$app->user->id])->exists())) {
-            throw new NotFoundHttpException('Betrieb nicht gefunden.');
+            throw new NotFoundHttpException(Yii::t('GewerbeModule.base', 'Betrieb nicht gefunden.'));
         }
         return $betrieb;
     }

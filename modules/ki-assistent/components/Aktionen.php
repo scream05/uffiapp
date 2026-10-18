@@ -33,6 +33,25 @@ class Aktionen
         ]],
     ];
 
+    /** Angezeigte Texte der Karte zu ABFALLPORTAL (übersetzt): [Titel, Knopf, Zeilen] */
+    private static function abfallportalTexte(string $dienst): array
+    {
+        return match ($dienst) {
+            'sperrmuell' => [Yii::t('KiAssistentModule.base', 'Sperrmüll abrufen (Landkreis)'), Yii::t('KiAssistentModule.base', 'Sperrmüll online abrufen'), [
+                Yii::t('KiAssistentModule.base', 'Im Formular „Uffenheim“, Straße und Hausnummer wählen und die Gegenstände angeben.'),
+                Yii::t('KiAssistentModule.base', 'Den Abholtermin teilt der Entsorger per E-Mail oder Telefon mit; bitte bestätigen.'),
+            ]],
+            'tonnenleerungen' => [Yii::t('KiAssistentModule.base', 'Meine Tonnenleerungen (Landkreis)'), Yii::t('KiAssistentModule.base', 'Tonnenleerungen ansehen'), [
+                Yii::t('KiAssistentModule.base', 'Ort „Uffenheim“, Straße und Hausnummer wählen und das Kundenkonto (Debitorennummer der Abfallwirtschaft) eingeben.'),
+                Yii::t('KiAssistentModule.base', 'Danach zeigt der Landkreis, wann welche deiner Tonnen geleert wurde.'),
+                Yii::t('KiAssistentModule.base', 'Kundenkonto nicht zur Hand? Abfallwirtschaft: abfall@kreis-nea.de, Tel. 09161 92-6310.'),
+            ]],
+            default => [Yii::t('KiAssistentModule.base', 'Kundenportal der Abfallwirtschaft (Landkreis)'), Yii::t('KiAssistentModule.base', 'Kundenportal öffnen'), [
+                Yii::t('KiAssistentModule.base', 'Mit den Zugangsdaten der Abfallwirtschaft anmelden: alle Online-Dienste des Landkreises an einer Stelle.'),
+            ]],
+        };
+    }
+
     /** @return array Werkzeuge für Claude (name, description, inputSchema) */
     public static function declarations(): array
     {
@@ -185,16 +204,17 @@ class Aktionen
         $karte = [
             'typ' => 'link',
             'icon' => 'map-marker',
-            'titel' => 'Mängelmeldung vorbereitet',
+            'titel' => Yii::t('KiAssistentModule.base', 'Mängelmeldung vorbereitet'),
             'zeilen' => array_values(array_filter([
-                "Kategorie: $kategorie",
-                $hit ? "Ort: $ort (auf der Karte markiert, bitte prüfen)" : "Ort „{$ort}“ nicht gefunden – bitte im Formular auf der Karte markieren",
-                'Ein Foto kannst du im Formular hinzufügen. Gesendet wird erst mit „Meldung absenden“.',
+                Yii::t('KiAssistentModule.base', 'Kategorie: {kategorie}', ['kategorie' => $kategorie]),
+                $hit ? Yii::t('KiAssistentModule.base', 'Ort: {ort} (auf der Karte markiert, bitte prüfen)', ['ort' => $ort])
+                    : Yii::t('KiAssistentModule.base', 'Ort „{ort}“ nicht gefunden – bitte im Formular auf der Karte markieren', ['ort' => $ort]),
+                Yii::t('KiAssistentModule.base', 'Ein Foto kannst du im Formular hinzufügen. Gesendet wird erst mit „Meldung absenden“.'),
                 Yii::$app->user->isGuest ? (self::gastMeldungen()
-                    ? 'Melden geht auch ohne Konto: Name und E-Mail oder Telefon für Rückfragen angeben, der Bauhof prüft die Meldung vor der Veröffentlichung.'
-                    : 'Zum Melden ist ein kostenloses Konto nötig – nach der Anmeldung geht es mit dem Formular weiter.') : null,
+                    ? Yii::t('KiAssistentModule.base', 'Melden geht auch ohne Konto: Name und E-Mail oder Telefon für Rückfragen angeben, der Bauhof prüft die Meldung vor der Veröffentlichung.')
+                    : Yii::t('KiAssistentModule.base', 'Zum Melden ist ein kostenloses Konto nötig – nach der Anmeldung geht es mit dem Formular weiter.')) : null,
             ])),
-            'knopf' => 'Meldeformular öffnen',
+            'knopf' => Yii::t('KiAssistentModule.base', 'Meldeformular öffnen'),
             'url' => $url,
         ];
         return [['ok' => true, 'ort_gefunden' => $hit !== null,
@@ -220,15 +240,18 @@ class Aktionen
         if ($entry === null || !$entry->content->canView(Yii::$app->user->getIdentity())) {
             return [['fehler' => 'Termin nicht gefunden'], null];
         }
-        $start = Yii::$app->formatter->asDatetime($entry->start_datetime, $entry->all_day ? 'php:D, d.m.Y' : 'php:D, d.m.Y, H:i') . ($entry->all_day ? '' : ' Uhr');
+        $start = Yii::$app->formatter->asDatetime($entry->start_datetime, $entry->all_day ? 'php:D, d.m.Y' : 'php:D, d.m.Y, H:i');
+        if (!$entry->all_day) {
+            $start = Yii::t('KiAssistentModule.base', '{zeit} Uhr', ['zeit' => $start]);
+        }
         $karte = [
             'typ' => 'termin',
             'icon' => 'calendar',
             'titel' => $entry->title,
-            'zeilen' => array_values(array_filter([$start, $entry->location ? 'Ort: ' . $entry->location : null])),
+            'zeilen' => array_values(array_filter([$start, $entry->location ? Yii::t('KiAssistentModule.base', 'Ort: {ort}', ['ort' => $entry->location]) : null])),
             'knoepfe' => [
-                ['text' => 'In meinen Kalender (.ics)', 'url' => $entry->content->container->createUrl('/calendar/entry/generateics', ['id' => $entry->id])],
-                ['text' => 'Termin ansehen', 'url' => Url::to($entry->getUrl())],
+                ['text' => Yii::t('KiAssistentModule.base', 'In meinen Kalender (.ics)'), 'url' => $entry->content->container->createUrl('/calendar/entry/generateics', ['id' => $entry->id])],
+                ['text' => Yii::t('KiAssistentModule.base', 'Termin ansehen'), 'url' => Url::to($entry->getUrl())],
             ],
         ];
         return [['ok' => true, 'hinweis' => 'Knöpfe zum Termin erscheinen unter deiner Antwort (Kalenderdatei für Handy/Outlook, Terminseite mit Erinnerung und Zusage).'], $karte];
@@ -243,13 +266,13 @@ class Aktionen
         $karte = [
             'typ' => 'link',
             'icon' => 'calendar-check-o',
-            'titel' => 'Termin im Bürgerbüro: ' . mb_substr(trim((string)($args['anliegen'] ?? $amt)), 0, 80),
+            'titel' => Yii::t('KiAssistentModule.base', 'Termin im Bürgerbüro: {anliegen}', ['anliegen' => mb_substr(trim((string)($args['anliegen'] ?? $amt)), 0, 80)]),
             'zeilen' => array_values(array_filter([
-                "Auf der Buchungsseite zuerst „{$amt}“ wählen, dann Anliegen und Uhrzeit.",
-                $mitbringen ? 'Mitbringen: ' . implode(', ', $mitbringen) : null,
-                'Gebucht wird direkt bei der Stadt Uffenheim (terminland.de); Rund um Uffni erhält dabei keine Daten.',
+                Yii::t('KiAssistentModule.base', 'Auf der Buchungsseite zuerst „{amt}“ wählen, dann Anliegen und Uhrzeit.', ['amt' => $amt]),
+                $mitbringen ? Yii::t('KiAssistentModule.base', 'Mitbringen: {liste}', ['liste' => implode(', ', $mitbringen)]) : null,
+                Yii::t('KiAssistentModule.base', 'Gebucht wird direkt bei der Stadt Uffenheim (terminland.de); Rund um Uffni erhält dabei keine Daten.'),
             ])),
-            'knopf' => 'Termin buchen',
+            'knopf' => Yii::t('KiAssistentModule.base', 'Termin buchen'),
             'url' => $ki->terminlandUrl,
         ];
         return [['ok' => true, 'hinweis' => 'Der Buchungsknopf erscheint unter deiner Antwort. Nenne kurz Adresse (Bürgerbüro, Marktplatz 9) und dass man ohne Termin mit Wartezeit rechnen muss.'], $karte];
@@ -261,12 +284,13 @@ class Aktionen
         if ($dienst === null) {
             return [['fehler' => 'Unbekannter Dienst'], null];
         }
-        [$titel, $knopf, $action, $zeilen] = $dienst;
+        [, , $action] = $dienst;
+        [$titel, $knopf, $zeilen] = self::abfallportalTexte((string)$args['dienst']);
         $karte = [
             'typ' => 'link',
             'icon' => 'trash',
             'titel' => $titel,
-            'zeilen' => array_merge($zeilen, ['Die Seite gehört dem Landratsamt; Rund um Uffni erhält deine Eingaben nicht.']),
+            'zeilen' => array_merge($zeilen, [Yii::t('KiAssistentModule.base', 'Die Seite gehört dem Landratsamt; Rund um Uffni erhält deine Eingaben nicht.')]),
             'knopf' => $knopf,
             'url' => self::PORTAL . $action,
         ];
@@ -301,18 +325,28 @@ class Aktionen
         $url = 'https://www.openstreetmap.org/directions?engine=' . $engine . '&route='
             . rawurlencode(($start ? "$start[0],$start[1]" : '') . ';' . "$ziel[0],$ziel[1]");
         $luft = $start ? (int)round(self::meter($start, $ziel) / 50) * 50 : null;
-        $mittel = ['fossgis_osrm_foot' => 'zu Fuß', 'fossgis_osrm_bike' => 'mit dem Rad', 'fossgis_osrm_car' => 'mit dem Auto'][$engine];
+        $titel = match ($engine) {
+            'fossgis_osrm_bike' => $startText !== ''
+                ? Yii::t('KiAssistentModule.base', 'Weg mit dem Rad von {start} nach {ziel}', ['start' => $startText, 'ziel' => $zielText])
+                : Yii::t('KiAssistentModule.base', 'Weg mit dem Rad nach {ziel}', ['ziel' => $zielText]),
+            'fossgis_osrm_car' => $startText !== ''
+                ? Yii::t('KiAssistentModule.base', 'Weg mit dem Auto von {start} nach {ziel}', ['start' => $startText, 'ziel' => $zielText])
+                : Yii::t('KiAssistentModule.base', 'Weg mit dem Auto nach {ziel}', ['ziel' => $zielText]),
+            default => $startText !== ''
+                ? Yii::t('KiAssistentModule.base', 'Weg zu Fuß von {start} nach {ziel}', ['start' => $startText, 'ziel' => $zielText])
+                : Yii::t('KiAssistentModule.base', 'Weg zu Fuß nach {ziel}', ['ziel' => $zielText]),
+        };
         $karte = [
             'typ' => 'link',
             'icon' => 'map-signs',
-            'titel' => 'Weg ' . $mittel . ($startText !== '' ? " von {$startText}" : '') . " nach {$zielText}",
+            'titel' => $titel,
             'zeilen' => array_values(array_filter([
-                $startText !== '' && $start === null ? "Start „{$startText}“ nicht gefunden – bitte auf der Karte eintragen." : null,
-                $startText === '' ? 'Startpunkt auf der Karte eintragen (oder Standort nutzen).' : null,
-                $luft ? "Luftlinie etwa {$luft} m." : null,
-                'Route von OpenStreetMap (FOSSGIS); bitte vor Ort auf Beschilderung achten.',
+                $startText !== '' && $start === null ? Yii::t('KiAssistentModule.base', 'Start „{start}“ nicht gefunden – bitte auf der Karte eintragen.', ['start' => $startText]) : null,
+                $startText === '' ? Yii::t('KiAssistentModule.base', 'Startpunkt auf der Karte eintragen (oder Standort nutzen).') : null,
+                $luft ? Yii::t('KiAssistentModule.base', 'Luftlinie etwa {meter} m.', ['meter' => (string)$luft]) : null,
+                Yii::t('KiAssistentModule.base', 'Route von OpenStreetMap (FOSSGIS); bitte vor Ort auf Beschilderung achten.'),
             ])),
-            'knopf' => 'Route auf der Karte',
+            'knopf' => Yii::t('KiAssistentModule.base', 'Route auf der Karte'),
             'url' => $url,
         ];
         return [['ok' => true, 'ziel_gefunden' => true, 'start_gefunden' => $start !== null, 'luftlinie_m' => $luft,
@@ -356,8 +390,8 @@ class Aktionen
             'typ' => 'download',
             'icon' => 'file-pdf-o',
             'titel' => $def['titel'],
-            'zeilen' => ['Bitte prüfen, ausdrucken und unterschreiben. Der Download ist eine Stunde lang verfügbar und wird dann gelöscht.'],
-            'knopf' => 'PDF herunterladen',
+            'zeilen' => [Yii::t('KiAssistentModule.base', 'Bitte prüfen, ausdrucken und unterschreiben. Der Download ist eine Stunde lang verfügbar und wird dann gelöscht.')],
+            'knopf' => Yii::t('KiAssistentModule.base', 'PDF herunterladen'),
             'url' => Url::to(['/ki-assistent/chat/formular', 'token' => $token]),
         ];
         return [['ok' => true, 'hinweis' => 'Der Download-Knopf erscheint unter deiner Antwort. Erkläre kurz die nächsten Schritte (prüfen, unterschreiben, wohin damit, Kosten).'], $karte];

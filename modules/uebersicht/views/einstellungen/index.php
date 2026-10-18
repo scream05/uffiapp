@@ -8,14 +8,13 @@ use humhub\helpers\Html;
 use humhub\modules\content\models\Content;
 use humhub\modules\space\widgets\Image;
 
-$this->title = 'Meine Übersicht';
+$this->title = Yii::t('UebersichtModule.base', 'Meine Übersicht');
 ?>
 <div class="container">
 <div class="panel panel-default" style="max-width:640px;margin:0 auto">
     <div class="panel-body">
-        <h1 style="font-size:1.4em;margin-top:0">Meine Übersicht</h1>
-        <p class="help-block">Wähle, aus welchen Bereichen Beiträge in deiner Übersicht erscheinen. Das gilt nur für dich.
-            Beiträge, die wir oben anpinnen, siehst du immer. Deine Benachrichtigungen ändern sich dadurch nicht.</p>
+        <h1 style="font-size:1.4em;margin-top:0"><?= Yii::t('UebersichtModule.base', 'Meine Übersicht') ?></h1>
+        <p class="help-block"><?= Yii::t('UebersichtModule.base', 'Wähle, aus welchen Bereichen Beiträge in deiner Übersicht erscheinen. Das gilt nur für dich. Beiträge, die wir oben anpinnen, siehst du immer. Deine Benachrichtigungen ändern sich dadurch nicht.') ?></p>
         <?= Html::beginForm(['/uebersicht/einstellungen/index'], 'post') ?>
             <div class="list-group uebersicht-bereiche" style="margin:16px 0">
                 <?php foreach ($bereiche as $space): ?>
@@ -27,20 +26,20 @@ $this->title = 'Meine Übersicht';
                                 <small class="text-muted"><?= Html::encode($space->description) ?></small>
                             <?php endif ?>
                             <?php if ($space->getDefaultContentVisibility() == Content::VISIBILITY_PRIVATE && !$space->isMember()): ?>
-                                <small style="display:block;color:#7c1922">Beiträge hier sehen nur Mitglieder –
-                                    <?= Html::a('Bereich öffnen und beitreten', $space->getUrl()) ?></small>
+                                <small style="display:block;color:#7c1922"><?= Yii::t('UebersichtModule.base', 'Beiträge hier sehen nur Mitglieder –') ?>
+                                    <?= Html::a(Yii::t('UebersichtModule.base', 'Bereich öffnen und beitreten'), $space->getUrl()) ?></small>
                             <?php endif ?>
                         </span>
                         <span class="form-check form-switch" style="margin:0">
                             <?= Html::checkbox('an[]', !in_array($space->guid, $aus, true), [
                                 'value' => $space->guid, 'class' => 'form-check-input', 'role' => 'switch',
-                                'aria-label' => 'Beiträge aus ' . $space->name . ' in meiner Übersicht']) ?>
+                                'aria-label' => Yii::t('UebersichtModule.base', 'Beiträge aus {bereich} in meiner Übersicht', ['bereich' => $space->name])]) ?>
                         </span>
                     </label>
                 <?php endforeach ?>
             </div>
-            <button type="submit" class="btn btn-primary">Speichern</button>
-            <?= Html::a('Abbrechen', ['/dashboard/dashboard'], ['class' => 'btn btn-link']) ?>
+            <button type="submit" class="btn btn-primary"><?= Yii::t('UebersichtModule.base', 'Speichern') ?></button>
+            <?= Html::a(Yii::t('UebersichtModule.base', 'Abbrechen'), ['/dashboard/dashboard'], ['class' => 'btn btn-link']) ?>
         <?= Html::endForm() ?>
     </div>
 </div>

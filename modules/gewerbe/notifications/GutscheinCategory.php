@@ -5,6 +5,7 @@ namespace humhub\modules\gewerbe\notifications;
 use humhub\modules\notification\components\NotificationCategory;
 use humhub\modules\notification\targets\BaseTarget;
 use humhub\modules\notification\targets\MailTarget;
+use Yii;
 
 class GutscheinCategory extends NotificationCategory
 {
@@ -13,12 +14,12 @@ class GutscheinCategory extends NotificationCategory
 
     public function getTitle()
     {
-        return 'Neue Gutscheine';
+        return Yii::t('GewerbeModule.base', 'Neue Gutscheine');
     }
 
     public function getDescription()
     {
-        return 'Ein Betrieb aus Uffenheim hat einen neuen Rabatt-Gutschein veröffentlicht.';
+        return Yii::t('GewerbeModule.base', 'Ein Betrieb aus Uffenheim hat einen neuen Rabatt-Gutschein veröffentlicht.');
     }
 
     /** Glocke und Push ja, E-Mail nur, wenn man es selbst einschaltet */

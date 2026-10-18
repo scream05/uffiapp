@@ -21,7 +21,7 @@ class Events
             }
             $other = $module->getDesign() === 'neu' ? 'klassisch' : 'neu';
             $event->sender->addEntry(new MenuLink([
-                'label' => 'Design: ' . Module::DESIGNS[$other],
+                'label' => Yii::t('DesignwahlModule.base', 'Design: {name}', ['name' => Module::designText($other)]),
                 'url' => Url::to(['/designwahl/wechsel', 'design' => $other]),
                 'icon' => $other === 'neu' ? 'magic' : 'undo',
                 'sortOrder' => 650,
@@ -38,6 +38,7 @@ class Events
      */
     public static function onBeforeRequest($event)
     {
+        self::uebersetzungenRegistrieren();
         Yii::$container->set(\humhub\modules\space\widgets\HeaderCounterSet::class, widgets\SpaceZaehler::class);
         Yii::$container->set(\humhub\modules\space\widgets\Members::class, widgets\SpaceMitglieder::class);
         Yii::$container->set(\humhub\modules\space\widgets\SpaceDirectoryIcons::class, widgets\SpaceVerzeichnisSymbole::class);
@@ -53,12 +54,30 @@ class Events
         Yii::$container->set(\humhub\modules\user\widgets\PeopleHeadingButtons::class, widgets\PersonenKnoepfe::class);
     }
 
+    /**
+     * HumHub erwartet englische Ausgangstexte; unsere Module sind deutsch geschrieben. Mit Ausgangssprache „de“
+     * bleiben deutsche Nutzer beim Original, alle anderen bekommen messages/<sprache>/base.php (en-US → en).
+     * Auch für die Konsole (Warteschlange: Benachrichtigungen und Mails in der Sprache des Empfängers).
+     */
+    public static function uebersetzungenRegistrieren(): void
+    {
+        foreach (Module::DEUTSCHE_MODULE as $id) {
+            if (Yii::$app->hasModule($id)) {
+                Yii::$app->i18n->translations[\humhub\libs\I18NHelper::getModuleTranslationCategory($id) . 'base'] = [
+                    'class' => \humhub\components\i18n\ModuleMessageSource::class,
+                    'moduleId' => $id,
+                    'sourceLanguage' => 'de',
+                ];
+            }
+        }
+    }
+
     /** Fußzeile (beide Designs, auch Anmeldeseite): Link zum öffentlichen Quellcode (AGPL-3.0 § 13), nach den Rechtstexten */
     public static function onFooterMenuInit($event)
     {
         try {
             $event->sender->addEntry(new MenuLink([
-                'label' => 'Quellcode',
+                'label' => Yii::t('DesignwahlModule.base', 'Quellcode'),
                 'url' => 'https://github.com/scream05/uffiapp',
                 'sortOrder' => 900,
                 'htmlOptions' => ['target' => '_blank', 'rel' => 'noopener'],
@@ -100,7 +119,7 @@ class Events
             Module::$mehrAusMenue = [];
             foreach ($menu->getEntries() as $entry) {
                 if ($entry->getId() === 'dashboard') {
-                    $entry->setLabel('Übersicht');
+                    $entry->setLabel(Yii::t('DesignwahlModule.base', 'Übersicht'));
                     $entry->setIcon('home');
                     $entry->setSortOrder(100);
                     continue;
@@ -112,13 +131,13 @@ class Events
                 $menu->removeEntry($entry);
             }
             $sort = 110;
-            foreach (Module::LEISTE as $id => [$text, $icon, $spaceUrl, $route]) {
+            foreach (Module::LEISTE as $id => [, $icon, $spaceUrl, $route]) {
                 if (($url = Module::zielUrl($spaceUrl, $route)) === null) {
                     continue;
                 }
                 $menu->addEntry(new MenuLink([
                     'id' => 'dn-' . $id,
-                    'label' => $text,
+                    'label' => Module::zielText($id),
                     'url' => $url,
                     'icon' => $icon,
                     'sortOrder' => $sort += 10,
@@ -130,7 +149,7 @@ class Events
             }
             $menu->addEntry(new MenuLink([
                 'id' => 'dn-mehr',
-                'label' => 'Mehr',
+                'label' => Yii::t('DesignwahlModule.base', 'Mehr'),
                 'url' => '#',
                 'icon' => 'th-large',
                 'sortOrder' => 900,
@@ -173,16 +192,29 @@ class Events
         }
     }
 
-    /** Seitentitel, die HumHub englisch oder ohne Aussage lässt (2.4.2), je Controller/Aktion */
-    private const TITEL = [
-        'calendar/global' => 'Kalender',
-        'user/auth' => 'Anmelden',
-        'user/registration' => 'Registrieren',
-        'user/password-recovery' => 'Passwort vergessen',
-        'ki-assistent/chat' => 'Uffi – KI-Assistent',
-    ];
-    private const RECHTSTEXTE = ['privacy' => 'Datenschutzerklärung', 'imprint' => 'Impressum', 'terms' => 'Nutzungsbedingungen',
-        'cookies' => 'Cookies'];
+    /** Seitentitel, die HumHub englisch oder ohne Aussage lässt (2.4.2), je Controller/Aktion (übersetzt) */
+    private static function titel(string $controller): ?string
+    {
+        return match ($controller) {
+            'calendar/global' => Yii::t('DesignwahlModule.base', 'Kalender'),
+            'user/auth' => Yii::t('DesignwahlModule.base', 'Anmelden'),
+            'user/registration' => Yii::t('DesignwahlModule.base', 'Registrieren'),
+            'user/password-recovery' => Yii::t('DesignwahlModule.base', 'Passwort vergessen'),
+            'ki-assistent/chat' => Yii::t('DesignwahlModule.base', 'Uffi – KI-Assistent'),
+            default => null,
+        };
+    }
+
+    private static function rechtstext(?string $pageKey): ?string
+    {
+        return match ($pageKey) {
+            'privacy' => Yii::t('DesignwahlModule.base', 'Datenschutzerklärung'),
+            'imprint' => Yii::t('DesignwahlModule.base', 'Impressum'),
+            'terms' => Yii::t('DesignwahlModule.base', 'Nutzungsbedingungen'),
+            'cookies' => Yii::t('DesignwahlModule.base', 'Cookies'),
+            default => null,
+        };
+    }
 
     /**
      * Fertige HTML-Seite kurz vor dem Senden: Zoom erlauben (das Layout der Anmeldeseite im Kern und das des
@@ -199,9 +231,10 @@ class Events
             }
             $html = preg_replace('/(<meta name="viewport" content="[^"]*?),\s*maximum-scale=1(\.0)?/', '$1', $response->data, 1);
             $controller = Yii::$app->controller;
-            $titel = $controller ? (self::TITEL[$controller->uniqueId] ?? null) : null;
+            $titel = $controller ? self::titel($controller->uniqueId) : null;
             if ($controller && $controller->uniqueId === 'legal/page') {
-                $titel = self::RECHTSTEXTE[Yii::$app->request->get('pageKey')] ?? null;
+                $pageKey = Yii::$app->request->get('pageKey');
+                $titel = self::rechtstext(is_string($pageKey) ? $pageKey : null);
             }
             if ($titel !== null) {
                 $name = Yii::$app->name;
@@ -222,6 +255,10 @@ class Events
             /** @var Module $module */
             $module = Yii::$app->getModule('designwahl');
             assets\BarrierefreiAsset::register(Yii::$app->view);
+            if (!str_starts_with(Yii::$app->language, 'de')) { // barrierefrei.js ist deutsch geschrieben
+                Yii::$app->view->registerJs('window.bfText = ' . json_encode(self::barrierefreiTexte(), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) . ';',
+                    \yii\web\View::POS_HEAD, 'barrierefrei-texte');
+            }
             if ($module->getDesign() === 'neu') {
                 $event->sender->addWidget(widgets\DesignNeu::class);
             }
@@ -233,6 +270,31 @@ class Events
         } catch (\Throwable $e) {
             Yii::error($e);
         }
+    }
+
+    /** Übersetzte Texte für barrierefrei.js (Schlüssel = deutscher Text) */
+    private static function barrierefreiTexte(): array
+    {
+        return [
+            'Zum Inhalt springen' => Yii::t('DesignwahlModule.base', 'Zum Inhalt springen'),
+            'Suche' => Yii::t('DesignwahlModule.base', 'Suche'),
+            'Suchen' => Yii::t('DesignwahlModule.base', 'Suchen'),
+            'Filter' => Yii::t('DesignwahlModule.base', 'Filter'),
+            'Schließen' => Yii::t('DesignwahlModule.base', 'Schließen'),
+            'Menü' => Yii::t('DesignwahlModule.base', 'Menü'),
+            'Weitere Aktionen' => Yii::t('DesignwahlModule.base', 'Weitere Aktionen'),
+            'Hinzufügen' => Yii::t('DesignwahlModule.base', 'Hinzufügen'),
+            'Bearbeiten' => Yii::t('DesignwahlModule.base', 'Bearbeiten'),
+            'Löschen' => Yii::t('DesignwahlModule.base', 'Löschen'),
+            'Einstellungen' => Yii::t('DesignwahlModule.base', 'Einstellungen'),
+            'Benachrichtigungen' => Yii::t('DesignwahlModule.base', 'Benachrichtigungen'),
+            'Nachrichten' => Yii::t('DesignwahlModule.base', 'Nachrichten'),
+            'Sortierung' => Yii::t('DesignwahlModule.base', 'Sortierung'),
+            'Sprache' => Yii::t('DesignwahlModule.base', 'Sprache'),
+            'Auswahl' => Yii::t('DesignwahlModule.base', 'Auswahl'),
+            'Tabelle, seitlich scrollbar' => Yii::t('DesignwahlModule.base', 'Tabelle, seitlich scrollbar'),
+            'ALTCHA-Website öffnen' => Yii::t('DesignwahlModule.base', 'ALTCHA-Website öffnen'),
+        ];
     }
 
     /**
@@ -254,7 +316,7 @@ class Events
 .dn-abbrechen:hover, .dn-abbrechen:focus { background: #fff; color: #1f2a37; text-decoration: none; }
 .dn-abbrechen-zeile { max-width: 380px; margin: 0 auto; text-align: left; }
 CSS);
-        $view->registerJs(<<<'JS'
+        $view->registerJs(strtr(<<<'JS'
 (function () {
     if (!document.body.classList.contains('login-container') || document.querySelector('.dn-abbrechen')) return;
     var schluessel = 'dnAbbrechenZiel', ziel = null;
@@ -272,11 +334,12 @@ CSS);
     if (!form) return;
     var zeile = document.createElement('div');
     zeile.className = 'dn-abbrechen-zeile';
-    zeile.innerHTML = '<a class="dn-abbrechen" href="#" data-pjax-prevent><i class="fa fa-chevron-left"></i> Abbrechen</a>';
+    zeile.innerHTML = '<a class="dn-abbrechen" href="#" data-pjax-prevent><i class="fa fa-chevron-left"></i> </a>';
+    zeile.firstChild.appendChild(document.createTextNode(DN_ABBRECHEN));
     zeile.firstChild.href = ziel || '/';
     form.parentNode.insertBefore(zeile, form);
 })();
-JS, \yii\web\View::POS_END);
+JS, ['DN_ABBRECHEN' => json_encode(Yii::t('DesignwahlModule.base', 'Abbrechen'), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG)]), \yii\web\View::POS_END);
     }
 
     /** Eigene Views: Original-Ordner => Ordner in designwahl */
@@ -310,7 +373,7 @@ JS, \yii\web\View::POS_END);
             self::gastSprache();
             // Seitentitel der Übersicht: HumHub setzt ihn schon in init(), bei Gästen also noch vor der Umstellung auf Deutsch
             if ($event->sender instanceof \humhub\modules\dashboard\controllers\DashboardController) {
-                $event->sender->setPageTitle('Übersicht');
+                $event->sender->setPageTitle(Yii::t('DesignwahlModule.base', 'Übersicht'));
             }
             $theme = Yii::$app->view->theme;
             if ($theme !== null) {
@@ -405,15 +468,14 @@ JS, \yii\web\View::POS_END);
             return '';
         }
         if (in_array($space->url, controllers\AboController::KALENDER, true)) {
-            $abos = [['Veranstaltungen', Url::to(['/designwahl/abo', 'kalender' => array_search($space->url, controllers\AboController::KALENDER, true)], true)]];
+            $abos = [[Yii::t('DesignwahlModule.base', 'Veranstaltungen'), Url::to(['/designwahl/abo', 'kalender' => array_search($space->url, controllers\AboController::KALENDER, true)], true)]];
             $hinweis = '';
         } elseif ($space->url === 'abfall-and-termine') {
             $abos = [
-                ['Kernstadt Uffenheim', Url::to('/abfall/abfall-kernstadt.ics', true)],
-                ['Ortsteile', Url::to('/abfall/abfall-ortsteile.ics', true)],
+                [Yii::t('DesignwahlModule.base', 'Kernstadt Uffenheim'), Url::to('/abfall/abfall-kernstadt.ics', true)],
+                [Yii::t('DesignwahlModule.base', 'Ortsteile'), Url::to('/abfall/abfall-ortsteile.ics', true)],
             ];
-            $hinweis = 'Restmüll, Bio- und Papiertonne sind überall gleich, die Gelbe Tonne kommt in den Ortsteilen einen Tag später. '
-                . 'Bitte den passenden Kalender wählen.';
+            $hinweis = Yii::t('DesignwahlModule.base', 'Restmüll, Bio- und Papiertonne sind überall gleich, die Gelbe Tonne kommt in den Ortsteilen einen Tag später. Bitte den passenden Kalender wählen.');
         } else {
             return '';
         }

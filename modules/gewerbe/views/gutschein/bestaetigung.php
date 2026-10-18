@@ -16,21 +16,21 @@ $f = Yii::$app->formatter;
 <div class="gs-best<?= $live ? ' live' : '' ?>" role="status">
     <?php if ($live): ?>
         <div class="gs-best-haken" aria-hidden="true"><i class="fa fa-check"></i></div>
-        <div class="gs-best-label">Gutschein eingelöst</div>
+        <div class="gs-best-label"><?= Yii::t('GewerbeModule.base', 'Gutschein eingelöst') ?></div>
     <?php else: ?>
-        <div class="gs-best-label"><?= $e->storniert_am ? 'Vom Betrieb zurückgenommen' : 'Abgelaufen – nicht mehr vorzeigbar' ?></div>
+        <div class="gs-best-label"><?= $e->storniert_am ? Yii::t('GewerbeModule.base', 'Vom Betrieb zurückgenommen') : Yii::t('GewerbeModule.base', 'Abgelaufen – nicht mehr vorzeigbar') ?></div>
     <?php endif ?>
     <div class="gs-best-titel"><?= Html::encode($g->titel) ?></div>
     <div class="gs-best-betrieb"><?= Html::encode($e->betrieb->name) ?></div>
-    <div class="gs-best-code" aria-label="Code <?= Html::encode(implode(' ', str_split($e->code))) ?>"><?= Html::encode($e->code) ?></div>
-    <div class="gs-best-zeit">Eingelöst <?= $f->asDate($e->created_at, 'php:j.n.Y') ?> um <?= $f->asTime($e->created_at, 'php:H:i') ?> Uhr</div>
+    <div class="gs-best-code" aria-label="<?= Html::encode(Yii::t('GewerbeModule.base', 'Code {code}', ['code' => implode(' ', str_split($e->code))])) ?>"><?= Html::encode($e->code) ?></div>
+    <div class="gs-best-zeit"><?= Yii::t('GewerbeModule.base', 'Eingelöst {datum} um {zeit} Uhr', ['datum' => $f->asDate($e->created_at, str_starts_with(Yii::$app->language, 'de') ? 'php:j.n.Y' : 'medium'), 'zeit' => $f->asTime($e->created_at, 'php:H:i')]) ?></div>
     <?php if ($live): ?>
         <div class="gs-best-uhr" id="gs-uhr" aria-live="off">--:--:--</div>
         <div class="gs-best-rest" id="gs-rest"></div>
     <?php endif ?>
 </div>
 <p style="text-align:center;margin-top:14px">
-    <?= Html::a('Zum Gutschein', $g->getUrl(), ['class' => 'btn btn-light']) ?>
+    <?= Html::a(Yii::t('GewerbeModule.base', 'Zum Gutschein'), $g->getUrl(), ['class' => 'btn btn-light']) ?>
 </p>
 <style <?= Html::nonce() ?>>
     .gs-best { margin: 0 auto; max-width: 520px; padding: 28px 20px 24px; border-radius: 22px; text-align: center; color: #fff;
@@ -60,6 +60,7 @@ $f = Yii::$app->formatter;
     // Bei PJAX-Wechseln nur eine Uhr laufen lassen
     if (window.gsUhr) clearInterval(window.gsUhr);
     var ende = Date.now() + <?= (int)$rest ?> * 1000;
+    var texte = <?= json_encode(['rest' => Yii::t('GewerbeModule.base', 'Noch {zeit} Min. zum Vorzeigen'), 'ende' => Yii::t('GewerbeModule.base', 'Zeit abgelaufen')], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE) ?>;
     function zwei(n) { return (n < 10 ? '0' : '') + n; }
     function tick() {
         var uhr = document.getElementById('gs-uhr');
@@ -68,8 +69,8 @@ $f = Yii::$app->formatter;
         uhr.textContent = zwei(d.getHours()) + ':' + zwei(d.getMinutes()) + ':' + zwei(d.getSeconds());
         var rest = Math.max(0, Math.round((ende - Date.now()) / 1000));
         document.getElementById('gs-rest').textContent = rest > 0
-            ? 'Noch ' + Math.floor(rest / 60) + ':' + zwei(rest % 60) + ' Min. zum Vorzeigen'
-            : 'Zeit abgelaufen';
+            ? texte.rest.replace('{zeit}', Math.floor(rest / 60) + ':' + zwei(rest % 60))
+            : texte.ende;
         if (rest === 0) { clearInterval(window.gsUhr); location.reload(); }
     }
     tick();

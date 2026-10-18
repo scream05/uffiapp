@@ -11,7 +11,7 @@ use humhub\helpers\Html;
 ?>
 <div class="panel panel-default calendar-type-legend kal-legende">
     <div class="panel-heading">
-        <strong>Kategorien</strong> <small class="text-muted">– antippen zum Filtern</small>
+        <strong><?= Yii::t('DesignwahlModule.base', 'Kategorien') ?></strong> <small class="text-muted"><?= Yii::t('DesignwahlModule.base', '– antippen zum Filtern') ?></small>
     </div>
     <div class="panel-body">
         <?php foreach ($types as $type) : ?>

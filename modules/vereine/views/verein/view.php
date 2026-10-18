@@ -19,46 +19,46 @@ use humhub\modules\vereine\Module;
 $space = $this->context->contentContainer;
 $pending = $canManage ? $verein->getVerwalter()->where(['status' => VereinVerwalter::STATUS_ANGEFRAGT])->count() : 0;
 $website = $verein->website;
+$module = Yii::$app->getModule('vereine');
 ?>
 <div class="panel panel-default">
     <div class="panel-body">
-        <p><?= Html::a('<i class="fa fa-arrow-left"></i> Vereinsverzeichnis', $space->createUrl('/vereine/verein/index')) ?></p>
+        <p><?= Html::a('<i class="fa fa-arrow-left"></i> ' . Yii::t('VereineModule.base', 'Vereinsverzeichnis'), $space->createUrl('/vereine/verein/index')) ?></p>
         <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
             <?= $this->render('_logo', ['verein' => $verein, 'size' => 72]) ?>
             <div style="flex:1;min-width:200px">
                 <h1 style="margin:0 0 4px;font-size:1.5em"><?= Html::encode($verein->name) ?></h1>
-                <span class="text-muted"><?= Html::encode($verein->kategorie) ?> · <?= Html::encode($verein->ortsteil) ?></span>
+                <span class="text-muted"><?= Html::encode($module->kategorieLabel($verein->kategorie)) ?> · <?= Html::encode($module->ortLabel($verein->ortsteil)) ?></span>
             </div>
         </div>
 
         <?php if ($canManage): ?>
             <div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:6px">
                 <?php if ($verein->status !== Verein::STATUS_VORGESCHLAGEN): ?>
-                    <?= Html::a('<i class="fa fa-calendar-plus-o"></i> Termin eintragen', $space->createUrl('/vereine/termin/create', ['verein' => $verein->id]), ['class' => 'btn btn-primary btn-sm']) ?>
-                    <?= Html::a('<i class="fa fa-pencil-square-o"></i> Beitrag schreiben', $space->createUrl('/vereine/beitrag/create', ['verein' => $verein->id]), ['class' => 'btn btn-primary btn-sm']) ?>
+                    <?= Html::a('<i class="fa fa-calendar-plus-o"></i> ' . Yii::t('VereineModule.base', 'Termin eintragen'), $space->createUrl('/vereine/termin/create', ['verein' => $verein->id]), ['class' => 'btn btn-primary btn-sm']) ?>
+                    <?= Html::a('<i class="fa fa-pencil-square-o"></i> ' . Yii::t('VereineModule.base', 'Beitrag schreiben'), $space->createUrl('/vereine/beitrag/create', ['verein' => $verein->id]), ['class' => 'btn btn-primary btn-sm']) ?>
                 <?php endif ?>
-                <?= Html::a('<i class="fa fa-pencil"></i> Seite bearbeiten', $space->createUrl('/vereine/verein/edit', ['id' => $verein->id]), ['class' => 'btn btn-light btn-sm']) ?>
-                <?= Html::a('<i class="fa fa-user-plus"></i> Verwalter' . ($pending ? " ($pending neu)" : ''), $space->createUrl('/vereine/verein/verwalter', ['id' => $verein->id]), ['class' => 'btn btn-light btn-sm']) ?>
+                <?= Html::a('<i class="fa fa-pencil"></i> ' . Yii::t('VereineModule.base', 'Seite bearbeiten'), $space->createUrl('/vereine/verein/edit', ['id' => $verein->id]), ['class' => 'btn btn-light btn-sm']) ?>
+                <?= Html::a('<i class="fa fa-user-plus"></i> ' . Yii::t('VereineModule.base', 'Verwalter') . ($pending ? ' (' . Yii::t('VereineModule.base', '{n} neu', ['n' => $pending]) . ')' : ''), $space->createUrl('/vereine/verein/verwalter', ['id' => $verein->id]), ['class' => 'btn btn-light btn-sm']) ?>
                 <?php if (Module::canManageAll()): ?>
-                    <?= Html::a('<i class="fa fa-trash"></i> Aus dem Verzeichnis löschen', $space->createUrl('/vereine/verein/delete', ['id' => $verein->id]), [
+                    <?= Html::a('<i class="fa fa-trash"></i> ' . Yii::t('VereineModule.base', 'Aus dem Verzeichnis löschen'), $space->createUrl('/vereine/verein/delete', ['id' => $verein->id]), [
                         'class' => 'btn btn-danger btn-sm', 'data-method' => 'post',
-                        'data-confirm' => 'Diesen Verein wirklich aus dem Verzeichnis löschen? Eingetragene Termine bleiben im Kalender.']) ?>
+                        'data-confirm' => Yii::t('VereineModule.base', 'Diesen Verein wirklich aus dem Verzeichnis löschen? Eingetragene Termine bleiben im Kalender.')]) ?>
                 <?php endif ?>
             </div>
         <?php endif ?>
 
         <?php if ($verein->status === Verein::STATUS_VORGESCHLAGEN): ?>
-            <div class="alert alert-warning" style="margin-top:14px">Dieser Verein wurde vorgeschlagen und wartet auf Freigabe. Erst danach ist er im Verzeichnis zu sehen.</div>
+            <div class="alert alert-warning" style="margin-top:14px"><?= Yii::t('VereineModule.base', 'Dieser Verein wurde vorgeschlagen und wartet auf Freigabe. Erst danach ist er im Verzeichnis zu sehen.') ?></div>
         <?php elseif ($verein->isRecherchiert()): ?>
-            <div class="alert alert-info" style="margin-top:14px">Diese Angaben haben wir aus öffentlichen Quellen zusammengestellt
-                (Stand: <?= Yii::$app->formatter->asDate($verein->recherchiert_am, 'long') ?>); der Verein hat sie noch nicht bestätigt.
-                Etwas stimmt nicht? Vorstandsmitglieder können die Seite unten übernehmen und selbst pflegen.</div>
+            <div class="alert alert-info" style="margin-top:14px"><?= Yii::t('VereineModule.base', 'Diese Angaben haben wir aus öffentlichen Quellen zusammengestellt (Stand: {datum}); der Verein hat sie noch nicht bestätigt.', ['datum' => Yii::$app->formatter->asDate($verein->recherchiert_am, 'long')]) ?>
+                <?= Yii::t('VereineModule.base', 'Etwas stimmt nicht? Vorstandsmitglieder können die Seite unten übernehmen und selbst pflegen.') ?></div>
         <?php elseif ($verein->status === Verein::STATUS_OFFEN): ?>
-            <div class="alert alert-info" style="margin-top:14px">Dieser Eintrag stammt aus der Vereinsliste der Stadt und wurde vom Verein noch nicht gepflegt.</div>
+            <div class="alert alert-info" style="margin-top:14px"><?= Yii::t('VereineModule.base', 'Dieser Eintrag stammt aus der Vereinsliste der Stadt und wurde vom Verein noch nicht gepflegt.') ?></div>
         <?php endif ?>
 
         <?php if (trim((string)$verein->beschreibung) !== ''): ?>
-            <div style="margin-top:16px"><?= RichText::output($verein->beschreibung) ?></div>
+            <div style="margin-top:16px" data-uebersetzbar="verein:<?= $verein->id ?>"><?= RichText::output($verein->beschreibung) ?></div>
         <?php endif ?>
 
         <?php $gallery = $verein->getGallery(); $credits = $verein->getBildnachweise(); ?>
@@ -73,8 +73,8 @@ $website = $verein->website;
                         <?php if ($c): ?>
                             <figcaption style="font-size:0.75em;line-height:1.3;margin-top:4px" class="text-muted">
                                 <?= Html::encode($c['beschreibung'] ?? '') ?><br>
-                                Foto: <?= Html::encode($c['urheber'] ?? 'unbekannt') ?>,
-                                <?= !empty($c['seite']) ? Html::a(Html::encode($c['lizenz'] ?? 'Lizenz'), $c['seite'], ['target' => '_blank', 'rel' => 'noopener nofollow']) : Html::encode($c['lizenz'] ?? '') ?>
+                                <?= Yii::t('VereineModule.base', 'Foto') ?>: <?= Html::encode($c['urheber'] ?? Yii::t('VereineModule.base', 'unbekannt')) ?>,
+                                <?= !empty($c['seite']) ? Html::a(Html::encode($c['lizenz'] ?? Yii::t('VereineModule.base', 'Lizenz')), $c['seite'], ['target' => '_blank', 'rel' => 'noopener nofollow']) : Html::encode($c['lizenz'] ?? '') ?>
                             </figcaption>
                         <?php endif ?>
                     </figure>
@@ -84,7 +84,7 @@ $website = $verein->website;
 
         <?php $ap = $verein->getAnsprechpartnerList(); $social = $verein->getSocialList(); ?>
         <?php if ($verein->treffpunkt || $website || $verein->email || $verein->telefon || $ap || $social): ?>
-            <h2 style="font-size:1.1em;margin-top:20px">Kontakt</h2>
+            <h2 style="font-size:1.1em;margin-top:20px"><?= Yii::t('VereineModule.base', 'Kontakt') ?></h2>
             <ul class="list-unstyled" style="line-height:1.9">
                 <?php if ($verein->treffpunkt): ?><li><i class="fa fa-map-marker fa-fw"></i> <?= Html::encode($verein->treffpunkt) ?></li><?php endif ?>
                 <?php if ($website): ?><li><i class="fa fa-globe fa-fw"></i> <?= Html::a(Html::encode(preg_replace('#^https?://(www\.)?|/$#', '', $website)), $website, ['target' => '_blank', 'rel' => 'noopener nofollow']) ?></li><?php endif ?>
@@ -96,7 +96,7 @@ $website = $verein->website;
                 <?php endforeach ?>
             </ul>
             <?php if ($ap): ?>
-                <h3 style="font-size:1em;margin-top:12px">Ansprechpartner</h3>
+                <h3 style="font-size:1em;margin-top:12px"><?= Yii::t('VereineModule.base', 'Ansprechpartner') ?></h3>
                 <ul class="list-unstyled" style="line-height:1.7">
                     <?php foreach ($ap as $p): ?>
                         <li><?= $p['funktion'] !== '' ? Html::encode($p['funktion']) . ': ' : '' ?><strong><?= Html::encode($p['name']) ?></strong>
@@ -115,13 +115,13 @@ $website = $verein->website;
 <div class="panel panel-default">
     <div class="panel-body">
         <details>
-            <summary style="cursor:pointer" class="text-muted">Quellen<?= $verein->recherchiert_am ? ' (Stand: ' . Yii::$app->formatter->asDate($verein->recherchiert_am, 'medium') . ')' : '' ?></summary>
+            <summary style="cursor:pointer" class="text-muted"><?= Yii::t('VereineModule.base', 'Quellen') ?><?= $verein->recherchiert_am ? ' (' . Yii::t('VereineModule.base', 'Stand: {datum}', ['datum' => Yii::$app->formatter->asDate($verein->recherchiert_am, 'medium')]) . ')' : '' ?></summary>
             <ul style="margin-top:8px;font-size:0.9em">
                 <?php foreach ($quellen as $url): ?>
                     <li><?= Html::a(Html::encode(mb_strimwidth(preg_replace('#^https?://(www\.)?#', '', $url), 0, 80, '…')), $url, ['target' => '_blank', 'rel' => 'noopener nofollow']) ?></li>
                 <?php endforeach ?>
                 <?php if ($verein->logo_quelle): ?>
-                    <li>Logo: <?= Html::a(Html::encode(mb_strimwidth(preg_replace('#^https?://(www\.)?#', '', $verein->logo_quelle), 0, 80, '…')), $verein->logo_quelle, ['target' => '_blank', 'rel' => 'noopener nofollow']) ?></li>
+                    <li><?= Yii::t('VereineModule.base', 'Logo') ?>: <?= Html::a(Html::encode(mb_strimwidth(preg_replace('#^https?://(www\.)?#', '', $verein->logo_quelle), 0, 80, '…')), $verein->logo_quelle, ['target' => '_blank', 'rel' => 'noopener nofollow']) ?></li>
                 <?php endif ?>
             </ul>
         </details>
@@ -131,15 +131,15 @@ $website = $verein->website;
 
 <?php if ($beitraege || $eigene): ?>
 <div class="panel panel-default">
-    <div class="panel-heading"><strong>Beiträge</strong></div>
+    <div class="panel-heading"><strong><?= Yii::t('VereineModule.base', 'Beiträge') ?></strong></div>
     <div class="panel-body">
         <?php foreach ($eigene as $b): ?>
             <div class="alert <?= $b->status === VereinBeitrag::STATUS_ABGELEHNT ? 'alert-danger' : 'alert-warning' ?>" style="margin-bottom:12px">
-                <strong><?= $b->status === VereinBeitrag::STATUS_ABGELEHNT ? 'Nicht veröffentlicht' : 'Wartet auf Prüfung' ?></strong>
-                (eingereicht <?= Yii::$app->formatter->asDatetime($b->created_at, 'short') ?> von <?= Html::encode($b->user->displayName ?? '') ?>):
+                <strong><?= $b->status === VereinBeitrag::STATUS_ABGELEHNT ? Yii::t('VereineModule.base', 'Nicht veröffentlicht') : Yii::t('VereineModule.base', 'Wartet auf Prüfung') ?></strong>
+                (<?= Yii::t('VereineModule.base', 'eingereicht {zeit} von {name}', ['zeit' => Yii::$app->formatter->asDatetime($b->created_at, 'short'), 'name' => Html::encode($b->user->displayName ?? '')]) ?>):
                 <?= Html::encode(mb_strimwidth($b->text, 0, 120, '…')) ?>
                 <?php if ($b->status === VereinBeitrag::STATUS_ABGELEHNT && $b->begruendung): ?>
-                    <br><small>Begründung: <?= Html::encode($b->begruendung) ?></small>
+                    <br><small><?= Yii::t('VereineModule.base', 'Begründung') ?>: <?= Html::encode($b->begruendung) ?></small>
                 <?php endif ?>
             </div>
         <?php endforeach ?>
@@ -149,12 +149,12 @@ $website = $verein->website;
                 <?= $this->render('@vereine/views/beitrag/_beitrag', ['beitrag' => $b]) ?>
                 <div style="margin-top:6px;font-size:0.9em">
                     <?php if ($b->content): ?>
-                        <?= Html::a('<i class="fa fa-comment-o"></i> Kommentieren', $b->content->getUrl()) ?>
+                        <?= Html::a('<i class="fa fa-comment-o"></i> ' . Yii::t('VereineModule.base', 'Kommentieren'), $b->content->getUrl()) ?>
                     <?php endif ?>
                     <?php if (Module::canManageAll()): ?>
-                        <?= Html::a('<i class="fa fa-trash"></i> Entfernen', $space->createUrl('/vereine/beitrag/entfernen', ['id' => $b->id]), [
+                        <?= Html::a('<i class="fa fa-trash"></i> ' . Yii::t('VereineModule.base', 'Entfernen'), $space->createUrl('/vereine/beitrag/entfernen', ['id' => $b->id]), [
                             'class' => 'text-danger', 'style' => 'margin-left:12px', 'data-method' => 'post', 'data-params' => ['zurueck' => 'verein'],
-                            'data-confirm' => 'Diesen Beitrag ganz entfernen (auch aus der Übersicht)?']) ?>
+                            'data-confirm' => Yii::t('VereineModule.base', 'Diesen Beitrag ganz entfernen (auch aus der Übersicht)?')]) ?>
                     <?php endif ?>
                 </div>
             </div>
@@ -164,7 +164,7 @@ $website = $verein->website;
 <?php endif ?>
 
 <div class="panel panel-default">
-    <div class="panel-heading"><strong>Nächste Termine</strong></div>
+    <div class="panel-heading"><strong><?= Yii::t('VereineModule.base', 'Nächste Termine') ?></strong></div>
     <div class="panel-body">
         <?php if ($entries): ?>
             <ul class="list-unstyled">
@@ -177,10 +177,10 @@ $website = $verein->website;
                 <?php endforeach ?>
             </ul>
         <?php else: ?>
-            <p class="text-muted">Zurzeit keine Termine eingetragen.</p>
+            <p class="text-muted"><?= Yii::t('VereineModule.base', 'Zurzeit keine Termine eingetragen.') ?></p>
         <?php endif ?>
         <?php if ($calendarSpace): ?>
-            <?= Html::a('Zum gemeinsamen Kalender', $calendarSpace->createUrl('/calendar/view/index')) ?>
+            <?= Html::a(Yii::t('VereineModule.base', 'Zum gemeinsamen Kalender'), $calendarSpace->createUrl('/calendar/view/index')) ?>
         <?php endif ?>
     </div>
 </div>
@@ -189,18 +189,18 @@ $website = $verein->website;
 <div class="panel panel-default">
     <div class="panel-body">
         <?php if ($own && $own->status === VereinVerwalter::STATUS_ANGEFRAGT): ?>
-            <p class="text-muted"><i class="fa fa-hourglass-half"></i> Deine Anfrage, diesen Verein zu verwalten, wartet auf Bestätigung.</p>
+            <p class="text-muted"><i class="fa fa-hourglass-half"></i> <?= Yii::t('VereineModule.base', 'Deine Anfrage, diesen Verein zu verwalten, wartet auf Bestätigung.') ?></p>
         <?php else: ?>
             <details>
-                <summary style="cursor:pointer"><strong>Du bist im Vorstand dieses Vereins?</strong> Seite und Termine selbst pflegen</summary>
+                <summary style="cursor:pointer"><strong><?= Yii::t('VereineModule.base', 'Du bist im Vorstand dieses Vereins?') ?></strong> <?= Yii::t('VereineModule.base', 'Seite und Termine selbst pflegen') ?></summary>
                 <?= Html::beginForm($space->createUrl('/vereine/verein/anfrage', ['id' => $verein->id]), 'post', ['style' => 'margin-top:10px']) ?>
-                    <p class="help-block">Deine Anfrage geht an die Verwalter des Vereins bzw. an die Betreiber der Plattform. Wir prüfen kurz, ob du zum Verein gehörst.</p>
+                    <p class="help-block"><?= Yii::t('VereineModule.base', 'Deine Anfrage geht an die Verwalter des Vereins bzw. an die Betreiber der Plattform. Wir prüfen kurz, ob du zum Verein gehörst.') ?></p>
                     <div class="form-group">
-                        <label for="verein-nachricht">Deine Funktion im Verein</label>
+                        <label for="verein-nachricht"><?= Yii::t('VereineModule.base', 'Deine Funktion im Verein') ?></label>
                         <?= Html::textInput('nachricht', '', ['id' => 'verein-nachricht', 'class' => 'form-control', 'maxlength' => 1000,
-                            'placeholder' => 'z. B. 2. Vorsitzende, Schriftführer, Jugendwart', 'required' => true]) ?>
+                            'placeholder' => Yii::t('VereineModule.base', 'z. B. 2. Vorsitzende, Schriftführer, Jugendwart'), 'required' => true]) ?>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-sm">Als Verwalter anfragen</button>
+                    <button type="submit" class="btn btn-primary btn-sm"><?= Yii::t('VereineModule.base', 'Als Verwalter anfragen') ?></button>
                 <?= Html::endForm() ?>
             </details>
         <?php endif ?>

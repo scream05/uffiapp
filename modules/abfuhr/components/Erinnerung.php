@@ -82,11 +82,25 @@ class Erinnerung
         return $out;
     }
 
-    /** Text wie „Biotonne und Restmüll“ */
-    public static function liste(array $keys): string
+    /** Text wie „Biotonne und Restmüll“ (deutsch; mit $uebersetzt in der Sprache des Nutzers) */
+    public static function liste(array $keys, bool $uebersetzt = false): string
     {
+        if ($uebersetzt) {
+            $labels = array_map(fn($k) => self::module()->tonneLabel($k), $keys);
+            return count($labels) > 1 ? Yii::t('AbfuhrModule.base', '{liste} und {letzte}', [
+                'liste' => implode(', ', array_slice($labels, 0, -1)), 'letzte' => end($labels)]) : (string)reset($labels);
+        }
         $labels = array_map(fn($k) => self::module()->tonnen[$k] ?? $k, $keys);
         return count($labels) > 1 ? implode(', ', array_slice($labels, 0, -1)) . ' und ' . end($labels) : (string)reset($labels);
+    }
+
+    /** Abfuhrtag kurz, z. B. „Mo, 20.10.“ – deutsch fest, andere Sprachen über den Formatter */
+    public static function tag(string $ymd, bool $uebersetzt = false): string
+    {
+        if ($uebersetzt && !str_starts_with(Yii::$app->language, 'de')) {
+            return Yii::$app->formatter->asDate($ymd, 'EEE, dd.MM.');
+        }
+        return ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'][(int)date('w', strtotime($ymd))] . ', ' . date('d.m.', strtotime($ymd));
     }
 
     /**

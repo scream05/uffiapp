@@ -6,11 +6,38 @@
     var tage = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
     var monate = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 
+    // Übersetzungen vom Server (widgets/DesignNeu::texte, window.dnText); bei Deutsch leer → deutsche Texte hier
+    var dn = window.dnText || {};
+    function t(text, werte) {
+        var s = (dn.t && dn.t[text]) || text;
+        Object.keys(werte || {}).forEach(function (k) { s = s.split('{' + k + '}').join(werte[k]); });
+        return s;
+    }
+    var tx = t; // in tagKarte ist t der Tag
+
+    function iso(d) {
+        return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+    }
+
+    // „Sonntag, 18. Oktober“ – andere Sprachen: vom Server (ICU), sonst Intl des Browsers
+    function datum(d, morgen) {
+        if (!dn.sprache) return tage[d.getDay()] + (morgen ? ' ' : ', ') + d.getDate() + '. ' + monate[d.getMonth()];
+        var heute = new Date();
+        var plus = Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()) - new Date(heute.getFullYear(), heute.getMonth(), heute.getDate())) / 864e5);
+        if (dn.tag === iso(heute) && plus === 0 && dn.heute) return dn.heute;
+        if (dn.tag === iso(heute) && plus === 1 && dn.morgen) return dn.morgen;
+        try {
+            return d.toLocaleDateString(dn.sprache, {weekday: 'long', day: 'numeric', month: 'long'});
+        } catch (e) {
+            return d.toLocaleDateString();
+        }
+    }
+
     function gruss(h) {
-        if (h < 5) return 'Gute Nacht,';
-        if (h < 11) return 'Guten Morgen,';
-        if (h < 18) return 'Hallo,';
-        return 'Guten Abend,';
+        if (h < 5) return t('Gute Nacht,');
+        if (h < 11) return t('Guten Morgen,');
+        if (h < 18) return t('Hallo,');
+        return t('Guten Abend,');
     }
 
     // Wettersymbole (24×24, Linien in Textfarbe)
@@ -56,8 +83,8 @@
                 feld.innerHTML = svg(w.icon)
                     + '<span class="dn-wetter-grad">' + w.temperatur + '°</span>'
                     + '<span class="dn-wetter-text">' + esc(w.text) + '</span>';
-                feld.title = 'Vorhersage für heute und morgen';
-                feld.setAttribute('aria-label', 'Wetter in Uffenheim: ' + w.text + ', ' + w.temperatur + ' Grad. Vorhersage öffnen');
+                feld.title = t('Vorhersage für heute und morgen');
+                feld.setAttribute('aria-label', t('Wetter in Uffenheim: {text}, {grad} Grad. Vorhersage öffnen', {text: w.text, grad: w.temperatur}));
                 feld.hidden = false;
             })
             .catch(function () { /* ohne Wetter weiter */ });
@@ -79,15 +106,15 @@
             + '<div><span class="dn-wf-maxmin"><strong>' + t.max + '°</strong> / ' + t.min + '°</span>'
             + '<span class="dn-wf-lage">' + esc(t.text) + '</span></div></div>'
             + '<ul class="dn-wf-werte">'
-            + '<li><i class="fa fa-tint" aria-hidden="true"></i>Regen ' + (t.regen > 0 ? 'bis ' + t.regen + ' %' : 'kaum')
-            + (t.niederschlag >= 0.1 ? ', ' + String(t.niederschlag).replace('.', ',') + ' l/m²' : '') + '</li>'
-            + '<li><i class="fa fa-flag-o" aria-hidden="true"></i>Wind bis ' + t.wind + ' km/h'
-            + (t.boeen >= 40 ? ', Böen ' + t.boeen + ' km/h' : '') + '</li>'
-            + (t.aufgang ? '<li><i class="fa fa-sun-o" aria-hidden="true"></i>' + t.aufgang + ' – ' + t.untergang + ' Uhr</li>' : '')
+            + '<li><i class="fa fa-tint" aria-hidden="true"></i>' + esc(t.regen > 0 ? tx('Regen bis {prozent} %', {prozent: t.regen}) : tx('Regen kaum'))
+            + (t.niederschlag >= 0.1 ? ', ' + esc(tx('{menge} l/m²', {menge: String(t.niederschlag).replace('.', dn.dezimal || ',')})) : '') + '</li>'
+            + '<li><i class="fa fa-flag-o" aria-hidden="true"></i>' + esc(tx('Wind bis {wind} km/h', {wind: t.wind}))
+            + (t.boeen >= 40 ? ', ' + esc(tx('Böen {boeen} km/h', {boeen: t.boeen})) : '') + '</li>'
+            + (t.aufgang ? '<li><i class="fa fa-sun-o" aria-hidden="true"></i>' + esc(tx('{von} – {bis} Uhr', {von: t.aufgang, bis: t.untergang})) + '</li>' : '')
             + '</ul>';
         if (mitZeiten && t.zeiten.length) {
             h += '<ul class="dn-wf-zeiten">' + t.zeiten.map(function (z) {
-                return '<li title="' + esc(z.text) + '"><span class="dn-wf-zeit">' + z.name + '</span>' + svg(z.icon)
+                return '<li title="' + esc(z.text) + '"><span class="dn-wf-zeit">' + esc(z.name) + '</span>' + svg(z.icon)
                     + '<strong>' + z.temperatur + '°</strong>' + prozent(z.regen) + '</li>';
             }).join('') + '</ul>';
         }
@@ -100,28 +127,30 @@
         var h = '';
         if (aktuell) {
             h += '<div class="dn-wf-jetzt">' + svg(aktuell.icon) + '<span class="dn-wf-grad">' + aktuell.temperatur + '°</span>'
-                + '<span><strong>' + esc(aktuell.text) + '</strong><small>Gemessen in ' + esc(aktuell.station)
-                + (aktuell.zeit ? ' um ' + esc(aktuell.zeit) + ' Uhr' : '') + '</small></span></div>';
+                + '<span><strong>' + esc(aktuell.text) + '</strong><small>'
+                + esc(aktuell.zeit ? t('Gemessen in {station} um {zeit} Uhr', {station: aktuell.station, zeit: aktuell.zeit})
+                    : t('Gemessen in {station}', {station: aktuell.station})) + '</small></span></div>';
         }
         if (d.warnungen && d.warnungen.length) {
             h += d.warnungen.map(function (w) {
                 return '<details class="dn-wf-warnung dn-wf-' + esc(w.stufe) + '"><summary><i class="fa fa-exclamation-triangle" aria-hidden="true"></i>'
-                    + '<span><strong>' + esc(w.titel) + '</strong><small>' + esc(w.von) + (w.bis ? ' bis ' + esc(w.bis) : '') + ' Uhr</small></span></summary>'
+                    + '<span><strong>' + esc(w.titel) + '</strong><small>' + esc(w.bis ? t('{von} bis {bis} Uhr', {von: w.von, bis: w.bis})
+                        : t('{von} Uhr', {von: w.von})) + '</small></span></summary>'
                     + '<p>' + esc(w.text) + '</p></details>';
             }).join('');
         } else if (d.warnungen) {
-            h += '<p class="dn-wf-ruhig"><i class="fa fa-check-circle" aria-hidden="true"></i>Keine Wetterwarnungen für Uffenheim</p>';
+            h += '<p class="dn-wf-ruhig"><i class="fa fa-check-circle" aria-hidden="true"></i>' + esc(t('Keine Wetterwarnungen für Uffenheim')) + '</p>';
         }
-        h += tagKarte('Heute', d.heute, false);
+        h += tagKarte(esc(t('Heute')), d.heute, false);
         if (d.stunden.length) {
-            h += '<ul class="dn-wf-stunden" aria-label="Stündliche Vorhersage">' + d.stunden.map(function (s) {
-                return '<li title="' + esc(s.text) + '"><span class="dn-wf-zeit">' + s.zeit + '</span>' + svg(s.icon)
+            h += '<ul class="dn-wf-stunden" aria-label="' + esc(t('Stündliche Vorhersage')) + '">' + d.stunden.map(function (s) {
+                return '<li title="' + esc(s.text) + '"><span class="dn-wf-zeit">' + esc(s.zeit) + '</span>' + svg(s.icon)
                     + '<strong>' + s.temperatur + '°</strong>' + prozent(s.regen) + '</li>';
             }).join('') + '</ul>';
         }
-        h += tagKarte('Morgen, ' + tage[morgen.getDay()] + ' ' + morgen.getDate() + '. ' + monate[morgen.getMonth()], d.morgen, true);
-        h += '<p class="dn-wf-quelle">Vorhersage und Warnungen: Deutscher Wetterdienst (über Bright Sky), Stand ' + esc(d.stand)
-            + ' Uhr. Prozentwerte: Regenwahrscheinlichkeit.</p>';
+        h += tagKarte(esc(t('Morgen, {datum}', {datum: datum(morgen, true)})), d.morgen, true);
+        h += '<p class="dn-wf-quelle">' + esc(t('Vorhersage und Warnungen: Deutscher Wetterdienst (über Bright Sky), Stand {zeit} Uhr. Prozentwerte: Regenwahrscheinlichkeit.', {zeit: d.stand}))
+            + '</p>';
         return h;
     }
 
@@ -142,7 +171,7 @@
             return;
         }
         var vorlage = document.getElementById('dn-hero-vorlage');
-        inhalt.innerHTML = '<p class="dn-wf-hinweis"><i class="fa fa-spinner fa-spin" aria-hidden="true"></i> Vorhersage wird geladen …</p>';
+        inhalt.innerHTML = '<p class="dn-wf-hinweis"><i class="fa fa-spinner fa-spin" aria-hidden="true"></i> ' + esc(t('Vorhersage wird geladen …')) + '</p>';
         fetch(vorlage.getAttribute('data-vorhersage-url'), {credentials: 'same-origin'})
             .then(function (r) { return r.json(); })
             .then(function (d) {
@@ -152,7 +181,7 @@
                 inhalt.innerHTML = wetterZeigen(d);
             })
             .catch(function () {
-                inhalt.innerHTML = '<p class="dn-wf-hinweis">Die Vorhersage ist gerade nicht erreichbar. Bitte später noch einmal versuchen.</p>';
+                inhalt.innerHTML = '<p class="dn-wf-hinweis">' + esc(t('Die Vorhersage ist gerade nicht erreichbar. Bitte später noch einmal versuchen.')) + '</p>';
             });
     }
 
@@ -177,9 +206,9 @@
         function setzen(zu) {
             karte.classList.toggle('dn-hero-zu', zu);
             knopf.setAttribute('aria-expanded', zu ? 'false' : 'true');
-            var t = zu ? 'Hinweis aufklappen' : 'Hinweis einklappen';
-            knopf.setAttribute('aria-label', t);
-            knopf.title = t;
+            var text = zu ? t('Hinweis aufklappen') : t('Hinweis einklappen');
+            knopf.setAttribute('aria-label', text);
+            knopf.title = text;
         }
         var zu = false;
         try { zu = localStorage.getItem('dn-hero-zu') === '1'; } catch (e) { /* ohne Speicher */ }
@@ -199,7 +228,7 @@
 
         var teil = vorlage.content.cloneNode(true);
         var jetzt = new Date();
-        teil.querySelector('.dn-hero-datum').textContent = tage[jetzt.getDay()] + ', ' + jetzt.getDate() + '. ' + monate[jetzt.getMonth()];
+        teil.querySelector('.dn-hero-datum').textContent = datum(jetzt, false);
         var g = teil.querySelector('.dn-hero-gruss'); // fehlt bei Gästen
         if (g) g.textContent = gruss(jetzt.getHours());
         ziel.insertBefore(teil, ziel.firstChild);

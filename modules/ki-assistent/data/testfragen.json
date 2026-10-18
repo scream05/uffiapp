@@ -251,5 +251,27 @@
       "openstreetmap|Route|Karte"
     ],
     "karte": "link"
+  },
+  {
+    "frage": "When is the next paper bin collection in Uffenheim?",
+    "erwartet": [
+      "[Pp]aper",
+      "\\d{1,2}"
+    ],
+    "nicht": [
+      "Papiertonne wird",
+      "Die nächste"
+    ]
+  },
+  {
+    "frage": "Коли наступний вивіз паперу в Уффенгаймі?",
+    "erwartet": [
+      "[а-яіїєґ]{5,}",
+      "\\d{1,2}"
+    ],
+    "nicht": [
+      "Die nächste",
+      "wird geleert"
+    ]
   }
 ]

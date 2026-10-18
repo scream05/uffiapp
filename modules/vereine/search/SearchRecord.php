@@ -26,7 +26,8 @@ class SearchRecord implements MetaSearchResultInterface
     public function getDescription(): string
     {
         $hint = $this->keyword ? $this->verein->searchHint($this->keyword) : null;
-        return $hint ?? "{$this->verein->kategorie} · {$this->verein->ortsteil}";
+        $module = Yii::$app->getModule('vereine');
+        return $hint ?? $module->kategorieLabel($this->verein->kategorie) . ' · ' . $module->ortLabel($this->verein->ortsteil);
     }
 
     public function getUrl(): string

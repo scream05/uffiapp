@@ -5,7 +5,7 @@
 .ki-card { margin-top: 10px; padding: 10px 12px; border-radius: 10px; background: var(--hh-background-color-main, #fff); border: 1px solid rgba(0, 0, 0, .08); }
 .ki-card .btn { margin: 6px 6px 0 0; }
 .ki-rate { margin-top: 6px; font-size: .85em; color: var(--hh-text-color-soft, #777); }
-.ki-rate a { margin-right: 8px; text-decoration: none; }
+.ki-rate a { margin-inline-end: 8px; text-decoration: none; } /* dir="auto": auch in arabischen Antworten zwischen den Daumen */
 .ki-rate .input-group { margin-top: 4px; }
 
 /* --- Avatar-Knopf unten rechts --- */

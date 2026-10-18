@@ -50,12 +50,24 @@ class Module extends ContentContainerModule
 
     public function getContentContainerName($container)
     {
-        return 'Vereinsverzeichnis';
+        return Yii::t('VereineModule.base', 'Vereinsverzeichnis');
     }
 
     public function getContentContainerDescription($container)
     {
-        return 'Vereine mit Vorstellungsseite; Vereinsverwalter tragen Termine in den gemeinsamen Kalender ein.';
+        return Yii::t('VereineModule.base', 'Vereine mit Vorstellungsseite; Vereinsverwalter tragen Termine in den gemeinsamen Kalender ein.');
+    }
+
+    /** Anzeigename einer Kategorie (gespeichert wird der deutsche Name aus $categories) */
+    public function kategorieLabel(string $kategorie): string
+    {
+        return in_array($kategorie, $this->categories, true) ? Yii::t('VereineModule.base', $kategorie) : $kategorie;
+    }
+
+    /** Anzeigename eines Orts: Ortsnamen bleiben, nur „Region“ wird übersetzt */
+    public function ortLabel(string $ort): string
+    {
+        return $ort === 'Region' ? Yii::t('VereineModule.base', 'Region') : $ort;
     }
 
     /** Globales Recht „Vereine verwalten“ (Anfragen bestätigen, alle Vereinsseiten bearbeiten) */

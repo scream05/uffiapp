@@ -14,6 +14,13 @@ class Module extends \humhub\components\Module
     public const DESIGNS = ['klassisch' => 'Klassisch', 'neu' => 'Uffi frisch'];
 
     /**
+     * Eigene Module mit deutschen Ausgangstexten: Yii::t('<Modul>Module.base', 'Deutscher Text'),
+     * Übersetzungen in <modul>/messages/<sprache>/base.php (en, uk, ar, tr, ru). Registrierung in Events::onBeforeRequest.
+     */
+    public const DEUTSCHE_MODULE = ['abfuhr', 'designwahl', 'gewerbe', 'ki-assistent', 'maengelmelder', 'mitteilungsblatt',
+        'notdienst', 'uebersicht', 'vereine'];
+
+    /**
      * Umschalter „Design: …“ im Profilmenü anzeigen? Seit 15.10.2026 aus (alle nutzen „Uffi frisch“); die Technik
      * (Benutzereinstellung, /designwahl/wechsel, klassisches Design) bleibt – zum Wiedereinschalten auf true setzen.
      */
@@ -35,6 +42,28 @@ class Module extends \humhub\components\Module
         'notdienste' => ['Notdienste', 'medkit', null, '/notdienst/index', 'rot'],
         'mitteilungsblatt' => ['Mitteilungsblatt', 'newspaper-o', null, '/mitteilungsblatt/index', 'blau'],
     ];
+
+    /** Angezeigter (übersetzter) Text eines Ziels aus LEISTE/MEHR – die Konstanten bleiben deutsch */
+    public static function zielText(string $id): string
+    {
+        return match ($id) {
+            'termine' => Yii::t('DesignwahlModule.base', 'Termine'),
+            'abfuhr' => Yii::t('DesignwahlModule.base', 'Abfuhr'),
+            'mangel' => Yii::t('DesignwahlModule.base', 'Mangel melden'),
+            'vereine' => Yii::t('DesignwahlModule.base', 'Vereine'),
+            'gewerbe' => Yii::t('DesignwahlModule.base', 'Gewerbe'),
+            'rathaus' => Yii::t('DesignwahlModule.base', 'Rathaus'),
+            'notdienste' => Yii::t('DesignwahlModule.base', 'Notdienste'),
+            'mitteilungsblatt' => Yii::t('DesignwahlModule.base', 'Mitteilungsblatt'),
+            default => self::LEISTE[$id][0] ?? self::MEHR[$id][0] ?? $id,
+        };
+    }
+
+    /** Angezeigter Name eines Designs („Uffi frisch“ bleibt) */
+    public static function designText(string $design): string
+    {
+        return $design === 'klassisch' ? Yii::t('DesignwahlModule.base', 'Klassisch') : (self::DESIGNS[$design] ?? $design);
+    }
 
     /** Menüpunkte, die das neue Design aus dem Hauptmenü ins Fach „Mehr“ verschiebt (gefüllt von Events::onTopMenuRun) */
     public static array $mehrAusMenue = [];

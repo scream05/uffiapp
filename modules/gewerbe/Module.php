@@ -47,6 +47,37 @@ class Module extends ContentContainerModule
         'Welbhausen', 'Region',
     ];
 
+    /** Branche zur Anzeige übersetzt (gespeichert und gefiltert wird immer der deutsche Wert) */
+    public static function kategorieLabel(?string $kategorie): string
+    {
+        return $kategorie === null || $kategorie === '' ? '' : Yii::t('GewerbeModule.base', $kategorie);
+    }
+
+    /** Ort zur Anzeige: Ortsnamen bleiben, nur „Region“ wird übersetzt */
+    public static function ortLabel(?string $ort): string
+    {
+        return $ort === 'Region' ? Yii::t('GewerbeModule.base', 'Region') : (string)$ort;
+    }
+
+    /** Liste Wert => übersetzte Anzeige, z. B. für Auswahllisten */
+    public function kategorieOptionen(): array
+    {
+        $optionen = [];
+        foreach ($this->categories as $k) {
+            $optionen[$k] = self::kategorieLabel($k);
+        }
+        return $optionen;
+    }
+
+    public function ortOptionen(): array
+    {
+        $optionen = [];
+        foreach ($this->ortsteile as $o) {
+            $optionen[$o] = self::ortLabel($o);
+        }
+        return $optionen;
+    }
+
     public function getContentContainerTypes()
     {
         return [Space::class];
@@ -54,12 +85,12 @@ class Module extends ContentContainerModule
 
     public function getContentContainerName($container)
     {
-        return 'Gewerbeverzeichnis';
+        return Yii::t('GewerbeModule.base', 'Gewerbeverzeichnis');
     }
 
     public function getContentContainerDescription($container)
     {
-        return 'Betriebe mit Schaufenster-Seite; Inhaber pflegen ihre Seite selbst.';
+        return Yii::t('GewerbeModule.base', 'Betriebe mit Schaufenster-Seite; Inhaber pflegen ihre Seite selbst.');
     }
 
     /** Globales Recht „Gewerbe verwalten“ (Anfragen bestätigen, alle Betriebsseiten bearbeiten) */

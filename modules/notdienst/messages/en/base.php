@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'Notdienste' => 'Emergency services',
+    'Notrufnummern' => 'Emergency numbers',
+    'Notruf (Rettungsdienst, Feuerwehr)' => 'Emergency (ambulance, fire brigade)',
+    'Lebensgefahr, Unfall, Brand – auch ohne Guthaben/SIM' => 'Danger to life, accident, fire – also without credit/SIM',
+    'Polizei' => 'Police',
+    'Ärztlicher Bereitschaftsdienst' => 'Out-of-hours medical service',
+    'außerhalb der Sprechzeiten, wenn es nicht lebensbedrohlich ist' => 'outside surgery hours, if not life-threatening',
+    'Giftnotruf München' => 'Poison control centre Munich',
+    'bei Vergiftungen, rund um die Uhr' => 'for poisoning, 24/7',
+    'Zahnärztlicher Notdienst' => 'Emergency dental service',
+    '<strong>Apotheken-Notdienst</strong> rund um Uffenheim' => '<strong>Pharmacy on duty</strong> around Uffenheim',
+    'Die Notdienstdaten sind gerade nicht aktuell. Bitte nutze die {link}.' => 'The pharmacy data is currently not up to date. Please use the {link}.',
+    'Notdienstsuche der Landesapothekerkammer' => 'pharmacy search of the Bavarian Chamber of Pharmacists',
+    'Jetzt' => 'Now',
+    'Danach' => 'Next',
+    'Anschließend' => 'After that',
+    '{von} bis {bis}' => '{von} to {bis}',
+    'Entfernung über die Straße ab Uffenheim. Vor dem Losfahren am besten kurz anrufen.' => 'Distance by road from Uffenheim. Best to call before you set off.',
+    'Weitere Tage und andere Orte: {link}.' => 'More days and other places: {link}.',
+    'Notdienstsuche der Kammer' => 'pharmacy search of the Chamber',
+    'Stand: {zeit}.' => 'As of: {zeit}.',
+    'Notruf' => 'Emergency',
+    'Apotheken-Notdienst bis {zeit}:' => 'Pharmacy on duty until {zeit}:',
+    'Alle Notdienste' => 'All emergency services',
+];

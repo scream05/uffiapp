@@ -24,13 +24,13 @@ class GastFotos
             fn(UploadedFile $f) => $f->error !== UPLOAD_ERR_NO_FILE));
         $fehler = [];
         if (count($dateien) > $module->gastFotos) {
-            $fehler[] = "Bitte höchstens {$module->gastFotos} Fotos anhängen.";
+            $fehler[] = Yii::t('MaengelmelderModule.base', 'Bitte höchstens {max} Fotos anhängen.', ['max' => $module->gastFotos]);
         }
         foreach ($dateien as $f) {
             if ($f->error === UPLOAD_ERR_INI_SIZE || $f->error === UPLOAD_ERR_FORM_SIZE || $f->size > $module->gastFotoMaxMb * 1024 * 1024) {
-                $fehler[] = "Das Foto „{$f->name}“ ist zu groß (höchstens {$module->gastFotoMaxMb} MB).";
+                $fehler[] = Yii::t('MaengelmelderModule.base', 'Das Foto „{name}“ ist zu groß (höchstens {mb} MB).', ['name' => $f->name, 'mb' => $module->gastFotoMaxMb]);
             } elseif ($f->error !== UPLOAD_ERR_OK) {
-                $fehler[] = "Das Foto „{$f->name}“ konnte nicht hochgeladen werden.";
+                $fehler[] = Yii::t('MaengelmelderModule.base', 'Das Foto „{name}“ konnte nicht hochgeladen werden.', ['name' => $f->name]);
             }
         }
         return [$dateien, $fehler];
@@ -84,7 +84,7 @@ class GastFotos
                 $files[] = $file;
             } catch (\Throwable $e) {
                 Yii::warning("Gastfoto {$f->name}: " . $e->getMessage(), 'maengelmelder');
-                $fehler[] = "„{$f->name}“ ist kein unterstütztes Foto (JPEG, PNG, WebP oder HEIC).";
+                $fehler[] = Yii::t('MaengelmelderModule.base', '„{name}“ ist kein unterstütztes Foto (JPEG, PNG, WebP oder HEIC).', ['name' => $f->name]);
             }
         }
         return [$files, $fehler];

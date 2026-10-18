@@ -48,9 +48,21 @@ class MaengelStatus extends ActiveRecord
             && (Yii::$app->user->isAdmin() || Yii::$app->user->can(ManageStatus::class));
     }
 
+    /** Deutsche Bezeichnung (für Kommentare, Mails, Bauhof-Verlauf, KI-Assistent – gespeicherte Texte bleiben deutsch) */
     public function getLabel(): string
     {
         return self::STATUSES[$this->status][0] ?? $this->status;
+    }
+
+    /** Übersetzte Bezeichnung für die Anzeige (Karte, Etikett) */
+    public function getAnzeigeLabel(): string
+    {
+        return self::anzeigeLabel($this->status);
+    }
+
+    public static function anzeigeLabel(string $status): string
+    {
+        return isset(self::STATUSES[$status]) ? Yii::t('MaengelmelderModule.base', self::STATUSES[$status][0]) : $status;
     }
 
     public function getColor(): string
@@ -61,7 +73,8 @@ class MaengelStatus extends ActiveRecord
     /** Etikett (HTML) für einen Status-Schlüssel; Gestaltung in StatusAsset */
     public static function etikett(string $status): string
     {
-        [$label, , $icon] = self::STATUSES[$status] ?? [$status, null, 'circle'];
+        $icon = self::STATUSES[$status][2] ?? 'circle';
+        $label = self::anzeigeLabel($status);
         return '<span class="mm-status mm-status-' . \humhub\helpers\Html::encode($status) . '">'
             . '<i class="fa fa-' . $icon . '" aria-hidden="true"></i>' . \humhub\helpers\Html::encode($label) . '</span>';
     }

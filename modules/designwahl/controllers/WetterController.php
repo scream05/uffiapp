@@ -31,6 +31,64 @@ class WetterController extends Controller
         'rain' => 'Regen', 'sleet' => 'Schneeregen', 'snow' => 'Schnee', 'hail' => 'Hagel', 'thunderstorm' => 'Gewitter',
     ];
 
+    /** Angezeigter Text einer Wetterlage (TEXTE ist deutsch und steht so im Cache; übersetzt wird bei der Ausgabe) */
+    private static function text(string $icon): string
+    {
+        return match ($icon) {
+            'clear-day' => Yii::t('DesignwahlModule.base', 'Sonnig'),
+            'clear-night' => Yii::t('DesignwahlModule.base', 'Klar'),
+            'partly-cloudy-day', 'partly-cloudy-night' => Yii::t('DesignwahlModule.base', 'Leicht bewölkt'),
+            'cloudy' => Yii::t('DesignwahlModule.base', 'Bewölkt'),
+            'fog' => Yii::t('DesignwahlModule.base', 'Nebel'),
+            'wind' => Yii::t('DesignwahlModule.base', 'Windig'),
+            'rain' => Yii::t('DesignwahlModule.base', 'Regen'),
+            'sleet' => Yii::t('DesignwahlModule.base', 'Schneeregen'),
+            'snow' => Yii::t('DesignwahlModule.base', 'Schnee'),
+            'hail' => Yii::t('DesignwahlModule.base', 'Hagel'),
+            'thunderstorm' => Yii::t('DesignwahlModule.base', 'Gewitter'),
+            default => self::TEXTE[$icon] ?? '',
+        };
+    }
+
+    /** Tageszeit (im Cache deutsch, siehe tag()) */
+    private static function tageszeit(string $name): string
+    {
+        return match ($name) {
+            'Morgens' => Yii::t('DesignwahlModule.base', 'Morgens'),
+            'Mittags' => Yii::t('DesignwahlModule.base', 'Mittags'),
+            'Nachmittags' => Yii::t('DesignwahlModule.base', 'Nachmittags'),
+            'Abends' => Yii::t('DesignwahlModule.base', 'Abends'),
+            default => $name,
+        };
+    }
+
+    /** Vorhersage aus dem Cache in die Sprache der Seite bringen */
+    private static function uebersetzen(array $d): array
+    {
+        foreach (['heute', 'morgen'] as $tag) {
+            if (!empty($d[$tag])) {
+                $d[$tag]['text'] = self::text($d[$tag]['icon']);
+                foreach ($d[$tag]['zeiten'] as $i => $z) {
+                    $d[$tag]['zeiten'][$i]['name'] = self::tageszeit($z['name']);
+                    $d[$tag]['zeiten'][$i]['text'] = self::text($z['icon']);
+                }
+            }
+        }
+        foreach ($d['stunden'] as $i => $s) {
+            $d['stunden'][$i]['text'] = self::text($s['icon']);
+            if (array_key_exists('stunde', $s)) {
+                $d['stunden'][$i]['zeit'] = $s['stunde'] === null ? Yii::t('DesignwahlModule.base', 'Jetzt')
+                    : Yii::t('DesignwahlModule.base', '{stunde} Uhr', ['stunde' => (string)$s['stunde']]);
+            }
+        }
+        foreach ($d['warnungen'] ?? [] as $i => $w) {
+            if (($w['titel'] ?? null) === null) {
+                $d['warnungen'][$i]['titel'] = Yii::t('DesignwahlModule.base', 'Wetterwarnung');
+            }
+        }
+        return $d;
+    }
+
     protected function getAccessRules()
     {
         return []; // auch für Gäste (Startseite)
@@ -60,12 +118,16 @@ class WetterController extends Controller
             return $this->asJson(['fehler' => true]);
         }
         Yii::$app->response->headers->set('Cache-Control', 'private, max-age=600');
+        if ($wetter['text'] !== '') {
+            $wetter['text'] = self::text($wetter['icon']);
+        }
         return $this->asJson($wetter);
     }
 
     public function actionVorhersage()
     {
-        $daten = Yii::$app->cache->getOrSet('designwahl-wetter-vorhersage', function () {
+        // v2: Stunden mit „stunde“ (übersetzt wird erst bei der Ausgabe)
+        $daten = Yii::$app->cache->getOrSet('designwahl-wetter-vorhersage-v2', function () {
             $zone = new \DateTimeZone(self::ZONE);
             $heute = new \DateTimeImmutable('today', $zone);
             $ort = 'lat=' . self::BREITE . '&lon=' . self::LAENGE . '&tz=' . self::ZONE;
@@ -92,11 +154,11 @@ class WetterController extends Controller
             ];
         }, 1800);
         if ($daten === false) {
-            Yii::$app->cache->delete('designwahl-wetter-vorhersage');
+            Yii::$app->cache->delete('designwahl-wetter-vorhersage-v2');
             return $this->asJson(['fehler' => true]);
         }
         Yii::$app->response->headers->set('Cache-Control', 'private, max-age=900');
-        return $this->asJson($daten);
+        return $this->asJson(self::uebersetzen($daten));
     }
 
     private function holen(string $pfad): ?array
@@ -209,6 +271,7 @@ class WetterController extends Controller
             $icon = self::symbol($w);
             $liste[] = [
                 'zeit' => $i === 0 ? 'Jetzt' : $t->format('G') . ' Uhr',
+                'stunde' => $i === 0 ? null : (int)$t->format('G'),
                 'icon' => $icon,
                 'text' => self::TEXTE[$icon],
                 'temperatur' => (int)round($w['temperature']),
@@ -224,7 +287,7 @@ class WetterController extends Controller
             return $z ? (new \DateTimeImmutable($z))->setTimezone(new \DateTimeZone(self::ZONE))->format('d.m., H:i') : '';
         };
         return [
-            'titel' => $a['headline_de'] ?? $a['event_de'] ?? 'Wetterwarnung',
+            'titel' => $a['headline_de'] ?? $a['event_de'] ?? null, // null: „Wetterwarnung“ (übersetzt in uebersetzen())
             'stufe' => in_array($a['severity'] ?? '', ['minor', 'moderate', 'severe', 'extreme'], true) ? $a['severity'] : 'minor',
             'von' => $zeit($a['onset'] ?? null),
             'bis' => $zeit($a['expires'] ?? null),

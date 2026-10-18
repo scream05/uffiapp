@@ -35,8 +35,11 @@ class GutscheinFuerAlle extends BaseNotification
     public function html()
     {
         $g = $this->source;
-        $ab = $g->gueltig_ab > date('Y-m-d') ? ' (ab ' . Yii::$app->formatter->asDate($g->gueltig_ab, 'php:j.n.') . ')' : '';
-        return 'Neuer Gutschein von ' . Html::tag('strong', Html::encode($g->betrieb->name)) . ': „'
-            . Html::encode($g->titel) . '“' . $ab;
+        $params = ['betrieb' => Html::tag('strong', Html::encode($g->betrieb->name)), 'titel' => Html::encode($g->titel)];
+        if ($g->gueltig_ab > date('Y-m-d')) {
+            $params['datum'] = Yii::$app->formatter->asDate($g->gueltig_ab, str_starts_with(Yii::$app->language, 'de') ? 'php:j.n.' : 'medium');
+            return Yii::t('GewerbeModule.base', 'Neuer Gutschein von {betrieb}: „{titel}“ (ab {datum})', $params);
+        }
+        return Yii::t('GewerbeModule.base', 'Neuer Gutschein von {betrieb}: „{titel}“', $params);
     }
 }

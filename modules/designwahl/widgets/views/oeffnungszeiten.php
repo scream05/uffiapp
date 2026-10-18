@@ -6,36 +6,39 @@
 
 use humhub\helpers\Html;
 
+$uhr = fn(string $von, string $bis) => Yii::t('DesignwahlModule.base', '{von} – {bis} Uhr', ['von' => $von, 'bis' => $bis]);
 $orte = [
     [
-        'name' => 'Wertstoffhof Uffenheim',
-        'adresse' => 'Buchenweg 3 (im Kreisbauhof)',
+        'name' => Yii::t('DesignwahlModule.base', 'Wertstoffhof Uffenheim'),
+        'adresse' => Yii::t('DesignwahlModule.base', 'Buchenweg 3 (im Kreisbauhof)'),
         'telefon' => '09161 92-6375',
         'zeiten' => [
-            ['Montag', '09:00 – 12:30 Uhr'],
-            ['Mittwoch', '11:30 – 17:00 Uhr'],
-            ['Freitag', '09:00 – 15:00 Uhr'],
-            ['Samstag', '09:00 – 12:30 Uhr'],
+            [Yii::t('DesignwahlModule.base', 'Montag'), $uhr('09:00', '12:30')],
+            [Yii::t('DesignwahlModule.base', 'Mittwoch'), $uhr('11:30', '17:00')],
+            [Yii::t('DesignwahlModule.base', 'Freitag'), $uhr('09:00', '15:00')],
+            [Yii::t('DesignwahlModule.base', 'Samstag'), $uhr('09:00', '12:30')],
         ],
         'hinweis' => '',
     ],
     [
-        'name' => 'Kompostplatz Uffenheim',
-        'adresse' => '„Bei den drei Kreuzen“, Richtung Custenlohr (bei der Bauschuttdeponie)',
+        'name' => Yii::t('DesignwahlModule.base', 'Kompostplatz Uffenheim'),
+        'adresse' => Yii::t('DesignwahlModule.base', '„Bei den drei Kreuzen“, Richtung Custenlohr (bei der Bauschuttdeponie)'),
         'telefon' => '',
         'zeiten' => [
-            ['Mo., Di., Mi., Fr.', '08:00 – 12:30 Uhr und 13:00 – 16:00 Uhr'],
-            ['Donnerstag', '12:30 – 17:00 Uhr (vormittags geschlossen)'],
-            ['Samstag', '09:00 – 14:00 Uhr'],
+            [Yii::t('DesignwahlModule.base', 'Mo., Di., Mi., Fr.'), Yii::t('DesignwahlModule.base', '{von1} – {bis1} Uhr und {von2} – {bis2} Uhr',
+                ['von1' => '08:00', 'bis1' => '12:30', 'von2' => '13:00', 'bis2' => '16:00'])],
+            [Yii::t('DesignwahlModule.base', 'Donnerstag'), Yii::t('DesignwahlModule.base', '{von} – {bis} Uhr (vormittags geschlossen)',
+                ['von' => '12:30', 'bis' => '17:00'])],
+            [Yii::t('DesignwahlModule.base', 'Samstag'), $uhr('09:00', '14:00')],
         ],
-        'hinweis' => 'Gartenabfälle, Reisig und Baumschnitt. Kleine Mengen Grüngut auch an den Containern am Geckenheimer Steig.',
+        'hinweis' => Yii::t('DesignwahlModule.base', 'Gartenabfälle, Reisig und Baumschnitt. Kleine Mengen Grüngut auch an den Containern am Geckenheimer Steig.'),
     ],
 ];
 
 ?>
 <div class="panel panel-default abfall-zeiten">
     <div class="panel-heading">
-        <strong><i class="fa fa-clock-o"></i> Öffnungszeiten</strong>
+        <strong><i class="fa fa-clock-o"></i> <?= Yii::t('DesignwahlModule.base', 'Öffnungszeiten') ?></strong>
     </div>
     <div class="panel-body">
         <?php foreach ($orte as $ort) : ?>
@@ -44,7 +47,7 @@ $orte = [
                 <div class="text-muted small">
                     <?= Html::encode($ort['adresse']) ?>
                     <?php if ($ort['telefon'] !== '') : ?>
-                        · Tel. <?= Html::a(Html::encode($ort['telefon']), 'tel:+49' . ltrim(preg_replace('/\D/', '', $ort['telefon']), '0')) ?>
+                        · <?= Yii::t('DesignwahlModule.base', 'Tel.') ?> <?= Html::a(Html::encode($ort['telefon']), 'tel:+49' . ltrim(preg_replace('/\D/', '', $ort['telefon']), '0')) ?>
                     <?php endif ?>
                 </div>
                 <table class="abfall-zeiten-tabelle">
@@ -57,9 +60,9 @@ $orte = [
                 <?php endif ?>
             </div>
         <?php endforeach ?>
-        <p class="text-muted small abfall-zeiten-quelle">Angaben ohne Gewähr, aktuelle Infos beim
-            <?= Html::a('Landratsamt (Abfallwirtschaft)', 'https://www.kreis-nea.de/service-themen/abfall-natur-umwelt/abfallentsorgung/annahmestellen-oeffnungszeiten/wertstoffhoefe.html',
-                ['target' => '_blank', 'rel' => 'noopener']) ?>.</p>
+        <p class="text-muted small abfall-zeiten-quelle"><?= Yii::t('DesignwahlModule.base', 'Angaben ohne Gewähr, aktuelle Infos beim {link}.', [
+            'link' => Html::a(Html::encode(Yii::t('DesignwahlModule.base', 'Landratsamt (Abfallwirtschaft)')), 'https://www.kreis-nea.de/service-themen/abfall-natur-umwelt/abfallentsorgung/annahmestellen-oeffnungszeiten/wertstoffhoefe.html',
+                ['target' => '_blank', 'rel' => 'noopener'])]) ?></p>
     </div>
 </div>
 <?php $this->registerCss(<<<'CSS'

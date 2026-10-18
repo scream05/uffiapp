@@ -96,7 +96,7 @@ class Events
                 return;
             }
             $event->sender->addEntry(new MenuLink([
-                'label' => 'Meine Übersicht',
+                'label' => Yii::t('UebersichtModule.base', 'Meine Übersicht'),
                 'url' => Url::to(['/uebersicht/einstellungen/index']),
                 'icon' => 'sliders',
                 'sortOrder' => 640,
@@ -120,7 +120,7 @@ class Events
             }
             if ($ersetzt) {
                 $menu->addEntry(new MenuLink([
-                    'label' => 'In meiner Übersicht anzeigen …',
+                    'label' => Yii::t('UebersichtModule.base', 'In meiner Übersicht anzeigen …'),
                     'url' => Url::to(['/uebersicht/einstellungen/index']),
                     'icon' => 'sliders',
                     'sortOrder' => 800,
@@ -170,7 +170,8 @@ class Events
             $view = Yii::$app->view;
             UebersichtAsset::register($view);
             $view->registerJsConfig('uebersicht', ['ids' => $module->getIds(),
-                'einstellungen' => Yii::$app->user->isGuest ? null : Url::to(['/uebersicht/einstellungen/index'])]);
+                'einstellungen' => Yii::$app->user->isGuest ? null : Url::to(['/uebersicht/einstellungen/index']),
+                'text' => ['angepinnt' => Yii::t('UebersichtModule.base', 'Angepinnt'), 'anpassen' => Yii::t('UebersichtModule.base', 'Übersicht anpassen')]]);
         } catch (\Throwable $e) {
             Yii::error($e);
         }

@@ -105,7 +105,7 @@ class VereinController extends ContentContainerController
                 $this->saveImages($verein);
                 if (!Module::canManageAll()) {
                     $this->request($verein, $nachricht);
-                    $this->view->success('Danke! Dein Vorschlag wird geprüft. Sobald er freigegeben ist, kannst du die Seite pflegen.');
+                    $this->view->success(Yii::t('VereineModule.base', 'Danke! Dein Vorschlag wird geprüft. Sobald er freigegeben ist, kannst du die Seite pflegen.'));
                 }
                 return $this->redirect($verein->getUrl());
             }
@@ -117,7 +117,7 @@ class VereinController extends ContentContainerController
     {
         $verein = $this->findVerein($id);
         if (!$verein->canManage()) {
-            throw new ForbiddenHttpException('Nur Verwalter dieses Vereins können die Seite bearbeiten.');
+            throw new ForbiddenHttpException(Yii::t('VereineModule.base', 'Nur Verwalter dieses Vereins können die Seite bearbeiten.'));
         }
         if ($verein->load(Yii::$app->request->post())) {
             // Umbenennen nur durch Admins (der Name ist das Erkennungsmerkmal im Verzeichnis)
@@ -144,7 +144,7 @@ class VereinController extends ContentContainerController
         }
         $verein = $this->findVerein($id);
         $verein->delete();
-        $this->view->success("„{$verein->name}“ wurde aus dem Verzeichnis entfernt. Bereits eingetragene Termine bleiben im Kalender.");
+        $this->view->success(Yii::t('VereineModule.base', '„{name}“ wurde aus dem Verzeichnis entfernt. Bereits eingetragene Termine bleiben im Kalender.', ['name' => $verein->name]));
         return $this->redirect($this->contentContainer->createUrl('/vereine/verein/index'));
     }
 
@@ -157,7 +157,7 @@ class VereinController extends ContentContainerController
             return $this->redirect($verein->getUrl());
         }
         $this->request($verein, trim((string)Yii::$app->request->post('nachricht', '')));
-        $this->view->success('Deine Anfrage wurde verschickt. Du bekommst eine Benachrichtigung, sobald sie bestätigt ist.');
+        $this->view->success(Yii::t('VereineModule.base', 'Deine Anfrage wurde verschickt. Du bekommst eine Benachrichtigung, sobald sie bestätigt ist.'));
         return $this->redirect($verein->getUrl());
     }
 
@@ -166,7 +166,7 @@ class VereinController extends ContentContainerController
     {
         $verein = $this->findVerein($id);
         if (!$verein->canManage()) {
-            throw new ForbiddenHttpException('Nur Verwalter dieses Vereins können das sehen.');
+            throw new ForbiddenHttpException(Yii::t('VereineModule.base', 'Nur Verwalter dieses Vereins können das sehen.'));
         }
         if (Yii::$app->request->isPost) {
             $userId = (int)Yii::$app->request->post('user_id');
@@ -178,10 +178,10 @@ class VereinController extends ContentContainerController
                     $verein->updateAttributes(['status' => Verein::STATUS_AKTIV]);
                 }
                 VerwaltungBestaetigt::instance()->from(Yii::$app->user->getIdentity())->about($verein)->send($row->user);
-                $this->view->success("{$row->user->displayName} kann den Verein jetzt verwalten.");
+                $this->view->success(Yii::t('VereineModule.base', '{name} kann den Verein jetzt verwalten.', ['name' => $row->user->displayName]));
             } elseif ($row && in_array($action, ['ablehnen', 'entfernen'], true)) {
                 $row->delete();
-                $this->view->success($action === 'ablehnen' ? 'Anfrage abgelehnt.' : 'Verwalter entfernt.');
+                $this->view->success($action === 'ablehnen' ? Yii::t('VereineModule.base', 'Anfrage abgelehnt.') : Yii::t('VereineModule.base', 'Verwalter entfernt.'));
                 if ($row->user_id === Yii::$app->user->id && !$verein->canManage()) {
                     return $this->redirect($verein->getUrl());
                 }
@@ -275,7 +275,7 @@ class VereinController extends ContentContainerController
         $verein = Verein::findOne((int)$id);
         if ($verein === null || ($verein->status === Verein::STATUS_VORGESCHLAGEN && !$verein->canManage()
                 && !VereinVerwalter::find()->where(['verein_id' => $verein->id, 'user_id' => Yii::$app->user->id])->exists())) {
-            throw new NotFoundHttpException('Verein nicht gefunden.');
+            throw new NotFoundHttpException(Yii::t('VereineModule.base', 'Verein nicht gefunden.'));
         }
         return $verein;
     }

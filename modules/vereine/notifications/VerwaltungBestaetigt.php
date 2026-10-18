@@ -5,6 +5,7 @@ namespace humhub\modules\vereine\notifications;
 use humhub\helpers\Html;
 use humhub\modules\notification\components\BaseNotification;
 use humhub\modules\vereine\models\Verein;
+use Yii;
 
 /**
  * An den Nutzer: Verwaltung eines Vereins bestätigt.
@@ -23,12 +24,13 @@ class VerwaltungBestaetigt extends BaseNotification
 
     public function getMailSubject()
     {
-        return "Du kannst jetzt den Verein {$this->source->name} verwalten";
+        return Yii::t('VereineModule.base', 'Du kannst jetzt den Verein {verein} verwalten', ['verein' => $this->source->name]);
     }
 
     public function html()
     {
-        return Html::tag('strong', Html::encode($this->originator->displayName)) . ' hat bestätigt: Du kannst jetzt den Verein '
-            . Html::tag('strong', Html::encode($this->source->name)) . ' verwalten (Vorstellungsseite und Termine).';
+        return Yii::t('VereineModule.base', '{name} hat bestätigt: Du kannst jetzt den Verein {verein} verwalten (Vorstellungsseite und Termine).', [
+            'name' => Html::tag('strong', Html::encode($this->originator->displayName)),
+            'verein' => Html::tag('strong', Html::encode($this->source->name))]);
     }
 }

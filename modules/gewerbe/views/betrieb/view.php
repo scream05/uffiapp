@@ -21,16 +21,16 @@ $pending = $canManage ? $betrieb->getVerwalter()->where(['status' => BetriebVerw
 $stichworte = array_filter(array_map('trim', preg_split('/[,;\n]+/u', (string)$betrieb->angebot)));
 $karte = $betrieb->getKartenUrl();
 $zeiten = $betrieb->getZeiten();
-$stand = $betrieb->getStand();
+$stand = $betrieb->getStand(true);
 ?>
 <div class="panel panel-default">
     <div class="panel-body">
-        <p><?= Html::a('<i class="fa fa-arrow-left" aria-hidden="true"></i> Gewerbeverzeichnis', $space->createUrl('/gewerbe/betrieb/index')) ?></p>
+        <p><?= Html::a('<i class="fa fa-arrow-left" aria-hidden="true"></i> ' . Yii::t('GewerbeModule.base', 'Gewerbeverzeichnis'), $space->createUrl('/gewerbe/betrieb/index')) ?></p>
         <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
             <?= $this->render('_logo', ['betrieb' => $betrieb, 'size' => 80]) ?>
             <div style="flex:1;min-width:200px">
                 <h1 style="margin:0 0 4px;font-size:1.5em"><?= Html::encode($betrieb->name) ?></h1>
-                <span class="text-muted"><?= Html::encode($betrieb->kategorie) ?> · <?= Html::encode($betrieb->ortsteil) ?></span>
+                <span class="text-muted"><?= Html::encode(Module::kategorieLabel($betrieb->kategorie)) ?> · <?= Html::encode(Module::ortLabel($betrieb->ortsteil)) ?></span>
                 <?php if ($stand): ?>
                     <div class="gw-stand <?= $stand['offen'] ? 'offen' : 'zu' ?>"><?= Html::encode($stand['text']) ?></div>
                 <?php endif ?>
@@ -39,44 +39,44 @@ $stand = $betrieb->getStand();
 
         <?php if ($canManage): ?>
             <div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:6px">
-                <?= Html::a('<i class="fa fa-pencil" aria-hidden="true"></i> Seite bearbeiten', $space->createUrl('/gewerbe/betrieb/edit', ['id' => $betrieb->id]), ['class' => 'btn btn-primary btn-sm']) ?>
+                <?= Html::a('<i class="fa fa-pencil" aria-hidden="true"></i> ' . Yii::t('GewerbeModule.base', 'Seite bearbeiten'), $space->createUrl('/gewerbe/betrieb/edit', ['id' => $betrieb->id]), ['class' => 'btn btn-primary btn-sm']) ?>
                 <?php if ($betrieb->status !== Betrieb::STATUS_VORGESCHLAGEN): ?>
-                    <?= Html::a('<i class="fa fa-pencil-square-o" aria-hidden="true"></i> Beitrag schreiben', $space->createUrl('/gewerbe/beitrag/create', ['betrieb' => $betrieb->id]), ['class' => 'btn btn-primary btn-sm']) ?>
+                    <?= Html::a('<i class="fa fa-pencil-square-o" aria-hidden="true"></i> ' . Yii::t('GewerbeModule.base', 'Beitrag schreiben'), $space->createUrl('/gewerbe/beitrag/create', ['betrieb' => $betrieb->id]), ['class' => 'btn btn-primary btn-sm']) ?>
                 <?php endif ?>
                 <?php if ($betrieb->status !== Betrieb::STATUS_VORGESCHLAGEN): ?>
-                    <?= Html::a('<i class="fa fa-ticket" aria-hidden="true"></i> Gutscheine', $space->createUrl('/gewerbe/gutschein/verwaltung', ['betrieb' => $betrieb->id]), ['class' => 'btn btn-primary btn-sm']) ?>
+                    <?= Html::a('<i class="fa fa-ticket" aria-hidden="true"></i> ' . Yii::t('GewerbeModule.base', 'Gutscheine'), $space->createUrl('/gewerbe/gutschein/verwaltung', ['betrieb' => $betrieb->id]), ['class' => 'btn btn-primary btn-sm']) ?>
                 <?php endif ?>
-                <?= Html::a('<i class="fa fa-user-plus" aria-hidden="true"></i> Verwalter' . ($pending ? " ($pending neu)" : ''), $space->createUrl('/gewerbe/betrieb/verwalter', ['id' => $betrieb->id]), ['class' => 'btn btn-light btn-sm']) ?>
+                <?= Html::a('<i class="fa fa-user-plus" aria-hidden="true"></i> ' . ($pending ? Yii::t('GewerbeModule.base', 'Verwalter ({anzahl} neu)', ['anzahl' => $pending]) : Yii::t('GewerbeModule.base', 'Verwalter')), $space->createUrl('/gewerbe/betrieb/verwalter', ['id' => $betrieb->id]), ['class' => 'btn btn-light btn-sm']) ?>
                 <?php if (Module::canManageAll()): ?>
-                    <?= Html::a('<i class="fa fa-trash" aria-hidden="true"></i> Aus dem Verzeichnis löschen', $space->createUrl('/gewerbe/betrieb/delete', ['id' => $betrieb->id]), [
+                    <?= Html::a('<i class="fa fa-trash" aria-hidden="true"></i> ' . Yii::t('GewerbeModule.base', 'Aus dem Verzeichnis löschen'), $space->createUrl('/gewerbe/betrieb/delete', ['id' => $betrieb->id]), [
                         'class' => 'btn btn-danger btn-sm', 'data-method' => 'post',
-                        'data-confirm' => 'Diesen Betrieb wirklich aus dem Verzeichnis löschen?']) ?>
+                        'data-confirm' => Yii::t('GewerbeModule.base', 'Diesen Betrieb wirklich aus dem Verzeichnis löschen?')]) ?>
                 <?php endif ?>
             </div>
         <?php endif ?>
 
         <?php if ($betrieb->status === Betrieb::STATUS_VORGESCHLAGEN): ?>
-            <div class="alert alert-warning" style="margin-top:14px">Dieser Eintrag wartet auf Freigabe. Erst danach ist er im Verzeichnis zu sehen.</div>
+            <div class="alert alert-warning" style="margin-top:14px"><?= Yii::t('GewerbeModule.base', 'Dieser Eintrag wartet auf Freigabe. Erst danach ist er im Verzeichnis zu sehen.') ?></div>
         <?php elseif ($betrieb->isRecherchiert()): $osm = str_contains((string)$betrieb->quelle, 'openstreetmap.org');
             $webQuellen = [];
             foreach ((array)json_decode((string)$betrieb->web_quellen, true) as $u) {
                 $webQuellen[Logo::host($u)] ??= $u; // je Domain nur der erste Link
             }
             $webQuellen = array_slice($webQuellen, 0, 4, true); ?>
-            <div class="alert alert-info" style="margin-top:14px">Diese Angaben stammen aus <?= $osm ? 'OpenStreetMap' : 'einer öffentlichen Liste der Stadt Uffenheim' ?>
-                (<?= Html::a('Quelle', $betrieb->quelle, ['target' => '_blank', 'rel' => 'noopener nofollow']) ?><?= $betrieb->recherchiert_am ? ', Stand ' . Yii::$app->formatter->asDate($betrieb->recherchiert_am, 'medium') : '' ?>)<?php if ($webQuellen): ?>,
-                Vorstellung und Leistungen aus öffentlichen Angaben im Netz (<?= implode(', ', array_map(fn($host, $u) => Html::a(Html::encode($host), $u, ['target' => '_blank', 'rel' => 'noopener nofollow']), array_keys($webQuellen), $webQuellen)) ?><?= $betrieb->web_recherche_am ? ', Stand ' . Yii::$app->formatter->asDate($betrieb->web_recherche_am, 'medium') : '' ?>)<?php endif ?>
-                und werden wöchentlich abgeglichen; der Betrieb hat sie noch nicht bestätigt. Das ist dein Betrieb? Unten kannst du die Seite übernehmen.</div>
+            <div class="alert alert-info" style="margin-top:14px"><?= $osm ? Yii::t('GewerbeModule.base', 'Diese Angaben stammen aus OpenStreetMap') : Yii::t('GewerbeModule.base', 'Diese Angaben stammen aus einer öffentlichen Liste der Stadt Uffenheim') ?>
+                (<?= Html::a(Yii::t('GewerbeModule.base', 'Quelle'), $betrieb->quelle, ['target' => '_blank', 'rel' => 'noopener nofollow']) ?><?= $betrieb->recherchiert_am ? ', ' . Yii::t('GewerbeModule.base', 'Stand {datum}', ['datum' => Yii::$app->formatter->asDate($betrieb->recherchiert_am, 'medium')]) : '' ?>)<?php if ($webQuellen): ?>,
+                <?= Yii::t('GewerbeModule.base', 'Vorstellung und Leistungen aus öffentlichen Angaben im Netz') ?> (<?= implode(', ', array_map(fn($host, $u) => Html::a(Html::encode($host), $u, ['target' => '_blank', 'rel' => 'noopener nofollow']), array_keys($webQuellen), $webQuellen)) ?><?= $betrieb->web_recherche_am ? ', ' . Yii::t('GewerbeModule.base', 'Stand {datum}', ['datum' => Yii::$app->formatter->asDate($betrieb->web_recherche_am, 'medium')]) : '' ?>)<?php endif ?>
+                <?= Yii::t('GewerbeModule.base', 'und werden wöchentlich abgeglichen; der Betrieb hat sie noch nicht bestätigt. Das ist dein Betrieb? Unten kannst du die Seite übernehmen.') ?></div>
         <?php endif ?>
         <?php if ($canManage && $betrieb->abgleich_hinweis): ?>
-            <div class="alert alert-warning" style="margin-top:14px"><strong>Hinweis aus dem wöchentlichen Abgleich</strong>
+            <div class="alert alert-warning" style="margin-top:14px"><strong><?= Yii::t('GewerbeModule.base', 'Hinweis aus dem wöchentlichen Abgleich') ?></strong>
                 (<?= Yii::$app->formatter->asDate($betrieb->abgleich_am, 'medium') ?>):
                 <div style="white-space:pre-line;margin-top:4px"><?= Html::encode($betrieb->abgleich_hinweis) ?></div>
-                <small>Bitte prüfen und die Seite bei Bedarf anpassen. Angaben auf gepflegten Seiten ändern wir nicht selbst.</small></div>
+                <small><?= Yii::t('GewerbeModule.base', 'Bitte prüfen und die Seite bei Bedarf anpassen. Angaben auf gepflegten Seiten ändern wir nicht selbst.') ?></small></div>
         <?php endif ?>
 
         <?php if ($stichworte): ?>
-            <ul class="gw-stichworte" aria-label="Angebot">
+            <ul class="gw-stichworte" aria-label="<?= Html::encode(Yii::t('GewerbeModule.base', 'Angebot')) ?>">
                 <?php foreach ($stichworte as $s): ?><li><?= Html::encode($s) ?></li><?php endforeach ?>
             </ul>
         <?php endif ?>
@@ -84,11 +84,11 @@ $stand = $betrieb->getStand();
         <div class="gw-infos">
             <?php if (Oeffnungszeiten::hatZeiten($zeiten) || trim((string)$betrieb->oeffnungszeiten) !== ''): ?>
                 <section>
-                    <h2><i class="fa fa-clock-o" aria-hidden="true"></i> Öffnungszeiten</h2>
+                    <h2><i class="fa fa-clock-o" aria-hidden="true"></i> <?= Yii::t('GewerbeModule.base', 'Öffnungszeiten') ?></h2>
                     <?php if (Oeffnungszeiten::hatZeiten($zeiten)): ?>
                         <table class="gw-zeiten">
-                            <caption class="visually-hidden">Öffnungszeiten nach Wochentagen</caption>
-                            <?php foreach (Oeffnungszeiten::zeilen($zeiten) as [$tage, $text]): ?>
+                            <caption class="visually-hidden"><?= Yii::t('GewerbeModule.base', 'Öffnungszeiten nach Wochentagen') ?></caption>
+                            <?php foreach (Oeffnungszeiten::zeilen($zeiten, true) as [$tage, $text]): ?>
                                 <tr><th scope="row"><?= Html::encode($tage) ?></th><td><?= Html::encode($text) ?></td></tr>
                             <?php endforeach ?>
                         </table>
@@ -101,12 +101,12 @@ $stand = $betrieb->getStand();
             <?php $social = $betrieb->getSocialList(); ?>
             <?php if ($betrieb->adresse || $betrieb->telefon || $betrieb->email || $betrieb->website || $social): ?>
                 <section>
-                    <h2><i class="fa fa-address-card-o" aria-hidden="true"></i> Kontakt</h2>
+                    <h2><i class="fa fa-address-card-o" aria-hidden="true"></i> <?= Yii::t('GewerbeModule.base', 'Kontakt') ?></h2>
                     <ul class="list-unstyled" style="line-height:1.9;margin:0">
                         <?php if ($betrieb->adresse): ?>
                             <li><i class="fa fa-map-marker fa-fw" aria-hidden="true"></i> <?= Html::encode($betrieb->adresse) ?>
-                                <?php if ($betrieb->lat !== null): ?> · <?= Html::a('Auf der Karte', $space->createUrl('/gewerbe/betrieb/karte', ['fokus' => $betrieb->id])) ?>
-                                <?php elseif ($karte): ?> · <?= Html::a('Karte', $karte, ['target' => '_blank', 'rel' => 'noopener nofollow']) ?><?php endif ?></li>
+                                <?php if ($betrieb->lat !== null): ?> · <?= Html::a(Yii::t('GewerbeModule.base', 'Auf der Karte'), $space->createUrl('/gewerbe/betrieb/karte', ['fokus' => $betrieb->id])) ?>
+                                <?php elseif ($karte): ?> · <?= Html::a(Yii::t('GewerbeModule.base', 'Karte'), $karte, ['target' => '_blank', 'rel' => 'noopener nofollow']) ?><?php endif ?></li>
                         <?php endif ?>
                         <?php if ($betrieb->telefon): ?><li><i class="fa fa-phone fa-fw" aria-hidden="true"></i> <?= Html::a(Html::encode($betrieb->telefon), 'tel:' . preg_replace('/[^0-9+]/', '', $betrieb->telefon)) ?></li><?php endif ?>
                         <?php if ($betrieb->email): ?><li><i class="fa fa-envelope fa-fw" aria-hidden="true"></i> <?= Html::mailto(Html::encode($betrieb->email), $betrieb->email) ?></li><?php endif ?>
@@ -121,7 +121,7 @@ $stand = $betrieb->getStand();
         </div>
 
         <?php if (trim((string)$betrieb->beschreibung) !== ''): ?>
-            <div style="margin-top:16px"><?= RichText::output($betrieb->beschreibung) ?></div>
+            <div style="margin-top:16px" data-uebersetzbar="betrieb:<?= $betrieb->id ?>"><?= RichText::output($betrieb->beschreibung) ?></div>
         <?php endif ?>
 
         <?php $gallery = $betrieb->getGallery(); ?>
@@ -129,7 +129,7 @@ $stand = $betrieb->getStand();
             <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-top:16px">
                 <?php foreach ($gallery as $file): ?>
                     <a href="<?= Html::encode($file->getUrl([], false)) ?>" target="_blank" rel="noopener">
-                        <?= Html::img($file->getUrl([], false), ['alt' => 'Foto: ' . $betrieb->name, 'loading' => 'lazy',
+                        <?= Html::img($file->getUrl([], false), ['alt' => Yii::t('GewerbeModule.base', 'Foto: {name}', ['name' => $betrieb->name]), 'loading' => 'lazy',
                             'style' => 'width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;display:block']) ?>
                     </a>
                 <?php endforeach ?>
@@ -143,7 +143,7 @@ $stand = $betrieb->getStand();
 <?php if ($gutscheine): ?>
 <?= $this->render('@gewerbe/views/gutschein/_stil') ?>
 <div class="panel panel-default">
-    <div class="panel-heading"><strong><i class="fa fa-ticket" aria-hidden="true"></i> Gutscheine</strong></div>
+    <div class="panel-heading"><strong><i class="fa fa-ticket" aria-hidden="true"></i> <?= Yii::t('GewerbeModule.base', 'Gutscheine') ?></strong></div>
     <div class="panel-body">
         <div class="gs-liste">
             <?php foreach ($gutscheine as $g): ?>
@@ -156,15 +156,15 @@ $stand = $betrieb->getStand();
 
 <?php if ($beitraege || $eigene): ?>
 <div class="panel panel-default">
-    <div class="panel-heading"><strong>Beiträge</strong></div>
+    <div class="panel-heading"><strong><?= Yii::t('GewerbeModule.base', 'Beiträge') ?></strong></div>
     <div class="panel-body">
         <?php foreach ($eigene as $b): ?>
             <div class="alert <?= $b->status === BetriebBeitrag::STATUS_ABGELEHNT ? 'alert-danger' : 'alert-warning' ?>" style="margin-bottom:12px">
-                <strong><?= $b->status === BetriebBeitrag::STATUS_ABGELEHNT ? 'Nicht veröffentlicht' : 'Wartet auf Prüfung' ?></strong>
-                (eingereicht <?= Yii::$app->formatter->asDatetime($b->created_at, 'short') ?> von <?= Html::encode($b->user->displayName ?? '') ?>):
+                <strong><?= $b->status === BetriebBeitrag::STATUS_ABGELEHNT ? Yii::t('GewerbeModule.base', 'Nicht veröffentlicht') : Yii::t('GewerbeModule.base', 'Wartet auf Prüfung') ?></strong>
+                (<?= Yii::t('GewerbeModule.base', 'eingereicht {zeit} von {name}', ['zeit' => Yii::$app->formatter->asDatetime($b->created_at, 'short'), 'name' => Html::encode($b->user->displayName ?? '')]) ?>):
                 <?= Html::encode(mb_strimwidth($b->text, 0, 120, '…')) ?>
                 <?php if ($b->status === BetriebBeitrag::STATUS_ABGELEHNT && $b->begruendung): ?>
-                    <br><small>Begründung: <?= Html::encode($b->begruendung) ?></small>
+                    <br><small><?= Yii::t('GewerbeModule.base', 'Begründung:') ?> <?= Html::encode($b->begruendung) ?></small>
                 <?php endif ?>
             </div>
         <?php endforeach ?>
@@ -174,20 +174,20 @@ $stand = $betrieb->getStand();
                 <?= $this->render('@gewerbe/views/beitrag/_beitrag', ['beitrag' => $b]) ?>
                 <div style="margin-top:6px;font-size:0.9em">
                     <?php if ($b->content): ?>
-                        <?= Html::a('<i class="fa fa-comment-o" aria-hidden="true"></i> Kommentieren', $b->content->getUrl()) ?>
+                        <?= Html::a('<i class="fa fa-comment-o" aria-hidden="true"></i> ' . Yii::t('GewerbeModule.base', 'Kommentieren'), $b->content->getUrl()) ?>
                     <?php endif ?>
                     <?php if (Module::canManageAll()): ?>
                         <?= $b->content_id
-                            ? Html::a('<i class="fa fa-eye-slash" aria-hidden="true"></i> Aus der Übersicht nehmen', $space->createUrl('/gewerbe/beitrag/aus-uebersicht', ['id' => $b->id]), [
+                            ? Html::a('<i class="fa fa-eye-slash" aria-hidden="true"></i> ' . Yii::t('GewerbeModule.base', 'Aus der Übersicht nehmen'), $space->createUrl('/gewerbe/beitrag/aus-uebersicht', ['id' => $b->id]), [
                                 'style' => 'margin-left:12px', 'data-method' => 'post', 'data-params' => ['zurueck' => 'betrieb'],
-                                'data-confirm' => 'Aus der Übersicht nehmen? Kommentare dort werden gelöscht; auf der Betriebsseite bleibt der Beitrag.'])
-                            : Html::a('<i class="fa fa-share" aria-hidden="true"></i> Auch in der Übersicht zeigen', $space->createUrl('/gewerbe/beitrag/uebersicht', ['id' => $b->id]), [
+                                'data-confirm' => Yii::t('GewerbeModule.base', 'Aus der Übersicht nehmen? Kommentare dort werden gelöscht; auf der Betriebsseite bleibt der Beitrag.')])
+                            : Html::a('<i class="fa fa-share" aria-hidden="true"></i> ' . Yii::t('GewerbeModule.base', 'Auch in der Übersicht zeigen'), $space->createUrl('/gewerbe/beitrag/uebersicht', ['id' => $b->id]), [
                                 'style' => 'margin-left:12px', 'data-method' => 'post', 'data-params' => ['zurueck' => 'betrieb']]) ?>
                     <?php endif ?>
                     <?php if (Module::canManageAll()): ?>
-                        <?= Html::a('<i class="fa fa-trash" aria-hidden="true"></i> Entfernen', $space->createUrl('/gewerbe/beitrag/entfernen', ['id' => $b->id]), [
+                        <?= Html::a('<i class="fa fa-trash" aria-hidden="true"></i> ' . Yii::t('GewerbeModule.base', 'Entfernen'), $space->createUrl('/gewerbe/beitrag/entfernen', ['id' => $b->id]), [
                             'class' => 'text-danger', 'style' => 'margin-left:12px', 'data-method' => 'post', 'data-params' => ['zurueck' => 'betrieb'],
-                            'data-confirm' => 'Diesen Beitrag ganz entfernen (auch aus der Übersicht)?']) ?>
+                            'data-confirm' => Yii::t('GewerbeModule.base', 'Diesen Beitrag ganz entfernen (auch aus der Übersicht)?')]) ?>
                     <?php endif ?>
                 </div>
             </div>
@@ -199,10 +199,10 @@ $stand = $betrieb->getStand();
 <?php if ($betrieb->osm_ref || $betrieb->logo_quelle): ?>
 <p class="text-muted small gw-nachweis">
     <?php if ($betrieb->osm_ref && $betrieb->status === Betrieb::STATUS_OFFEN): ?>
-        Daten: <?= Html::a('© OpenStreetMap-Mitwirkende', 'https://www.openstreetmap.org/copyright', ['target' => '_blank', 'rel' => 'noopener']) ?>, ODbL.
+        <?= Yii::t('GewerbeModule.base', 'Daten:') ?> <?= Html::a(Yii::t('GewerbeModule.base', '© OpenStreetMap-Mitwirkende'), 'https://www.openstreetmap.org/copyright', ['target' => '_blank', 'rel' => 'noopener']) ?>, ODbL.
     <?php endif ?>
     <?php if ($betrieb->logo_quelle): ?>
-        Logo: <?= Html::a(Html::encode(parse_url($betrieb->logo_quelle, PHP_URL_HOST)), $betrieb->logo_quelle, ['target' => '_blank', 'rel' => 'noopener nofollow']) ?>.
+        <?= Yii::t('GewerbeModule.base', 'Logo:') ?> <?= Html::a(Html::encode(parse_url($betrieb->logo_quelle, PHP_URL_HOST)), $betrieb->logo_quelle, ['target' => '_blank', 'rel' => 'noopener nofollow']) ?>.
     <?php endif ?>
 </p>
 <?php endif ?>
@@ -210,20 +210,20 @@ $stand = $betrieb->getStand();
 <div class="panel panel-default">
     <div class="panel-body">
         <?php if (Yii::$app->user->isGuest): ?>
-            <p class="text-muted">Das ist dein Betrieb? <?= Html::a('Melde dich an', ['/user/auth/login']) ?>, um die Seite selbst zu pflegen.</p>
+            <p class="text-muted"><?= Yii::t('GewerbeModule.base', 'Das ist dein Betrieb? {link}, um die Seite selbst zu pflegen.', ['link' => Html::a(Yii::t('GewerbeModule.base', 'Melde dich an'), ['/user/auth/login'])]) ?></p>
         <?php elseif ($own && $own->status === BetriebVerwalter::STATUS_ANGEFRAGT): ?>
-            <p class="text-muted"><i class="fa fa-hourglass-half" aria-hidden="true"></i> Deine Anfrage, diesen Betrieb zu verwalten, wartet auf Bestätigung.</p>
+            <p class="text-muted"><i class="fa fa-hourglass-half" aria-hidden="true"></i> <?= Yii::t('GewerbeModule.base', 'Deine Anfrage, diesen Betrieb zu verwalten, wartet auf Bestätigung.') ?></p>
         <?php else: ?>
             <details>
-                <summary style="cursor:pointer"><strong>Das ist dein Betrieb?</strong> Seite selbst pflegen</summary>
+                <summary style="cursor:pointer"><strong><?= Yii::t('GewerbeModule.base', 'Das ist dein Betrieb?') ?></strong> <?= Yii::t('GewerbeModule.base', 'Seite selbst pflegen') ?></summary>
                 <?= Html::beginForm($space->createUrl('/gewerbe/betrieb/anfrage', ['id' => $betrieb->id]), 'post', ['style' => 'margin-top:10px']) ?>
-                    <p class="help-block">Deine Anfrage geht an die Verwalter des Betriebs bzw. an die Betreiber der Plattform. Wir prüfen kurz, ob du zum Betrieb gehörst.</p>
+                    <p class="help-block"><?= Yii::t('GewerbeModule.base', 'Deine Anfrage geht an die Verwalter des Betriebs bzw. an die Betreiber der Plattform. Wir prüfen kurz, ob du zum Betrieb gehörst.') ?></p>
                     <div class="form-group">
-                        <label for="gw-nachricht">Deine Funktion im Betrieb</label>
+                        <label for="gw-nachricht"><?= Yii::t('GewerbeModule.base', 'Deine Funktion im Betrieb') ?></label>
                         <?= Html::textInput('nachricht', '', ['id' => 'gw-nachricht', 'class' => 'form-control', 'maxlength' => 1000,
-                            'placeholder' => 'z. B. Inhaberin, Geschäftsführer, Mitarbeiterin mit Auftrag', 'required' => true]) ?>
+                            'placeholder' => Yii::t('GewerbeModule.base', 'z. B. Inhaberin, Geschäftsführer, Mitarbeiterin mit Auftrag'), 'required' => true]) ?>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-sm">Als Verwalter anfragen</button>
+                    <button type="submit" class="btn btn-primary btn-sm"><?= Yii::t('GewerbeModule.base', 'Als Verwalter anfragen') ?></button>
                 <?= Html::endForm() ?>
             </details>
         <?php endif ?>

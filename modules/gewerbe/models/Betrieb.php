@@ -81,17 +81,17 @@ class Betrieb extends ActiveRecord implements ViewableInterface
             [['name', 'angebot', 'adresse', 'website', 'email', 'telefon'], 'trim'],
             [['angebot', 'adresse', 'website', 'email', 'telefon', 'oeffnungszeiten', 'beschreibung'], 'default', 'value' => null],
             ['name', 'string', 'min' => 2, 'max' => 150],
-            ['name', 'unique', 'message' => 'Diesen Betrieb gibt es schon im Verzeichnis.'],
+            ['name', 'unique', 'message' => Yii::t('GewerbeModule.base', 'Diesen Betrieb gibt es schon im Verzeichnis.')],
             ['kategorie', 'in', 'range' => $module->categories],
             ['ortsteil', 'in', 'range' => $module->ortsteile],
             ['angebot', 'string', 'max' => 500],
             ['beschreibung', 'string', 'max' => 20000],
             ['adresse', 'string', 'max' => 255],
             ['oeffnungszeiten', 'string', 'max' => 1000],
-            ['website', 'url', 'defaultScheme' => 'https', 'enableIDN' => true, 'message' => 'Bitte eine gültige Internetadresse angeben.'],
+            ['website', 'url', 'defaultScheme' => 'https', 'enableIDN' => true, 'message' => Yii::t('GewerbeModule.base', 'Bitte eine gültige Internetadresse angeben.')],
             ['website', 'string', 'max' => 255],
-            ['email', 'email', 'enableIDN' => true, 'message' => 'Bitte eine gültige E-Mail-Adresse angeben.'],
-            ['telefon', 'match', 'pattern' => '/^[0-9 +\/()-]{5,50}$/', 'message' => 'Bitte nur Ziffern, Leerzeichen und + / - ( ).'],
+            ['email', 'email', 'enableIDN' => true, 'message' => Yii::t('GewerbeModule.base', 'Bitte eine gültige E-Mail-Adresse angeben.')],
+            ['telefon', 'match', 'pattern' => '/^[0-9 +\/()-]{5,50}$/', 'message' => Yii::t('GewerbeModule.base', 'Bitte nur Ziffern, Leerzeichen und + / - ( ).')],
             [['socialRows', 'zeitenRows'], 'safe'],
             ['socialRows', 'validateSocial'],
             ['zeitenRows', 'validateZeiten'],
@@ -101,18 +101,18 @@ class Betrieb extends ActiveRecord implements ViewableInterface
     public function attributeLabels()
     {
         return [
-            'name' => 'Name des Betriebs',
-            'kategorie' => 'Branche',
-            'ortsteil' => 'Ort / Ortsteil',
-            'angebot' => 'Angebot in Stichworten',
-            'beschreibung' => 'Vorstellung',
-            'adresse' => 'Adresse',
-            'oeffnungszeiten' => 'Hinweise zu den Öffnungszeiten',
-            'zeitenRows' => 'Öffnungszeiten',
-            'website' => 'Website',
-            'email' => 'E-Mail',
-            'telefon' => 'Telefon',
-            'socialRows' => 'Social Media',
+            'name' => Yii::t('GewerbeModule.base', 'Name des Betriebs'),
+            'kategorie' => Yii::t('GewerbeModule.base', 'Branche'),
+            'ortsteil' => Yii::t('GewerbeModule.base', 'Ort / Ortsteil'),
+            'angebot' => Yii::t('GewerbeModule.base', 'Angebot in Stichworten'),
+            'beschreibung' => Yii::t('GewerbeModule.base', 'Vorstellung'),
+            'adresse' => Yii::t('GewerbeModule.base', 'Adresse'),
+            'oeffnungszeiten' => Yii::t('GewerbeModule.base', 'Hinweise zu den Öffnungszeiten'),
+            'zeitenRows' => Yii::t('GewerbeModule.base', 'Öffnungszeiten'),
+            'website' => Yii::t('GewerbeModule.base', 'Website'),
+            'email' => Yii::t('GewerbeModule.base', 'E-Mail'),
+            'telefon' => Yii::t('GewerbeModule.base', 'Telefon'),
+            'socialRows' => Yii::t('GewerbeModule.base', 'Social Media'),
         ];
     }
 
@@ -125,7 +125,7 @@ class Betrieb extends ActiveRecord implements ViewableInterface
                 continue;
             }
             if (!preg_match('#^https://[^\s"<>]{4,300}$#', $url)) {
-                $this->addError('socialRows', "Bitte vollständige Adressen mit https:// angeben: $url");
+                $this->addError('socialRows', Yii::t('GewerbeModule.base', 'Bitte vollständige Adressen mit https:// angeben: {url}', ['url' => $url]));
                 continue;
             }
             $rows[] = ['typ' => mb_substr(trim((string)($row['typ'] ?? '')), 0, 30) ?: self::socialType($url), 'url' => $url];
@@ -146,7 +146,8 @@ class Betrieb extends ActiveRecord implements ViewableInterface
                     continue;
                 }
                 if (!Oeffnungszeiten::gueltig($von) || !Oeffnungszeiten::gueltig($bis) || $von === $bis) {
-                    $this->addError('zeitenRows', "$name: Bitte Anfang und Ende als Uhrzeit angeben, z. B. 08:00 und 12:00.");
+                    $this->addError('zeitenRows', Yii::t('GewerbeModule.base', '{tag}: Bitte Anfang und Ende als Uhrzeit angeben, z. B. 08:00 und 12:00.',
+                        ['tag' => Oeffnungszeiten::tagName($tag, false, true)]));
                     continue;
                 }
                 $zeiten[$tag][] = [$von, $bis];
@@ -160,10 +161,13 @@ class Betrieb extends ActiveRecord implements ViewableInterface
         return Oeffnungszeiten::ausJson($this->zeiten);
     }
 
-    /** „Jetzt geöffnet · bis 18 Uhr“ usw.; null ohne hinterlegte Zeiten */
-    public function getStand(): ?array
+    /**
+     * „Jetzt geöffnet · bis 18 Uhr“ usw.; null ohne hinterlegte Zeiten.
+     * Deutsch (z. B. für den KI-Assistenten); mit $uebersetzt in der Sprache der Oberfläche.
+     */
+    public function getStand(bool $uebersetzt = false): ?array
     {
-        return Oeffnungszeiten::stand($this->getZeiten());
+        return Oeffnungszeiten::stand($this->getZeiten(), null, $uebersetzt);
     }
 
     public function isRecherchiert(): bool

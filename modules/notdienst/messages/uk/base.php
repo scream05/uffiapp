@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'Notdienste' => 'Невідкладна допомога',
+    'Notrufnummern' => 'Номери екстрених служб',
+    'Notruf (Rettungsdienst, Feuerwehr)' => 'Екстрений виклик (швидка допомога, пожежна служба)',
+    'Lebensgefahr, Unfall, Brand – auch ohne Guthaben/SIM' => 'Загроза життю, аварія, пожежа – також без коштів на рахунку/SIM',
+    'Polizei' => 'Поліція',
+    'Ärztlicher Bereitschaftsdienst' => 'Черговий лікар',
+    'außerhalb der Sprechzeiten, wenn es nicht lebensbedrohlich ist' => 'поза годинами прийому, якщо немає загрози життю',
+    'Giftnotruf München' => 'Токсикологічна служба Мюнхена',
+    'bei Vergiftungen, rund um die Uhr' => 'при отруєннях, цілодобово',
+    'Zahnärztlicher Notdienst' => 'Чергова стоматологія',
+    '<strong>Apotheken-Notdienst</strong> rund um Uffenheim' => '<strong>Чергова аптека</strong> поблизу Уффенгайма',
+    'Die Notdienstdaten sind gerade nicht aktuell. Bitte nutze die {link}.' => 'Дані про чергові аптеки зараз неактуальні. Скористайтеся {link}.',
+    'Notdienstsuche der Landesapothekerkammer' => 'пошуком Баварської палати фармацевтів',
+    'Jetzt' => 'Зараз',
+    'Danach' => 'Далі',
+    'Anschließend' => 'Потім',
+    '{von} bis {bis}' => '{von} – {bis}',
+    'Entfernung über die Straße ab Uffenheim. Vor dem Losfahren am besten kurz anrufen.' => 'Відстань дорогою від Уффенгайма. Краще зателефонувати перед виїздом.',
+    'Weitere Tage und andere Orte: {link}.' => 'Інші дні та місця: {link}.',
+    'Notdienstsuche der Kammer' => 'пошуком палати',
+    'Stand: {zeit}.' => 'Станом на: {zeit}.',
+    'Notruf' => 'Екстрений виклик',
+    'Apotheken-Notdienst bis {zeit}:' => 'Чергова аптека до {zeit}:',
+    'Alle Notdienste' => 'Усі чергові служби',
+];

@@ -4,6 +4,9 @@
  * Läuft beim Laden, nach jedem PJAX-Seitenwechsel (humhub:ready) und für nachgeladene Teile (MutationObserver).
  */
 (function () {
+    // Übersetzungen vom Server (Events::barrierefreiTexte, window.bfText), Schlüssel = deutscher Text
+    function t(text) { return (window.bfText && window.bfText[text]) || text; }
+
     // Sprunglink zum Inhalt und Hauptbereich (2.4.1, 1.3.1)
     function landmarken() {
         var inhalt = document.getElementById('layout-content')
@@ -17,7 +20,7 @@
             var a = document.createElement('a');
             a.className = 'bf-skip';
             a.href = '#' + inhalt.id;
-            a.textContent = 'Zum Inhalt springen';
+            a.textContent = t('Zum Inhalt springen');
             a.setAttribute('data-pjax-prevent', '');
             a.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -40,8 +43,8 @@
 
     // Namen für Bedienelemente ohne Text (2.4.4, 4.1.2), Tabulatorreihenfolge, scrollbare Bereiche
     function namen(root) {
-        root.querySelectorAll('#search-menu').forEach(function (el) { name(el, 'Suche'); });
-        root.querySelectorAll('.form-button-search').forEach(function (el) { name(el, 'Suchen'); });
+        root.querySelectorAll('#search-menu').forEach(function (el) { name(el, t('Suche')); });
+        root.querySelectorAll('.form-button-search').forEach(function (el) { name(el, t('Suchen')); });
         // Avatar-Link neben dem Namen führt zum selben Ziel: für Tastatur und Screenreader überspringen
         root.querySelectorAll('.wall-entry-header-image a, .media-left > a, .comment .media > a').forEach(function (a) {
             if (!a.textContent.trim() && !a.getAttribute('aria-label')) {
@@ -68,7 +71,7 @@
             var icon = !titel && b.querySelector('i.fa, i[class*="fa-"]');
             var m = icon && icon.className.match(/fa-([a-z-]+)/g);
             var text = titel || (m || []).map(function (c) { return symbole[c.slice(3)]; }).filter(Boolean)[0];
-            if (text) b.setAttribute('aria-label', text);
+            if (text) b.setAttribute('aria-label', titel ? text : t(text));
         });
         root.querySelectorAll('[tabindex]').forEach(function (el) {
             if (+el.getAttribute('tabindex') > 0) el.setAttribute('tabindex', '0');
@@ -83,7 +86,7 @@
             }
             var label = sel.id && document.querySelector('label[for="' + sel.id + '"]');
             var text = (label && label.textContent.trim()) || sel.getAttribute('aria-label') || sel.title
-                || ({sort: 'Sortierung', connection: 'Filter', 'ChooseLanguage[language]': 'Sprache'})[sel.name] || 'Auswahl';
+                || t(({sort: 'Sortierung', connection: 'Filter', 'ChooseLanguage[language]': 'Sprache'})[sel.name] || 'Auswahl');
             box.setAttribute('aria-label', text);
             box.querySelectorAll('[role="textbox"]').forEach(function (tb) { tb.setAttribute('aria-label', text); });
         });
@@ -92,13 +95,13 @@
             if (el.scrollWidth > el.clientWidth + 1) {
                 el.setAttribute('tabindex', '0');
                 el.setAttribute('role', 'region');
-                el.setAttribute('aria-label', 'Tabelle, seitlich scrollbar');
+                el.setAttribute('aria-label', t('Tabelle, seitlich scrollbar'));
             }
         });
         // Captcha: englischer Linkname
         root.querySelectorAll('a[href*="altcha.org"]').forEach(function (a) {
-            a.setAttribute('aria-label', 'ALTCHA-Website öffnen');
-            a.title = 'ALTCHA-Website öffnen';
+            a.setAttribute('aria-label', t('ALTCHA-Website öffnen'));
+            a.title = t('ALTCHA-Website öffnen');
         });
     }
 

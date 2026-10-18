@@ -28,10 +28,10 @@ class BeitragController extends ContentContainerController
     {
         $v = Verein::findOne((int)$verein);
         if ($v === null || $v->status === Verein::STATUS_VORGESCHLAGEN) {
-            throw new NotFoundHttpException('Verein nicht gefunden.');
+            throw new NotFoundHttpException(Yii::t('VereineModule.base', 'Verein nicht gefunden.'));
         }
         if (!$v->canManage()) {
-            throw new ForbiddenHttpException('Nur Verwalter dieses Vereins können Beiträge schreiben.');
+            throw new ForbiddenHttpException(Yii::t('VereineModule.base', 'Nur Verwalter dieses Vereins können Beiträge schreiben.'));
         }
         $beitrag = new VereinBeitrag(['verein_id' => $v->id, 'user_id' => Yii::$app->user->id, 'status' => VereinBeitrag::STATUS_EINGEREICHT]);
         if ($beitrag->load(Yii::$app->request->post()) && $beitrag->save()) {
@@ -40,7 +40,7 @@ class BeitragController extends ContentContainerController
                 $beitrag->fileManager->attach($bilder);
             }
             BeitragDienst::eingereicht($beitrag);
-            $this->view->success('Danke! Dein Beitrag wird geprüft und danach veröffentlicht. Du bekommst Bescheid.');
+            $this->view->success(Yii::t('VereineModule.base', 'Danke! Dein Beitrag wird geprüft und danach veröffentlicht. Du bekommst Bescheid.'));
             return $this->redirect($v->getUrl());
         }
         return $this->render('create', ['verein' => $v, 'beitrag' => $beitrag]);
@@ -120,7 +120,7 @@ class BeitragController extends ContentContainerController
     {
         $b = VereinBeitrag::findOne((int)$id);
         if ($b === null) {
-            throw new NotFoundHttpException('Beitrag nicht gefunden.');
+            throw new NotFoundHttpException(Yii::t('VereineModule.base', 'Beitrag nicht gefunden.'));
         }
         return $b;
     }

@@ -5,6 +5,7 @@ namespace humhub\modules\vereine\notifications;
 use humhub\helpers\Html;
 use humhub\modules\notification\components\BaseNotification;
 use humhub\modules\vereine\models\Verein;
+use Yii;
 
 /**
  * An Admins und bisherige Verwalter: jemand möchte einen Verein verwalten (oder hat einen neuen Verein vorgeschlagen).
@@ -18,7 +19,7 @@ class VerwaltungAngefragt extends BaseNotification
 
     public function getUrl()
     {
-        $space = \Yii::$app->getModule('vereine')->getDirectorySpace();
+        $space = Yii::$app->getModule('vereine')->getDirectorySpace();
         return $space ? $space->createUrl('/vereine/verein/verwalter', ['id' => $this->source->id], true) : parent::getUrl();
     }
 
@@ -36,7 +37,7 @@ class VerwaltungAngefragt extends BaseNotification
     private function infoText($user, $verein)
     {
         return $this->source->status === Verein::STATUS_VORGESCHLAGEN
-            ? "$user hat den Verein $verein für das Verzeichnis vorgeschlagen und möchte ihn verwalten."
-            : "$user möchte den Verein $verein im Vereinsverzeichnis verwalten.";
+            ? Yii::t('VereineModule.base', '{name} hat den Verein {verein} für das Verzeichnis vorgeschlagen und möchte ihn verwalten.', ['name' => $user, 'verein' => $verein])
+            : Yii::t('VereineModule.base', '{name} möchte den Verein {verein} im Vereinsverzeichnis verwalten.', ['name' => $user, 'verein' => $verein]);
     }
 }

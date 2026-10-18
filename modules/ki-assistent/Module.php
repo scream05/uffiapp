@@ -17,6 +17,10 @@ class Module extends \humhub\components\Module
     public int $hourlyLimit = 20;
     public int $dailyLimit = 60;
 
+    /** Übersetzen auf Klick: neue Übersetzungen je Monat insgesamt und je Konto bzw. Anschluss und Stunde (Treffer aus dem Zwischenspeicher zählen nicht) */
+    public int $uebersetzungMonat = 4000;
+    public int $uebersetzungStunde = 60;
+
     /** Bewertungen 👍/👎 je Konto bzw. Anschluss und Stunde */
     public int $feedbackHourlyLimit = 10;
 
@@ -99,22 +103,22 @@ class Module extends \humhub\components\Module
     {
         $mutex = \Yii::$app->mutex;
         if (!$mutex->acquire('ki-assistent-limit', 5)) {
-            return 'Uffi ist gerade sehr gefragt. Bitte versuch es gleich noch einmal.';
+            return \Yii::t('KiAssistentModule.base', 'Uffi ist gerade sehr gefragt. Bitte versuch es gleich noch einmal.');
         }
         try {
             [$requests, $in, $out, $guests] = $this->getUsage();
             if ($requests >= $this->monthlyLimit || $in + 5 * $out >= $this->monthlyTokenLimit) {
-                return 'Uffi macht für diesen Monat Pause – das Kontingent ist aufgebraucht. Ab dem 1. geht es weiter.';
+                return \Yii::t('KiAssistentModule.base', 'Uffi macht für diesen Monat Pause – das Kontingent ist aufgebraucht. Ab dem 1. geht es weiter.');
             }
             $gast = \Yii::$app->user->isGuest;
             if ($gast && $guests >= $this->guestMonthlyLimit) {
-                return 'Ohne Konto ist Uffis Kontingent für diesen Monat aufgebraucht. Mit einem kostenlosen Konto geht es weiter.';
+                return \Yii::t('KiAssistentModule.base', 'Ohne Konto ist Uffis Kontingent für diesen Monat aufgebraucht. Mit einem kostenlosen Konto geht es weiter.');
             }
             $cache = \Yii::$app->cache;
             $stunde = 'ki-stunde-' . $this->ident() . '-' . date('YmdH');
             $tag = 'ki-tag-' . $this->ident() . '-' . date('Ymd');
             if ((int)$cache->get($stunde) >= $this->hourlyLimit || (int)$cache->get($tag) >= $this->dailyLimit) {
-                return 'Du hast schon viele Fragen gestellt. Bitte versuch es später noch einmal.';
+                return \Yii::t('KiAssistentModule.base', 'Du hast schon viele Fragen gestellt. Bitte versuch es später noch einmal.');
             }
             $cache->set($stunde, (int)$cache->get($stunde) + 1, 3600);
             $cache->set($tag, (int)$cache->get($tag) + 1, 86400);
@@ -122,6 +126,47 @@ class Module extends \humhub\components\Module
             return null;
         } finally {
             $mutex->release('ki-assistent-limit');
+        }
+    }
+
+    /** Prüft die Grenzen für eine neue Übersetzung und zählt sie; null oder Grund der Ablehnung (in der Sprache des Nutzers) */
+    public function reserveUebersetzung(): ?string
+    {
+        $mutex = \Yii::$app->mutex;
+        if (!$mutex->acquire('ki-uebersetzung-limit', 5)) {
+            return \Yii::t('KiAssistentModule.base', 'Gerade sind viele Übersetzungen unterwegs. Bitte versuch es gleich noch einmal.');
+        }
+        try {
+            $key = 'uebersetzung-' . date('Y-m');
+            $usage = json_decode((string)$this->settings->get($key), true);
+            [$anzahl, $in, $out] = array_values(array_map('intval', is_array($usage) ? $usage + [0, 0, 0] : [0, 0, 0]));
+            if ($anzahl >= $this->uebersetzungMonat) {
+                return \Yii::t('KiAssistentModule.base', 'Das Übersetzungs-Kontingent für diesen Monat ist aufgebraucht. Ab dem 1. geht es weiter.');
+            }
+            $cache = \Yii::$app->cache;
+            $stunde = 'ki-ue-stunde-' . $this->ident() . '-' . date('YmdH');
+            if ((int)$cache->get($stunde) >= $this->uebersetzungStunde) {
+                return \Yii::t('KiAssistentModule.base', 'Du hast in dieser Stunde schon viel übersetzt. Bitte versuch es später noch einmal.');
+            }
+            $cache->set($stunde, (int)$cache->get($stunde) + 1, 3600);
+            $this->settings->set($key, json_encode([$anzahl + 1, $in, $out]));
+            return null;
+        } finally {
+            $mutex->release('ki-uebersetzung-limit');
+        }
+    }
+
+    public function addUebersetzungUsage(int $in, int $out): void
+    {
+        $mutex = \Yii::$app->mutex;
+        $mutex->acquire('ki-uebersetzung-limit', 5);
+        try {
+            $key = 'uebersetzung-' . date('Y-m');
+            $usage = json_decode((string)$this->settings->get($key), true);
+            [$anzahl, $i, $o] = array_values(array_map('intval', is_array($usage) ? $usage + [0, 0, 0] : [0, 0, 0]));
+            $this->settings->set($key, json_encode([$anzahl, $i + $in, $o + $out]));
+        } finally {
+            $mutex->release('ki-uebersetzung-limit');
         }
     }
 

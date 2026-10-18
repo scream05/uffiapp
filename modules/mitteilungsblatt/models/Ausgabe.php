@@ -34,6 +34,18 @@ class Ausgabe extends ActiveRecord
         return (int)substr($this->datum, 8, 2) . '. ' . self::MONATE[(int)substr($this->datum, 5, 2)] . ' ' . substr($this->datum, 0, 4);
     }
 
+    /** Titel für die Anzeige in der Sprache des Nutzers („Nr. 5/2026“) */
+    public function getTitelAnzeige(): string
+    {
+        return Yii::t('MitteilungsblattModule.base', 'Nr. {nr}/{jahr}', ['nr' => $this->nr . ($this->nr_bis ? '–' . $this->nr_bis : ''), 'jahr' => (string)$this->jahr]);
+    }
+
+    /** Erscheinungsdatum für die Anzeige: deutsch wie getDatumText(), sonst über den Formatter */
+    public function getDatumAnzeige(): string
+    {
+        return str_starts_with(Yii::$app->language, 'de') ? $this->getDatumText() : Yii::$app->formatter->asDate($this->datum, 'long');
+    }
+
     /** Dateiname ohne Endung in der Ablage */
     public function getName(): string
     {

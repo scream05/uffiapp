@@ -32,7 +32,7 @@ class IndexController extends ContentContainerController
             return false;
         }
         if (!$this->module->darfLesen()) {
-            throw new ForbiddenHttpException('Das Mitteilungsblatt ist noch nicht freigegeben.');
+            throw new ForbiddenHttpException(Yii::t('MitteilungsblattModule.base', 'Das Mitteilungsblatt ist noch nicht freigegeben.'));
         }
         // Lesbar für alle, aber nicht in Suchmaschinen (Geburtstage, Jubilare, Anzeigen Dritter)
         Yii::$app->response->headers->set('X-Robots-Tag', 'noindex, nofollow');
@@ -58,13 +58,13 @@ class IndexController extends ContentContainerController
     /** Archiv aller Ausgaben, mit ?q= Volltextsuche */
     public function actionIndex($q = '')
     {
-        $this->view->setPageTitle('Mitteilungsblatt');
+        $this->view->setPageTitle(Yii::t('MitteilungsblattModule.base', 'Mitteilungsblatt'));
         $q = trim(mb_substr((string)$q, 0, 100));
         return $this->render('index', [
             'ausgaben' => Ausgabe::find()->orderBy(['jahr' => SORT_DESC, 'nr' => SORT_DESC])->all(),
             'q' => $q,
             'treffer' => mb_strlen($q) >= 3 ? $this->suchen($q) : null,
-            'hinweis' => Termine::hinweis($this->module) ?? $this->module->settings->get('hinweis'),
+            'hinweis' => Termine::hinweis($this->module, true) ?? $this->module->settings->get('hinweis'),
             'termineUrl' => $this->module->settings->get('termine_url'),
             'quelle' => $this->module->quelle,
         ]);
@@ -72,7 +72,7 @@ class IndexController extends ContentContainerController
 
     public function actionLesen($id, $seite = null, $q = null)
     {
-        $this->view->setPageTitle('Mitteilungsblatt');
+        $this->view->setPageTitle(Yii::t('MitteilungsblattModule.base', 'Mitteilungsblatt'));
         return $this->render('lesen', [
             'ausgabe' => $this->ausgabe($id),
             'seite' => $seite !== null ? max(1, (int)$seite) : null,
@@ -103,7 +103,7 @@ class IndexController extends ContentContainerController
     {
         $a = Ausgabe::findOne((int)$id);
         if ($a === null || !is_file($a->pdfPfad)) {
-            throw new NotFoundHttpException('Diese Ausgabe ist nicht mehr im Archiv. Ältere Ausgaben gibt es im Rathaus.');
+            throw new NotFoundHttpException(Yii::t('MitteilungsblattModule.base', 'Diese Ausgabe ist nicht mehr im Archiv. Ältere Ausgaben gibt es im Rathaus.'));
         }
         return $a;
     }

@@ -4,6 +4,7 @@ namespace humhub\modules\gewerbe\components;
 
 use DateTimeImmutable;
 use DateTimeZone;
+use Yii;
 
 /**
  * Öffnungszeiten je Wochentag: [1 => [['08:00', '12:00'], ['14:00', '18:00']], …, 7 => []] (1 = Montag).
@@ -13,6 +14,42 @@ class Oeffnungszeiten
 {
     public const TAGE = [1 => 'Montag', 2 => 'Dienstag', 3 => 'Mittwoch', 4 => 'Donnerstag', 5 => 'Freitag', 6 => 'Samstag', 7 => 'Sonntag'];
     public const KURZ = [1 => 'Mo', 2 => 'Di', 3 => 'Mi', 4 => 'Do', 5 => 'Fr', 6 => 'Sa', 7 => 'So'];
+
+    /**
+     * Anzeige-Text: deutsch (für den KI-Assistenten und die deutsche Oberfläche) oder übersetzt in die Sprache der Oberfläche.
+     * Platzhalter {name} werden in beiden Fällen ersetzt.
+     */
+    private static function t(bool $uebersetzt, string $text, array $params = []): string
+    {
+        if ($uebersetzt) {
+            return Yii::t('GewerbeModule.base', $text, $params);
+        }
+        $ersetzen = [];
+        foreach ($params as $k => $v) {
+            $ersetzen['{' . $k . '}'] = $v;
+        }
+        return strtr($text, $ersetzen);
+    }
+
+    /** Deutsche Oberfläche (oder kein Übersetzungswunsch): Wochentage aus TAGE/KURZ */
+    private static function deutsch(bool $uebersetzt): bool
+    {
+        return !$uebersetzt || str_starts_with((string)Yii::$app->language, 'de');
+    }
+
+    /** Wochentag (1 = Montag) kurz („Mo“) bzw. lang („Montag“); übersetzt über ICU in der Sprache der Oberfläche */
+    public static function tagName(int $tag, bool $kurz = true, bool $uebersetzt = false): string
+    {
+        if (self::deutsch($uebersetzt)) {
+            return $kurz ? self::KURZ[$tag] : self::TAGE[$tag];
+        }
+        try {
+            // 1.1.2024 war ein Montag; Mittag, damit keine Zeitzone den Tag verschiebt
+            return Yii::$app->formatter->asDate(gmmktime(12, 0, 0, 1, $tag, 2024), $kurz ? 'EEE' : 'EEEE');
+        } catch (\Throwable $e) {
+            return $kurz ? self::KURZ[$tag] : self::TAGE[$tag];
+        }
+    }
 
     public static function ausJson(?string $json): array
     {
@@ -51,10 +88,10 @@ class Oeffnungszeiten
     }
 
     /**
-     * Stand zum Zeitpunkt $jetzt (Europe/Berlin).
+     * Stand zum Zeitpunkt $jetzt (Europe/Berlin). Text deutsch, mit $uebersetzt in der Sprache der Oberfläche.
      * @return array{offen: bool, text: string}|null null, wenn keine Zeiten hinterlegt sind
      */
-    public static function stand(array $zeiten, ?DateTimeImmutable $jetzt = null): ?array
+    public static function stand(array $zeiten, ?DateTimeImmutable $jetzt = null, bool $uebersetzt = false): ?array
     {
         if (!self::hatZeiten($zeiten)) {
             return null;
@@ -71,7 +108,8 @@ class Oeffnungszeiten
                     $b += 1440;
                 }
                 if ($m >= $a && $m < $b) {
-                    return ['offen' => true, 'text' => $von === $bis ? 'Jetzt geöffnet · rund um die Uhr' : 'Jetzt geöffnet · bis ' . self::zeit($bis) . ' Uhr'];
+                    return ['offen' => true, 'text' => $von === $bis ? self::t($uebersetzt, 'Jetzt geöffnet · rund um die Uhr')
+                        : self::t($uebersetzt, 'Jetzt geöffnet · bis {zeit} Uhr', ['zeit' => self::zeit($bis)])];
                 }
             }
         }
@@ -82,11 +120,16 @@ class Oeffnungszeiten
                 if ($i === 0 && self::minuten($von) <= $min) {
                     continue;
                 }
-                $wann = $i === 0 ? 'heute' : ($i === 1 ? 'morgen' : self::KURZ[$t]);
-                return ['offen' => false, 'text' => 'Geschlossen · öffnet ' . $wann . ' ' . self::zeit($von) . ' Uhr'];
+                $text = match ($i) {
+                    0 => self::t($uebersetzt, 'Geschlossen · öffnet heute {zeit} Uhr', ['zeit' => self::zeit($von)]),
+                    1 => self::t($uebersetzt, 'Geschlossen · öffnet morgen {zeit} Uhr', ['zeit' => self::zeit($von)]),
+                    default => self::t($uebersetzt, 'Geschlossen · öffnet {tag} {zeit} Uhr',
+                        ['tag' => self::tagName($t, true, $uebersetzt), 'zeit' => self::zeit($von)]),
+                };
+                return ['offen' => false, 'text' => $text];
             }
         }
-        return ['offen' => false, 'text' => 'Geschlossen'];
+        return ['offen' => false, 'text' => self::t($uebersetzt, 'Geschlossen')];
     }
 
     /**
@@ -164,16 +207,21 @@ class Oeffnungszeiten
         return [array_values(array_unique($tage)), $spannen];
     }
 
-    /** Zeilen zur Anzeige: Tage mit gleichen Zeiten zusammengefasst, z. B. ['Mo–Fr', '8:00–12:00, 14:00–18:00 Uhr'] */
-    public static function zeilen(array $zeiten): array
+    /**
+     * Zeilen zur Anzeige: Tage mit gleichen Zeiten zusammengefasst, z. B. ['Mo–Fr', '8:00–12:00, 14:00–18:00 Uhr'].
+     * Deutsch (KI-Assistent), mit $uebersetzt in der Sprache der Oberfläche.
+     */
+    public static function zeilen(array $zeiten, bool $uebersetzt = false): array
     {
         $zeilen = [];
-        $text = fn(array $s) => $s ? ($s[0][0] === $s[0][1] ? 'rund um die Uhr'
-            : implode(', ', array_map(fn($p) => self::zeit($p[0]) . '–' . self::zeit($p[1]), $s)) . ' Uhr') : 'geschlossen';
+        $text = fn(array $s) => $s ? ($s[0][0] === $s[0][1] ? self::t($uebersetzt, 'rund um die Uhr')
+            : self::t($uebersetzt, '{zeiten} Uhr', ['zeiten' => implode(', ', array_map(fn($p) => self::zeit($p[0]) . '–' . self::zeit($p[1]), $s))]))
+            : self::t($uebersetzt, 'geschlossen');
         $start = 1;
         for ($t = 1; $t <= 7; $t++) {
             if ($t === 7 || $text($zeiten[$t + 1]) !== $text($zeiten[$t])) {
-                $zeilen[] = [$start === $t ? self::KURZ[$t] : self::KURZ[$start] . '–' . self::KURZ[$t], $text($zeiten[$t])];
+                $zeilen[] = [$start === $t ? self::tagName($t, true, $uebersetzt)
+                    : self::tagName($start, true, $uebersetzt) . '–' . self::tagName($t, true, $uebersetzt), $text($zeiten[$t])];
                 $start = $t + 1;
             }
         }

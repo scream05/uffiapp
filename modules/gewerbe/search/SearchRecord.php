@@ -4,6 +4,7 @@ namespace humhub\modules\gewerbe\search;
 
 use humhub\interfaces\MetaSearchResultInterface;
 use humhub\modules\gewerbe\models\Betrieb;
+use humhub\modules\gewerbe\Module;
 use Yii;
 
 class SearchRecord implements MetaSearchResultInterface
@@ -25,8 +26,8 @@ class SearchRecord implements MetaSearchResultInterface
 
     public function getDescription(): string
     {
-        $stand = $this->betrieb->getStand();
-        return implode(' · ', array_filter([$this->betrieb->kategorie, $this->betrieb->ortsteil, $stand['text'] ?? null]));
+        $stand = $this->betrieb->getStand(true);
+        return implode(' · ', array_filter([Module::kategorieLabel($this->betrieb->kategorie), Module::ortLabel($this->betrieb->ortsteil), $stand['text'] ?? null]));
     }
 
     public function getUrl(): string

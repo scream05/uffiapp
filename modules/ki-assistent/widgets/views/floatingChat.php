@@ -10,41 +10,40 @@ use yii\helpers\Url;
 use yii\web\View;
 
 ?>
-<button type="button" class="ki-fab" id="ki-fab" title="Uffi fragen – zum Verschieben ziehen" aria-label="Uffi, den KI-Assistenten, öffnen"
+<button type="button" class="ki-fab" id="ki-fab" title="<?= Yii::t('KiAssistentModule.base', 'Uffi fragen – zum Verschieben ziehen') ?>" aria-label="<?= Yii::t('KiAssistentModule.base', 'Uffi, den KI-Assistenten, öffnen') ?>"
         aria-controls="ki-panel" aria-expanded="false">
     <img src="<?= Html::encode($avatar) ?>" alt="">
 </button>
-<div class="ki-panel" id="ki-panel" role="dialog" aria-label="Uffi – KI-Assistent">
+<div class="ki-panel" id="ki-panel" role="dialog" aria-label="<?= Yii::t('KiAssistentModule.base', 'Uffi – KI-Assistent') ?>">
     <div class="ki-panel-head">
         <img src="<?= Html::encode($avatar) ?>" alt="">
-        <div class="ki-title" tabindex="-1"><strong>Uffi</strong><small>KI-Assistent</small></div>
-        <a href="<?= Url::to(['/ki-assistent/chat']) ?>" title="Als Seite öffnen" aria-label="Als Seite öffnen"><i class="fa fa-expand" aria-hidden="true"></i></a>
-        <button type="button" class="ki-close" title="Schließen" aria-label="Schließen"><i class="fa fa-times"></i></button>
+        <div class="ki-title" tabindex="-1"><strong>Uffi</strong><small><?= Yii::t('KiAssistentModule.base', 'KI-Assistent') ?></small></div>
+        <a href="<?= Url::to(['/ki-assistent/chat']) ?>" title="<?= Yii::t('KiAssistentModule.base', 'Als Seite öffnen') ?>" aria-label="<?= Yii::t('KiAssistentModule.base', 'Als Seite öffnen') ?>"><i class="fa fa-expand" aria-hidden="true"></i></a>
+        <button type="button" class="ki-close" title="<?= Yii::t('KiAssistentModule.base', 'Schließen') ?>" aria-label="<?= Yii::t('KiAssistentModule.base', 'Schließen') ?>"><i class="fa fa-times"></i></button>
     </div>
-    <div class="ki-messages" role="log" aria-live="polite" aria-relevant="additions" aria-label="Gespräch mit Uffi">
-        <p class="ki-hello">Hallo, ich bin Uffi! Ich beantworte Fragen zu Uffenheim: Abfuhrtermine, Veranstaltungen, Vereine, Rathaus und Formulare.
-            Ich kann auch eine Mängelmeldung vorbereiten. Meine Antworten kommen von Claude (Anthropic) und sind unverbindlich.</p>
+    <div class="ki-messages" role="log" aria-live="polite" aria-relevant="additions" aria-label="<?= Yii::t('KiAssistentModule.base', 'Gespräch mit Uffi') ?>">
+        <p class="ki-hello" dir="auto"><?= Yii::t('KiAssistentModule.base', 'Hallo, ich bin Uffi! Ich beantworte Fragen zu Uffenheim: Abfuhrtermine, Veranstaltungen, Vereine, Rathaus und Formulare. Ich kann auch eine Mängelmeldung vorbereiten. Meine Antworten kommen von Claude (Anthropic) und sind unverbindlich.') ?></p>
     </div>
     <?php if (!$ageConfirmed): ?>
         <?= Html::beginForm(['/ki-assistent/chat/confirm-age'], 'post', ['class' => 'ki-age']) ?>
         <div class="form-check">
             <input type="checkbox" class="form-check-input" name="adult" value="1" id="ki-adult" required>
-            <label class="form-check-label" for="ki-adult">Ich bin mindestens 18 Jahre alt.</label>
+            <label class="form-check-label" for="ki-adult"><?= Yii::t('KiAssistentModule.base', 'Ich bin mindestens 18 Jahre alt.') ?></label>
         </div>
-        <button type="submit" class="btn btn-primary btn-sm mt-1">Bestätigen</button>
+        <button type="submit" class="btn btn-primary btn-sm mt-1"><?= Yii::t('KiAssistentModule.base', 'Bestätigen') ?></button>
         <?= Html::endForm() ?>
     <?php endif ?>
     <div class="ki-panel-foot">
         <form class="ki-form">
             <div class="input-group">
                 <input type="text" class="form-control ki-input" maxlength="2000" autocomplete="off"
-                       placeholder="Deine Frage …" aria-label="Deine Frage" <?= $enabled ? '' : 'disabled' ?>>
-                <button class="btn btn-primary" type="submit" title="Senden" aria-label="Senden" <?= $enabled ? '' : 'disabled' ?>>
+                       dir="auto" placeholder="<?= Yii::t('KiAssistentModule.base', 'Deine Frage …') ?>" aria-label="<?= Yii::t('KiAssistentModule.base', 'Deine Frage') ?>" <?= $enabled ? '' : 'disabled' ?>>
+                <button class="btn btn-primary" type="submit" title="<?= Yii::t('KiAssistentModule.base', 'Senden') ?>" aria-label="<?= Yii::t('KiAssistentModule.base', 'Senden') ?>" <?= $enabled ? '' : 'disabled' ?>>
                     <i class="fa fa-paper-plane"></i></button>
             </div>
         </form>
-        <div class="ki-links"><a href="#" class="ki-reset">Neues Gespräch</a> ·
-            <?= Html::a('Datenschutz', ['/legal/page/view', 'pageKey' => 'privacy']) ?></div>
+        <div class="ki-links"><a href="#" class="ki-reset"><?= Yii::t('KiAssistentModule.base', 'Neues Gespräch') ?></a> ·
+            <?= Html::a(Html::encode(Yii::t('KiAssistentModule.base', 'Datenschutz')), ['/legal/page/view', 'pageKey' => 'privacy']) ?></div>
     </div>
 </div>
 <?php ob_start() // nach ki-chat.js ausführen, das erst am Seitenende geladen wird ?>

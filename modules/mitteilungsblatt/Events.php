@@ -16,7 +16,7 @@ class Events
                 return;
             }
             $event->sender->addItem([
-                'label' => 'Mitteilungsblatt',
+                'label' => Yii::t('MitteilungsblattModule.base', 'Mitteilungsblatt'),
                 'group' => 'modules',
                 'url' => $event->sender->space->createUrl('/mitteilungsblatt/index'),
                 'icon' => '<i class="fa fa-newspaper-o"></i>',

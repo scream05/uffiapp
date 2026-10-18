@@ -11,11 +11,10 @@ use humhub\helpers\Html;
 ?>
 <div class="panel panel-default kal-abo">
     <div class="panel-heading">
-        <strong><i class="fa fa-calendar-plus-o"></i> Kalender abonnieren</strong>
+        <strong><i class="fa fa-calendar-plus-o"></i> <?= Yii::t('DesignwahlModule.base', 'Kalender abonnieren') ?></strong>
     </div>
     <div class="panel-body">
-        <p>Die Termine erscheinen in deinem Kalender auf dem Handy oder am Computer und werden von selbst aktualisiert.
-            Ein Konto ist dafür nicht nötig.</p>
+        <p><?= Yii::t('DesignwahlModule.base', 'Die Termine erscheinen in deinem Kalender auf dem Handy oder am Computer und werden von selbst aktualisiert. Ein Konto ist dafür nicht nötig.') ?></p>
         <?php if ($hinweis !== '') : ?>
             <p class="text-muted"><?= Html::encode($hinweis) ?></p>
         <?php endif ?>
@@ -26,22 +25,20 @@ use humhub\helpers\Html;
                     <div class="kal-abo-name"><?= Html::encode($name) ?></div>
                 <?php endif ?>
                 <div class="kal-abo-knoepfe">
-                    <?= Html::a('<i class="fa fa-mobile"></i> Abonnieren (iPhone, Outlook, Thunderbird)', $webcal,
+                    <?= Html::a('<i class="fa fa-mobile"></i> ' . Html::encode(Yii::t('DesignwahlModule.base', 'Abonnieren (iPhone, Outlook, Thunderbird)')), $webcal,
                         ['class' => 'btn btn-primary btn-sm']) ?>
-                    <?= Html::a('<i class="fa fa-google"></i> Google Kalender (Android)',
+                    <?= Html::a('<i class="fa fa-google"></i> ' . Html::encode(Yii::t('DesignwahlModule.base', 'Google Kalender (Android)')),
                         'https://calendar.google.com/calendar/r?cid=' . rawurlencode($webcal),
                         ['class' => 'btn btn-light btn-sm', 'target' => '_blank', 'rel' => 'noopener']) ?>
                 </div>
                 <div class="input-group input-group-sm kal-abo-adresse">
                     <input type="text" class="form-control" readonly value="<?= Html::encode($url) ?>"
-                           aria-label="Adresse zum Abonnieren" onclick="this.select()">
-                    <button type="button" class="btn btn-light kal-abo-kopieren">Adresse kopieren</button>
+                           aria-label="<?= Yii::t('DesignwahlModule.base', 'Adresse zum Abonnieren') ?>" onclick="this.select()">
+                    <button type="button" class="btn btn-light kal-abo-kopieren" data-kopiert="<?= Yii::t('DesignwahlModule.base', 'Kopiert ✓') ?>"><?= Yii::t('DesignwahlModule.base', 'Adresse kopieren') ?></button>
                 </div>
             </div>
         <?php endforeach ?>
-        <p class="text-muted small kal-abo-tipp">Klappt der Knopf nicht? Adresse kopieren und in der Kalender-App unter
-            „Kalender hinzufügen“ → „Abonnement“ bzw. „Per URL“ einfügen. Android: In Google Kalender abonnierte Kalender
-            erscheinen auf dem Handy, wenn dort in den Einstellungen der Kalender eingeschaltet ist.</p>
+        <p class="text-muted small kal-abo-tipp"><?= Yii::t('DesignwahlModule.base', 'Klappt der Knopf nicht? Adresse kopieren und in der Kalender-App unter „Kalender hinzufügen“ → „Abonnement“ bzw. „Per URL“ einfügen. Android: In Google Kalender abonnierte Kalender erscheinen auf dem Handy, wenn dort in den Einstellungen der Kalender eingeschaltet ist.') ?></p>
     </div>
 </div>
 <?php $this->registerCss(<<<'CSS'
@@ -57,7 +54,9 @@ if (!window.kalAbo) {
     $(document).on('click', '.kal-abo-kopieren', function () {
         var $btn = $(this), feld = $btn.siblings('input')[0];
         feld.select();
-        var fertig = function () { $btn.text('Kopiert ✓'); setTimeout(function () { $btn.text('Adresse kopieren'); }, 2000); };
+        var alt = $btn.data('text') || $btn.text();
+        $btn.data('text', alt);
+        var fertig = function () { $btn.text($btn.attr('data-kopiert') || 'Kopiert ✓'); setTimeout(function () { $btn.text(alt); }, 2000); };
         if (navigator.clipboard && window.isSecureContext) {
             navigator.clipboard.writeText(feld.value).then(fertig, function () { document.execCommand('copy'); fertig(); });
         } else {

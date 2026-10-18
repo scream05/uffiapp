@@ -14,7 +14,7 @@ class Events
     {
         try {
             $event->sender->addItem([
-                'label' => 'Abfuhr-Erinnerung',
+                'label' => Yii::t('AbfuhrModule.base', 'Abfuhr-Erinnerung'),
                 'url' => Url::to(['/abfuhr/einstellungen']),
                 'icon' => 'trash',
                 'sortOrder' => 450,
@@ -34,7 +34,7 @@ class Events
                 return;
             }
             $event->sender->addItem([
-                'label' => 'Erinnerung einrichten',
+                'label' => Yii::t('AbfuhrModule.base', 'Erinnerung einrichten'),
                 'group' => 'modules',
                 'url' => Url::to(['/abfuhr/einstellungen']),
                 'icon' => '<i class="fa fa-bell"></i>',

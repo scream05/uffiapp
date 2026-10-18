@@ -58,7 +58,7 @@ class ChatController extends Controller
     {
         $history = json_decode((string)Yii::$app->request->post('history'), true);
         if (!is_array($history)) {
-            return $this->asJson(['error' => 'Ungültige Anfrage']);
+            return $this->asJson(['error' => Yii::t('KiAssistentModule.base', 'Ungültige Anfrage')]);
         }
         $history = array_values(array_filter(array_map(fn($m) => [
             'role' => ($m['role'] ?? '') === 'model' ? 'model' : 'user',
@@ -73,16 +73,16 @@ class ChatController extends Controller
             array_shift($history);
         }
         if ($history === [] || end($history)['role'] !== 'user') {
-            return $this->asJson(['error' => 'Ungültige Anfrage']);
+            return $this->asJson(['error' => Yii::t('KiAssistentModule.base', 'Ungültige Anfrage')]);
         }
 
         if (!$this->module->isAgeConfirmed()) {
-            return $this->asJson(['error' => 'Bitte bestätige zuerst, dass du mindestens 18 Jahre alt bist.']);
+            return $this->asJson(['error' => Yii::t('KiAssistentModule.base', 'Bitte bestätige zuerst, dass du mindestens 18 Jahre alt bist.')]);
         }
         $key = $this->module->getApiKey();
         if ($key === null) {
             Yii::error('KI-Assistent: kein Claude-Schlüssel hinterlegt (secrets/anthropic_api_key)', 'ki-assistent');
-            return $this->asJson(['error' => 'Uffi ist gerade nicht erreichbar. Bitte versuch es später noch einmal.']);
+            return $this->asJson(['error' => Yii::t('KiAssistentModule.base', 'Uffi ist gerade nicht erreichbar. Bitte versuch es später noch einmal.')]);
         }
         if (($grund = $this->module->reserve()) !== null) {
             return $this->asJson(['error' => $grund]);
@@ -94,7 +94,7 @@ class ChatController extends Controller
         } catch (\Throwable $e) {
             // Nur die Fehlermeldung protokollieren, nie den Inhalt der Frage
             Yii::error('KI-Assistent: ' . $e->getMessage(), 'ki-assistent');
-            return $this->asJson(['error' => 'Uffi ist gerade nicht erreichbar. Bitte versuch es später noch einmal.']);
+            return $this->asJson(['error' => Yii::t('KiAssistentModule.base', 'Uffi ist gerade nicht erreichbar. Bitte versuch es später noch einmal.')]);
         }
         $this->module->addUsage($in, $out);
         // „memo“ hängt der Browser an den Verlauf an, damit die KI später weiß, welche Aktionen schon liefen
@@ -139,7 +139,8 @@ class ChatController extends Controller
             $messages[] = ['role' => 'user', 'content' => $results];
         }
         if (($answer ?? '') === '') {
-            $answer = $cards ? 'Bitte schön:' : 'Das hat leider nicht geklappt. Bitte formulier die Frage noch einmal.';
+            $answer = $cards ? Yii::t('KiAssistentModule.base', 'Bitte schön:')
+                : Yii::t('KiAssistentModule.base', 'Das hat leider nicht geklappt. Bitte formulier die Frage noch einmal.');
         }
         return [$answer, $cards, implode(' ', array_unique($memo)), $in, $out];
     }
@@ -149,7 +150,7 @@ class ChatController extends Controller
     {
         $r = Yii::$app->request;
         if (!$this->module->takeFeedback()) {
-            return $this->asJson(['error' => 'Danke – für den Moment haben wir genug Bewertungen von dir.']);
+            return $this->asJson(['error' => Yii::t('KiAssistentModule.base', 'Danke – für den Moment haben wir genug Bewertungen von dir.')]);
         }
         $rating = (int)$r->post('bewertung') === 1 ? 1 : -1;
         $fb = new Feedback([
@@ -161,7 +162,7 @@ class ChatController extends Controller
             'created_at' => date('Y-m-d H:i:s'),
         ]);
         if ($fb->frage === '' || $fb->antwort === '') {
-            return $this->asJson(['error' => 'Ungültige Anfrage']);
+            return $this->asJson(['error' => Yii::t('KiAssistentModule.base', 'Ungültige Anfrage')]);
         }
         $fb->save(false);
         return $this->asJson(['ok' => true]);
@@ -193,7 +194,7 @@ class ChatController extends Controller
     {
         $file = Formulare::file((string)$token);
         if ($file === null) {
-            throw new \yii\web\NotFoundHttpException('Das Formular ist nicht mehr verfügbar. Bitte bei Uffi neu erstellen.');
+            throw new \yii\web\NotFoundHttpException(Yii::t('KiAssistentModule.base', 'Das Formular ist nicht mehr verfügbar. Bitte bei Uffi neu erstellen.'));
         }
         Yii::$app->response->headers->set('Cache-Control', 'no-store');
         return Yii::$app->response->sendFile($file[0], $file[1], ['mimeType' => 'application/pdf', 'inline' => false]);
@@ -215,8 +216,8 @@ Du bist Uffi, der KI-Assistent von „{$name}“, dem Bürger- und Vereinsnetzwe
 Betrieben wird die Plattform ehrenamtlich von der Bürgerliste Uffenheim (BLU), nicht von der Stadtverwaltung.
 
 Regeln:
-- Antworte auf Deutsch, freundlich, kurz und konkret (meist 1–5 Sätze oder eine kurze Liste).
-- Sprich die Nutzer immer mit „du“ an (du, dich, dir, dein) – die ganze Plattform duzt. Das gilt auch, wenn jemand dich siezt oder „Guten Tag“ schreibt: Antworte trotzdem freundlich in der Du-Form, nie mit „Sie“.
+- Antworte in der Sprache, in der der Nutzer seine letzte Nachricht geschrieben hat. Ist die nicht eindeutig (z. B. nur ein Name oder eine Zahl), antworte in seiner eingestellten Sprache: {SPRACHE}. Antworte freundlich, kurz und konkret (meist 1–5 Sätze oder eine kurze Liste). Eigennamen (Straßen, Orte, Vereine, Ämter, Formulare) bleiben deutsch; bei Ämtern und Fachbegriffen ergänze kurz die Übersetzung.
+- Auf Deutsch sprich die Nutzer immer mit „du“ an (du, dich, dir, dein) – die ganze Plattform duzt. Das gilt auch, wenn jemand dich siezt oder „Guten Tag“ schreibt: Antworte trotzdem freundlich in der Du-Form, nie mit „Sie“. In anderen Sprachen die übliche freundliche, informelle Anrede.
 - Stütze dich bei Terminen, Abfuhr, Nachrichten, Ansprechpartnern, Öffnungszeiten und Stadtgeschichte ausschließlich auf die Daten unten. Erfinde keine Termine, Uhrzeiten, Orte, Telefonnummern oder Öffnungszeiten.
 - Steht etwas nicht in den Daten, sag das offen und verweise auf https://www.uffenheim.de oder das Rathaus.
 - Verlinke die passende Quelle als Markdown-Link [Text](URL), nur URLs aus den Daten unten.
@@ -249,6 +250,8 @@ TXT;
         if (Yii::$app->has('user') && Yii::$app->user->isGuest) {
             $prompt .= "\n- Der Nutzer ist nicht angemeldet (Gast). Lesen geht ohne Konto, Mängel melden ebenfalls (mit Name und E-Mail oder Telefon, der Bauhof prüft vor der Veröffentlichung); Abfuhr-Erinnerung aufs Handy, Kommentieren und Beiträge brauchen ein kostenloses Konto (Anmelden/Registrieren oben rechts). Sag das kurz, wenn es passt.";
         }
+        $sprachen = ['de' => 'Deutsch', 'en' => 'Englisch', 'uk' => 'Ukrainisch', 'ar' => 'Arabisch', 'tr' => 'Türkisch', 'ru' => 'Russisch'];
+        $prompt = str_replace('{SPRACHE}', $sprachen[substr(Yii::$app->language, 0, 2)] ?? 'Deutsch', $prompt);
         return str_replace('{FORMULARE}', Formulare::catalog(), $prompt) . "\n" . Context::get() . "\n\n" . Wissen::forQuestion($question, $embed);
     }
 }

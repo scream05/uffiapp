@@ -64,12 +64,12 @@ class GutscheinDienst
         $key = "gewerbe-nummer-fehler-$userId";
         $fehler = (int)Yii::$app->cache->get($key);
         if ($fehler >= 8) {
-            return 'Zu viele falsche Nummern. Bitte scanne den QR-Code an der Kasse oder versuch es in einer Stunde noch einmal.';
+            return Yii::t('GewerbeModule.base', 'Zu viele falsche Nummern. Bitte scanne den QR-Code an der Kasse oder versuch es in einer Stunde noch einmal.');
         }
         $betrieb = self::theke($betrieb);
         if (!hash_equals((string)$betrieb->theke_nummer, preg_replace('/\D/', '', $nummer))) {
             Yii::$app->cache->set($key, $fehler + 1, 3600);
-            return 'Die Nummer passt nicht. Sie steht auf dem Aufsteller an der Kasse unter dem QR-Code.';
+            return Yii::t('GewerbeModule.base', 'Die Nummer passt nicht. Sie steht auf dem Aufsteller an der Kasse unter dem QR-Code.');
         }
         return null;
     }
@@ -81,11 +81,15 @@ class GutscheinDienst
             return $grund;
         }
         if ($userId === null) {
-            return 'Zum Einlösen musst du angemeldet sein.';
+            return Yii::t('GewerbeModule.base', 'Zum Einlösen musst du angemeldet sein.');
         }
         if (($ab = self::wiederAb($g, $userId)) !== null) {
-            return $ab === 'nie' ? 'Du hast diesen Gutschein schon eingelöst.'
-                : 'Du hast diesen Gutschein schon eingelöst. Wieder möglich ab ' . Yii::$app->formatter->asDatetime($ab, 'php:j.n. \\u\\m H:i') . ' Uhr.';
+            if ($ab === 'nie') {
+                return Yii::t('GewerbeModule.base', 'Du hast diesen Gutschein schon eingelöst.');
+            }
+            $de = str_starts_with((string)Yii::$app->language, 'de');
+            return Yii::t('GewerbeModule.base', 'Du hast diesen Gutschein schon eingelöst. Wieder möglich ab {zeit} Uhr.',
+                ['zeit' => Yii::$app->formatter->asDatetime($ab, $de ? 'php:j.n. \\u\\m H:i' : 'short')]);
         }
         return null;
     }
@@ -95,19 +99,19 @@ class GutscheinDienst
     {
         $betrieb = $g->betrieb;
         if ($g->status === Gutschein::STATUS_BEENDET || $g->istAbgelaufen()) {
-            return 'Dieser Gutschein ist beendet.';
+            return Yii::t('GewerbeModule.base', 'Dieser Gutschein ist beendet.');
         }
         if ($g->status === Gutschein::STATUS_PAUSIERT) {
-            return 'Der Betrieb hat diesen Gutschein gerade pausiert.';
+            return Yii::t('GewerbeModule.base', 'Der Betrieb hat diesen Gutschein gerade pausiert.');
         }
         if ($g->gueltig_ab > date('Y-m-d')) {
-            return 'Der Gutschein gilt erst ab ' . Yii::$app->formatter->asDate($g->gueltig_ab, 'medium') . '.';
+            return Yii::t('GewerbeModule.base', 'Der Gutschein gilt erst ab {datum}.', ['datum' => Yii::$app->formatter->asDate($g->gueltig_ab, 'medium')]);
         }
         if ($g->istAufgebraucht()) {
-            return 'Alle Gutscheine sind schon eingelöst.';
+            return Yii::t('GewerbeModule.base', 'Alle Gutscheine sind schon eingelöst.');
         }
-        if ($g->nur_geoeffnet && ($stand = $betrieb->getStand()) !== null && !$stand['offen']) {
-            return 'Einlösen geht nur während der Öffnungszeiten (' . $stand['text'] . ').';
+        if ($g->nur_geoeffnet && ($stand = $betrieb->getStand(true)) !== null && !$stand['offen']) {
+            return Yii::t('GewerbeModule.base', 'Einlösen geht nur während der Öffnungszeiten ({stand}).', ['stand' => $stand['text']]);
         }
         return null;
     }

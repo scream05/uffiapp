@@ -7,6 +7,8 @@
  * onAsk(), onUsage(usage)
  */
 window.kiChat = function (root, opts) {
+    // Übersetzungen vom Server (FloatingChat::texteRegistrieren, window.kiChatText), Schlüssel = deutscher Text
+    function t(text) { return (window.kiChatText && window.kiChatText[text]) || text; }
     var box = root.querySelector('.ki-messages');
     var input = root.querySelector('.ki-input');
     var form = root.querySelector('.ki-form');
@@ -72,7 +74,7 @@ window.kiChat = function (root, opts) {
     function rating(question, answer) {
         var wrap = document.createElement('div');
         wrap.className = 'ki-rate';
-        wrap.innerHTML = '<a href="#" data-r="1" title="Hilfreich">👍</a><a href="#" data-r="-1" title="Nicht hilfreich">👎</a>';
+        wrap.innerHTML = '<a href="#" data-r="1" title="' + esc(t('Hilfreich')) + '">👍</a><a href="#" data-r="-1" title="' + esc(t('Nicht hilfreich')) + '">👎</a>';
         function send(r, comment) {
             var data = new FormData();
             data.append('bewertung', r);
@@ -81,7 +83,7 @@ window.kiChat = function (root, opts) {
             data.append('kommentar', comment || '');
             data.append(yii.getCsrfParam(), yii.getCsrfToken());
             fetch(opts.feedbackUrl, {method: 'POST', body: data, credentials: 'same-origin'}).then(function () {
-                wrap.textContent = 'Danke für deine Rückmeldung!';
+                wrap.textContent = t('Danke für deine Rückmeldung!');
             });
         }
         wrap.addEventListener('click', function (e) {
@@ -89,9 +91,9 @@ window.kiChat = function (root, opts) {
             if (!a) return;
             e.preventDefault();
             if (a.getAttribute('data-r') === '1') { send(1); return; }
-            wrap.innerHTML = 'Was war falsch oder hat gefehlt? (optional)'
+            wrap.innerHTML = esc(t('Was war falsch oder hat gefehlt? (optional)'))
                 + '<div class="input-group input-group-sm"><input type="text" class="form-control" maxlength="500">'
-                + '<button class="btn btn-light btn-sm" type="button">Senden</button></div>';
+                + '<button class="btn btn-light btn-sm" type="button">' + esc(t('Senden')) + '</button></div>';
             var inp = wrap.querySelector('input');
             inp.focus();
             wrap.querySelector('button').addEventListener('click', function () { send(-1, inp.value); });
@@ -113,6 +115,7 @@ window.kiChat = function (root, opts) {
     function add(role, html) {
         var div = document.createElement('div');
         div.className = 'ki-msg ki-msg-' + (role === 'user' ? 'user' : 'model');
+        div.setAttribute('dir', 'auto'); // Arabisch: Antwort von rechts nach links
         div.innerHTML = html;
         if (!newestFirst) {
             box.appendChild(div);
@@ -177,7 +180,7 @@ window.kiChat = function (root, opts) {
             })
             .catch(function () {
                 history.pop();
-                pending.innerHTML = '<span class="text-danger">Verbindungsfehler</span>';
+                pending.innerHTML = '<span class="text-danger">' + esc(t('Verbindungsfehler')) + '</span>';
             })
             .finally(function () {
                 input.disabled = false;

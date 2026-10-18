@@ -25,7 +25,7 @@ class Events
                 return;
             }
             $event->sender->addItem([
-                'label' => 'Notdienste',
+                'label' => Yii::t('NotdienstModule.base', 'Notdienste'),
                 'group' => 'modules',
                 'url' => $event->sender->space->createUrl('/notdienst/index'),
                 'icon' => '<i class="fa fa-medkit"></i>',

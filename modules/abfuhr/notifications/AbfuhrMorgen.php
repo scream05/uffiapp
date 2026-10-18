@@ -53,13 +53,24 @@ class AbfuhrMorgen extends BaseNotification
         }
         $wann = !empty($d['heute']) ? 'Heute' : 'Morgen';
         // Wochentag fest auf Deutsch: Push und E-Mail entstehen im Hintergrund (Konsole, ggf. andere Sprache)
-        $datum = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'][(int)date('w', strtotime($d['tag']))] . ', ' . date('d.m.', strtotime($d['tag']));
+        $datum = Erinnerung::tag($d['tag']);
         return "$wann ($datum): " . Erinnerung::liste($d['tonnen'] ?? []) . ' – bitte rechtzeitig bereitstellen.';
     }
 
+    /** Im Browser (Glocke, Benachrichtigungsliste) in der Sprache des Nutzers, im Hintergrund (Push, E-Mail) wie text() */
     public function html()
     {
-        return Html::encode($this->text());
+        $d = $this->data();
+        if (!(Yii::$app instanceof \yii\web\Application)) {
+            return Html::encode($this->text());
+        }
+        if (empty($d['tag'])) {
+            return Html::encode(Yii::t('AbfuhrModule.base', 'Abfuhr-Erinnerung'));
+        }
+        $params = ['datum' => Erinnerung::tag($d['tag'], true), 'tonnen' => Erinnerung::liste($d['tonnen'] ?? [], true)];
+        return Html::encode(!empty($d['heute'])
+            ? Yii::t('AbfuhrModule.base', 'Heute ({datum}): {tonnen} – bitte rechtzeitig bereitstellen.', $params)
+            : Yii::t('AbfuhrModule.base', 'Morgen ({datum}): {tonnen} – bitte rechtzeitig bereitstellen.', $params));
     }
 
     public function getMailSubject()

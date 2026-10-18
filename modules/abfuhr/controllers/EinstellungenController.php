@@ -46,11 +46,11 @@ class EinstellungenController extends BaseAccountController
             $keys = array_values(array_intersect($keys, $tonnen ?: array_keys($this->module->tonnen)));
             if ($keys) {
                 AbfuhrMorgen::instance()->payload(['tag' => $tag, 'tonnen' => $keys, 'heute' => $tag === date('Y-m-d')])->send($user);
-                $this->view->success('Test-Erinnerung verschickt – sie erscheint gleich in der Glocke und, falls erlaubt, als Push.');
+                $this->view->success(Yii::t('AbfuhrModule.base', 'Test-Erinnerung verschickt – sie erscheint gleich in der Glocke und, falls erlaubt, als Push.'));
                 return $this->redirect(['index']);
             }
         }
-        $this->view->warn('Keine passende Abfuhr in den nächsten 60 Tagen gefunden.');
+        $this->view->warn(Yii::t('AbfuhrModule.base', 'Keine passende Abfuhr in den nächsten 60 Tagen gefunden.'));
         return $this->redirect(['index']);
     }
 }
