@@ -188,4 +188,13 @@ return [
     'Politik' => 'السياسة',
     'Förderverein' => 'جمعيات الدعم',
     'Sonstiges' => 'أخرى',
+    'Dein Beitrag für „{name}“ wurde nicht veröffentlicht' => 'لم يُنشر منشورك الخاص بـ «{name}»',
+    'Hallo {name},' => 'مرحبًا {name}،',
+    'dein Beitrag für „{name}“ auf Rund um Uffni wurde geprüft und nicht veröffentlicht.' => 'تمت مراجعة منشورك الخاص بـ «{name}» على Rund um Uffni ولم يُنشر.',
+    'Begründung:' => 'السبب:',
+    'Dein Text:' => 'نصك:',
+    'Fragen? Antworte einfach auf diese E-Mail oder schreib an {mail}.' => 'لديك أسئلة؟ رُدّ ببساطة على هذه الرسالة أو اكتب إلى {mail}.',
+    'Viele Grüße' => 'مع أطيب التحيات',
+    'Rund um Uffni – Bürgerplattform der Bürgerliste Uffenheim e. V.' => 'Rund um Uffni – منصة المواطنين التابعة لـ Bürgerliste Uffenheim e. V.',
+    'Du kannst den Beitrag überarbeiten und über die Vereinsseite neu einreichen:' => 'يمكنك تعديل المنشور وإعادة تقديمه عبر صفحة النادي:',
 ];

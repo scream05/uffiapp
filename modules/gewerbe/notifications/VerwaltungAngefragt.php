@@ -39,7 +39,7 @@ class VerwaltungAngefragt extends BaseNotification
     private function infoText($user, $betrieb)
     {
         return $this->source->status === Betrieb::STATUS_VORGESCHLAGEN
-            ? "$user hat den Betrieb $betrieb im Gewerbeverzeichnis eingetragen und möchte ihn verwalten."
-            : "$user möchte den Betrieb $betrieb im Gewerbeverzeichnis verwalten.";
+            ? Yii::t('GewerbeModule.base', '{user} hat den Betrieb {betrieb} im Gewerbeverzeichnis eingetragen und möchte ihn verwalten.', ['user' => $user, 'betrieb' => $betrieb])
+            : Yii::t('GewerbeModule.base', '{user} möchte den Betrieb {betrieb} im Gewerbeverzeichnis verwalten.', ['user' => $user, 'betrieb' => $betrieb]);
     }
 }

@@ -15,6 +15,7 @@ use humhub\modules\user\models\User;
  * @property string|null $nachname
  * @property string|null $email
  * @property string|null $telefon
+ * @property string|null $sprache beim Melden eingestellte Sprache (Gäste); Angemeldete: Sprache des Kontos
  * @property int $info_mail Über Statusänderungen per E-Mail informieren
  * @property int $info_whatsapp … per WhatsApp an wa_id
  * @property string|null $wa_id Telefon im WhatsApp-Format (nur Ziffern, mit Ländervorwahl)
@@ -44,6 +45,24 @@ class MaengelKontakt extends ActiveRecord
     public function getName(): string
     {
         return $this->user ? $this->user->displayName : trim("$this->vorname $this->nachname");
+    }
+
+    /** Sprache für Mails an die meldende Person */
+    public function getSprache(): string
+    {
+        return ($this->user ? $this->user->language : $this->sprache) ?: (\Yii::$app->settings->get('defaultLanguage') ?: 'de');
+    }
+
+    /** $fn in der Sprache der meldenden Person ausführen (Mailtexte), danach die bisherige Sprache wiederherstellen */
+    public function inSprache(callable $fn)
+    {
+        $alt = [\Yii::$app->language, \Yii::$app->formatter->locale];
+        \Yii::$app->language = \Yii::$app->formatter->locale = $this->getSprache();
+        try {
+            return $fn();
+        } finally {
+            [\Yii::$app->language, \Yii::$app->formatter->locale] = $alt;
+        }
     }
 
     public function getMail(): ?string

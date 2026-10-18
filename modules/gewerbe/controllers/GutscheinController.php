@@ -205,10 +205,13 @@ class GutscheinController extends ContentContainerController
     }
 
     /** Druckseite für die Kasse (A6-Aufsteller bzw. Aufkleber) */
-    public function actionAufsteller($betrieb)
+    /** Druckseite Theken-Aufsteller; $sprache = Sprache der Karten (für die Kundschaft, Standard Deutsch) */
+    public function actionAufsteller($betrieb, $sprache = 'de')
     {
         $b = GutscheinDienst::theke($this->betriebVerwalten($betrieb));
-        return $this->renderPartial('aufsteller', ['betrieb' => $b, 'url' => GutscheinDienst::thekeUrl($b)]);
+        $sprachen = Yii::$app->i18n->getAllowedLanguages();
+        return $this->renderPartial('aufsteller', ['betrieb' => $b, 'url' => GutscheinDienst::thekeUrl($b),
+            'sprache' => isset($sprachen[$sprache]) ? $sprache : 'de', 'sprachen' => $sprachen]);
     }
 
     /**

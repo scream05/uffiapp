@@ -1,6 +1,7 @@
 <?php
 /**
  * Info an die meldende Person bei Freigabe/Statusänderung (Text). Siehe Buergerinfo::mail()
+ * Wird in der Sprache der meldenden Person erzeugt (MaengelKontakt::inSprache).
  *
  * @var string $name
  * @var \humhub\modules\maengelmelder\models\Mangel $mangel
@@ -10,28 +11,34 @@
  * @var string $kontaktMail
  * @var bool $gast
  */
+$t = fn($s, $p = []) => Yii::t('MaengelmelderModule.base', $s, $p);
 ?>
-Hallo <?= $name ?>,
+<?= $t('Hallo {name},', ['name' => $name]) ?>
 
-es gibt einen neuen Stand zu deiner Mängelmeldung:
 
-Nummer: <?= $mangel->getContentId() ?>
+<?= $t('es gibt einen neuen Stand zu deiner Mängelmeldung:') ?>
 
-Kategorie: <?= $mangel->kategorie ?>
 
-Ort: <?= $mangel->getOrt() ?>
+<?= $t('Nummer: {nr}', ['nr' => $mangel->getContentId()]) ?>
 
-Neuer Stand: <?= $stand ?>
+<?= $t('Kategorie: {kategorie}', ['kategorie' => Yii::$app->getModule('maengelmelder')->kategorieLabel($mangel->kategorie)]) ?>
 
-<?= $hinweis ? "Hinweis des Bauhofs: $hinweis\n" : '' ?>
+<?= $t('Ort: {ort}', ['ort' => $mangel->getOrt()]) ?>
 
-<?= $gast ? 'Den Bearbeitungsstand siehst du auch auf der Karte:' : 'Zur Meldung:' ?>
+<?= $t('Neuer Stand: {stand}', ['stand' => $stand]) ?>
+
+<?= $hinweis ? $t('Hinweis des Bauhofs: {hinweis}', ['hinweis' => $hinweis]) . "\n" : '' ?>
+
+<?= $gast ? $t('Den Bearbeitungsstand siehst du auch auf der Karte:') : $t('Zur Meldung:') ?>
 
 <?= $link ?>
 
 
-Du kannst auf diese E-Mail antworten; deine Antwort geht an den Bauhof.
-Du bekommst diese E-Mail, weil du beim Melden Infos per E-Mail gewünscht hast. Keine Infos mehr? Antworte mit STOPP.
+<?= $t('Du kannst auf diese E-Mail antworten; deine Antwort geht an den Bauhof.') ?>
+
+<?= $t('Du bekommst diese E-Mail, weil du beim Melden Infos per E-Mail gewünscht hast. Keine Infos mehr? Antworte mit STOPP.') ?>
+
 
 --
-Rund um Uffni – Bürgerplattform der Bürgerliste Uffenheim e. V., kein Angebot der Stadt Uffenheim.
+<?= $t('Rund um Uffni – Bürgerplattform der Bürgerliste Uffenheim e. V., kein Angebot der Stadt Uffenheim.') ?>
+

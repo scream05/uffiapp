@@ -147,10 +147,18 @@ class Buergerinfo
     {
         $k = MaengelKontakt::findOne($content->id);
         $name = $k ? $k->getName() : $content->createdBy->displayName;
-        $mail = "Hallo $name,\n\nder Bauhof hat eine Nachricht zu deiner Mängelmeldung Nr. {$content->id} ({$mangel->kategorie}, "
-            . $mangel->getOrt() . "):\n\n$text\n\nDu kannst einfach auf diese E-Mail antworten; deine Antwort geht an den Bauhof.\n\n--\n"
-            . 'Rund um Uffni – Bürgerplattform der Bürgerliste Uffenheim e. V., kein Angebot der Stadt Uffenheim.';
-        return self::mailSenden($an, "Nachricht vom Bauhof zu deiner Mängelmeldung Nr. {$content->id}", $mail, $content->id);
+        // Rahmen in der Sprache der meldenden Person, die Nachricht des Bauhofs selbst bleibt wie geschrieben
+        $baue = function () use ($name, $content, $mangel, $text) {
+            $t = fn($s, $p = []) => Yii::t('MaengelmelderModule.base', $s, $p);
+            return [$t('Hallo {name},', ['name' => $name]) . "\n\n"
+                . $t('der Bauhof hat eine Nachricht zu deiner Mängelmeldung Nr. {nr} ({kategorie}, {ort}):', [
+                    'nr' => $content->id, 'kategorie' => self::module()->kategorieLabel($mangel->kategorie), 'ort' => $mangel->getOrt()])
+                . "\n\n$text\n\n" . $t('Du kannst einfach auf diese E-Mail antworten; deine Antwort geht an den Bauhof.') . "\n\n--\n"
+                . $t('Rund um Uffni – Bürgerplattform der Bürgerliste Uffenheim e. V., kein Angebot der Stadt Uffenheim.'),
+                $t('Nachricht vom Bauhof zu deiner Mängelmeldung Nr. {nr}', ['nr' => $content->id])];
+        };
+        [$mail, $betreff] = $k ? $k->inSprache($baue) : $baue();
+        return self::mailSenden($an, $betreff, $mail, $content->id);
     }
 
     /**
@@ -233,11 +241,17 @@ class Buergerinfo
         $link = $k->istGast() || $content->state != Content::STATE_PUBLISHED
             ? $content->container->createUrl('/maengelmelder/meldung/karte', ['lat' => $mangel->lat, 'lng' => $mangel->lng], true)
             : \yii\helpers\Url::to($content->getUrl(), true);
-        $text = Yii::$app->view->renderFile('@maengelmelder/views/mail/status_text.php', [
-            'name' => $k->getName(), 'mangel' => $mangel, 'stand' => $stand, 'hinweis' => $hinweis, 'link' => $link,
-            'kontaktMail' => self::module()->kontaktMail, 'gast' => $k->istGast(),
-        ]);
-        self::mailSenden($an, "Neuer Stand zu deiner Mängelmeldung Nr. {$content->id}: $stand", $text, $content->id);
+        // In der Sprache der meldenden Person; Stand und Standard-Hinweise sind feste Texte (übersetzt),
+        // eigene Hinweise des Bauhofs bleiben wie geschrieben
+        [$text, $betreff] = $k->inSprache(function () use ($k, $mangel, $stand, $hinweis, $link, $content) {
+            $stand = Yii::t('MaengelmelderModule.base', $stand);
+            return [Yii::$app->view->renderFile('@maengelmelder/views/mail/status_text.php', [
+                'name' => $k->getName(), 'mangel' => $mangel, 'stand' => $stand,
+                'hinweis' => $hinweis !== null ? Yii::t('MaengelmelderModule.base', $hinweis) : null, 'link' => $link,
+                'kontaktMail' => self::module()->kontaktMail, 'gast' => $k->istGast(),
+            ]), Yii::t('MaengelmelderModule.base', 'Neuer Stand zu deiner Mängelmeldung Nr. {nr}: {stand}', ['nr' => $content->id, 'stand' => $stand])];
+        });
+        self::mailSenden($an, $betreff, $text, $content->id);
     }
 
     /**

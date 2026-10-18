@@ -311,6 +311,52 @@ class SetupController extends Controller
     }
 
     /**
+     * Vorschau der Mails an Bürger in einer Sprache, ohne Versand: setup/mailvorschau <sprache> (de, en-US, uk, ar, tr, ru).
+     * Nimmt die neueste Mängelmeldung und den neuesten Vereins-/Gewerbebeitrag als Beispiel.
+     */
+    public function actionMailvorschau($sprache = 'en-US')
+    {
+        Yii::$app->language = Yii::$app->formatter->locale = $sprache;
+        $zeige = fn($titel, $text) => $this->stdout("===== $titel\n$text\n");
+        $mangel = null;
+        foreach (\humhub\modules\post\models\Post::find()->where(['like', 'message', 'maengelmelder/meldung/karte?lat='])
+                     ->orderBy(['id' => SORT_DESC])->limit(5)->all() as $post) {
+            if (($mangel = \humhub\modules\maengelmelder\models\Mangel::fromContent($post->content)) !== null) {
+                break;
+            }
+        }
+        if ($mangel !== null) {
+            $m = Yii::$app->getModule('maengelmelder');
+            $zeige('Mängelmelder: Bestätigung', Yii::$app->view->renderFile('@maengelmelder/views/mail/bestaetigung_text.php',
+                ['name' => 'Max Muster', 'nr' => $mangel->getContentId(), 'link' => 'https://…', 'stunden' => 48, 'kontaktMail' => $m->kontaktMail]));
+            $zeige('Mängelmelder: Status', Yii::$app->view->renderFile('@maengelmelder/views/mail/status_text.php', [
+                'name' => 'Max Muster', 'mangel' => $mangel, 'stand' => Yii::t('MaengelmelderModule.base', 'In Bearbeitung'),
+                'hinweis' => Yii::t('MaengelmelderModule.base', 'Deine Meldung ist jetzt auf der Karte zu sehen.'),
+                'link' => 'https://…', 'kontaktMail' => $m->kontaktMail, 'gast' => true]));
+        }
+        foreach (['vereine' => \humhub\modules\vereine\models\VereinBeitrag::class, 'gewerbe' => \humhub\modules\gewerbe\models\BetriebBeitrag::class] as $id => $klasse) {
+            if (class_exists($klasse) && ($b = $klasse::find()->orderBy(['id' => SORT_DESC])->one()) !== null) {
+                $b->begruendung = $b->begruendung ?: '(Begründung)';
+                $zeige("$id: Ablehnung", Yii::$app->view->renderFile("@$id/views/mail/abgelehnt_text.php",
+                    ['beitrag' => $b, 'name' => 'Max Muster', 'link' => 'https://…', 'kontaktMail' => Yii::$app->getModule($id)->kontaktMail]));
+            }
+        }
+        // Gutschein-Aufsteller: Karten in der Sprache $sprache, Hinweise oben auf Deutsch (Sprache des Betriebs)
+        if (class_exists(\humhub\modules\gewerbe\models\Betrieb::class)
+            && ($b = \humhub\modules\gewerbe\models\Betrieb::find()->where(['not', ['theke_nummer' => null]])->one()) !== null) {
+            if (!Yii::$app->has('session')) { // Html::nonce() braucht eine Sitzung
+                Yii::$app->set('session', ['class' => \yii\web\Session::class]);
+            }
+            $html = Yii::$app->view->renderFile('@gewerbe/views/gutschein/aufsteller.php', ['betrieb' => $b, 'url' => 'https://example.org',
+                'sprache' => $sprache, 'sprachen' => Yii::$app->i18n->getAllowedLanguages()]);
+            Yii::$app->language = 'de';
+            preg_match('#<section.*?</section>#s', $html, $m);
+            $zeige('Gutschein-Aufsteller (eine Karte)', trim(preg_replace(['#<svg.*?</svg>#s', '#<[^>]+>#', "#\n\s*\n+#"], ['[QR]', '', "\n"], $m[0] ?? '')));
+        }
+        return ExitCode::OK;
+    }
+
+    /**
      * Abfallkalender im Space „Abfall & Termine“ anlegen/abgleichen und alle Nutzer aufnehmen:
      * setup/abfall  (die ICS-Datei erzeugt scripts/abfall-kalender.py)
      */

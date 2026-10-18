@@ -27,7 +27,7 @@ class BeitragFreigegeben extends BaseNotification
 
     public function getMailSubject()
     {
-        return "Dein Beitrag für {$this->source->betrieb->name} ist veröffentlicht";
+        return Yii::t('GewerbeModule.base', 'Dein Beitrag für {betrieb} ist veröffentlicht', ['betrieb' => $this->source->betrieb->name]);
     }
 
     public function html()

@@ -106,7 +106,7 @@ class MeldungController extends ContentContainerController
                     $infos = $this->module->buergerInfoAktiv();
                     if ($kontakt->telefon !== '' || ($infos && ($kontakt->info_mail || $kontakt->info_whatsapp))) {
                         (new MaengelKontakt(['content_id' => $post->content->id, 'user_id' => Yii::$app->user->id,
-                            'telefon' => $kontakt->telefon ?: null, 'created_at' => date('Y-m-d H:i:s'),
+                            'telefon' => $kontakt->telefon ?: null, 'sprache' => Yii::$app->language, 'created_at' => date('Y-m-d H:i:s'),
                             'info_mail' => $infos && $kontakt->info_mail ? 1 : 0,
                             'info_whatsapp' => $this->module->buergerWhatsappAktiv() && $kontakt->info_whatsapp ? 1 : 0,
                             'wa_id' => MeldeKontakt::waId($kontakt->telefon),
@@ -165,6 +165,7 @@ class MeldungController extends ContentContainerController
                 'nachname' => $kontakt->nachname,
                 'email' => $kontakt->email ?: null,
                 'telefon' => $kontakt->telefon ?: null,
+                'sprache' => Yii::$app->language,
                 'created_at' => date('Y-m-d H:i:s'),
                 'info_mail' => $this->module->buergerInfoAktiv() && $kontakt->info_mail ? 1 : 0,
                 'info_whatsapp' => $this->module->buergerWhatsappAktiv() && $kontakt->info_whatsapp ? 1 : 0,
@@ -215,16 +216,16 @@ class MeldungController extends ContentContainerController
             Yii::$app->cache->set($key, $n + 1, 86400);
             $k->updateAttributes(['mail_token' => bin2hex(random_bytes(24))]);
             $link = $this->contentContainer->createUrl('/maengelmelder/meldung/bestaetigen', ['id' => $k->content_id, 't' => $k->mail_token], true);
-            $text = $this->renderPartial('@maengelmelder/views/mail/bestaetigung_text', [
+            [$text, $betreff] = $k->inSprache(fn() => [$this->renderPartial('@maengelmelder/views/mail/bestaetigung_text', [
                 'name' => $k->getName(), 'nr' => $k->content_id, 'link' => $link,
                 'stunden' => $this->module->bestaetigungStunden, 'kontaktMail' => $this->module->kontaktMail,
-            ]);
+            ]), Yii::t('MaengelmelderModule.base', 'Bitte bestätige deine E-Mail-Adresse (Mängelmeldung Nr. {nr})', ['nr' => $k->content_id])]);
             $html = nl2br(\yii\helpers\Html::encode($text), false);
             $html = preg_replace('#https?://[^\s<]+#', '<a href="$0">$0</a>', $html);
             $mailer = Yii::$app->mailer;
             $html = $mailer->render('@humhub/views/mail/TextOnly', ['message' => $html], $mailer->htmlLayout);
             $mail = $mailer->compose()->setTo($k->email)->setReplyTo($this->module->kontaktMail)
-                ->setSubject('Bitte bestätige deine E-Mail-Adresse (Mängelmeldung Nr. ' . $k->content_id . ')');
+                ->setSubject($betreff);
             // Text/HTML direkt setzen: HumHubs Link-Dienst (go.humhub.com) würde den Link sonst umleiten
             $mail->getSymfonyEmail()->text($text)->html($html);
             if (!$mail->send()) {

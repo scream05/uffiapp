@@ -25,7 +25,7 @@ class BeitragEingereicht extends BaseNotification
 
     public function getMailSubject()
     {
-        return "{$this->originator->displayName} hat einen Beitrag für {$this->source->betrieb->name} eingereicht";
+        return Yii::t('GewerbeModule.base', '{name} hat einen Beitrag für {betrieb} eingereicht', ['name' => $this->originator->displayName, 'betrieb' => $this->source->betrieb->name]);
     }
 
     public function html()

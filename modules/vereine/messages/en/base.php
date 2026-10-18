@@ -188,4 +188,13 @@ return [
     'Politik' => 'Politics',
     'Förderverein' => 'Support associations',
     'Sonstiges' => 'Other',
+    'Dein Beitrag für „{name}“ wurde nicht veröffentlicht' => 'Your post for “{name}” was not published',
+    'Hallo {name},' => 'Hello {name},',
+    'dein Beitrag für „{name}“ auf Rund um Uffni wurde geprüft und nicht veröffentlicht.' => 'your post for “{name}” on Rund um Uffni has been reviewed and was not published.',
+    'Begründung:' => 'Reason:',
+    'Dein Text:' => 'Your text:',
+    'Fragen? Antworte einfach auf diese E-Mail oder schreib an {mail}.' => 'Questions? Just reply to this e-mail or write to {mail}.',
+    'Viele Grüße' => 'Best regards',
+    'Rund um Uffni – Bürgerplattform der Bürgerliste Uffenheim e. V.' => 'Rund um Uffni – citizens’ platform of Bürgerliste Uffenheim e. V.',
+    'Du kannst den Beitrag überarbeiten und über die Vereinsseite neu einreichen:' => 'You can revise the post and submit it again via the club page:',
 ];

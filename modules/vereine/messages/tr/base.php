@@ -188,4 +188,13 @@ return [
     'Politik' => 'Siyaset',
     'Förderverein' => 'Destek dernekleri',
     'Sonstiges' => 'Diğer',
+    'Dein Beitrag für „{name}“ wurde nicht veröffentlicht' => '“{name}” için gönderin yayımlanmadı',
+    'Hallo {name},' => 'Merhaba {name},',
+    'dein Beitrag für „{name}“ auf Rund um Uffni wurde geprüft und nicht veröffentlicht.' => 'Rund um Uffni’de “{name}” için gönderin incelendi ve yayımlanmadı.',
+    'Begründung:' => 'Gerekçe:',
+    'Dein Text:' => 'Metnin:',
+    'Fragen? Antworte einfach auf diese E-Mail oder schreib an {mail}.' => 'Sorun mu var? Bu e-postayı yanıtlaman ya da {mail} adresine yazman yeterli.',
+    'Viele Grüße' => 'Selamlar',
+    'Rund um Uffni – Bürgerplattform der Bürgerliste Uffenheim e. V.' => 'Rund um Uffni – Bürgerliste Uffenheim e. V.’nin vatandaş platformu',
+    'Du kannst den Beitrag überarbeiten und über die Vereinsseite neu einreichen:' => 'Gönderiyi düzenleyip kulüp sayfası üzerinden yeniden gönderebilirsin:',
 ];

@@ -106,15 +106,23 @@ class BeitragDienst
         }
         /** @var Module $module */
         $module = Yii::$app->getModule('vereine');
-        $text = Yii::$app->view->renderFile('@vereine/views/mail/abgelehnt_text.php', [
-            'beitrag' => $b, 'name' => $user->displayName, 'link' => $b->verein->getUrl(true), 'kontaktMail' => $module->kontaktMail,
-        ]);
+        // Mailtext und Betreff in der Sprache des Empfängers, danach die bisherige Sprache wiederherstellen
+        $alt = [Yii::$app->language, Yii::$app->formatter->locale, Yii::$app->formatter->timeZone];
+        Yii::$app->i18n->setUserLocale($user);
+        try {
+            $betreff = Yii::t('VereineModule.base', 'Dein Beitrag für „{name}“ wurde nicht veröffentlicht', ['name' => $b->verein->name]);
+            $text = Yii::$app->view->renderFile('@vereine/views/mail/abgelehnt_text.php', [
+                'beitrag' => $b, 'name' => $user->displayName, 'link' => $b->verein->getUrl(true), 'kontaktMail' => $module->kontaktMail,
+            ]);
+        } finally {
+            [Yii::$app->language, Yii::$app->formatter->locale, Yii::$app->formatter->timeZone] = $alt;
+        }
         $html = nl2br(Html::encode($text), false);
         $html = preg_replace('#https?://[^\s<]+#', '<a href="$0">$0</a>', $html);
         $mailer = Yii::$app->mailer;
         $html = $mailer->render('@humhub/views/mail/TextOnly', ['message' => $html], $mailer->htmlLayout);
         $mail = $mailer->compose()->setTo($user->email)->setReplyTo($module->kontaktMail)
-            ->setSubject("Dein Beitrag für „{$b->verein->name}“ wurde nicht veröffentlicht");
+            ->setSubject($betreff);
         $mail->getSymfonyEmail()->text($text)->html($html);
         $ok = $mail->send();
         if (!$ok) {

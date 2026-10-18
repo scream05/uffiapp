@@ -24,7 +24,7 @@ class VerwaltungBestaetigt extends BaseNotification
 
     public function getMailSubject()
     {
-        return "Du kannst jetzt den Betrieb {$this->source->name} verwalten";
+        return Yii::t('GewerbeModule.base', 'Du kannst jetzt den Betrieb {betrieb} verwalten', ['betrieb' => $this->source->name]);
     }
 
     public function html()

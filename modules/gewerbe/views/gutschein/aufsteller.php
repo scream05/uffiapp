@@ -3,33 +3,38 @@
  * Druckseite: Theken-Aufsteller (A6 hoch, auf A4 mit Schnittlinie viermal) für die Kasse
  * @var \humhub\modules\gewerbe\models\Betrieb $betrieb
  * @var string $url Ziel des Theken-QR
+ * @var string $sprache Sprache der Karten (Kundschaft); Hinweise oben in der Sprache des Betriebs
+ * @var array $sprachen Sprachkürzel => Name
  */
 
 use humhub\helpers\Html;
 use humhub\modules\gewerbe\components\GutscheinDienst;
 
 $svg = preg_replace('/^<\?xml[^>]*>\s*/', '', GutscheinDienst::qrSvg($url, 600));
-$karte = function () use ($betrieb, $svg) { ?>
-    <section class="karte">
-        <div class="kopf">Gutschein einlösen</div>
+$k = fn($s, $p = []) => Yii::t('GewerbeModule.base', $s, $p, $sprache);
+$t = fn($s, $p = []) => Yii::t('GewerbeModule.base', $s, $p);
+$rtl = str_starts_with($sprache, 'ar');
+$karte = function () use ($betrieb, $svg, $k, $rtl, $sprache) { ?>
+    <section class="karte" lang="<?= Html::encode($sprache) ?>"<?= $rtl ? ' dir="rtl"' : '' ?>>
+        <div class="kopf"><?= $k('Gutschein einlösen') ?></div>
         <div class="name"><?= Html::encode($betrieb->name) ?></div>
         <div class="qr"><?= $svg ?></div>
         <ol>
-            <li>QR-Code mit der Handykamera scannen</li>
-            <li>Bei <strong>Rund um Uffni</strong> anmelden (kostenlos)</li>
-            <li>„Jetzt einlösen“ tippen und vorzeigen</li>
+            <li><?= $k('QR-Code mit der Handykamera scannen') ?></li>
+            <li><?= $k('Bei <strong>Rund um Uffni</strong> anmelden (kostenlos)') ?></li>
+            <li><?= $k('„Jetzt einlösen“ tippen und vorzeigen') ?></li>
         </ol>
-        <div class="nummer">Ohne Kamera: Nummer <strong><?= Html::encode($betrieb->theke_nummer) ?></strong></div>
+        <div class="nummer"><?= $k('Ohne Kamera: Nummer {nummer}', ['nummer' => '<strong dir="ltr">' . Html::encode($betrieb->theke_nummer) . '</strong>']) ?></div>
         <div class="fuss">community.rundumuffni.de</div>
     </section>
 <?php };
 ?>
 <!DOCTYPE html>
-<html lang="de">
+<html lang="<?= Html::encode(Yii::$app->language) ?>">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Theken-Aufsteller – <?= Html::encode($betrieb->name) ?></title>
+    <title><?= $t('Theken-Aufsteller – {name}', ['name' => Html::encode($betrieb->name)]) ?></title>
     <style <?= Html::nonce() ?>>
         @page { size: A4; margin: 0; }
         * { box-sizing: border-box; }
@@ -42,7 +47,8 @@ $karte = function () use ($betrieb, $svg) { ?>
         .name { margin-top: 4mm; font-size: 13pt; font-weight: 700; line-height: 1.2; }
         .qr { width: 60mm; height: 60mm; margin: 4mm 0 3mm; }
         .qr svg { width: 100%; height: 100%; display: block; }
-        ol { text-align: left; margin: 0; padding-left: 5mm; font-size: 10pt; line-height: 1.45; }
+        ol { text-align: start; margin: 0; padding-inline-start: 5mm; padding-inline-end: 0; font-size: 10pt; line-height: 1.45; }
+        .hinweis select { font: inherit; padding: 4px 6px; border-radius: 8px; }
         .nummer { margin-top: 3mm; font-size: 10pt; }
         .nummer strong { font-size: 14pt; letter-spacing: .15em; }
         .fuss { margin-top: auto; padding-top: 2mm; font-size: 8.5pt; color: #5e7f0a; font-weight: 700; }
@@ -51,15 +57,28 @@ $karte = function () use ($betrieb, $svg) { ?>
 </head>
 <body>
 <div class="hinweis">
-    Vier Aufsteller auf einem A4-Blatt (A6). Ausschneiden, ggf. laminieren oder in einen Tischaufsteller stecken.
-    Drucken ohne Skalierung („Tatsächliche Größe“).
-    <button type="button" id="drucken">Drucken</button>
+    <?= $t('Vier Aufsteller auf einem A4-Blatt (A6). Ausschneiden, ggf. laminieren oder in einen Tischaufsteller stecken.') ?>
+    <?= $t('Drucken ohne Skalierung („Tatsächliche Größe“).') ?>
+    <form method="get" style="display:inline">
+        <input type="hidden" name="betrieb" value="<?= (int)$betrieb->id ?>">
+        <label><?= $t('Sprache der Karten:') ?>
+            <select name="sprache" id="sprache">
+                <?php foreach ($sprachen as $code => $name): ?>
+                    <option value="<?= Html::encode($code) ?>"<?= $code === $sprache ? ' selected' : '' ?>><?= Html::encode($name) ?></option>
+                <?php endforeach ?>
+            </select>
+        </label>
+    </form>
+    <button type="button" id="drucken"><?= $t('Drucken') ?></button>
 </div>
 <div class="blatt">
     <?php for ($i = 0; $i < 4; $i++) {
         $karte();
     } ?>
 </div>
-<script <?= Html::nonce() ?>>document.getElementById('drucken').addEventListener('click', function () { window.print(); });</script>
+<script <?= Html::nonce() ?>>
+    document.getElementById('drucken').addEventListener('click', function () { window.print(); });
+    document.getElementById('sprache').addEventListener('change', function () { this.form.submit(); });
+</script>
 </body>
 </html>

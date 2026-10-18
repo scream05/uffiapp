@@ -29,7 +29,7 @@ class GutscheinFuerAlle extends BaseNotification
 
     public function getMailSubject()
     {
-        return "Neuer Gutschein: {$this->source->titel}";
+        return Yii::t('GewerbeModule.base', 'Neuer Gutschein: {titel}', ['titel' => $this->source->titel]);
     }
 
     public function html()

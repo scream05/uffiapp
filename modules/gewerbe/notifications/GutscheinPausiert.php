@@ -25,7 +25,7 @@ class GutscheinPausiert extends BaseNotification
 
     public function getMailSubject()
     {
-        return "Gutschein von {$this->source->betrieb->name} automatisch pausiert";
+        return Yii::t('GewerbeModule.base', 'Gutschein von {betrieb} automatisch pausiert', ['betrieb' => $this->source->betrieb->name]);
     }
 
     public function html()

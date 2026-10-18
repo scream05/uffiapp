@@ -48,22 +48,21 @@ class AbfuhrMorgen extends BaseNotification
     public function text()
     {
         $d = $this->data();
+        // Push und E-Mail: HumHub stellt vorher die Sprache des Empfängers ein (MailTarget, fcm-push),
+        // die Übersetzungen sind auch auf der Konsole registriert (designwahl Events::uebersetzungenRegistrieren)
         if (empty($d['tag'])) {
-            return 'Abfuhr-Erinnerung';
+            return Yii::t('AbfuhrModule.base', 'Abfuhr-Erinnerung');
         }
-        $wann = !empty($d['heute']) ? 'Heute' : 'Morgen';
-        // Wochentag fest auf Deutsch: Push und E-Mail entstehen im Hintergrund (Konsole, ggf. andere Sprache)
-        $datum = Erinnerung::tag($d['tag']);
-        return "$wann ($datum): " . Erinnerung::liste($d['tonnen'] ?? []) . ' – bitte rechtzeitig bereitstellen.';
+        $params = ['datum' => Erinnerung::tag($d['tag'], true), 'tonnen' => Erinnerung::liste($d['tonnen'] ?? [], true)];
+        return !empty($d['heute'])
+            ? Yii::t('AbfuhrModule.base', 'Heute ({datum}): {tonnen} – bitte rechtzeitig bereitstellen.', $params)
+            : Yii::t('AbfuhrModule.base', 'Morgen ({datum}): {tonnen} – bitte rechtzeitig bereitstellen.', $params);
     }
 
-    /** Im Browser (Glocke, Benachrichtigungsliste) in der Sprache des Nutzers, im Hintergrund (Push, E-Mail) wie text() */
+    /** Glocke und Benachrichtigungsliste, in der Sprache des Nutzers */
     public function html()
     {
         $d = $this->data();
-        if (!(Yii::$app instanceof \yii\web\Application)) {
-            return Html::encode($this->text());
-        }
         if (empty($d['tag'])) {
             return Html::encode(Yii::t('AbfuhrModule.base', 'Abfuhr-Erinnerung'));
         }

@@ -24,7 +24,7 @@ class GutscheinNeu extends BaseNotification
 
     public function getMailSubject()
     {
-        return "Neuer Gutschein von {$this->source->betrieb->name}";
+        return Yii::t('GewerbeModule.base', 'Neuer Gutschein von {betrieb}', ['betrieb' => $this->source->betrieb->name]);
     }
 
     public function html()
