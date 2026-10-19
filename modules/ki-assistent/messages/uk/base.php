@@ -94,4 +94,7 @@ return [
     'Deine Frage …' => 'Твоє запитання …',
     'Deine Frage' => 'Твоє запитання',
     'Datenschutz' => 'Конфіденційність',
+    'Auf der Karte (OpenStreetMap)' => 'На мапі (OpenStreetMap)',
+    'In Google Maps' => 'У Google Maps',
+    'Google Maps ist ein Dienst von Google; erst beim Klick werden Daten an Google übertragen.' => 'Google Maps – сервіс Google; дані передаються Google лише після натискання.',
 ];

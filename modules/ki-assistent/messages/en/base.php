@@ -94,4 +94,7 @@ return [
     'Deine Frage …' => 'Your question …',
     'Deine Frage' => 'Your question',
     'Datenschutz' => 'Privacy',
+    'Auf der Karte (OpenStreetMap)' => 'On the map (OpenStreetMap)',
+    'In Google Maps' => 'In Google Maps',
+    'Google Maps ist ein Dienst von Google; erst beim Klick werden Daten an Google übertragen.' => 'Google Maps is a Google service; data is only sent to Google when you click.',
 ];

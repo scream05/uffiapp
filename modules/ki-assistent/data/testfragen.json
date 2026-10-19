@@ -273,5 +273,29 @@
       "Die nächste",
       "wird geleert"
     ]
+  },
+  {
+    "frage": "Wo ist das Rathaus?",
+    "erwartet": [
+      "Marktplatz",
+      "google\\.com\\/maps.*openstreetmap|openstreetmap.*google\\.com\\/maps"
+    ],
+    "karte": "link"
+  },
+  {
+    "frage": "Wo finde ich den Wertstoffhof?",
+    "erwartet": [
+      "Buchenweg",
+      "google\\.com\\/maps.*openstreetmap|openstreetmap.*google\\.com\\/maps"
+    ],
+    "karte": "link"
+  },
+  {
+    "frage": "Where is the Stadt-Apotheke in Uffenheim?",
+    "erwartet": [
+      "Uffenheim",
+      "openstreetmap.*google\\.com\\/maps|google\\.com\\/maps.*openstreetmap"
+    ],
+    "karte": "link"
   }
 ]

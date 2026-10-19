@@ -130,6 +130,22 @@ class Aktionen
                 ],
             ];
         }
+        if (class_exists(\humhub\modules\maengelmelder\components\Osm::class)) {
+            $tools[] = [
+                'name' => 'ort_zeigen',
+                'description' => 'Zeigt unter der Antwort Knöpfe, die einen Ort auf OpenStreetMap und in Google Maps öffnen. '
+                    . 'Aufrufen, sobald der Nutzer wissen will, wo etwas ist oder wo etwas stattfindet (Adresse, Gebäude, Amt, Betrieb, '
+                    . 'Apotheke, Veranstaltungsort, Straße), je genanntem Ort einmal, höchstens 4.',
+                'inputSchema' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'name' => ['type' => 'string', 'description' => 'Name des Ortes, z. B. „Rathaus Uffenheim“ oder „Stadt-Apotheke“; leer bei einer reinen Adresse'],
+                        'adresse' => ['type' => 'string', 'description' => 'Straße mit Hausnummer und Ort, nur aus den Daten; sonst Straße bzw. markanter Ort mit Ortsteil'],
+                    ],
+                    'required' => ['adresse'],
+                ],
+            ];
+        }
         if (Formulare::all()) {
             $ids = array_keys(Formulare::all());
             $tools[] = [
@@ -179,6 +195,7 @@ class Aktionen
                 'rathaus_termin' => self::rathausTermin($args),
                 'abfallportal' => self::abfallportal($args),
                 'weg_zeigen' => self::weg($args),
+                'ort_zeigen' => self::ort($args),
                 'formular_ausfuellen' => self::formularAusfuellen($args),
                 default => [['fehler' => "Unbekannte Aktion $name"], null],
             };
@@ -346,12 +363,59 @@ class Aktionen
                 $luft ? Yii::t('KiAssistentModule.base', 'Luftlinie etwa {meter} m.', ['meter' => (string)$luft]) : null,
                 Yii::t('KiAssistentModule.base', 'Route von OpenStreetMap (FOSSGIS); bitte vor Ort auf Beschilderung achten.'),
             ])),
-            'knopf' => Yii::t('KiAssistentModule.base', 'Route auf der Karte'),
-            'url' => $url,
+            'knoepfe' => [
+                ['text' => Yii::t('KiAssistentModule.base', 'Route auf der Karte'), 'url' => $url],
+                ['text' => Yii::t('KiAssistentModule.base', 'In Google Maps'), 'url' => 'https://www.google.com/maps/dir/?api=1'
+                    . ($start ? '&origin=' . $start[0] . ',' . $start[1] : '') . '&destination=' . $ziel[0] . ',' . $ziel[1]
+                    . '&travelmode=' . match ($engine) { 'fossgis_osrm_bike' => 'bicycling', 'fossgis_osrm_car' => 'driving', default => 'walking' }],
+            ],
         ];
         return [['ok' => true, 'ziel_gefunden' => true, 'start_gefunden' => $start !== null, 'luftlinie_m' => $luft,
             'hinweis' => 'Der Routen-Knopf erscheint unter deiner Antwort. Beschreibe den Weg höchstens grob anhand des Straßenverzeichnisses '
                 . '(Lage, Kreuzungen); keine Abbiegeanweisungen erfinden.'], $karte];
+    }
+
+    /** Ort auf OpenStreetMap (Markierung, sonst Suche) und in Google Maps (Suche nach Name + Adresse, findet auch Betriebe) */
+    private static function ort(array $args): array
+    {
+        $name = mb_substr(trim((string)($args['name'] ?? '')), 0, 100);
+        $adresse = mb_substr(trim((string)($args['adresse'] ?? '')), 0, 150);
+        if ($adresse === '' && $name === '') {
+            return [['fehler' => 'Keine Adresse angegeben'], null];
+        }
+        $bounds = Yii::$app->hasModule('maengelmelder') ? Yii::$app->getModule('maengelmelder')->bounds
+            : ['south' => 49.45, 'west' => 10.08, 'north' => 49.64, 'east' => 10.40];
+        $hit = null;
+        foreach (array_unique(array_filter([$adresse, $name])) as $suche) {
+            for ($i = 0; $i < 3 && ($hit = \humhub\modules\maengelmelder\components\Osm::searchThrottled($suche, $bounds)) === false; $i++) {
+                usleep(1100000); // Nominatim: höchstens eine Anfrage pro Sekunde
+            }
+            if ($hit) {
+                break;
+            }
+        }
+        $text = implode(', ', array_filter([$name, $adresse]));
+        if (!preg_match('/uffenheim|brackenlohr|custenlohr|langensteinach|rudolzhofen|uttenhofen|wallmersbach|welbhausen|pfeinach|\b9\d{4}\b/i', $text)) {
+            $text .= ', Uffenheim';
+        }
+        $osm = $hit
+            ? sprintf('https://www.openstreetmap.org/?mlat=%1$.5f&mlon=%2$.5f#map=18/%1$.5f/%2$.5f', $hit[0], $hit[1])
+            : 'https://www.openstreetmap.org/search?query=' . rawurlencode($text);
+        $karte = [
+            'typ' => 'link',
+            'icon' => 'map-marker',
+            'titel' => $name !== '' ? $name : $adresse,
+            'zeilen' => array_values(array_filter([
+                $name !== '' ? $adresse : null,
+                Yii::t('KiAssistentModule.base', 'Google Maps ist ein Dienst von Google; erst beim Klick werden Daten an Google übertragen.'),
+            ])),
+            'knoepfe' => [
+                ['text' => Yii::t('KiAssistentModule.base', 'Auf der Karte (OpenStreetMap)'), 'url' => $osm],
+                ['text' => Yii::t('KiAssistentModule.base', 'In Google Maps'), 'url' => 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($text)],
+            ],
+        ];
+        return [['ok' => true, 'gefunden' => $hit !== null,
+            'hinweis' => 'Die Karten-Knöpfe erscheinen unter deiner Antwort; die Kartenadressen nicht noch einmal als Link schreiben.'], $karte];
     }
 
     private static function meter(array $a, array $b): float

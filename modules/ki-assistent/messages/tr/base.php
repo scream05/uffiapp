@@ -94,4 +94,7 @@ return [
     'Deine Frage …' => 'Sorun …',
     'Deine Frage' => 'Sorun',
     'Datenschutz' => 'Gizlilik',
+    'Auf der Karte (OpenStreetMap)' => 'Haritada (OpenStreetMap)',
+    'In Google Maps' => 'Google Haritalar\'da',
+    'Google Maps ist ein Dienst von Google; erst beim Klick werden Daten an Google übertragen.' => 'Google Haritalar bir Google hizmetidir; veriler yalnızca tıkladığınızda Google\'a gönderilir.',
 ];

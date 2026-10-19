@@ -94,4 +94,7 @@ return [
     'Deine Frage …' => 'سؤالك …',
     'Deine Frage' => 'سؤالك',
     'Datenschutz' => 'الخصوصية',
+    'Auf der Karte (OpenStreetMap)' => 'على الخريطة (OpenStreetMap)',
+    'In Google Maps' => 'في خرائط Google',
+    'Google Maps ist ein Dienst von Google; erst beim Klick werden Daten an Google übertragen.' => 'خرائط Google خدمة من Google؛ لا تُرسل البيانات إلى Google إلا عند النقر.',
 ];

@@ -94,4 +94,7 @@ return [
     'Deine Frage …' => 'Твой вопрос …',
     'Deine Frage' => 'Твой вопрос',
     'Datenschutz' => 'Конфиденциальность',
+    'Auf der Karte (OpenStreetMap)' => 'На карте (OpenStreetMap)',
+    'In Google Maps' => 'В Google Maps',
+    'Google Maps ist ein Dienst von Google; erst beim Klick werden Daten an Google übertragen.' => 'Google Maps — сервис Google; данные передаются Google только после нажатия.',
 ];

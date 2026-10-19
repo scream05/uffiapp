@@ -931,8 +931,9 @@ class SetupController extends Controller
                 continue;
             }
             $problems = [];
-            // Antwort plus Text der Karten (z. B. Mitbring-Liste beim Rathaus-Termin)
-            $haystack = $answer . "\n" . implode("\n", array_map(fn($c) => ($c['titel'] ?? '') . ' ' . implode(' ', $c['zeilen'] ?? []), $cards));
+            // Antwort plus Text und Adressen der Karten (z. B. Mitbring-Liste beim Rathaus-Termin, Kartenlinks)
+            $haystack = $answer . "\n" . implode("\n", array_map(fn($c) => ($c['titel'] ?? '') . ' ' . implode(' ', $c['zeilen'] ?? [])
+                . ' ' . ($c['url'] ?? '') . ' ' . implode(' ', array_column($c['knoepfe'] ?? [], 'url')), $cards));
             foreach ($t['erwartet'] ?? [] as $re) {
                 if (!preg_match("/$re/iu", $haystack)) {
                     $problems[] = "fehlt /$re/";
