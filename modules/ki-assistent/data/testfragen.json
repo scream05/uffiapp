@@ -297,5 +297,27 @@
       "openstreetmap.*google\\.com\\/maps|google\\.com\\/maps.*openstreetmap"
     ],
     "karte": "link"
+  },
+  {
+    "frage": "Welche amtlichen Bekanntmachungen gab es in letzter Zeit?",
+    "erwartet": [
+      "lesen\\?id=\\d+",
+      "nicht ?amtlich|rechtsverbindlich"
+    ]
+  },
+  {
+    "frage": "Wann wurden die Bodenrichtwerte 2026 bekanntgemacht und kann man sie noch einsehen?",
+    "erwartet": [
+      "Bodenrichtwert",
+      "14\\.0?9|September",
+      "Seite 5|seite=5"
+    ]
+  },
+  {
+    "frage": "Gibt es einen Bebauungsplan für den Verbrauchermarkt an der Würzburger Straße?",
+    "erwartet": [
+      "69",
+      "Würzburger"
+    ]
   }
 ]

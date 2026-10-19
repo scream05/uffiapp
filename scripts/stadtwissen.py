@@ -18,7 +18,7 @@ import tempfile
 import sys
 import time
 import urllib.request
-from datetime import datetime
+from datetime import datetime, timedelta
 from html.parser import HTMLParser
 import urllib.parse
 from urllib.parse import urljoin, urlparse
@@ -1138,6 +1138,12 @@ def community_written():
         print(f'! Mitteilungsblatt nicht gelesen: {e}', file=sys.stderr)
         for d, _, files in os.walk(os.path.join(ROOT, 'community', 'mitteilungsblatt')):
             written += [(os.path.relpath(os.path.join(d, f), ROOT), False, False) for f in files if f.endswith('.md')]
+    try:
+        written += [write(rel, title, url, text, always=immer) for rel, title, url, text, immer in community_bekanntmachungen()]
+    except Exception as e:
+        print(f'! Bekanntmachungen nicht gelesen: {e}', file=sys.stderr)
+        for d, _, files in os.walk(os.path.join(ROOT, 'community', 'bekanntmachungen')):
+            written += [(os.path.relpath(os.path.join(d, f), ROOT), False, False) for f in files if f.endswith('.md')]
     return written
 
 
@@ -1188,6 +1194,49 @@ def community_mitteilungsblatt():
                       'Das Mitteilungsblatt der Stadt Uffenheim erscheint alle 14 Tage freitags und wird an alle Haushalte verteilt. '
                       'Beiträge (z. B. von Vereinen) müssen bis zum Redaktionsschluss um 10:00 Uhr bei der Stadt sein. '
                       'Termine laut Terminliste der Stadt (Änderungen vorbehalten):\n\n' + '\n'.join(zeilen)))
+    return found
+
+
+BM_ARTEN = {'satzung': 'Satzung', 'verordnung': 'Verordnung', 'haushalt': 'Haushalt', 'bauleitplanung': 'Bauleitplanung',
+            'bauen': 'Bauen und Grundstücke', 'verfahren': 'Allgemeinverfügungen und Verfahren', 'wahl': 'Wahlen',
+            'zustellung': 'Öffentliche Zustellung', 'sonstiges': 'Sonstiges'}
+BM_HINWEIS = ('Nichtamtliche Übersicht von Rund um Uffni, automatisch aus dem Mitteilungsblatt erstellt. Rechtsverbindlich ist allein '
+              'die Bekanntmachung im Amtsblatt der Stadt Uffenheim (Mitteilungsblatt) bzw. an der Amtstafel im Rathaus; maßgeblich für '
+              'Fristen ist das Original. Jeder Eintrag verlinkt die Originalseite.')
+
+
+def community_bekanntmachungen():
+    """Amtliche Bekanntmachungen (Modul mitteilungsblatt, Tabelle mb_bekanntmachung) als [(rel, titel, url, text, immer)]:
+    „aktuell“ (laufende Fristen + letzte 3 Monate) geht bei jeder Frage mit, dazu je Jahr eine Liste für die Suche.
+    Ohne Hinweise der Verwaltung, ohne Ausgeblendete und ohne Einträge mit Personenbezug."""
+    basis = 'https://community.rundumuffni.de/s/rathaus-uffenheim/mitteilungsblatt/index'
+    heute = datetime.now().date().isoformat()
+    zeilen_jahr, aktuell = {}, []
+    for b in db_json("SELECT JSON_OBJECT('id', b.id, 'titel', b.titel, 'art', b.art, 'stelle', b.stelle, 'frist_bis', b.frist_bis, "
+                     "'frist_text', b.frist_text, 'seite', b.seite, 'aid', a.id, 'jahr', a.jahr, 'nr', a.nr, 'nr_bis', a.nr_bis, 'datum', a.datum) "
+                     "FROM mb_bekanntmachung b JOIN mb_ausgabe a ON a.id = b.ausgabe_id "
+                     "WHERE b.art <> 'hinweis' AND b.ausgeblendet = 0 AND b.personenbezug = 0 ORDER BY a.datum DESC, b.seite, b.id"):
+        j, m, t = (int(x) for x in b['datum'][:10].split('-'))
+        nummer = f"{b['nr']}–{b['nr_bis']}" if b.get('nr_bis') else b['nr']
+        frist = ''
+        if b.get('frist_bis'):
+            fj, fm, ft = (int(x) for x in b['frist_bis'][:10].split('-'))
+            frist = (f" Frist bis {ft:02d}.{fm:02d}.{fj}" + (' (läuft noch)' if b['frist_bis'][:10] >= heute else ' (abgelaufen)')
+                     + (f": {b['frist_text']}" if b.get('frist_text') else '') + '.')
+        zeile = (f"- {t:02d}.{m:02d}.{j} · {BM_ARTEN.get(b['art'], 'Sonstiges')}" + (f" · {b['stelle']}" if b.get('stelle') else '')
+                 + f": {b['titel']}.{frist} Original: Mitteilungsblatt Nr. {nummer}/{b['jahr']}, Seite {b['seite']} – "
+                 + f"{basis}/lesen?id={b['aid']}&seite={b['seite']}")
+        zeilen_jahr.setdefault(b['jahr'], []).append(zeile)
+        laeuft = b.get('frist_bis') and b['frist_bis'][:10] >= heute
+        if laeuft or b['datum'][:10] >= (datetime.now() - timedelta(days=92)).date().isoformat():
+            aktuell.append(zeile)
+    found = [('community/bekanntmachungen/aktuell.md', 'Amtliche Bekanntmachungen: aktuell und laufende Fristen', f'{basis}/bekanntmachungen',
+              BM_HINWEIS + f' Alle Bekanntmachungen mit Suche und Filtern: {basis}/bekanntmachungen\n\n'
+              + 'Bekanntmachungen der letzten drei Monate und alle mit laufender Frist (neueste zuerst):\n\n'
+              + ('\n'.join(aktuell) if aktuell else '- keine'), True)]
+    for jahr, zeilen in sorted(zeilen_jahr.items(), reverse=True):
+        found.append((f'community/bekanntmachungen/{jahr}.md', f'Amtliche Bekanntmachungen {jahr} (Satzungen, Verordnungen, Haushalt, Bauleitplanung)',
+                      f'{basis}/bekanntmachungen?jahr={jahr}', BM_HINWEIS + f'\n\nBekanntmachungen im Amtsblatt {jahr} (neueste zuerst):\n\n' + '\n'.join(zeilen), False))
     return found
 
 

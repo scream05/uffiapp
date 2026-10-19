@@ -5,6 +5,7 @@ namespace humhub\modules\mitteilungsblatt\components;
 use humhub\modules\content\models\Content;
 use humhub\modules\file\models\File;
 use humhub\modules\mitteilungsblatt\models\Ausgabe;
+use humhub\modules\mitteilungsblatt\models\Bekanntmachung;
 use humhub\modules\mitteilungsblatt\models\Seite;
 use humhub\modules\mitteilungsblatt\Module;
 use humhub\modules\post\models\Post;
@@ -327,6 +328,34 @@ class Abruf
         }
     }
 
+    /** Text des Beitrags; mit den amtlichen Bekanntmachungen der Ausgabe, sobald deren Seite freigegeben ist */
+    public function beitragText(Ausgabe $a, Space $space): string
+    {
+        $text = "**Das Mitteilungsblatt {$a->titel} ist erschienen**\n\n"
+            . "Ausgabe vom {$a->datumText} mit {$a->seiten} Seiten – hier in der App lesen und durchsuchen.\n\n"
+            . '[Mitteilungsblatt lesen](' . Url::to(['/mitteilungsblatt/index/lesen', 'id' => $a->id], true) . ')';
+        $liste = $this->module->bekanntmachungenFrei() ? Bekanntmachung::find()
+            ->where(['ausgabe_id' => $a->id, 'ausgeblendet' => 0])->andWhere(['not in', 'art', Bekanntmachung::NUR_AUF_WUNSCH])
+            ->orderBy(['seite' => SORT_ASC, 'id' => SORT_ASC])->all() : [];
+        if (!$liste) {
+            return $text;
+        }
+        $text .= "\n\n**Amtliche Bekanntmachungen in dieser Ausgabe:**\n";
+        foreach ($liste as $b) {
+            $frist = $b->frist_bis ? ' – Frist bis ' . date('d.m.Y', strtotime($b->frist_bis)) : '';
+            $text .= "\n- [{$this->markdownText($b->titel)}](" . Url::to(['/mitteilungsblatt/index/lesen', 'id' => $a->id, 'seite' => $b->seite], true)
+                . ") (S. {$b->seite}){$frist}";
+        }
+        return $text . "\n\n[Alle Bekanntmachungen](" . $space->createUrl('/mitteilungsblatt/index/bekanntmachungen', [], true) . ')'
+            . ' · nichtamtliche Übersicht, rechtsverbindlich ist allein das Amtsblatt.';
+    }
+
+    /** Eckige Klammern würden den Markdown-Link brechen */
+    private function markdownText(string $s): string
+    {
+        return strtr($s, ['[' => '(', ']' => ')']);
+    }
+
     /** Beitrag im Space mit Titelbild, Verfasser wie beim Website-Import */
     public function beitrag(Ausgabe $a): void
     {
@@ -338,9 +367,7 @@ class Abruf
         }
         Yii::$app->user->switchIdentity($konto);
         $post = new Post($space);
-        $post->message = "**Das Mitteilungsblatt {$a->titel} ist erschienen**\n\n"
-            . "Ausgabe vom {$a->datumText} mit {$a->seiten} Seiten – hier in der App lesen und durchsuchen.\n\n"
-            . '[Mitteilungsblatt lesen](' . Url::to(['/mitteilungsblatt/index/lesen', 'id' => $a->id], true) . ')';
+        $post->message = $this->beitragText($a, $space);
         $post->content->visibility = Content::VISIBILITY_PUBLIC; // wie die Website-Nachrichten: auch für Gäste
         if (!$post->save()) {
             ($this->log)("! Beitrag: " . json_encode($post->getErrors(), JSON_UNESCAPED_UNICODE) . "\n");
