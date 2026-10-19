@@ -262,9 +262,8 @@ class Events
             if ($module->getDesign() === 'neu') {
                 $event->sender->addWidget(widgets\DesignNeu::class);
             }
-            if (!Yii::$app->user->isGuest) {
-                assets\KalenderAsset::register(Yii::$app->view);
-            } else {
+            assets\KalenderAsset::register(Yii::$app->view);
+            if (Yii::$app->user->isGuest) {
                 self::abbrechenKnopf();
             }
         } catch (\Throwable $e) {
