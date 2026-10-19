@@ -20,7 +20,20 @@ $this->title = Yii::t('MitteilungsblattModule.base', 'Amtliche Bekanntmachungen'
 $url = fn(array $p = []) => $this->context->url('/mitteilungsblatt/index/bekanntmachungen',
     array_filter(array_merge(['art' => $art, 'jahr' => $jahr, 'frist' => $frist ? 1 : null, 'q' => $q, 'hinweise' => $hinweise ? 1 : null], $p), fn($v) => $v !== '' && $v !== null));
 // Zurück aus dem Amtsblatt (…#bm-<id>): zum zuletzt geöffneten Eintrag springen, auch nach PJAX-Seitenwechsel
-$this->registerJs("(function(){var m=/^#bm-\\d+$/.test(location.hash)&&document.getElementById(location.hash.slice(1));if(m){m.scrollIntoView({block:'start'});}})();");
+$this->registerJs(<<<'JS'
+(function () {
+    if (!/^#bm-\d+$/.test(location.hash)) return;
+    var springen = function () {
+        var e = document.getElementById(location.hash.slice(1));
+        if (!e) return;
+        var kopf = document.getElementById('topbar');
+        var frei = kopf && /fixed|sticky/.test(getComputedStyle(kopf).position) ? kopf.getBoundingClientRect().bottom : 0;
+        window.scrollTo(0, window.scrollY + e.getBoundingClientRect().top - frei - 12);
+    };
+    springen();
+    setTimeout(springen, 300); // nach dem Sprung des Browsers zur Marke und nachgeladenen Schriften
+})();
+JS);
 $gefiltert = $art !== '' || $jahr !== '' || $frist || $q !== '' || $hinweise;
 ?>
 <style <?= Html::nonce() ?>>
