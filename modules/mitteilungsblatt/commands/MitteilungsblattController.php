@@ -3,7 +3,9 @@
 namespace humhub\modules\mitteilungsblatt\commands;
 
 use humhub\modules\mitteilungsblatt\components\Abruf;
+use humhub\modules\mitteilungsblatt\components\Bekanntmachungen;
 use humhub\modules\mitteilungsblatt\models\Ausgabe;
+use humhub\modules\mitteilungsblatt\models\Bekanntmachung;
 use Yii;
 use yii\console\Controller;
 use yii\console\ExitCode;
@@ -64,6 +66,57 @@ class MitteilungsblattController extends Controller
             $module->settings->set('freigegeben', $an ? 1 : 0);
         }
         $this->stdout('Mitteilungsblatt ' . ($module->istFreigegeben() ? 'für alle Mitglieder freigegeben' : 'nur für Admins') . "\n");
+        return ExitCode::OK;
+    }
+
+    /**
+     * Amtliche Bekanntmachungen auslesen (Claude): ohne Angabe nur Ausgaben, die noch nicht durchgesehen sind,
+     * sonst ein Jahr (2026), eine Ausgabe (2026/17) oder „alle“ (auch schon durchgesehene neu).
+     * @param int $probelauf 1 = nur anzeigen, nichts speichern
+     */
+    public function actionBekanntmachungen($auswahl = null, $probelauf = 0)
+    {
+        $query = Ausgabe::find()->orderBy(['jahr' => SORT_ASC, 'nr' => SORT_ASC]);
+        if ($auswahl === null) {
+            $query->where(['bm_geprueft' => null]);
+        } elseif (preg_match('#^(\d{4})/(\d+)$#', $auswahl, $m)) {
+            $query->where(['jahr' => (int)$m[1], 'nr' => (int)$m[2]]);
+        } elseif (preg_match('/^\d{4}$/', $auswahl)) {
+            $query->where(['jahr' => (int)$auswahl]);
+        } elseif ($auswahl !== 'alle') {
+            $this->stderr("Auswahl: leer, Jahr (2026), Ausgabe (2026/17) oder „alle“\n");
+            return ExitCode::USAGE;
+        }
+        $in = $out = $anzahl = 0;
+        foreach ($query->all() as $a) {
+            try {
+                [$liste, $i, $o] = Bekanntmachungen::auslesen($a, (bool)$probelauf);
+            } catch (\Throwable $e) {
+                $this->stdout("! {$a->titel}: {$e->getMessage()}\n");
+                continue;
+            }
+            $in += $i;
+            $out += $o;
+            $anzahl += count($liste);
+            $this->stdout("{$a->titel} vom {$a->datum}: " . count($liste) . "\n");
+            foreach ($liste as $e) {
+                $this->stdout("  S. {$e['seite']} [{$e['art']}] {$e['titel']}" . ($e['stelle'] ? " – {$e['stelle']}" : '')
+                    . ($e['frist_bis'] ? " (Frist {$e['frist_bis']}: {$e['frist_text']})" : '') . ($e['personenbezug'] ? ' [Personen]' : '') . "\n");
+            }
+        }
+        $this->stdout("$anzahl Bekanntmachungen, $in Eingabe- / $out Ausgabe-Tokens\n");
+        return ExitCode::OK;
+    }
+
+    /** Seite „Bekanntmachungen“ für alle freigeben (1) oder nur für Admins (0). Ohne Angabe: Stand anzeigen. */
+    public function actionBekanntmachungenFreigeben($an = null)
+    {
+        $module = Yii::$app->getModule('mitteilungsblatt');
+        if ($an !== null) {
+            $module->settings->set('bekanntmachungen_frei', $an ? 1 : 0);
+        }
+        $this->stdout('Bekanntmachungen ' . ($module->bekanntmachungenFrei() ? 'für alle sichtbar' : 'nur für Admins')
+            . ', ' . Bekanntmachung::find()->count() . " im Verzeichnis\n");
         return ExitCode::OK;
     }
 

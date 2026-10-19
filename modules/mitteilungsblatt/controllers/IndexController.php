@@ -6,6 +6,7 @@ use humhub\components\access\ControllerAccess;
 use humhub\modules\content\components\ContentContainerController;
 use humhub\modules\mitteilungsblatt\components\Termine;
 use humhub\modules\mitteilungsblatt\models\Ausgabe;
+use humhub\modules\mitteilungsblatt\models\Bekanntmachung;
 use humhub\modules\mitteilungsblatt\models\Seite;
 use humhub\modules\space\models\Space;
 use Yii;
@@ -39,9 +40,9 @@ class IndexController extends ContentContainerController
         if ($this->contentContainer !== null && $this->contentContainer->url !== $this->module->space) {
             throw new NotFoundHttpException();
         }
-        if ($this->contentContainer === null && in_array($action->id, ['index', 'lesen'], true)
+        if ($this->contentContainer === null && in_array($action->id, ['index', 'lesen', 'bekanntmachungen'], true)
             && ($space = Space::findOne(['url' => $this->module->space])) !== null) {
-            $this->redirect($space->createUrl($action->id === 'index' ? '/mitteilungsblatt/index' : '/mitteilungsblatt/index/lesen', Yii::$app->request->get()));
+            $this->redirect($space->createUrl($action->id === 'index' ? '/mitteilungsblatt/index' : '/mitteilungsblatt/index/' . $action->id, Yii::$app->request->get()));
             return false;
         }
         return true;
@@ -68,6 +69,65 @@ class IndexController extends ContentContainerController
             'termineUrl' => $this->module->settings->get('termine_url'),
             'quelle' => $this->module->quelle,
         ]);
+    }
+
+    /**
+     * Verzeichnis der amtlichen Bekanntmachungen (nichtamtlich, verlinkt auf die Originalseite im Amtsblatt).
+     * Filter: ?art=…, ?jahr=…, ?frist=1 (nur laufende Fristen), ?q= (Titel), ?hinweise=1 (auch Hinweise der Verwaltung)
+     */
+    public function actionBekanntmachungen($art = '', $jahr = '', $frist = 0, $q = '', $hinweise = 0)
+    {
+        if (!$this->module->darfBekanntmachungenSehen()) {
+            throw new ForbiddenHttpException(Yii::t('MitteilungsblattModule.base', 'Diese Seite ist noch nicht freigegeben.'));
+        }
+        $this->view->setPageTitle(Yii::t('MitteilungsblattModule.base', 'Amtliche Bekanntmachungen'));
+        $admin = Yii::$app->user->isAdmin();
+        $query = Bekanntmachung::find()->alias('b')->innerJoinWith('ausgabe a')
+            ->orderBy(['a.datum' => SORT_DESC, 'b.seite' => SORT_ASC, 'b.id' => SORT_ASC]);
+        if (!$admin) {
+            $query->andWhere(['b.ausgeblendet' => 0]);
+        }
+        $art = in_array($art, Bekanntmachung::ARTEN, true) ? $art : '';
+        if ($art !== '') {
+            $query->andWhere(['b.art' => $art]);
+        } elseif (!$hinweise) {
+            $query->andWhere(['not in', 'b.art', Bekanntmachung::NUR_AUF_WUNSCH]);
+        }
+        $jahr = preg_match('/^\d{4}$/', (string)$jahr) ? (int)$jahr : '';
+        if ($jahr !== '') {
+            $query->andWhere(['a.jahr' => $jahr]);
+        }
+        if ($frist) {
+            $query->andWhere(['>=', 'b.frist_bis', date('Y-m-d')]);
+        }
+        $q = trim(mb_substr((string)$q, 0, 100));
+        foreach (array_slice(array_filter(preg_split('/\s+/u', $q), fn($w) => mb_strlen($w) >= 2), 0, 6) as $w) {
+            $query->andWhere(['or', ['like', 'b.titel', $w], ['like', 'b.stelle', $w]]);
+        }
+        return $this->render('bekanntmachungen', [
+            'liste' => $query->limit(300)->all(),
+            'jahre' => Ausgabe::find()->alias('a')->select('a.jahr')->distinct()
+                ->innerJoin(Bekanntmachung::tableName() . ' b', 'b.ausgabe_id = a.id')->orderBy(['a.jahr' => SORT_DESC])->column(),
+            'laufend' => Bekanntmachung::find()->where(['>=', 'frist_bis', date('Y-m-d')])->andWhere($admin ? [] : ['ausgeblendet' => 0])
+                ->andWhere($hinweise ? [] : ['not in', 'art', Bekanntmachung::NUR_AUF_WUNSCH])->count(),
+            'art' => $art, 'jahr' => $jahr, 'frist' => (bool)$frist, 'q' => $q, 'hinweise' => (bool)$hinweise,
+            'admin' => $admin,
+            'frei' => $this->module->bekanntmachungenFrei(),
+            'geprueft' => Ausgabe::find()->where(['not', ['bm_geprueft' => null]])->count(),
+            'ausgaben' => Ausgabe::find()->count(),
+        ]);
+    }
+
+    /** Admins: falsch erkannte Bekanntmachung aus- bzw. wieder einblenden */
+    public function actionBekanntmachungUmschalten($id)
+    {
+        $this->forcePostRequest();
+        if (!Yii::$app->user->isAdmin()) {
+            throw new ForbiddenHttpException();
+        }
+        $b = Bekanntmachung::findOne((int)$id) ?? throw new NotFoundHttpException();
+        $b->updateAttributes(['ausgeblendet' => $b->ausgeblendet ? 0 : 1]);
+        return $this->redirect(Yii::$app->request->referrer ?: $this->url('/mitteilungsblatt/index/bekanntmachungen'));
     }
 
     public function actionLesen($id, $seite = null, $q = null)

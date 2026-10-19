@@ -15,6 +15,7 @@ use yii\db\ActiveRecord;
  * @property int $seiten
  * @property int $groesse
  * @property int|null $post_id
+ * @property string|null $bm_geprueft wann zuletzt auf amtliche Bekanntmachungen durchgesehen
  * @property string $created_at
  */
 class Ausgabe extends ActiveRecord

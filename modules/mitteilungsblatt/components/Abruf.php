@@ -74,6 +74,12 @@ class Abruf
                 continue;
             }
             ($this->log)(($istNeu ? '+ ' : '~ ') . "{$a->titel} vom {$a->datum}, {$a->seiten} Seiten\n");
+            try {
+                [$bm] = Bekanntmachungen::auslesen($a);
+                ($this->log)('  ' . count($bm) . " amtliche Bekanntmachungen\n");
+            } catch (\Throwable $ex) {
+                ($this->log)("! Bekanntmachungen {$a->titel}: {$ex->getMessage()}\n"); // nächster Versuch: mitteilungsblatt/bekanntmachungen
+            }
             if ($istNeu) {
                 $neu++;
                 if (!$ersterLauf && $this->module->istFreigegeben()) {

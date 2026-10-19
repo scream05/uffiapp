@@ -21,8 +21,18 @@ class Events
                 'url' => $event->sender->space->createUrl('/mitteilungsblatt/index'),
                 'icon' => '<i class="fa fa-newspaper-o"></i>',
                 'sortOrder' => 55,
-                'isActive' => Yii::$app->controller?->module?->id === 'mitteilungsblatt',
+                'isActive' => Yii::$app->controller?->module?->id === 'mitteilungsblatt' && Yii::$app->controller->action?->id !== 'bekanntmachungen',
             ]);
+            if ($module->darfBekanntmachungenSehen()) {
+                $event->sender->addItem([
+                    'label' => Yii::t('MitteilungsblattModule.base', 'Bekanntmachungen'),
+                    'group' => 'modules',
+                    'url' => $event->sender->space->createUrl('/mitteilungsblatt/index/bekanntmachungen'),
+                    'icon' => '<i class="fa fa-gavel"></i>',
+                    'sortOrder' => 56,
+                    'isActive' => Yii::$app->controller?->module?->id === 'mitteilungsblatt' && Yii::$app->controller->action?->id === 'bekanntmachungen',
+                ]);
+            }
         } catch (\Throwable $e) {
             Yii::error($e);
         }

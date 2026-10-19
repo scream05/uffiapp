@@ -30,6 +30,20 @@ class Module extends \humhub\components\Module
         return (bool)$this->settings->get('freigegeben');
     }
 
+    /** Seite „Bekanntmachungen“ freigegeben (/app/yii mitteilungsblatt/bekanntmachungen-freigeben 1)? Sonst nur Admins. */
+    public function bekanntmachungenFrei(): bool
+    {
+        return (bool)$this->settings->get('bekanntmachungen_frei');
+    }
+
+    public function darfBekanntmachungenSehen(): bool
+    {
+        if (!$this->darfLesen()) {
+            return false;
+        }
+        return $this->bekanntmachungenFrei() || (!Yii::$app->user->isGuest && Yii::$app->user->isAdmin());
+    }
+
     /** Darf das aktuelle Konto das Mitteilungsblatt sehen? */
     public function darfLesen(): bool
     {
