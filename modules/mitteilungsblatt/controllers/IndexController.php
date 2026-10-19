@@ -130,13 +130,23 @@ class IndexController extends ContentContainerController
         return $this->redirect(Yii::$app->request->referrer ?: $this->url('/mitteilungsblatt/index/bekanntmachungen'));
     }
 
-    public function actionLesen($id, $seite = null, $q = null)
+    /** @param string|null $zurueck Liste der Bekanntmachungen (mit Filtern), zu der der Zurück-Knopf führt */
+    public function actionLesen($id, $seite = null, $q = null, $zurueck = null)
     {
         $this->view->setPageTitle(Yii::t('MitteilungsblattModule.base', 'Mitteilungsblatt'));
+        $q = $q !== null ? mb_substr(trim((string)$q), 0, 100) : null;
+        // Nur eigene Adressen der Bekanntmachungsliste zulassen (kein Sprung auf fremde Seiten)
+        $liste = $this->url('/mitteilungsblatt/index/bekanntmachungen');
+        $zurueck = is_string($zurueck) && str_starts_with($zurueck, $liste) && !preg_match('/[\s\\\\"<>]/', $zurueck) && mb_strlen($zurueck) < 500
+            ? $zurueck : null;
         return $this->render('lesen', [
             'ausgabe' => $this->ausgabe($id),
             'seite' => $seite !== null ? max(1, (int)$seite) : null,
-            'q' => $q !== null ? mb_substr(trim((string)$q), 0, 100) : null,
+            'q' => $q,
+            'zurueck' => $zurueck !== null
+                ? [Yii::t('MitteilungsblattModule.base', 'Zurück zu den Bekanntmachungen'), $zurueck]
+                : ($q ? [Yii::t('MitteilungsblattModule.base', 'Zurück zur Suche'), $this->url('/mitteilungsblatt/index', ['q' => $q])]
+                    : [Yii::t('MitteilungsblattModule.base', 'Alle Ausgaben'), $this->url('/mitteilungsblatt/index')]),
         ]);
     }
 

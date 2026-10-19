@@ -7,6 +7,7 @@ use yii\helpers\Url;
 /** @var \humhub\modules\mitteilungsblatt\models\Ausgabe $ausgabe */
 /** @var int|null $seite */
 /** @var string|null $q */
+/** @var array $zurueck [Beschriftung, Adresse] des Zurück-Knopfs */
 
 $this->title = Yii::t('MitteilungsblattModule.base', 'Mitteilungsblatt {titel}', ['titel' => $ausgabe->titelAnzeige]);
 $hash = array_filter(['page' => $seite, 'search' => $q]);
@@ -35,8 +36,8 @@ $pdfLang = in_array(Yii::$app->language, ['de', 'en-US', 'uk', 'ar', 'tr', 'ru']
 </style>
 <div class="<?= $this->context->contentContainer ? 'panel panel-default' : 'container' ?>"><div class="<?= $this->context->contentContainer ? 'panel-body' : '' ?>">
     <div class="mb-kopf">
-        <?= Html::a('<i class="fa fa-arrow-left"></i><span class="mb-text"> ' . Yii::t('MitteilungsblattModule.base', 'Alle Ausgaben') . '</span>', $this->context->url('/mitteilungsblatt/index'),
-            ['class' => 'btn btn-light', 'title' => Yii::t('MitteilungsblattModule.base', 'Alle Ausgaben')]) ?>
+        <?= Html::a('<i class="fa fa-arrow-left"></i><span class="mb-text"> ' . Html::encode($zurueck[0]) . '</span>', $zurueck[1],
+            ['class' => 'btn btn-light', 'title' => $zurueck[0]]) ?>
         <h1><?= Html::encode(Yii::t('MitteilungsblattModule.base', 'Mitteilungsblatt {titel}', ['titel' => $ausgabe->titelAnzeige])) ?> <small><?= Html::encode($ausgabe->datumAnzeige) ?></small></h1>
         <button type="button" class="btn btn-light" id="mb-vollbild" title="<?= Html::encode(Yii::t('MitteilungsblattModule.base', 'Vollbild')) ?>">
             <i class="fa fa-expand"></i><span class="mb-text"> <?= Yii::t('MitteilungsblattModule.base', 'Vollbild') ?></span></button>

@@ -19,6 +19,8 @@ use humhub\modules\mitteilungsblatt\models\Bekanntmachung;
 $this->title = Yii::t('MitteilungsblattModule.base', 'Amtliche Bekanntmachungen');
 $url = fn(array $p = []) => $this->context->url('/mitteilungsblatt/index/bekanntmachungen',
     array_filter(array_merge(['art' => $art, 'jahr' => $jahr, 'frist' => $frist ? 1 : null, 'q' => $q, 'hinweise' => $hinweise ? 1 : null], $p), fn($v) => $v !== '' && $v !== null));
+// Zurück aus dem Amtsblatt (…#bm-<id>): zum zuletzt geöffneten Eintrag springen, auch nach PJAX-Seitenwechsel
+$this->registerJs("(function(){var m=/^#bm-\\d+$/.test(location.hash)&&document.getElementById(location.hash.slice(1));if(m){m.scrollIntoView({block:'start'});}})();");
 $gefiltert = $art !== '' || $jahr !== '' || $frist || $q !== '' || $hinweise;
 ?>
 <style <?= Html::nonce() ?>>
@@ -28,7 +30,7 @@ $gefiltert = $art !== '' || $jahr !== '' || $frist || $q !== '' || $hinweise;
     .bm-filter { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
     .bm-filter .form-control, .bm-filter .form-select { width: auto; flex: 1 1 160px; }
     .bm-filter .bm-suche { flex: 3 1 220px; }
-    .bm-eintrag { padding: 14px 0; border-top: 1px solid var(--hh-border-color, #e5e5e5); }
+    .bm-eintrag { scroll-margin-top: 90px; padding: 14px 0; border-top: 1px solid var(--hh-border-color, #e5e5e5); }
     .bm-eintrag:first-child { border-top: 0; padding-top: 0; }
     .bm-eintrag.bm-aus { opacity: .5; }
     .bm-oben { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; font-size: .85em; margin-bottom: 4px; }
@@ -101,7 +103,7 @@ $gefiltert = $art !== '' || $jahr !== '' || $frist || $q !== '' || $hinweise;
                 <?= $gefiltert ? Yii::t('MitteilungsblattModule.base', 'Keine Bekanntmachungen für diese Auswahl.') : Yii::t('MitteilungsblattModule.base', 'Noch keine Bekanntmachungen erfasst.') ?>
             <?php endif ?>
             <?php foreach ($liste as $b): ?>
-                <div class="bm-eintrag<?= $b->ausgeblendet ? ' bm-aus' : '' ?>">
+                <div class="bm-eintrag<?= $b->ausgeblendet ? ' bm-aus' : '' ?>" id="bm-<?= $b->id ?>">
                     <div class="bm-oben">
                         <?= Html::a(Html::encode(Bekanntmachung::artName($b->art)), $url(['art' => $b->art]), ['class' => 'bm-art bm-art-' . $b->art]) ?>
                         <?php if ($b->stelle): ?><span><?= Html::encode($b->stelle) ?></span><?php endif ?>
@@ -127,7 +129,8 @@ $gefiltert = $art !== '' || $jahr !== '' || $frist || $q !== '' || $hinweise;
                     <?php endif ?>
                     <div class="bm-knoepfe">
                         <?= Html::a('<i class="fa fa-file-text-o"></i> ' . Yii::t('MitteilungsblattModule.base', 'Original im Amtsblatt'),
-                            $this->context->url('/mitteilungsblatt/index/lesen', ['id' => $b->ausgabe_id, 'seite' => $b->seite]), ['class' => 'btn btn-sm btn-primary']) ?>
+                            $this->context->url('/mitteilungsblatt/index/lesen', ['id' => $b->ausgabe_id, 'seite' => $b->seite, 'zurueck' => $url() . '#bm-' . $b->id]),
+                            ['class' => 'btn btn-sm btn-primary']) ?>
                         <?php if ($admin): ?>
                             <?= Html::beginForm($this->context->url('/mitteilungsblatt/index/bekanntmachung-umschalten', ['id' => $b->id]), 'post') ?>
                             <button type="submit" class="btn btn-sm btn-light" title="<?= Html::encode(Yii::t('MitteilungsblattModule.base', 'Nur Admins: falsch erkannte Einträge ausblenden')) ?>">

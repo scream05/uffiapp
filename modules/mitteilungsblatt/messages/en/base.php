@@ -74,4 +74,6 @@ return [
     'Hinweise der Verwaltung' => 'Notes from the administration',
     'Auch Hinweise der Verwaltung zeigen' => 'Also show notes from the administration',
     'Fälligkeiten, Fundsachen, Schließtage, Vermietungen u. Ä. – stehen im Amtsblatt oft bei den Bekanntmachungen' => 'Due dates, lost property, closing days, rentals etc. – often printed among the notices in the gazette',
+    'Zurück zu den Bekanntmachungen' => 'Back to the notices',
+    'Zurück zur Suche' => 'Back to search',
 ];

@@ -74,4 +74,6 @@ return [
     'Hinweise der Verwaltung' => 'Повідомлення адміністрації',
     'Auch Hinweise der Verwaltung zeigen' => 'Показати також повідомлення адміністрації',
     'Fälligkeiten, Fundsachen, Schließtage, Vermietungen u. Ä. – stehen im Amtsblatt oft bei den Bekanntmachungen' => 'Строки сплати, знахідки, вихідні дні, оренда тощо – у віснику часто стоять серед оголошень',
+    'Zurück zu den Bekanntmachungen' => 'Назад до оголошень',
+    'Zurück zur Suche' => 'Назад до пошуку',
 ];

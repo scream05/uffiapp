@@ -74,4 +74,6 @@ return [
     'Hinweise der Verwaltung' => 'تنبيهات الإدارة',
     'Auch Hinweise der Verwaltung zeigen' => 'إظهار تنبيهات الإدارة أيضاً',
     'Fälligkeiten, Fundsachen, Schließtage, Vermietungen u. Ä. – stehen im Amtsblatt oft bei den Bekanntmachungen' => 'مواعيد الاستحقاق، المفقودات، أيام الإغلاق، الإيجارات ونحوها – تُنشر غالباً بين الإعلانات في الجريدة الرسمية',
+    'Zurück zu den Bekanntmachungen' => 'العودة إلى الإعلانات',
+    'Zurück zur Suche' => 'العودة إلى البحث',
 ];
