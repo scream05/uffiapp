@@ -70,4 +70,8 @@ return [
     'Suchen, z. B. Bebauungsplan, Hundesteuer' => 'Search, e.g. development plan, dog tax',
     'Verordnung' => 'Ordinance (Verordnung)',
     'Wahlen' => 'Elections',
+    'Allgemeinverfügungen und Verfahren' => 'General orders and procedures',
+    'Hinweise der Verwaltung' => 'Notes from the administration',
+    'Auch Hinweise der Verwaltung zeigen' => 'Also show notes from the administration',
+    'Fälligkeiten, Fundsachen, Schließtage, Vermietungen u. Ä. – stehen im Amtsblatt oft bei den Bekanntmachungen' => 'Due dates, lost property, closing days, rentals etc. – often printed among the notices in the gazette',
 ];

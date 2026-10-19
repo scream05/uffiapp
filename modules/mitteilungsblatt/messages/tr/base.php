@@ -70,4 +70,8 @@ return [
     'Suchen, z. B. Bebauungsplan, Hundesteuer' => 'Ara, örn. imar planı, köpek vergisi',
     'Verordnung' => 'Yönetmelik (Verordnung)',
     'Wahlen' => 'Seçimler',
+    'Allgemeinverfügungen und Verfahren' => 'Genel kararlar ve işlemler',
+    'Hinweise der Verwaltung' => 'Yönetimden notlar',
+    'Auch Hinweise der Verwaltung zeigen' => 'Yönetimden notları da göster',
+    'Fälligkeiten, Fundsachen, Schließtage, Vermietungen u. Ä. – stehen im Amtsblatt oft bei den Bekanntmachungen' => 'Vade tarihleri, kayıp eşya, kapalı günler, kiralamalar vb. – resmî gazetede genellikle duyuruların arasında yer alır',
 ];

@@ -70,4 +70,8 @@ return [
     'Suchen, z. B. Bebauungsplan, Hundesteuer' => 'بحث، مثل مخطط البناء، ضريبة الكلاب',
     'Verordnung' => 'لائحة (Verordnung)',
     'Wahlen' => 'الانتخابات',
+    'Allgemeinverfügungen und Verfahren' => 'الأوامر العامة والإجراءات',
+    'Hinweise der Verwaltung' => 'تنبيهات الإدارة',
+    'Auch Hinweise der Verwaltung zeigen' => 'إظهار تنبيهات الإدارة أيضاً',
+    'Fälligkeiten, Fundsachen, Schließtage, Vermietungen u. Ä. – stehen im Amtsblatt oft bei den Bekanntmachungen' => 'مواعيد الاستحقاق، المفقودات، أيام الإغلاق، الإيجارات ونحوها – تُنشر غالباً بين الإعلانات في الجريدة الرسمية',
 ];

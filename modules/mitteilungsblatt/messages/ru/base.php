@@ -70,4 +70,8 @@ return [
     'Suchen, z. B. Bebauungsplan, Hundesteuer' => 'Поиск, напр. план застройки, налог на собак',
     'Verordnung' => 'Постановление (Verordnung)',
     'Wahlen' => 'Выборы',
+    'Allgemeinverfügungen und Verfahren' => 'Общие распоряжения и процедуры',
+    'Hinweise der Verwaltung' => 'Сообщения администрации',
+    'Auch Hinweise der Verwaltung zeigen' => 'Показать также сообщения администрации',
+    'Fälligkeiten, Fundsachen, Schließtage, Vermietungen u. Ä. – stehen im Amtsblatt oft bei den Bekanntmachungen' => 'Сроки платежей, находки, нерабочие дни, аренда и т. п. – в вестнике часто стоят среди объявлений',
 ];
