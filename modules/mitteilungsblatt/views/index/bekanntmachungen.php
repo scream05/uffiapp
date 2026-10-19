@@ -47,7 +47,7 @@ $gefiltert = $art !== '' || $jahr !== '' || $frist || $q !== '' || $hinweise;
 </style>
 <div class="<?= $this->context->contentContainer ? '' : 'container' ?>">
     <div class="panel panel-default">
-        <div class="panel-heading"><?= Yii::t('MitteilungsblattModule.base', '<strong>Amtliche Bekanntmachungen</strong> der Stadt Uffenheim') ?></div>
+        <div class="panel-heading"><?= Yii::t('MitteilungsblattModule.base', '<strong>Amtliche Bekanntmachungen</strong> der Stadt Uffenheim – nichtamtliche Übersicht') ?></div>
         <div class="panel-body">
             <?php if ($admin && !$frei): ?>
                 <div class="alert alert-info"><i class="fa fa-lock"></i>
@@ -56,8 +56,7 @@ $gefiltert = $art !== '' || $jahr !== '' || $frist || $q !== '' || $hinweise;
                 </div>
             <?php endif ?>
             <div class="bm-hinweis" role="note">
-                <p><strong><?= Yii::t('MitteilungsblattModule.base', 'Nichtamtliche Übersicht.') ?></strong>
-                    <?= Yii::t('MitteilungsblattModule.base', 'Rechtsverbindlich ist allein die Bekanntmachung im Amtsblatt der Stadt Uffenheim (Mitteilungsblatt) bzw. an der Amtstafel im Rathaus. Maßgeblich für Fristen ist das Original.') ?></p>
+                <p><?= Yii::t('MitteilungsblattModule.base', 'Rechtsverbindlich ist allein die Bekanntmachung im Amtsblatt der Stadt Uffenheim (Mitteilungsblatt) bzw. an der Amtstafel im Rathaus. Maßgeblich für Fristen ist das Original.') ?></p>
                 <p><?= Yii::t('MitteilungsblattModule.base', 'Die Liste wird automatisch aus den Ausgaben des Mitteilungsblatts erstellt und kann unvollständig sein. Jeder Eintrag führt zur Originalseite.') ?></p>
             </div>
             <form method="get" action="<?= $this->context->url('/mitteilungsblatt/index/bekanntmachungen') ?>" class="bm-filter" role="search">

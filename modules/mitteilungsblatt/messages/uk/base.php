@@ -76,4 +76,5 @@ return [
     'Fälligkeiten, Fundsachen, Schließtage, Vermietungen u. Ä. – stehen im Amtsblatt oft bei den Bekanntmachungen' => 'Строки сплати, знахідки, вихідні дні, оренда тощо – у віснику часто стоять серед оголошень',
     'Zurück zu den Bekanntmachungen' => 'Назад до оголошень',
     'Zurück zur Suche' => 'Назад до пошуку',
+    '<strong>Amtliche Bekanntmachungen</strong> der Stadt Uffenheim – nichtamtliche Übersicht' => '<strong>Офіційні оголошення</strong> міста Уффенгайм – неофіційний огляд',
 ];

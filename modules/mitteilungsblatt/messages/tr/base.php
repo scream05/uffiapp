@@ -76,4 +76,5 @@ return [
     'Fälligkeiten, Fundsachen, Schließtage, Vermietungen u. Ä. – stehen im Amtsblatt oft bei den Bekanntmachungen' => 'Vade tarihleri, kayıp eşya, kapalı günler, kiralamalar vb. – resmî gazetede genellikle duyuruların arasında yer alır',
     'Zurück zu den Bekanntmachungen' => 'Duyurulara geri dön',
     'Zurück zur Suche' => 'Aramaya geri dön',
+    '<strong>Amtliche Bekanntmachungen</strong> der Stadt Uffenheim – nichtamtliche Übersicht' => 'Uffenheim şehrinin <strong>resmî duyuruları</strong> – resmî olmayan genel bakış',
 ];
