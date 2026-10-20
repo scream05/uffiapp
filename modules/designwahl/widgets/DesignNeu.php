@@ -123,6 +123,7 @@ class DesignNeu extends Widget
                 'Die Vorhersage ist gerade nicht erreichbar. Bitte später noch einmal versuchen.' => Yii::t('DesignwahlModule.base', 'Die Vorhersage ist gerade nicht erreichbar. Bitte später noch einmal versuchen.'),
                 'Hinweis aufklappen' => Yii::t('DesignwahlModule.base', 'Hinweis aufklappen'),
                 'Hinweis einklappen' => Yii::t('DesignwahlModule.base', 'Hinweis einklappen'),
+                'Notdienste, Spritpreise und Termine' => Yii::t('DesignwahlModule.base', 'Notdienste, Spritpreise und Termine'),
             ],
         ];
     }

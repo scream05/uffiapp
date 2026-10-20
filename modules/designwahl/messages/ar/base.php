@@ -89,6 +89,8 @@ return [
     'Die Vorhersage ist gerade nicht erreichbar. Bitte später noch einmal versuchen.' => 'التوقعات غير متاحة حاليًا. حاول مرة أخرى لاحقًا.',
     'Hinweis aufklappen' => 'إظهار المعلومات',
     'Hinweis einklappen' => 'إخفاء المعلومات',
+    'Notdienste, Spritpreise und Termine' => 'خدمات الطوارئ وأسعار الوقود والمواعيد',
+    'Auf einen Blick' => 'نظرة سريعة',
     'Wertstoffhof Uffenheim' => 'مركز إعادة التدوير في أوفنهايم',
     'Buchenweg 3 (im Kreisbauhof)' => 'Buchenweg 3 (داخل مستودع المقاطعة)',
     'Montag' => 'الاثنين',

@@ -74,3 +74,15 @@ $sprache = str_starts_with(Yii::$app->language, 'de') ? [] : ['sprache' => Yii::
         <div class="dn-wf-inhalt" aria-live="polite"></div>
     </div>
 </div>
+
+<div class="dn-mehr dn-kastenfach" id="dn-kastenfach" role="dialog" aria-modal="true" aria-label="<?= Yii::t('DesignwahlModule.base', 'Notdienste, Spritpreise und Termine') ?>" hidden>
+    <div class="dn-mehr-hinter" data-dn-kasten-zu></div>
+    <div class="dn-mehr-fach">
+        <div class="dn-mehr-griff" aria-hidden="true"></div>
+        <div class="dn-mehr-kopf">
+            <strong><?= Yii::t('DesignwahlModule.base', 'Auf einen Blick') ?></strong>
+            <button type="button" class="dn-mehr-zu" data-dn-kasten-zu aria-label="<?= Yii::t('DesignwahlModule.base', 'Schließen') ?>"><i class="fa fa-times"></i></button>
+        </div>
+        <div class="dn-kf-inhalt"></div>
+    </div>
+</div>

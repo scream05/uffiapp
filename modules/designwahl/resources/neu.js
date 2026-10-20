@@ -220,10 +220,77 @@
         });
     }
 
+    // --- Handy/Tablet: Kästen der Seitenleiste (Notdienste, Spritpreise, Termine) stehen sonst unter dem Stream ---
+    // Knopf in der Begrüßungskarte mit den Symbolen der Kästen, die Kästen wandern beim Öffnen ins Fach und danach zurück
+    var kastenKnopf = null, kastenLeiste = null;
+
+    function kastenFach() { return document.getElementById('dn-kastenfach'); }
+
+    function kastenFenster(auf) {
+        var f = kastenFach();
+        if (!f) return;
+        var inhalt = f.querySelector('.dn-kf-inhalt');
+        if (auf && kastenLeiste) {
+            kastenLeiste.querySelectorAll(':scope > .panel').forEach(function (p) { inhalt.appendChild(p); });
+        } else if (!auf) {
+            var zurueck = kastenLeiste && document.contains(kastenLeiste);
+            Array.prototype.slice.call(inhalt.children).forEach(function (p) {
+                if (zurueck) kastenLeiste.appendChild(p); else p.remove();
+            });
+        }
+        f.hidden = !auf;
+        document.documentElement.classList.toggle('dn-kasten-offen', auf);
+        if (kastenKnopf) kastenKnopf.setAttribute('aria-expanded', auf ? 'true' : 'false');
+        if (auf) {
+            f.querySelector('.dn-mehr-zu').focus({preventScroll: true});
+        } else if (kastenKnopf && document.contains(kastenKnopf)) {
+            kastenKnopf.focus({preventScroll: true});
+        }
+    }
+
+    function kaesten(hero) {
+        var leiste = document.querySelector('#layout-content .layout-sidebar-container');
+        var panels = leiste ? leiste.querySelectorAll(':scope > .panel') : [];
+        if (!hero || !panels.length) return false;
+        var knopf = document.createElement('button');
+        knopf.type = 'button';
+        knopf.className = 'dn-kasten-knopf';
+        knopf.setAttribute('aria-haspopup', 'dialog');
+        knopf.setAttribute('aria-expanded', 'false');
+        knopf.setAttribute('aria-controls', 'dn-kastenfach');
+        knopf.setAttribute('aria-label', t('Notdienste, Spritpreise und Termine'));
+        knopf.title = t('Notdienste, Spritpreise und Termine');
+        panels.forEach(function (p) {
+            var i = p.querySelector('.panel-heading .fa');
+            if (i) knopf.appendChild(i.cloneNode(false)).setAttribute('aria-hidden', 'true');
+        });
+        if (!knopf.children.length) knopf.innerHTML = '<i class="fa fa-th-large" aria-hidden="true"></i>';
+        knopf.insertAdjacentHTML('beforeend', '<i class="fa fa-chevron-down dn-kasten-pfeil" aria-hidden="true"></i>');
+        var zeile = hero.querySelector('.dn-hero-zeile');
+        zeile.insertBefore(knopf, zeile.querySelector('.dn-wetter'));
+        kastenKnopf = knopf;
+        kastenLeiste = leiste;
+        return true;
+    }
+
+    document.addEventListener('click', function (e) {
+        if (e.target.closest('.dn-kasten-knopf')) {
+            kastenFenster(true);
+        } else if (e.target.closest('[data-dn-kasten-zu]')) {
+            kastenFenster(false);
+        }
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && kastenFach() && !kastenFach().hidden) kastenFenster(false);
+    });
+
     function einsetzen() {
         var vorlage = document.getElementById('dn-hero-vorlage');
         var ziel = document.querySelector('#layout-content .layout-content-container');
         var startseite = /^\/(dashboard(\/dashboard)?)?\/?$/.test(location.pathname);
+        if (kastenFach() && !kastenFach().hidden) kastenFenster(false); // PJAX-Wechsel bei offenem Fach
+        if (!startseite) document.documentElement.classList.remove('dn-kasten-start');
         if (!vorlage || !ziel || !startseite || ziel.querySelector('.dn-hero')) return;
 
         var teil = vorlage.content.cloneNode(true);
@@ -233,6 +300,7 @@
         if (g) g.textContent = gruss(jetzt.getHours());
         ziel.insertBefore(teil, ziel.firstChild);
         klappe(ziel.querySelector('.dn-hero'));
+        document.documentElement.classList.toggle('dn-kasten-start', kaesten(ziel.querySelector('.dn-hero')));
         wetter(ziel.querySelector('.dn-hero'), vorlage.getAttribute('data-wetter-url'));
     }
 
