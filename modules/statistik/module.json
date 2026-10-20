@@ -1,0 +1,10 @@
+{
+  "id": "statistik",
+  "name": "Statistik",
+  "description": "Cookielose, datensparsame Besucherstatistik (Aufrufe, Besucher, beliebte Seiten) – nur für Admins.",
+  "keywords": ["statistik", "analytics", "besucher"],
+  "version": "0.1.0",
+  "humhub": {
+    "minVersion": "1.18"
+  }
+}

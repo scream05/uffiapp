@@ -1,0 +1,75 @@
+/* Statistik (Administration). Farben farbenblind-geprüft: Aufrufe Blau, Besucher Ocker */
+.st { --st-a: #1f6fae; --st-b: #b8750c; --st-ink: #212529; --st-ink2: #5b6570; --st-linie: #e3e6ea; --st-flaeche: #f5f7f9; }
+.st .panel-heading { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; }
+.st-zeitraum { color: var(--st-ink2); }
+.st-live { margin-left: auto; font-size: 12px; color: var(--st-ink2); display: inline-flex; align-items: center; gap: 6px; }
+.st-punkt { width: 8px; height: 8px; border-radius: 50%; background: #2e8540; box-shadow: 0 0 0 3px rgba(46,133,64,.18); }
+.st-filter { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin-bottom: 16px; }
+.st-knoepfe { display: flex; flex-wrap: wrap; }
+.st-eigen { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.st-eigen input { width: 140px; max-width: 40vw; }
+.st-csv { margin-left: auto; }
+
+.st-kacheln { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-bottom: 10px; }
+.st-kachel { background: var(--st-flaeche); border-radius: 8px; padding: 12px 14px; }
+.st-k-titel { font-size: 12px; color: var(--st-ink2); }
+.st-k-wert { font-size: 26px; font-weight: 700; color: var(--st-ink); line-height: 1.2; font-variant-numeric: tabular-nums; }
+.st-k-zusatz, .st-delta { font-size: 12px; color: var(--st-ink2); }
+.st-delta.st-auf::first-letter { color: #2e8540; }
+.st-delta.st-ab::first-letter { color: #b3261e; }
+.st-kacheln-konten .st-kachel { background: #fff; border: 1px solid var(--st-linie); }
+
+.st-h { font-size: 14px; font-weight: 700; margin: 22px 0 10px; display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; }
+.st-legende { font-weight: 400; font-size: 12px; color: var(--st-ink2); display: inline-flex; align-items: center; gap: 6px; }
+.st-l { display: inline-block; width: 16px; height: 3px; border-radius: 2px; margin-left: 8px; }
+.st-l-a { background: var(--st-a); } .st-l-b { background: var(--st-b); }
+
+.st-diagramm { padding: 6px 0 26px 48px; }
+.st-plot { position: relative; height: 230px; }
+.st-plot svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.st-gitter { stroke: var(--st-linie); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.st-gitter.st-null { stroke: #c4c9cf; }
+.st-linie { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.st-linie-a { stroke: var(--st-a); } .st-linie-b { stroke: var(--st-b); }
+.st-flaeche { fill: var(--st-a); opacity: .08; }
+.st-y, .st-x { position: absolute; font-size: 11px; color: var(--st-ink2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.st-y { left: -8px; transform: translate(-100%, -50%); }
+.st-x { top: 100%; margin-top: 6px; transform: translateX(-50%); }
+.st-fadenkreuz { position: absolute; top: 0; bottom: 0; width: 1px; background: #9aa3ad; pointer-events: none; }
+.st-marke { position: absolute; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; border: 2px solid #fff; pointer-events: none; }
+.st-marke-a { background: var(--st-a); } .st-marke-b { background: var(--st-b); }
+.st-tip { position: absolute; z-index: 5; pointer-events: none; background: #fff; color: var(--st-ink); border: 1px solid var(--st-linie);
+    box-shadow: 0 4px 14px rgba(0,0,0,.12); border-radius: 6px; padding: 6px 10px; font-size: 12px; white-space: nowrap; }
+.st-tip b { display: block; margin-bottom: 2px; }
+.st-tip i { display: inline-block; width: 10px; height: 3px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
+.st-tabelle { margin-top: 4px; font-size: 12px; }
+.st-tabelle summary { cursor: pointer; color: var(--st-ink2); }
+.st-tabelle table { max-width: 520px; margin-top: 8px; }
+
+.st-raster { display: grid; grid-template-columns: 1fr 1fr; gap: 0 28px; }
+.st-breit { grid-column: 1 / -1; }
+.st-liste { width: 100%; font-size: 13px; border-collapse: collapse; table-layout: fixed; }
+.st-liste th { font-weight: 400; color: var(--st-ink2); font-size: 11px; text-align: right; padding: 0 0 4px 8px; width: 70px; }
+.st-liste th:first-child { width: auto; }
+.st-liste td { padding: 2px 0; }
+.st-name { position: relative; }
+.st-balken { position: absolute; left: 0; top: 2px; bottom: 2px; background: var(--st-a); opacity: .14; border-radius: 0 4px 4px 0; }
+.st-text { position: relative; display: block; padding: 3px 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.st-n { text-align: right; padding-left: 8px !important; font-variant-numeric: tabular-nums; }
+.st-n2 { color: var(--st-ink2); }
+.st-leer { color: var(--st-ink2); padding: 6px !important; }
+
+.st-saeulen { display: flex; align-items: flex-end; gap: 2px; height: 140px; padding-bottom: 18px; }
+.st-saeule { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; position: relative; }
+.st-s { display: block; background: var(--st-a); border-radius: 4px 4px 0 0; min-height: 0; }
+.st-saeule:hover .st-s { background: #174f7e; }
+.st-sl { position: absolute; top: 100%; left: 0; right: 0; text-align: center; font-size: 10px; color: var(--st-ink2); margin-top: 3px; }
+
+.st-hinweis { margin-top: 26px; font-size: 12px; color: var(--st-ink2); border-top: 1px solid var(--st-linie); padding-top: 10px; }
+
+@media (max-width: 767px) {
+    .st-raster { grid-template-columns: 1fr; }
+    .st-csv { margin-left: 0; }
+    .st-saeulen .st-saeule:nth-child(odd) .st-sl { visibility: hidden; }
+    .st-saeulen:has(.st-saeule:nth-child(8)) .st-sl { font-size: 9px; }
+}
