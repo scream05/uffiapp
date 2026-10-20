@@ -221,60 +221,57 @@
     }
 
     // --- Handy/Tablet: Kästen der Seitenleiste (Notdienste, Spritpreise, Termine) stehen sonst unter dem Stream ---
-    // Knopf in der Begrüßungskarte mit den Symbolen der Kästen, die Kästen wandern beim Öffnen ins Fach und danach zurück
-    var kastenKnopf = null, kastenLeiste = null;
+    // Lasche mit Pfeil am rechten Rand, das Fach fährt von rechts herein; die Kästen wandern hinein und danach zurück
+    var kastenKnopf = null, kastenLeiste = null, kastenZu = null;
 
     function kastenFach() { return document.getElementById('dn-kastenfach'); }
 
-    function kastenFenster(auf) {
+    function kastenFenster(auf, sofort) {
         var f = kastenFach();
         if (!f) return;
         var inhalt = f.querySelector('.dn-kf-inhalt');
-        if (auf && kastenLeiste) {
-            kastenLeiste.querySelectorAll(':scope > .panel').forEach(function (p) { inhalt.appendChild(p); });
-        } else if (!auf) {
-            var zurueck = kastenLeiste && document.contains(kastenLeiste);
-            Array.prototype.slice.call(inhalt.children).forEach(function (p) {
-                if (zurueck) kastenLeiste.appendChild(p); else p.remove();
-            });
+        clearTimeout(kastenZu);
+        if (auf) {
+            if (kastenLeiste) kastenLeiste.querySelectorAll(':scope > .panel').forEach(function (p) { inhalt.appendChild(p); });
+            f.hidden = false;
+            f.offsetWidth; // Startlage übernehmen, damit das Hereinfahren animiert
+            f.classList.add('dn-kf-auf');
+            f.querySelector('.dn-mehr-zu').focus({preventScroll: true});
+        } else {
+            f.classList.remove('dn-kf-auf');
+            kastenZu = setTimeout(function () {
+                f.hidden = true;
+                var zurueck = kastenLeiste && document.contains(kastenLeiste);
+                Array.prototype.slice.call(inhalt.children).forEach(function (p) {
+                    if (zurueck) kastenLeiste.appendChild(p); else p.remove();
+                });
+            }, sofort ? 0 : 280);
+            if (kastenKnopf && document.contains(kastenKnopf)) kastenKnopf.focus({preventScroll: true});
         }
-        f.hidden = !auf;
         document.documentElement.classList.toggle('dn-kasten-offen', auf);
         if (kastenKnopf) kastenKnopf.setAttribute('aria-expanded', auf ? 'true' : 'false');
-        if (auf) {
-            f.querySelector('.dn-mehr-zu').focus({preventScroll: true});
-        } else if (kastenKnopf && document.contains(kastenKnopf)) {
-            kastenKnopf.focus({preventScroll: true});
-        }
     }
 
-    function kaesten(hero) {
+    function kaesten() {
         var leiste = document.querySelector('#layout-content .layout-sidebar-container');
-        var panels = leiste ? leiste.querySelectorAll(':scope > .panel') : [];
-        if (!hero || !panels.length) return false;
+        if (!leiste || !leiste.querySelector(':scope > .panel')) return false;
         var knopf = document.createElement('button');
         knopf.type = 'button';
-        knopf.className = 'dn-kasten-knopf';
+        knopf.className = 'dn-kasten-lasche';
         knopf.setAttribute('aria-haspopup', 'dialog');
         knopf.setAttribute('aria-expanded', 'false');
         knopf.setAttribute('aria-controls', 'dn-kastenfach');
         knopf.setAttribute('aria-label', t('Notdienste, Spritpreise und Termine'));
         knopf.title = t('Notdienste, Spritpreise und Termine');
-        panels.forEach(function (p) {
-            var i = p.querySelector('.panel-heading .fa');
-            if (i) knopf.appendChild(i.cloneNode(false)).setAttribute('aria-hidden', 'true');
-        });
-        if (!knopf.children.length) knopf.innerHTML = '<i class="fa fa-th-large" aria-hidden="true"></i>';
-        knopf.insertAdjacentHTML('beforeend', '<i class="fa fa-chevron-down dn-kasten-pfeil" aria-hidden="true"></i>');
-        var zeile = hero.querySelector('.dn-hero-zeile');
-        zeile.insertBefore(knopf, zeile.querySelector('.dn-wetter'));
+        knopf.innerHTML = '<i class="fa fa-chevron-left" aria-hidden="true"></i>';
+        document.body.appendChild(knopf);
         kastenKnopf = knopf;
         kastenLeiste = leiste;
         return true;
     }
 
     document.addEventListener('click', function (e) {
-        if (e.target.closest('.dn-kasten-knopf')) {
+        if (e.target.closest('.dn-kasten-lasche')) {
             kastenFenster(true);
         } else if (e.target.closest('[data-dn-kasten-zu]')) {
             kastenFenster(false);
@@ -285,12 +282,29 @@
         if (e.key === 'Escape' && kastenFach() && !kastenFach().hidden) kastenFenster(false);
     });
 
+    // Nach rechts wischen schließt das Fach
+    var wischX = null, wischY = 0;
+    document.addEventListener('touchstart', function (e) {
+        wischX = e.target.closest('#dn-kastenfach') ? e.touches[0].clientX : null;
+        wischY = e.touches[0].clientY;
+    }, {passive: true});
+    document.addEventListener('touchend', function (e) {
+        if (wischX === null) return;
+        var dx = e.changedTouches[0].clientX - wischX, dy = Math.abs(e.changedTouches[0].clientY - wischY);
+        if (dx > 70 && dx > 2 * dy) kastenFenster(false);
+        wischX = null;
+    }, {passive: true});
+
     function einsetzen() {
         var vorlage = document.getElementById('dn-hero-vorlage');
         var ziel = document.querySelector('#layout-content .layout-content-container');
         var startseite = /^\/(dashboard(\/dashboard)?)?\/?$/.test(location.pathname);
-        if (kastenFach() && !kastenFach().hidden) kastenFenster(false); // PJAX-Wechsel bei offenem Fach
-        if (!startseite) document.documentElement.classList.remove('dn-kasten-start');
+        if (kastenFach() && !kastenFach().hidden) kastenFenster(false, true); // PJAX-Wechsel bei offenem Fach
+        if (!startseite) {
+            document.documentElement.classList.remove('dn-kasten-start');
+            if (kastenKnopf) kastenKnopf.remove();
+            kastenKnopf = kastenLeiste = null;
+        }
         if (!vorlage || !ziel || !startseite || ziel.querySelector('.dn-hero')) return;
 
         var teil = vorlage.content.cloneNode(true);
@@ -300,7 +314,8 @@
         if (g) g.textContent = gruss(jetzt.getHours());
         ziel.insertBefore(teil, ziel.firstChild);
         klappe(ziel.querySelector('.dn-hero'));
-        document.documentElement.classList.toggle('dn-kasten-start', kaesten(ziel.querySelector('.dn-hero')));
+        if (kastenKnopf) kastenKnopf.remove();
+        document.documentElement.classList.toggle('dn-kasten-start', kaesten());
         wetter(ziel.querySelector('.dn-hero'), vorlage.getAttribute('data-wetter-url'));
     }
 

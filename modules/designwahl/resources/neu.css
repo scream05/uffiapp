@@ -1478,36 +1478,70 @@ html.design-neu[data-bs-theme="dark"] .dn-wf-werte .fa {
     }
 }
 
-/* ---------- Kästen der Seitenleiste am Handy/Tablet: Knopf in der Begrüßungskarte, Fach wie „Mehr“ ---------- */
-html.design-neu .dn-kasten-knopf {
+/* ---------- Kästen der Seitenleiste am Handy/Tablet: Lasche am rechten Rand, Fach fährt von rechts herein ---------- */
+html.design-neu .dn-kasten-lasche {
     display: none;
+    position: fixed;
+    top: 50%;
+    right: 0;
+    z-index: 1030;
     align-items: center;
-    gap: 8px;
-    margin: 0 0 0 auto;
-    padding: 6px 10px 6px 12px;
+    justify-content: center;
+    width: 30px;
+    height: 64px;
+    padding: 0 0 0 4px;
     border: 0;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, .16);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .18);
-    color: inherit;
+    border-radius: 16px 0 0 16px;
+    background: var(--dn-blau);
+    box-shadow: -4px 4px 16px rgba(20, 35, 45, .25);
+    color: #fff;
     font-size: 15px;
-    line-height: 1;
+    transform: translateY(-50%);
     cursor: pointer;
-    transition: background-color .15s ease;
+    transition: width .15s ease, background-color .15s ease;
 }
 
-html.design-neu .dn-kasten-knopf:hover,
-html.design-neu .dn-kasten-knopf[aria-expanded="true"] {
-    background: rgba(255, 255, 255, .26);
-}
-
-html.design-neu .dn-kasten-knopf .dn-kasten-pfeil {
-    font-size: 11px;
-    opacity: .8;
+html.design-neu .dn-kasten-lasche:hover,
+html.design-neu .dn-kasten-lasche:focus-visible {
+    width: 36px;
+    background: var(--dn-blau-tief);
 }
 
 html.design-neu .dn-kastenfach {
     z-index: 1050;
+}
+
+html.design-neu .dn-kastenfach .dn-mehr-hinter {
+    opacity: 0;
+    animation: none;
+    transition: opacity .25s ease;
+}
+
+html.design-neu .dn-kastenfach.dn-kf-auf .dn-mehr-hinter {
+    opacity: 1;
+}
+
+html.design-neu .dn-kastenfach .dn-mehr-fach {
+    top: 0;
+    bottom: 0;
+    left: auto;
+    right: 0;
+    width: min(400px, 88vw);
+    max-height: none;
+    padding: calc(8px + var(--hh-mobile-app-safe-area-inset-top, env(safe-area-inset-top))) 16px calc(20px + var(--hh-mobile-app-safe-area-inset-bottom, env(safe-area-inset-bottom)));
+    border-radius: var(--dn-r-xl) 0 0 var(--dn-r-xl);
+    transform: translateX(100%);
+    animation: none;
+    transition: transform .28s cubic-bezier(.2, .9, .3, 1);
+    overscroll-behavior: contain;
+}
+
+html.design-neu .dn-kastenfach.dn-kf-auf .dn-mehr-fach {
+    transform: none;
+}
+
+html.design-neu .dn-kastenfach .dn-mehr-griff {
+    display: none;
 }
 
 html.design-neu.dn-kasten-offen body {
@@ -1524,8 +1558,15 @@ html.design-neu .dn-kf-inhalt > .panel:last-child {
     margin-bottom: 0;
 }
 
+@media (prefers-reduced-motion: reduce) {
+    html.design-neu .dn-kastenfach .dn-mehr-fach,
+    html.design-neu .dn-kastenfach .dn-mehr-hinter {
+        transition: none;
+    }
+}
+
 @media (max-width: 991.98px) {
-    html.design-neu .dn-kasten-knopf {
+    html.design-neu.dn-kasten-start .dn-kasten-lasche {
         display: inline-flex;
     }
 
