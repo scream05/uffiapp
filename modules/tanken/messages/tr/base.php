@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'Abweichung vom Tagesmittel je Stunde' => 'Saat başına günlük ortalamadan sapma',
+    'Daten: Markttransparenzstelle für Kraftstoffe (MTS-K) des Bundeskartellamts, bereitgestellt von {tk} unter der Lizenz {cc}.' => 'Veriler: Federal Kartel Dairesi Akaryakıt Piyasası Şeffaflık Birimi (MTS-K), {tk} tarafından {cc} lisansıyla sağlanır.',
+    'Daten: MTS-K über {link}' => 'Veriler: {link} üzerinden MTS-K',
+    'Die Preise sind gerade nicht abrufbar. Bitte versuch es in ein paar Minuten noch einmal.' => 'Fiyatlar şu anda alınamıyor. Lütfen birkaç dakika sonra tekrar dene.',
+    'Falsche Preise kannst du der {mtsk} melden.' => 'Yanlış fiyatları {mtsk} birimine bildirebilirsin.',
+    'geöffnet' => 'açık',
+    'geschlossen' => 'kapalı',
+    'Grün nach unten: günstiger als im Tagesschnitt, Ocker nach oben: teurer. Grundlage: die niedrigsten Preise geöffneter Tankstellen im Umkreis von {km} km, beobachtet an {tage} Tagen.' => 'Yeşil aşağı: günlük ortalamadan ucuz, hardal yukarı: daha pahalı. Temel: {km} km içindeki açık istasyonların en düşük fiyatları, {tage} günlük gözlem.',
+    'Keine Tankstelle in diesem Umkreis.' => 'Bu yarıçapta akaryakıt istasyonu yok.',
+    'Mehr Tankstellen und Tipps' => 'Daha fazla istasyon ve ipuçları',
+    'Meist am günstigsten gegen {gut} Uhr, am teuersten gegen {teuer} Uhr – im Schnitt {cent} Cent Unterschied je Liter.' => 'Genellikle en ucuz saat {gut} civarı, en pahalı saat {teuer} civarı – litre başına ortalama {cent} sent fark.',
+    'nach Entfernung' => 'mesafeye göre',
+    'nach Preis' => 'fiyata göre',
+    '{n} km' => '{n} km',
+    'Preise in Euro je Liter, Entfernung Luftlinie ab Marktplatz. Angaben ohne Gewähr – maßgeblich ist der Preis an der Zapfsäule.' => 'Fiyatlar litre başına euro, mesafe pazar meydanından kuş uçuşu. Garanti verilmez – pompadaki fiyat geçerlidir.',
+    'Spritpreise' => 'Akaryakıt fiyatları',
+    'Spritpreise in Uffenheim' => 'Uffenheim\'da akaryakıt fiyatları',
+    'Stand: {zeit}' => 'Güncelleme: {zeit}',
+    '<strong>Spritpreise</strong> rund um Uffenheim' => 'Uffenheim çevresinde <strong>akaryakıt fiyatları</strong>',
+    '<strong>Wann ist Tanken günstig?</strong> {sorte} in Uffenheim' => '<strong>Ne zaman yakıt almak ucuz?</strong> Uffenheim\'da {sorte}',
+    'Wir sammeln dafür gerade noch Preise. Nach ein paar Tagen steht hier, zu welcher Uhrzeit es meist am günstigsten ist.' => 'Bunun için henüz fiyat topluyoruz. Birkaç gün sonra burada yakıtın genellikle hangi saatte en ucuz olduğunu göreceksin.',
+    '{zeit} Uhr' => '{zeit}',
+];

@@ -37,12 +37,14 @@ services:
       - ./modules/mitteilungsblatt:/data/modules/mitteilungsblatt:ro
       - ./modules/uebersicht:/data/modules/uebersicht:ro
       - ./modules/statistik:/data/modules/statistik:ro
+      - ./modules/tanken:/data/modules/tanken:ro
       - ./modules/gewerbe:/data/modules/gewerbe:ro
       # Stadtwissen von uffenheim.de (scripts/stadtwissen.py)
       - ./wissen:/srv/wissen:ro
     secrets:
       - anthropic_api_key
       - blak_notdienst_url
+      - tankerkoenig_api_key
       - whatsapp
       - facebook
     environment:
@@ -130,6 +132,9 @@ secrets:
   # Schnittstellen-Link der Bayerischen Landesapothekerkammer (Apotheken-Notdienst), an die Registrierung der BLU gebunden
   blak_notdienst_url:
     file: ./secrets/blak_notdienst_url
+  # Spritpreise (modules/tanken): persönlicher Schlüssel von onboarding.tankerkoenig.de, leer = ausgeblendet
+  tankerkoenig_api_key:
+    file: ./secrets/tankerkoenig_api_key
   # WhatsApp Cloud API (Termin-Nummer): token, app_secret, phone_number_id, waba_id, verify_token
   whatsapp:
     file: ./secrets/whatsapp.json

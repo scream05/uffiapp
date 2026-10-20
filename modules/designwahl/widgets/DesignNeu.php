@@ -41,6 +41,10 @@ class DesignNeu extends Widget
                 if ($id === 'mitteilungsblatt' && !Yii::$app->getModule('mitteilungsblatt')?->darfLesen()) {
                     continue;
                 }
+                // Spritpreise erst mit Tankerkönig-Schlüssel
+                if ($id === 'spritpreise' && !Yii::$app->getModule('tanken')?->aktiv()) {
+                    continue;
+                }
                 if (($url = Module::zielUrl($spaceUrl, $route)) !== null) {
                     $mehr[] = ['text' => Module::zielText($id), 'icon' => (string)Icon::get($icon), 'url' => $url, 'farbe' => $farbe, 'uffi' => false];
                 }

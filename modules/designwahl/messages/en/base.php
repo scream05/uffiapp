@@ -123,4 +123,5 @@ return [
     'Konto anlegen' => 'Create account',
     'Bürgerplattform der Bürgerliste Uffenheim e. V. – kein Angebot der Stadt Uffenheim.' => 'Citizens\' platform run by Bürgerliste Uffenheim e. V. – not a service of the Town of Uffenheim.',
     'Wetter in Uffenheim' => 'Weather in Uffenheim',
+    'Spritpreise' => 'Fuel prices',
 ];

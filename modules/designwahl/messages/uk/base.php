@@ -123,4 +123,5 @@ return [
     'Konto anlegen' => 'Створити обліковий запис',
     'Bürgerplattform der Bürgerliste Uffenheim e. V. – kein Angebot der Stadt Uffenheim.' => 'Громадська платформа Bürgerliste Uffenheim e. V. – не є сервісом міста Уффенгайм.',
     'Wetter in Uffenheim' => 'Погода в Уффенгаймі',
+    'Spritpreise' => 'Ціни на пальне',
 ];

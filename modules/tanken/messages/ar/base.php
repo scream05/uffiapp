@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'Abweichung vom Tagesmittel je Stunde' => 'الانحراف عن المتوسط اليومي لكل ساعة',
+    'Daten: Markttransparenzstelle für Kraftstoffe (MTS-K) des Bundeskartellamts, bereitgestellt von {tk} unter der Lizenz {cc}.' => 'البيانات: وحدة شفافية سوق الوقود (MTS-K) التابعة لمكتب مكافحة الاحتكار الاتحادي، مقدمة من {tk} بموجب الترخيص {cc}.',
+    'Daten: MTS-K über {link}' => 'البيانات: MTS-K عبر {link}',
+    'Die Preise sind gerade nicht abrufbar. Bitte versuch es in ein paar Minuten noch einmal.' => 'الأسعار غير متاحة حاليًا. حاول مرة أخرى بعد بضع دقائق.',
+    'Falsche Preise kannst du der {mtsk} melden.' => 'يمكنك الإبلاغ عن الأسعار الخاطئة إلى {mtsk}.',
+    'geöffnet' => 'مفتوحة',
+    'geschlossen' => 'مغلقة',
+    'Grün nach unten: günstiger als im Tagesschnitt, Ocker nach oben: teurer. Grundlage: die niedrigsten Preise geöffneter Tankstellen im Umkreis von {km} km, beobachtet an {tage} Tagen.' => 'الأخضر للأسفل: أرخص من متوسط اليوم، الأصفر الداكن للأعلى: أغلى. الأساس: أدنى أسعار محطات الوقود المفتوحة ضمن {km} كم، على مدى {tage} أيام.',
+    'Keine Tankstelle in diesem Umkreis.' => 'لا توجد محطة وقود ضمن هذا النطاق.',
+    'Mehr Tankstellen und Tipps' => 'المزيد من المحطات والنصائح',
+    'Meist am günstigsten gegen {gut} Uhr, am teuersten gegen {teuer} Uhr – im Schnitt {cent} Cent Unterschied je Liter.' => 'الأرخص عادة حوالي الساعة {gut}، والأغلى حوالي الساعة {teuer} – بفارق {cent} سنت للتر في المتوسط.',
+    'nach Entfernung' => 'حسب المسافة',
+    'nach Preis' => 'حسب السعر',
+    '{n} km' => '{n} كم',
+    'Preise in Euro je Liter, Entfernung Luftlinie ab Marktplatz. Angaben ohne Gewähr – maßgeblich ist der Preis an der Zapfsäule.' => 'الأسعار باليورو لكل لتر، والمسافة بخط مستقيم من ساحة السوق. بدون ضمان – السعر المعتمد هو سعر المضخة.',
+    'Spritpreise' => 'أسعار الوقود',
+    'Spritpreise in Uffenheim' => 'أسعار الوقود في أوفنهايم',
+    'Stand: {zeit}' => 'آخر تحديث: {zeit}',
+    '<strong>Spritpreise</strong> rund um Uffenheim' => '<strong>أسعار الوقود</strong> حول أوفنهايم',
+    '<strong>Wann ist Tanken günstig?</strong> {sorte} in Uffenheim' => '<strong>متى يكون التزود بالوقود أرخص؟</strong> {sorte} في أوفنهايم',
+    'Wir sammeln dafür gerade noch Preise. Nach ein paar Tagen steht hier, zu welcher Uhrzeit es meist am günstigsten ist.' => 'ما زلنا نجمع الأسعار. بعد بضعة أيام سترى هنا في أي ساعة يكون الوقود عادةً أرخص.',
+    '{zeit} Uhr' => '{zeit}',
+];

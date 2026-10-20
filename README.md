@@ -22,6 +22,7 @@ nach § 13 der AGPL-3.0 veröffentlicht.
 | `modules/mitteilungsblatt` | Mitteilungsblatt der Stadt: Ausgaben, Archiv, Volltextsuche |
 | `modules/notdienst` | Notrufnummern und Apotheken-Notdienst |
 | `modules/statistik` | Cookielose Besucherstatistik für Admins (Tages-Salz, keine IP gespeichert) |
+| `modules/tanken` | Spritpreise rund um Uffenheim (Daten MTS-K über Tankerkönig, CC BY 4.0; eigener API-Schlüssel nötig) |
 | `modules/vereine` | Vereinsverzeichnis mit Vorstellungsseiten und Terminen |
 | `modules/whatsapp` | Veranstaltungen aus weitergeleiteten WhatsApp-Plakaten |
 | `scripts/` | Einrichtung (`run-setup.sh` + `SetupController.php`), Importe, Sicherung |

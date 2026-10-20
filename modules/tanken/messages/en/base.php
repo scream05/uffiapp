@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'Abweichung vom Tagesmittel je Stunde' => 'Deviation from the daily average per hour',
+    'Daten: Markttransparenzstelle für Kraftstoffe (MTS-K) des Bundeskartellamts, bereitgestellt von {tk} unter der Lizenz {cc}.' => 'Data: Market Transparency Unit for Fuels (MTS-K) of the Federal Cartel Office, provided by {tk} under the licence {cc}.',
+    'Daten: MTS-K über {link}' => 'Data: MTS-K via {link}',
+    'Die Preise sind gerade nicht abrufbar. Bitte versuch es in ein paar Minuten noch einmal.' => 'Prices are currently unavailable. Please try again in a few minutes.',
+    'Falsche Preise kannst du der {mtsk} melden.' => 'You can report wrong prices to the {mtsk}.',
+    'geöffnet' => 'open',
+    'geschlossen' => 'closed',
+    'Grün nach unten: günstiger als im Tagesschnitt, Ocker nach oben: teurer. Grundlage: die niedrigsten Preise geöffneter Tankstellen im Umkreis von {km} km, beobachtet an {tage} Tagen.' => 'Green, downwards: cheaper than the daily average; ochre, upwards: more expensive. Based on the lowest prices of open filling stations within {km} km, observed on {tage} days.',
+    'Keine Tankstelle in diesem Umkreis.' => 'No filling station within this radius.',
+    'Mehr Tankstellen und Tipps' => 'More filling stations and tips',
+    'Meist am günstigsten gegen {gut} Uhr, am teuersten gegen {teuer} Uhr – im Schnitt {cent} Cent Unterschied je Liter.' => 'Usually cheapest around {gut}:00, most expensive around {teuer}:00 – on average a difference of {cent} cents per litre.',
+    'nach Entfernung' => 'by distance',
+    'nach Preis' => 'by price',
+    '{n} km' => '{n} km',
+    'Preise in Euro je Liter, Entfernung Luftlinie ab Marktplatz. Angaben ohne Gewähr – maßgeblich ist der Preis an der Zapfsäule.' => 'Prices in euros per litre, distance as the crow flies from the market square. No guarantee – the price at the pump applies.',
+    'Spritpreise' => 'Fuel prices',
+    'Spritpreise in Uffenheim' => 'Fuel prices in Uffenheim',
+    'Stand: {zeit}' => 'As of: {zeit}',
+    '<strong>Spritpreise</strong> rund um Uffenheim' => '<strong>Fuel prices</strong> around Uffenheim',
+    '<strong>Wann ist Tanken günstig?</strong> {sorte} in Uffenheim' => '<strong>When is fuel cheapest?</strong> {sorte} in Uffenheim',
+    'Wir sammeln dafür gerade noch Preise. Nach ein paar Tagen steht hier, zu welcher Uhrzeit es meist am günstigsten ist.' => 'We are still collecting prices for this. After a few days you will see here at what time of day fuel is usually cheapest.',
+    '{zeit} Uhr' => '{zeit}',
+];

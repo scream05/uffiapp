@@ -1,0 +1,10 @@
+{
+  "id": "tanken",
+  "name": "Spritpreise",
+  "description": "Aktuelle Benzin- und Dieselpreise rund um Uffenheim (Daten: Markttransparenzstelle für Kraftstoffe über Tankerkönig, CC BY 4.0).",
+  "keywords": ["tanken", "spritpreise", "diesel", "benzin"],
+  "version": "0.1.0",
+  "humhub": {
+    "minVersion": "1.18"
+  }
+}

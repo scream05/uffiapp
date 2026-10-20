@@ -18,7 +18,7 @@ class Module extends \humhub\components\Module
      * Übersetzungen in <modul>/messages/<sprache>/base.php (en, uk, ar, tr, ru). Registrierung in Events::onBeforeRequest.
      */
     public const DEUTSCHE_MODULE = ['abfuhr', 'designwahl', 'gewerbe', 'ki-assistent', 'maengelmelder', 'mitteilungsblatt',
-        'notdienst', 'statistik', 'uebersicht', 'vereine'];
+        'notdienst', 'statistik', 'tanken', 'uebersicht', 'vereine'];
 
     /**
      * Umschalter „Design: …“ im Profilmenü anzeigen? Seit 15.10.2026 aus (alle nutzen „Uffi frisch“); die Technik
@@ -40,6 +40,7 @@ class Module extends \humhub\components\Module
         'gewerbe' => ['Gewerbe', 'shopping-bag', 'gewerbe', '/gewerbe/betrieb/index', 'gruen'],
         'rathaus' => ['Rathaus', 'university', 'rathaus-uffenheim', '/space/space/home', 'bordeaux'],
         'notdienste' => ['Notdienste', 'medkit', null, '/notdienst/index', 'rot'],
+        'spritpreise' => ['Spritpreise', 'car', null, '/tanken/index', 'gold'],
         'mitteilungsblatt' => ['Mitteilungsblatt', 'newspaper-o', null, '/mitteilungsblatt/index', 'blau'],
     ];
 
@@ -54,6 +55,7 @@ class Module extends \humhub\components\Module
             'gewerbe' => Yii::t('DesignwahlModule.base', 'Gewerbe'),
             'rathaus' => Yii::t('DesignwahlModule.base', 'Rathaus'),
             'notdienste' => Yii::t('DesignwahlModule.base', 'Notdienste'),
+            'spritpreise' => Yii::t('DesignwahlModule.base', 'Spritpreise'),
             'mitteilungsblatt' => Yii::t('DesignwahlModule.base', 'Mitteilungsblatt'),
             default => self::LEISTE[$id][0] ?? self::MEHR[$id][0] ?? $id,
         };

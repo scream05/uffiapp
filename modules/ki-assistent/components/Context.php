@@ -24,7 +24,10 @@ class Context
         $maengel = self::maengel();
         // Datum und Uhrzeit außerhalb des Zwischenspeichers (Notdienst wechselt morgens)
         return "Heute ist " . self::DAYS[date('w')] . ', ' . date('d.m.Y') . ', jetzt ist es ' . date('G:i') . " Uhr.\n\n"
-            . $base . ($maengel !== null ? "\n\n" . $maengel : '');
+            . $base . ($maengel !== null ? "\n\n" . $maengel : '')
+            // Spritpreise ändern sich laufend: nicht im 10-Minuten-Speicher, eigener Zwischenspeicher im Modul
+            . (Yii::$app->hasModule('tanken') && Yii::$app->getModule('tanken')->aktiv()
+                ? "\n\n" . \humhub\modules\tanken\components\Spritpreise::forAssistant() : '');
     }
 
     /**

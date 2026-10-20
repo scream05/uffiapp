@@ -123,4 +123,5 @@ return [
     'Konto anlegen' => 'Hesap oluştur',
     'Bürgerplattform der Bürgerliste Uffenheim e. V. – kein Angebot der Stadt Uffenheim.' => 'Bürgerliste Uffenheim e. V. tarafından işletilen vatandaş platformu – Uffenheim Belediyesi\'nin bir hizmeti değildir.',
     'Wetter in Uffenheim' => 'Uffenheim\'da hava',
+    'Spritpreise' => 'Akaryakıt fiyatları',
 ];
