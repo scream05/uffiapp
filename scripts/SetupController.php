@@ -189,6 +189,20 @@ class SetupController extends Controller
         return $ok ? ExitCode::OK : ExitCode::UNSPECIFIED_ERROR;
     }
 
+    /** Kurze Hinweis-Mail an den ersten Admin (Benutzer-ID 1): setup/admin-hinweis "Betreff" "Text" */
+    public function actionAdminHinweis($betreff, $text)
+    {
+        $admin = \humhub\modules\user\models\User::findOne(1);
+        $ok = $admin && Yii::$app->mailer->compose()
+            ->setFrom([Yii::$app->settings->get('mailerSystemEmailAddress') => Yii::$app->settings->get('mailerSystemEmailName')])
+            ->setTo($admin->email)
+            ->setSubject($betreff)
+            ->setTextBody($text)
+            ->send();
+        $this->stdout(($ok ? 'OK' : 'FEHLER') . "\n");
+        return $ok ? ExitCode::OK : ExitCode::UNSPECIFIED_ERROR;
+    }
+
     /** Rechtstexte aus legal/*.md übernehmen: setup/legal (Dateien liegen unter /tmp/legal) */
     public function actionLegal()
     {
