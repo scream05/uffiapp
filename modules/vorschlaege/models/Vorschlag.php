@@ -102,6 +102,12 @@ class Vorschlag extends ActiveRecord
         return $post;
     }
 
+    /** Beschreibung aus dem Beitragstext (ohne fetten Titel und Kategorie am Ende) */
+    public static function beschreibung(string $message): string
+    {
+        return trim(preg_replace(['/^\*\*.*?\*\*\s*/us', '/\s*_[^_\n]+_\s*$/u'], '', $message));
+    }
+
     /** Deutsche Bezeichnung (für den Kommentar bei Änderungen – gespeicherte Texte bleiben deutsch) */
     public function getLabel(): string
     {

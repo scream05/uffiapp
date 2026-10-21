@@ -61,7 +61,7 @@ foreach (array_keys(Vorschlag::STATUSES) as $key) {
                     <?php
                     $autor = $v->content->createdBy;
                     $text = trim(preg_replace('/\s+/u', ' ', strip_tags(\humhub\libs\Helpers::truncateText(
-                        preg_replace(['/^\*\*.*?\*\*\s*/us', '/\s*_[^_\n]+_\s*$/u'], '', $v->content->getPolymorphicRelation()->message ?? ''), 220))));
+                        Vorschlag::beschreibung($v->content->getPolymorphicRelation()->message ?? ''), 220))));
                     $n = $kommentare[$v->content->object_id] ?? 0;
                     ?>
                     <li class="vs-eintrag">

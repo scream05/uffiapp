@@ -7,7 +7,7 @@ use Yii;
 /**
  * Apotheken-Notdienst von der Schnittstelle der Bayerischen Landesapothekerkammer (XML, ca. 4 Wochen,
  * je Notdienstzeitraum die 4 nächstgelegenen Apotheken nach Straßenweg ab Uffenheim).
- * Abruf per Crontab (notdienst/abrufen), gespeichert in @runtime/notdienst.json; bei Fehlern bleibt der letzte Stand.
+ * Abruf per Crontab (notdienst/abrufen), gespeichert in /data/notdienst/notdienst.json; bei Fehlern bleibt der letzte Stand.
  */
 class Notdienst
 {
@@ -23,7 +23,8 @@ class Notdienst
 
     public static function file(): string
     {
-        return Yii::getAlias('@runtime/notdienst.json');
+        // Nicht @runtime: liegt nur im Container und ist nach jedem Neuanlegen leer (am 21.10.2026 so passiert)
+        return '/data/notdienst/notdienst.json';
     }
 
     /** Holt die Daten und speichert sie; liefert die Anzahl der Einträge */
@@ -65,6 +66,7 @@ class Notdienst
         if ($entries === []) {
             throw new \RuntimeException('keine Einträge');
         }
+        @mkdir(dirname(self::file()), 0775, true);
         $tmp = self::file() . '.tmp';
         file_put_contents($tmp, json_encode(['abgerufen' => time(), 'eintraege' => $entries], JSON_UNESCAPED_UNICODE));
         rename($tmp, self::file());

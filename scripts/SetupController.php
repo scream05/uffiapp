@@ -1667,6 +1667,70 @@ class SetupController extends Controller
     }
 
     /**
+     * Uffi und die Vorschläge mit Testdaten (setup/vorschlaege-ki-test): legt in einer Transaktion zwei Vorschläge an,
+     * prüft den Kontext-Abschnitt und stellt Uffi zwei Fragen (2 API-Anfragen). Danach Rollback, Kontextspeicher geleert.
+     */
+    public function actionVorschlaegeKiTest()
+    {
+        $modul = Yii::$app->getModule('vorschlaege');
+        $modul->benachrichtigen = false;
+        $ki = Yii::$app->getModule('ki-assistent');
+        $space = $modul->getSpace();
+        $admin = User::findOne(['username' => 'admin']);
+        $nutzer = array_values(array_filter(User::find()->active()->andWhere(['!=', 'id', $admin->id])->all(), fn($u) => !$u->isSystemAdmin()));
+        $ok = 0;
+        $fehler = 0;
+        $pruefe = function (string $was, bool $bedingung, string $zeige = '') use (&$ok, &$fehler) {
+            $bedingung ? $ok++ : $fehler++;
+            $this->stdout(($bedingung ? 'ok   ' : 'FEHL ') . "$was\n" . (!$bedingung && $zeige !== '' ? "     $zeige\n" : ''));
+        };
+        $tx = Yii::$app->db->beginTransaction();
+        Yii::$app->cache->delete('ki-assistent-context');
+        try {
+            Yii::$app->user->switchIdentity($nutzer[0]);
+            $F = \humhub\modules\vorschlaege\models\VorschlagForm::class;
+            $abo = \humhub\modules\vorschlaege\models\Vorschlag::einreichen($space, new $F(['titel' => 'Abfuhrtermine als Kalender-Abo',
+                'kategorie' => 'Neue Funktion', 'text' => 'Die Abfuhrtermine sollten sich als iCal-Abo ins Handy übernehmen lassen.']));
+            \humhub\modules\vorschlaege\models\Vorschlag::einreichen($space, new $F(['titel' => 'Dunkles Design für die App',
+                'kategorie' => 'Verbesserung', 'text' => 'Abends wäre ein dunkles Design angenehmer für die Augen.']));
+            Yii::$app->user->switchIdentity($admin);
+            \humhub\modules\vorschlaege\models\Stimme::setzen($abo->content->id, $admin->id, 1);
+            \humhub\modules\vorschlaege\models\Vorschlag::findOne($abo->content->id)->statusSetzen('geplant', 'kommt im November');
+
+            $abschnitt = \humhub\modules\vorschlaege\components\Uffi::forAssistant();
+            $pruefe('Kontext: Vorschlag mit Stand, Hinweis und Stimmen', str_contains($abschnitt, 'Abfuhrtermine als Kalender-Abo (Neue Funktion) – Stand: Geplant')
+                && str_contains($abschnitt, 'Hinweis des Teams: kommt im November') && str_contains($abschnitt, '1 dafür, 0 dagegen, 1 Kommentare'), $abschnitt);
+            $pruefe('Kontext: beliebtester zuerst, Beschreibung ohne Titel', strpos($abschnitt, 'Kalender-Abo') < strpos($abschnitt, 'Dunkles Design')
+                && str_contains($abschnitt, "\n  Die Abfuhrtermine sollten"));
+            $pruefe('Kontext: keine Namen der Verfasser', !str_contains($abschnitt, $nutzer[0]->displayName));
+            $pruefe('Kontext im Prompt', str_contains(\humhub\modules\kiAssistent\components\Context::get(), 'Dunkles Design für die App'));
+
+            $claude = new \humhub\modules\kiAssistent\components\Claude($ki->getApiKey(), $ki->getModel());
+            $fragen = [
+                ['Kann man die Abfuhrtermine eigentlich als Kalender abonnieren? Das wäre echt praktisch.',
+                    ['geplant', 'November', preg_quote($abo->content->getUrl(), '/')]],
+                ['Ich hätte gern einen Dark Mode für die App. Hat das schon jemand vorgeschlagen?',
+                    ['Dunkles Design', 'dafür|abstimm|stimm']],
+            ];
+            foreach ($fragen as [$frage, $muster]) {
+                [$antwort, , , $in, $out] = \humhub\modules\kiAssistent\controllers\ChatController::converse($claude,
+                    \humhub\modules\kiAssistent\controllers\ChatController::systemPrompt($frage), [['role' => 'user', 'text' => $frage]]);
+                $ki->addUsage($in, $out);
+                $fehlt = array_filter($muster, fn($re) => !preg_match("/$re/iu", $antwort));
+                $pruefe("Uffi: $frage", !$fehlt, 'fehlt ' . implode(', ', $fehlt) . ' – ' . mb_substr(preg_replace('/\s+/u', ' ', $antwort), 0, 400));
+            }
+        } catch (\Throwable $e) {
+            $fehler++;
+            $this->stderr("FEHL Ausnahme: " . $e->getMessage() . "\n" . $e->getTraceAsString() . "\n");
+        } finally {
+            $tx->rollBack();
+            Yii::$app->cache->delete('ki-assistent-context');
+        }
+        $this->stdout("\n$ok ok, $fehler Fehler (alles zurückgerollt)\n");
+        return $fehler ? ExitCode::SOFTWARE : ExitCode::OK;
+    }
+
+    /**
      * Startliste des Gewerbeverzeichnisses: setup/gewerbe-import (idempotent, Status „offen“ mit Quelle)
      * Quelle: Liste „Gastronomie und Unterkünfte“ der Stadt (modules/gewerbe/data/start.json, ohne Personennamen und
      * private E-Mail-Adressen). Danach den Ort aller Betriebe ohne Kartenpunkt über Nominatim bestimmen (1 Abfrage/s).

@@ -74,6 +74,10 @@ class Context
 
         $parts[] = Warnungen::forAssistant();
 
+        if (Yii::$app->hasModule('vorschlaege') && ($v = \humhub\modules\vorschlaege\components\Uffi::forAssistant()) !== null) {
+            $parts[] = $v;
+        }
+
         $space = Space::findOne(['url' => 'veranstaltungen']);
         if ($space !== null) {
             $lines = [];
