@@ -25,7 +25,7 @@ services:
       - ./design/imagemagick-policy.xml:/etc/ImageMagick-7/policy.xml:ro
       # PHP-Grenzen für Uploads (Standard 2 MB je Datei war für Handyfotos zu klein)
       - ./design/php-uploads.ini:/usr/local/etc/php/conf.d/zz-uploads.ini:ro
-      # Abhilfe CVE-2026-109618/109619 (memory_limit -1, kein Upload-Fortschritt), siehe Datei
+      # Härtung nach CVE-2026-109618/109619 (kein Upload-Fortschritt, geringe Formular-Tiefe), siehe Datei
       - ./design/php-sicherheit.ini:/usr/local/etc/php/conf.d/zzz-sicherheit.ini:ro
       # Eigenes Modul aus diesem Repo (KI-Assistent, Claude)
       - ./modules/ki-assistent:/data/modules/ki-assistent:ro
@@ -67,7 +67,7 @@ services:
         CADDY_SERVER_EXTRA_DIRECTIVES=request_body {
         	max_size 64MB
         }
-    # Ersetzt PHPs memory_limit (seit CVE-2026-109618 auf -1): Ausreißer beendet nur den Prozess, supervisord startet neu
+    # Obergrenze für den ganzen Container (Webserver, Queue, Cron): Ausreißer beendet nur den Prozess, supervisord startet neu
     mem_limit: 1200m
     memswap_limit: 1200m
     logging:
