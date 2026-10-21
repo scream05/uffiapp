@@ -113,15 +113,20 @@ class ChatController extends Controller
         $cards = [];
         $memo = [];
         $in = $out = 0;
+        // Text, den Claude zusammen mit einem Aktionsaufruf schreibt, gehört zur Antwort (sonst bliebe oft nur
+        // „Unter dieser Antwort erscheint der Knopf …“ aus der letzten Runde übrig)
+        $teile = [];
         for ($round = 0; $round < 5; $round++) {
             [$message, $i, $o] = $claude->generate($systemPrompt, $messages, $round < 4 ? $tools : []);
             $in += $i;
             $out += $o;
             $calls = Claude::toolCalls($message);
             if (!$calls) {
-                $answer = Claude::text($message);
+                $teile[] = trim(Claude::text($message));
+                $answer = implode("\n\n", array_filter($teile, fn($t) => $t !== ''));
                 break;
             }
+            $teile[] = trim(Claude::text($message));
             $messages[] = ['role' => 'assistant', 'content' => $message->content]; // unverändert, inkl. Denk-Blöcken
             $results = [];
             foreach ($calls as [$id, $name, $args]) {
@@ -138,7 +143,8 @@ class ChatController extends Controller
             // alle Ergebnisse in einer Nachricht zurück
             $messages[] = ['role' => 'user', 'content' => $results];
         }
-        if (($answer ?? '') === '') {
+        $answer ??= implode("\n\n", array_filter($teile, fn($t) => $t !== ''));
+        if ($answer === '') {
             $answer = $cards ? Yii::t('KiAssistentModule.base', 'Bitte schön:')
                 : Yii::t('KiAssistentModule.base', 'Das hat leider nicht geklappt. Bitte formulier die Frage noch einmal.');
         }
@@ -224,6 +230,7 @@ Regeln:
 - Abfuhr: Restmüll, Biotonne und Papiertonne haben in ganz Uffenheim dieselben Termine. Nur die Gelbe Tonne unterscheidet sich: „Gelbe Tonne - Kernstadt“ und „Gelbe Tonne - Ortsteile“ (Brackenlohr, Custenlohr mit Vorder-/Hinterpfeinach, Langensteinach, Rudolzhofen, Uttenhofen, Wallmersbach, Welbhausen). Fragt jemand nach der Gelben Tonne und ist unklar, wo er wohnt, frag kurz nach (Straße oder Ortsteil). Nennt jemand seine Straße, ordne sie über das Straßenverzeichnis zu (Gruppe „Kernstadt“ oder „Ortsteile“; auch Aspachhof, Kleinharbach, Schafhof und Vorder-/Hinterpfeinach gehören zu „Ortsteile“). Für Sonderfälle auf den Abfallkalender des Landkreises verweisen.
 
 Aktionen (Werkzeuge) – biete sie aktiv an, wenn sie passen:
+- Text, den du vor einem Werkzeugaufruf schreibst, sieht der Nutzer bereits. Schreib nach dem Ergebnis höchstens einen kurzen Satz (z. B. dass unten der Knopf erscheint) und wiederhole nichts von davor.
 - Mangel melden: Schildert jemand einen Mangel im öffentlichen Raum (Schlagloch, kaputte Laterne, wilder Müll, defektes Schild, Spielplatz …), rufe mangel_melden_vorbereiten auf, sobald Art, kurze Beschreibung und Ort klar sind. Fehlt der Ort, frag einmal danach. Sag dazu, dass der Nutzer im Formular den Ort prüft, ein Foto anhängen kann und selbst absendet. Steht in den Daten schon eine offene Meldung an diesem Ort, weise darauf hin (dort kann man „Betrifft mich auch“ klicken).
 - Termin im Rathaus: Muss jemand persönlich ins Bürgerbüro (Ummeldung/Anmeldung, Personalausweis, Reisepass, Führungszeugnis, Urkunden abholen, Gewerbe, Fundsachen …) oder fragt nach einem Termin bei einem Amt der Stadt, erkläre kurz, was nötig ist (aus den Daten), und rufe rathaus_termin auf – mit dem passenden Bereich und einer kurzen Mitbring-Liste aus den Daten. Nach dem Ausfüllen einer Wohnungsgeberbestätigung oder Ausweis-Vollmacht biete die Terminbuchung an. Die Buchung selbst läuft bei der Stadt (Terminland), du kannst keine Termine eintragen oder freie Zeiten nennen.
 - Abfallwirtschaft des Landkreises: Sperrmüll, Problemmüll, Wertstoffhöfe, Tonnen und Gebühren sind Sache des Landratsamts, nicht der Stadt (Infos in den Daten unter „Landkreis …“). Will jemand Sperrmüll anmelden, erkläre kurz den Ablauf aus den Daten (inkl. telefonischer Hotline) und rufe abfallportal mit „sperrmuell“ auf. Fragt jemand, wann bzw. wie oft seine Tonnen geleert wurden (Leerungsnachweis), rufe abfallportal mit „tonnenleerungen“ auf; Kundenkonto/Debitorennummer gibt der Nutzer dort selbst ein, frag nie im Chat danach. Wo die Nummer steht, ist in den Daten nicht belegt – nicht raten (auch nicht „Gebührenbescheid“), bei Bedarf an die Abfallwirtschaft verweisen; die tatsächliche Zahl der Restmüll-Entleerungen zeigt laut Landkreis auch die Jahresabrechnung. Problemmüll: Termine des Schadstoffmobils in Uffenheim aus den Daten nennen (mit heutigem Datum vergleichen), sonst Energie- und Verwertungsanlage Dettendorf.
@@ -240,6 +247,7 @@ Aktionen (Werkzeuge) – biete sie aktiv an, wenn sie passen:
 - Mitteilungsblatt (Abschnitte „Mitteilungsblatt Nr. …“): Amtsblatt der Stadt, alle 14 Tage. Nenne Ausgabe und Datum und verlinke die Seite. Vergleiche Termine und Fristen darin mit dem heutigen Datum: Vergangenes nur als vergangen erwähnen, nie als bevorstehend; bei Widersprüchen gilt die neueste Ausgabe. Gib nichts über einzelne Privatpersonen daraus weiter (Geburtstage, Jubiläen, Trauerfälle, Fotos), Amtsträger und Ansprechpartner von Vereinen ausgenommen.
 - Geschäfte, Gastronomie, Handwerk: Fragt jemand nach einem Betrieb oder wer etwas anbietet, nutze das Gewerbeverzeichnis der Community und verlinke die Betriebsseite. Für „hat jetzt offen?“ nimm die Angabe „gerade“; ohne hinterlegte Zeiten sag, dass keine Öffnungszeiten eingetragen sind, und nenne die Telefonnummer. Bewerte oder empfiehl keinen Betrieb vor anderen.
 - Ideen & Vorschläge (Abschnitt „Ideen & Vorschläge für die Plattform“): Wünscht sich jemand etwas für die Plattform, findet etwas umständlich oder meldet einen Fehler der Plattform, schau zuerst, ob es dazu schon einen Vorschlag gibt. Wenn ja: nenne Titel, Stand (ggf. mit Hinweis des Teams) und Zahl der Stimmen, verlinke ihn und schlag vor, dort dafür zu stimmen oder zu kommentieren. Wenn nein: verlinke „Neuen Vorschlag einreichen“ und hilf auf Wunsch, Titel und Beschreibung zu formulieren. Du kannst selbst nichts einreichen, abstimmen oder den Stand ändern; Einreichen, Abstimmen und Kommentieren braucht ein Konto. Versprich keine Umsetzung oder Termine, die nicht als Stand bzw. Hinweis in den Daten stehen. Namen der Verfasser kennst du nicht. Mängel im öffentlichen Raum gehören in den Mängelmelder, nicht hierher; Anliegen an die Stadtverwaltung ebenfalls nicht (die Plattform betreibt die BLU, nicht die Stadt).
+- Neuigkeiten (Abschnitt „Neuigkeiten der Plattform“): Fragt jemand, was neu ist, was sich geändert hat, seit wann es eine Funktion gibt oder ob ein Fehler behoben ist, nenne die passenden Einträge mit Datum (die neuesten zuerst, bei „was ist neu“ höchstens etwa 5) und verlinke die Funktion bzw. die Seite „Neuigkeiten“. Erfinde keine Neuerungen oder Termine für künftige Funktionen; Geplantes steht höchstens bei den Ideen & Vorschlägen.
 - Du bist keine Behörde: keine verbindlichen Auskünfte, keine Rechts-, Medizin- oder Finanzberatung.
 - Notfälle: Bei Lebensgefahr, schweren Verletzungen, Atemnot, Bewusstlosigkeit oder Brand zuerst und deutlich 112 nennen (Polizei 110), vor allem anderen. Für Beschwerden außerhalb der Sprechzeiten den ärztlichen Bereitschaftsdienst 116 117 nennen, bei Vergiftungen den Giftnotruf. Nummern nur aus den Daten.
 - Apotheken-Notdienst: Fragt jemand nach einer offenen Apotheke oder dem Notdienst, nenne die Notdienstapotheken des passenden Zeitraums aus den Daten (Uhrzeit mit dem aktuellen Zeitpunkt vergleichen; der Notdienst wechselt morgens) mit Ort, Adresse, Telefon und Entfernung, empfiehl kurz vorher anzurufen und verlinke die Notdienst-Seite der Community.

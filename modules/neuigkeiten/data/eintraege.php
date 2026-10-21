@@ -10,6 +10,12 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'uffi-antwort-mit-knopf', 'datum' => '2026-10-21', 'art' => 'behoben', 'popup' => false,
+        'titel' => 'Uffis Antworten mit Knöpfen vollständig',
+        'text' => 'Zeigte Uffi einen Knopf an (z. B. Karte oder Sperrmüll-Formular), fehlte manchmal der eigentliche Antworttext. Jetzt kommt die ganze Antwort an.'],
+    ['id' => 'uffi-neuigkeiten', 'datum' => '2026-10-21', 'art' => 'besser', 'popup' => false,
+        'titel' => 'Uffi kennt die Neuigkeiten',
+        'text' => 'Frag Uffi, was neu ist oder seit wann es eine Funktion gibt – er kennt alle Einträge dieser Seite und die Ideen & Vorschläge.'],
     ['id' => 'ideen-vorschlaege', 'datum' => '2026-10-21', 'art' => 'neu', 'popup' => true,
         'link' => ['vorschlaege', '/vorschlaege/vorschlag/index'],
         'titel' => 'Ideen & Vorschläge',

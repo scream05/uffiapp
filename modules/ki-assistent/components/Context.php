@@ -78,6 +78,10 @@ class Context
             $parts[] = $v;
         }
 
+        if (Yii::$app->hasModule('neuigkeiten')) {
+            $parts[] = \humhub\modules\neuigkeiten\components\Uffi::forAssistant();
+        }
+
         $space = Space::findOne(['url' => 'veranstaltungen']);
         if ($space !== null) {
             $lines = [];

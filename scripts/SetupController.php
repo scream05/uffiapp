@@ -899,11 +899,11 @@ class SetupController extends Controller
      * setup/ki-alter <benutzername> [zeigen|setzen|zuruecksetzen]
      */
     /**
-     * Testfragen des KI-Assistenten prüfen: setup/ki-test [nur diese Nummer]
+     * Testfragen des KI-Assistenten prüfen: setup/ki-test [nur diese Nummer] [1 = Antworten immer ausgeben]
      * modules/ki-assistent/data/testfragen.json: je Frage „erwartet“ (Muster, die vorkommen müssen), „nicht“ (Muster, die
      * nicht vorkommen dürfen) und/oder „karte“ (erwartete Aktion: link, termin, download). Kostet je Frage 1–3 Anfragen.
      */
-    public function actionKiTest($nr = null)
+    public function actionKiTest($nr = null, $zeigen = 0)
     {
         Yii::$app->user->switchIdentity(User::findOne(['username' => 'admin']));
         $module = Yii::$app->getModule('ki-assistent');
@@ -956,6 +956,9 @@ class SetupController extends Controller
             $problems ? null : $ok++;
             $this->stdout(sprintf("%2d %s %s (%.1f s%s)\n", $i + 1, $problems ? '✗' : '✓', $t['frage'],
                 microtime(true) - $start, $cards ? ', Aktion: ' . implode('/', array_column($cards, 'typ')) : ''));
+            if ($zeigen && !$problems) {
+                $this->stdout("   Antwort: $answer\n");
+            }
             if ($problems) {
                 $this->stdout('   ' . implode('; ', $problems) . "\n   Antwort: " . mb_substr(preg_replace('/\s+/u', ' ', $answer), 0, 400) . "\n");
             }
@@ -1850,7 +1853,7 @@ class SetupController extends Controller
                 && str_contains($seite, 'Oktober 2026') && str_contains($seite, 'September 2026'));
             Yii::$app->language = Yii::$app->formatter->locale = 'en-US';
             $en = Yii::$app->view->renderFile('@neuigkeiten/views/index/index.php', ['module' => $modul, 'art' => 'neu', 'eintraege' => array_slice($alle, 0, 2)]);
-            $pruefe('Seite englisch', str_contains($en, 'What’s new') && str_contains($en, \humhub\helpers\Html::encode($tr['ideen-vorschlaege']['en']['titel'] ?? '###'))
+            $pruefe('Seite englisch', str_contains($en, 'What’s new') && str_contains($en, \humhub\helpers\Html::encode($tr[$alle[0]['id']]['en']['titel'] ?? '###'))
                 && str_contains($en, 'October 2026'));
             Yii::$app->language = 'de';
         } catch (\Throwable $e) {

@@ -1,4 +1,58 @@
 {
+    "uffi-antwort-mit-knopf": {
+        "en": {
+            "titel": "Uffi's answers with buttons now complete",
+            "text": "When Uffi showed a button (e.g. a map or bulky waste form), the actual answer text was sometimes missing. Now the whole answer comes through.",
+            "quelle": "118b1db25f1973f8fa2e7ff7717cbd91fe9c2a67"
+        },
+        "uk": {
+            "titel": "Відповіді Uffi з кнопками тепер повні",
+            "text": "Коли Uffi показував кнопку (наприклад, карту або форму для вивезення великогабаритного сміття), інколи не було самого тексту відповіді. Тепер відповідь надходить повністю.",
+            "quelle": "118b1db25f1973f8fa2e7ff7717cbd91fe9c2a67"
+        },
+        "ar": {
+            "titel": "اكتملت إجابات أوفي مع الأزرار",
+            "text": "عندما كان أوفي يعرض زرًا (مثل الخريطة أو نموذج الإعلان عن النفايات الضخمة)، كان نص الإجابة الفعلي يغيب أحيانًا. الآن تصلك الإجابة كاملة.",
+            "quelle": "118b1db25f1973f8fa2e7ff7717cbd91fe9c2a67"
+        },
+        "tr": {
+            "titel": "Uffi'nin düğmeli yanıtları artık eksiksiz",
+            "text": "Uffi bir düğme gösterdiğinde (ör. harita veya büyük çöp formu), bazen asıl yanıt metni eksik kalıyordu. Artık yanıtın tamamı ulaşıyor.",
+            "quelle": "118b1db25f1973f8fa2e7ff7717cbd91fe9c2a67"
+        },
+        "ru": {
+            "titel": "Ответы Уффи с кнопками теперь полные",
+            "text": "Когда Уффи показывала кнопку (например, карту или форму для крупногабаритного мусора), иногда не хватало самого текста ответа. Теперь ответ приходит целиком.",
+            "quelle": "118b1db25f1973f8fa2e7ff7717cbd91fe9c2a67"
+        }
+    },
+    "uffi-neuigkeiten": {
+        "en": {
+            "titel": "Uffi knows what's new",
+            "text": "Ask Uffi what's new or since when a feature has existed – he knows all the entries on this page and the ideas & suggestions.",
+            "quelle": "f1d7b4361f93c7d527ddbd61dd164cc4ef4282e1"
+        },
+        "uk": {
+            "titel": "Uffi знає новини",
+            "text": "Запитай Uffi, що нового або з якого часу з'явилася певна функція. Він знає всі записи на цій сторінці та ідеї й пропозиції.",
+            "quelle": "f1d7b4361f93c7d527ddbd61dd164cc4ef4282e1"
+        },
+        "ar": {
+            "titel": "أوفي يعرف الجديد",
+            "text": "اسأل أوفي عما هو جديد أو منذ متى توجد ميزة معينة. فهو يعرف كل المدخلات في هذه الصفحة والأفكار والاقتراحات.",
+            "quelle": "f1d7b4361f93c7d527ddbd61dd164cc4ef4282e1"
+        },
+        "tr": {
+            "titel": "Uffi kennt die Neuigkeiten",
+            "text": "Frag Uffi, was neu ist oder seit wann es eine Funktion gibt – er kennt alle Einträge dieser Seite und die Ideen & Vorschläge.",
+            "quelle": "f1d7b4361f93c7d527ddbd61dd164cc4ef4282e1"
+        },
+        "ru": {
+            "titel": "Uffi kennt die Neuigkeiten",
+            "text": "Frag Uffi, was neu ist oder seit wann es eine Funktion gibt – er kennt alle Einträge dieser Seite und die Ideen & Vorschläge.",
+            "quelle": "f1d7b4361f93c7d527ddbd61dd164cc4ef4282e1"
+        }
+    },
     "ideen-vorschlaege": {
         "en": {
             "titel": "Ideas & Suggestions",

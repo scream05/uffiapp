@@ -335,5 +335,19 @@
     "erwartet": [
       "vorschlaege\\/vorschlag\\/(index|create)"
     ]
+  },
+  {
+    "frage": "Was ist in letzter Zeit neu auf der Plattform?",
+    "erwartet": [
+      "Vorschl",
+      "Sprit",
+      "neuigkeiten\\/index"
+    ]
+  },
+  {
+    "frage": "Seit wann gibt es das Gewerbeverzeichnis?",
+    "erwartet": [
+      "15\\.0?\\s?10|15\\. Oktober"
+    ]
   }
 ]
