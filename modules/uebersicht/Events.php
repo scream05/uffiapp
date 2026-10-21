@@ -136,6 +136,8 @@ class Events
     {
         try {
             $event->sender->addFilterHandler(new AngepinntFilter());
+            // Gäste: Bereiche, die standardmäßig aus sind (z. B. Ideen & Vorschläge), auch nicht in ihrer Übersicht
+            $event->sender->addFilterHandler(new \humhub\modules\uebersicht\filters\GastStandardAus());
         } catch (\Throwable $e) {
             Yii::error($e);
         }

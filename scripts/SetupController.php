@@ -1731,6 +1731,64 @@ class SetupController extends Controller
     }
 
     /**
+     * „Meine Übersicht“ mit standardmäßig ausgeschalteten Bereichen (setup/uebersicht-standard-test): Testvorschlag in
+     * einer Transaktion, Übersicht eines normalen Kontos (Standard, eingeschaltet, wieder aus) und eines Gasts. Rollback.
+     */
+    public function actionUebersichtStandardTest()
+    {
+        $modul = Yii::$app->getModule('vorschlaege');
+        $modul->benachrichtigen = false;
+        $ue = Yii::$app->getModule('uebersicht');
+        Yii::$app->getModule('dashboard')->memberFilterClass = \humhub\modules\uebersicht\filters\MeineUebersicht::class;
+        $space = $modul->getSpace();
+        $nutzer = array_values(array_filter(User::find()->active()->all(), fn($u) => !$u->isSystemAdmin()));
+        $ok = 0;
+        $fehler = 0;
+        $pruefe = function (string $was, bool $bedingung) use (&$ok, &$fehler) {
+            $bedingung ? $ok++ : $fehler++;
+            $this->stdout(($bedingung ? 'ok   ' : 'FEHL ') . "$was\n");
+        };
+        $imStream = function (?User $user, int $contentId): bool {
+            Yii::$app->user->switchIdentity($user);
+            $q = new \humhub\modules\dashboard\stream\DashboardStreamQuery(['user' => $user, 'limit' => 50, 'activity' => false]);
+            return in_array($contentId, array_map(fn($c) => (int)$c->id, $q->all()), true);
+        };
+        $tx = Yii::$app->db->beginTransaction();
+        try {
+            Yii::$app->user->switchIdentity($nutzer[0]);
+            $post = \humhub\modules\vorschlaege\models\Vorschlag::einreichen($space, new \humhub\modules\vorschlaege\models\VorschlagForm([
+                'titel' => 'TEST Übersicht', 'kategorie' => 'Sonstiges', 'text' => 'Nur ein Test für die Übersicht.']));
+            $id = (int)$post->content->id;
+            $leser = $nutzer[1];
+            $alt = $ue->getAusgeblendet($leser);
+            $pruefe('Standard: Bereich ist ausgeschaltet', in_array($space->guid, $alt, true));
+            $pruefe('Standard: Vorschlag nicht in der Übersicht', !$imStream($leser, $id));
+            $ue->setAusgeblendet($leser, array_values(array_diff($alt, [$space->guid])));
+            Yii::$app->cache->flush();
+            $pruefe('Eingeschaltet: Bereich nicht mehr ausgeblendet', !in_array($space->guid, $ue->getAusgeblendet($leser), true));
+            $pruefe('Eingeschaltet: Vorschlag in der Übersicht', $imStream($leser, $id));
+            $ue->setAusgeblendet($leser, array_merge($alt, [$space->guid]));
+            Yii::$app->cache->flush();
+            $pruefe('Wieder aus: Vorschlag nicht in der Übersicht', !$imStream($leser, $id));
+            $pruefe('Andere Bereiche unverändert', array_values(array_diff($ue->getAusgeblendet($leser), [$space->guid])) === array_values(array_diff($alt, [$space->guid])));
+            $pruefe('Gast: Vorschlag nicht in der Übersicht', !$imStream(null, $id));
+            $standard = $ue->standardAus;
+            $ue->standardAus = [];
+            $pruefe('Gegenprobe: ohne Standard-Aus sieht der Gast ihn', $imStream(null, $id));
+            $ue->standardAus = $standard;
+            $pruefe('Vorschlag selbst für Gäste sichtbar', $post->content->canView(null) || (int)$post->content->visibility === 1);
+        } catch (\Throwable $e) {
+            $fehler++;
+            $this->stderr("FEHL Ausnahme: " . $e->getMessage() . "\n" . $e->getTraceAsString() . "\n");
+        } finally {
+            $tx->rollBack();
+            Yii::$app->cache->flush();
+        }
+        $this->stdout("\n$ok ok, $fehler Fehler (alles zurückgerollt)\n");
+        return $fehler ? ExitCode::SOFTWARE : ExitCode::OK;
+    }
+
+    /**
      * Startliste des Gewerbeverzeichnisses: setup/gewerbe-import (idempotent, Status „offen“ mit Quelle)
      * Quelle: Liste „Gastronomie und Unterkünfte“ der Stadt (modules/gewerbe/data/start.json, ohne Personennamen und
      * private E-Mail-Adressen). Danach den Ort aller Betriebe ohne Kartenpunkt über Nominatim bestimmen (1 Abfrage/s).

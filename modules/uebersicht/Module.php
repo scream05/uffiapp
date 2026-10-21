@@ -13,13 +13,17 @@ use humhub\modules\user\models\User;
  * (jeweils nur für Personen, die den Beitrag ohnehin sehen dürfen). Liste als Moduleinstellung „ids“, neueste zuerst.
  *
  * „Meine Übersicht“: jede angemeldete Person schaltet Bereiche (Spaces) für ihre Übersicht an oder aus, unabhängig
- * von der Mitgliedschaft. Standard: alles an. Gespeichert wird nur, was ausgeschaltet ist (Benutzereinstellung
- * „ausgeblendet“, Space-GUIDs), damit neue Spaces automatisch an sind.
+ * von der Mitgliedschaft. Standard: alles an außer $standardAus. Gespeichert wird nur, was ausgeschaltet ist (Benutzereinstellung
+ * „ausgeblendet“, Space-GUIDs), damit neue Spaces automatisch an sind; eingeschaltete Bereiche aus $standardAus
+ * stehen in „eingeblendet“.
  */
 class Module extends \humhub\components\Module
 {
     /** Spaces ohne Beiträge im Stream (nur Kalender) – erscheinen nicht in „Meine Übersicht“ */
     public array $ohneSchalter = ['abfall-and-termine'];
+
+    /** Bereiche, die in der Übersicht standardmäßig aus sind (auch für Gäste); jede Person kann sie einschalten */
+    public array $standardAus = ['vorschlaege'];
 
     /** @return Space[] Bereiche, die die Person sehen und für die Übersicht wählen kann */
     public function getBereiche(User $user): array
@@ -28,24 +32,52 @@ class Module extends \humhub\components\Module
             ->andWhere(['not in', 'space.url', $this->ohneSchalter])->orderBy(['space.name' => SORT_ASC])->all();
     }
 
-    /** @return string[] GUIDs der ausgeschalteten Spaces */
+    /** @return string[] GUIDs der ausgeschalteten Spaces (eigene Wahl plus nicht eingeschaltete aus $standardAus) */
     public function getAusgeblendet(User $user): array
     {
-        $guids = json_decode((string)$this->settings->user($user)->get('ausgeblendet', '[]'), true);
-        return is_array($guids) ? array_values(array_filter($guids, 'is_string')) : [];
+        $guids = $this->leseListe($user, 'ausgeblendet');
+        $an = $this->leseListe($user, 'eingeblendet');
+        foreach ($this->standardAusGuids() as $guid) {
+            if (!in_array($guid, $an, true)) {
+                $guids[] = $guid;
+            }
+        }
+        return array_values(array_unique($guids));
     }
 
     /** Speichert die Auswahl und gleicht „Beiträge in der Übersicht“ der Mitgliedschaften an */
     public function setAusgeblendet(User $user, array $guids): void
     {
         $guids = array_values(array_unique(array_filter($guids, 'is_string')));
-        $this->settings->user($user)->set('ausgeblendet', json_encode($guids));
+        $standard = $this->standardAusGuids();
+        $this->settings->user($user)->set('ausgeblendet', json_encode(array_values(array_diff($guids, $standard))));
+        $this->settings->user($user)->set('eingeblendet', json_encode(array_values(array_diff($standard, $guids))));
         foreach (Membership::findAll(['user_id' => $user->id]) as $m) {
             $space = $m->space;
             if ($space && !in_array($space->url, $this->ohneSchalter, true)) {
                 $m->updateAttributes(['show_at_dashboard' => in_array($space->guid, $guids, true) ? 0 : 1]);
             }
         }
+    }
+
+    /** @return string[] */
+    private function standardAusGuids(): array
+    {
+        return $this->standardAus ? Space::find()->select('guid')->where(['url' => $this->standardAus])->column() : [];
+    }
+
+    /** @return int[] Content-Container-IDs von $standardAus (Übersicht der Gäste) */
+    public function standardAusContainerIds(): array
+    {
+        return $this->standardAus ? array_map('intval', Space::find()->select('contentcontainer_id')
+            ->where(['url' => $this->standardAus])->column()) : [];
+    }
+
+    /** @return string[] */
+    private function leseListe(User $user, string $name): array
+    {
+        $guids = json_decode((string)$this->settings->user($user)->get($name, '[]'), true);
+        return is_array($guids) ? array_values(array_filter($guids, 'is_string')) : [];
     }
 
     /** @return array{0: int[], 1: int[]} Content-Container-IDs der ein- und der ausgeschalteten Bereiche */
