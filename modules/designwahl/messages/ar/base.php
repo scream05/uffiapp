@@ -125,5 +125,6 @@ return [
     'Konto anlegen' => 'إنشاء حساب',
     'Bürgerplattform der Bürgerliste Uffenheim e. V. – kein Angebot der Stadt Uffenheim.' => 'منصة مدنية تديرها جمعية Bürgerliste Uffenheim e. V. – وليست خدمة تابعة لمدينة أوفنهايم.',
     'Wetter in Uffenheim' => 'الطقس في أوفنهايم',
+    'Ideen & Vorschläge' => 'أفكار واقتراحات',
     'Spritpreise' => 'أسعار الوقود',
 ];

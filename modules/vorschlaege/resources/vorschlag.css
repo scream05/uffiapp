@@ -1,0 +1,68 @@
+/* Ideen & Vorschläge – Farben wie das Status-Etikett des Mängelmelders (Stadtfarben, Design „Uffi frisch“) */
+.vs-status {
+    --vs-farbe: #446e88;
+    --vs-grund: #e3edf3;
+    --vs-text: #2b4a5f;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 1px 9px;
+    border-radius: 999px;
+    background: var(--vs-grund);
+    color: var(--vs-text);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.5;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+.vs-status .fa { font-size: 11px; color: var(--vs-farbe); }
+.vs-status-neu { --vs-farbe: #446e88; --vs-grund: #e3edf3; --vs-text: #2b4a5f; }
+.vs-status-pruefung { --vs-farbe: #b98a00; --vs-grund: #fbf0cc; --vs-text: #6b5000; }
+.vs-status-geplant { --vs-farbe: #7a4fa0; --vs-grund: #efe7f6; --vs-text: #4e2f6a; }
+.vs-status-arbeit { --vs-farbe: #0f7a9e; --vs-grund: #dcf0f7; --vs-text: #0a5470; }
+.vs-status-umgesetzt { --vs-farbe: #6a8f0c; --vs-grund: #eef5d9; --vs-text: #3f5606; }
+.vs-status-abgelehnt { --vs-farbe: #7f8c8d; --vs-grund: #eceff1; --vs-text: #4a5459; }
+
+[data-bs-theme="dark"] .vs-status { --vs-grund: rgba(255, 255, 255, .08); --vs-text: #e6edf2; }
+[data-bs-theme="dark"] .vs-status-neu { --vs-farbe: #7fa9c4; }
+[data-bs-theme="dark"] .vs-status-pruefung { --vs-farbe: #e0b030; }
+[data-bs-theme="dark"] .vs-status-geplant { --vs-farbe: #b48ad6; }
+[data-bs-theme="dark"] .vs-status-arbeit { --vs-farbe: #4fb3d6; }
+[data-bs-theme="dark"] .vs-status-umgesetzt { --vs-farbe: #a6cf2a; }
+
+/* Zeile unter dem Vorschlag */
+.vs-zeile { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 10px 0 4px; }
+.vs-seit, .vs-hinweis, .vs-formular-hinweis { color: var(--hh-text-color-soft, #6c757d); font-size: 13px; }
+.vs-stimmen { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.vs-stimmen form { display: inline; margin: 0; }
+.vs-knopf { padding: 2px 12px; border-radius: 999px; font-size: 13px; background: var(--hh-background-color-secondary, #f1f3f5);
+    border: 1px solid transparent; color: inherit; }
+.vs-knopf .vs-anzahl { font-weight: 700; margin-left: 2px; }
+.vs-knopf.vs-nur-zahl { cursor: default; }
+.vs-knopf-dafuer.vs-an { background: #eef5d9; border-color: #6a8f0c; color: #3f5606; }
+.vs-knopf-dagegen.vs-an { background: #f6e3e1; border-color: #a33b2f; color: #6e231b; }
+[data-bs-theme="dark"] .vs-knopf-dafuer.vs-an { background: rgba(166, 207, 42, .15); color: #d8eba0; }
+[data-bs-theme="dark"] .vs-knopf-dagegen.vs-an { background: rgba(220, 110, 95, .15); color: #f1c0b8; }
+.vs-aendern { font-size: 13px; }
+.vs-formular { flex-basis: 100%; display: none; margin-top: 4px; padding: 12px; border-radius: 16px;
+    background: var(--hh-background-color-secondary, #f8f9fa); }
+.vs-formular.offen { display: block; }
+.vs-formular .form-select, .vs-formular .form-control { margin-bottom: 8px; }
+.vs-formular-hinweis { margin-left: 10px; }
+
+/* Übersichtsseite */
+.vs-filter { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; }
+.vs-filter a { padding: 3px 12px; border-radius: 999px; font-size: 13px; background: var(--hh-background-color-secondary, #f1f3f5);
+    color: inherit; text-decoration: none; white-space: nowrap; }
+.vs-filter a.aktiv { background: var(--hh-accent-color, #1f5f8b); color: #fff; }
+.vs-liste { list-style: none; margin: 0; padding: 0; }
+.vs-eintrag { padding: 14px 0; border-top: 1px solid var(--hh-border-color, #e5e7eb); }
+.vs-eintrag:first-child { border-top: 0; }
+.vs-eintrag h2 { font-size: 1.05em; margin: 0 0 4px; line-height: 1.35; }
+.vs-eintrag h2 a { color: inherit; }
+.vs-meta { color: var(--hh-text-color-soft, #6c757d); font-size: 13px; }
+.vs-auszug { margin: 4px 0 0; }
+.vs-eintrag .vs-zeile { margin-bottom: 0; }
+.vs-kopf { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+.vs-kopf h1 { font-size: 1.4em; margin: 0; }

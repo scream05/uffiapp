@@ -1504,6 +1504,169 @@ class SetupController extends Controller
     }
 
     /**
+     * Space „Ideen & Vorschläge“ (url vorschlaege) mit Modul vorschlaege: setup/vorschlaege (idempotent).
+     * Startseite ist die Übersicht; Beiträge entstehen nur über „Vorschlag einreichen“, kommentieren dürfen alle Angemeldeten.
+     */
+    public function actionVorschlaege($ownerUsername = 'admin')
+    {
+        $space = Space::findOne(['url' => 'vorschlaege']);
+        if ($space === null) {
+            // Nur diesen Space anlegen – nicht actionSpaces(), das bewusst gelöschte Spaces wieder anlegen würde
+            $owner = User::findOne(['username' => $ownerUsername]);
+            if ($owner === null) {
+                $this->stderr("User $ownerUsername not found\n");
+                return ExitCode::DATAERR;
+            }
+            Yii::$app->user->switchIdentity($owner);
+            $space = new Space();
+            $space->scenario = Space::SCENARIO_CREATE;
+            $space->name = 'Ideen & Vorschläge';
+            $space->description = 'Ideen für die Plattform einreichen, kommentieren und abstimmen.';
+            $space->color = '#7a4fa0';
+            $space->visibility = Space::VISIBILITY_ALL;
+            $space->join_policy = Space::JOIN_POLICY_FREE;
+            $space->auto_add_new_members = 0;
+            if (!$space->save()) {
+                $this->stderr('! ' . json_encode($space->getErrors(), JSON_UNESCAPED_UNICODE) . "\n");
+                return ExitCode::DATAERR;
+            }
+            if ($space->url !== 'vorschlaege') {
+                $space->updateAttributes(['url' => 'vorschlaege']);
+            }
+            $this->stdout("+ {$space->name}\n");
+        }
+        if (!$space->moduleManager->isEnabled('vorschlaege')) {
+            $space->moduleManager->enable('vorschlaege');
+            $this->stdout("+ vorschlaege im Space {$space->name}\n");
+        }
+        $space->visibility = Space::VISIBILITY_ALL;
+        $space->default_content_visibility = 1;
+        $space->save(false);
+        $start = $space->createUrl('/vorschlaege/vorschlag/index');
+        $space->getSettings()->set('indexUrl', $start);
+        $space->getSettings()->set('indexGuestUrl', $start);
+        $this->stdout("Startseite: $start\n");
+        $this->actionKeineBeitraege('vorschlaege');
+        $space->permissionManager->setGroupState(Space::USERGROUP_MEMBER,
+            new \humhub\modules\space\permissions\InviteUsers(), \humhub\libs\BasePermission::STATE_DENY);
+        Yii::$app->cache->flush();
+        return ExitCode::OK;
+    }
+
+    /**
+     * Selbsttest Ideen & Vorschläge (setup/vorschlaege-test): Einreichen als normales Konto (kein Mitglied), Abstimmen,
+     * Zurücknehmen, Sperren für eigene/abgeschlossene, Stand setzen mit Kommentar, Übersicht und Addon rendern.
+     * Alles in einer Transaktion mit Rollback, ohne Glocke.
+     */
+    public function actionVorschlaegeTest()
+    {
+        $modul = Yii::$app->getModule('vorschlaege');
+        $modul->benachrichtigen = false;
+        $sprache = Yii::$app->language;
+        Yii::$app->language = 'de';
+        $space = $modul->getSpace();
+        $admin = User::findOne(['username' => 'admin']);
+        $nutzer = User::find()->active()->andWhere(['!=', 'id', $admin->id])->all();
+        $nutzer = array_values(array_filter($nutzer, fn($u) => !$u->isSystemAdmin() && !$space->isMember($u->id)));
+        if (count($nutzer) < 1) {
+            $this->stderr("Kein normales Konto ohne Mitgliedschaft gefunden\n");
+            return ExitCode::DATAERR;
+        }
+        $ok = 0;
+        $fehler = 0;
+        $pruefe = function (string $was, bool $bedingung) use (&$ok, &$fehler) {
+            $bedingung ? $ok++ : $fehler++;
+            $this->stdout(($bedingung ? 'ok   ' : 'FEHL ') . "$was\n");
+        };
+        $tx = Yii::$app->db->beginTransaction();
+        try {
+            Yii::$app->user->switchIdentity($nutzer[0]);
+            $form = new \humhub\modules\vorschlaege\models\VorschlagForm(['titel' => 'TEST Abfuhrtermine als Kalender-Abo',
+                'kategorie' => 'Neue Funktion', 'text' => 'Bitte die Abfuhrtermine als iCal-Abo anbieten.']);
+            $pruefe('Formular gültig', $form->validate());
+            $kurz = new \humhub\modules\vorschlaege\models\VorschlagForm(['titel' => 'x', 'kategorie' => 'Quatsch', 'text' => '']);
+            $pruefe('Formular lehnt leere/ungültige Eingaben ab', !$kurz->validate() && count($kurz->getErrors()) === 3);
+            $post = \humhub\modules\vorschlaege\models\Vorschlag::einreichen($space, $form);
+            $v = \humhub\modules\vorschlaege\models\Vorschlag::findOne(['content_id' => $post->content->id]);
+            $pruefe('Beitrag + Vorschlag angelegt (Nicht-Mitglied)', $v !== null && $v->status === 'neu');
+            $pruefe('Beitrag öffentlich im Space', (int)$post->content->visibility === \humhub\modules\content\models\Content::VISIBILITY_PUBLIC
+                && (int)$post->content->contentcontainer_id === (int)$space->contentcontainer_id);
+            $pruefe('Beitragstext mit Titel', str_starts_with($post->message, '**TEST Abfuhrtermine'));
+            $html = \humhub\modules\vorschlaege\widgets\VorschlagAddon::abstimmung($v, null, 0);
+            $pruefe('Verfasser sieht keine Abstimm-Knöpfe', !str_contains($html, '<form') && str_contains($html, 'vs-nur-zahl'));
+
+            Yii::$app->user->switchIdentity($admin);
+            $S = \humhub\modules\vorschlaege\models\Stimme::class;
+            $pruefe('Stimme dafür', $S::setzen($v->content_id, $admin->id, 1) === 1);
+            $pruefe('Summe 1/0', ($S::summen([$v->content_id])[$v->content_id] ?? null) === ['dafuer' => 1, 'dagegen' => 0]);
+            $pruefe('Wechsel zu dagegen', $S::setzen($v->content_id, $admin->id, -1) === -1
+                && $S::summen([$v->content_id])[$v->content_id] === ['dafuer' => 0, 'dagegen' => 1]);
+            $pruefe('Nochmal dagegen = zurückgenommen', $S::setzen($v->content_id, $admin->id, -1) === 0
+                && !isset($S::summen([$v->content_id])[$v->content_id]));
+            $S::setzen($v->content_id, $admin->id, 1);
+            $pruefe('Eigene Stimme gefunden', ($S::meine([$v->content_id])[$v->content_id] ?? 0) === 1);
+            $html = \humhub\modules\vorschlaege\widgets\VorschlagAddon::abstimmung($v, $S::summen([$v->content_id])[$v->content_id], 1);
+            $pruefe('Andere sehen Knöpfe, Dafür markiert', substr_count($html, '<form') === 2 && str_contains($html, 'vs-knopf-dafuer vs-an'));
+
+            $pruefe('Admin darf Stand setzen', \humhub\modules\vorschlaege\models\Vorschlag::canManage());
+            $kommentare = \humhub\modules\comment\models\Comment::find()->where(['object_model' => \humhub\modules\post\models\Post::class, 'object_id' => $post->id])->count();
+            $pruefe('Stand „Geplant“ gesetzt', $v->statusSetzen('geplant', 'kommt im November'));
+            $c = \humhub\modules\comment\models\Comment::find()->where(['object_model' => \humhub\modules\post\models\Post::class, 'object_id' => $post->id])
+                ->orderBy(['id' => SORT_DESC])->one();
+            $pruefe('Kommentar zum Stand', $c !== null && (int)$kommentare + 1 === (int)\humhub\modules\comment\models\Comment::find()
+                ->where(['object_model' => \humhub\modules\post\models\Post::class, 'object_id' => $post->id])->count()
+                && $c->message === '**Stand: Geplant** – kommt im November');
+            $pruefe('Gleicher Stand ohne Hinweis = keine Änderung', !$v->statusSetzen('geplant', ''));
+            $v->statusSetzen('umgesetzt', null);
+            $html = \humhub\modules\vorschlaege\widgets\VorschlagAddon::abstimmung($v, null, 0);
+            $pruefe('Abgeschlossen: keine Knöpfe', !str_contains($html, '<form') && str_contains($html, 'vs-nur-zahl'));
+            $v->statusSetzen('neu', null);
+
+            Yii::$app->user->switchIdentity($nutzer[0]);
+            $pruefe('Normales Konto darf Stand nicht setzen', !\humhub\modules\vorschlaege\models\Vorschlag::canManage());
+            $pruefe('Normales Konto darf kommentieren', $space->permissionManager->can(\humhub\modules\comment\permissions\CreateComment::class));
+            $addon = \humhub\modules\vorschlaege\widgets\VorschlagAddon::widget(['vorschlag' => $v]);
+            $pruefe('Addon gerendert ohne Stand-Formular', str_contains($addon, 'vs-status-neu') && !str_contains($addon, 'vs-formular'));
+            Yii::$app->user->switchIdentity($admin);
+            $addon = \humhub\modules\vorschlaege\widgets\VorschlagAddon::widget(['vorschlag' => $v]);
+            $pruefe('Addon für Admin mit Stand-Formular', str_contains($addon, 'vs-formular'));
+
+            // Übersicht wie im Controller (Sortierung nach Stimmen)
+            $liste = \humhub\modules\vorschlaege\models\Vorschlag::find()->alias('v')->innerJoinWith('content c')
+                ->where(['c.contentcontainer_id' => $space->contentcontainer_id])->all();
+            $seite = Yii::$app->view->renderFile('@vorschlaege/views/vorschlag/index.php', ['module' => $modul, 'space' => $space,
+                'vorschlaege' => $liste, 'summen' => $S::summen([$v->content_id]), 'meine' => $S::meine([$v->content_id]),
+                'kommentare' => [$post->id => 2], 'anzahl' => ['neu' => 1], 'stand' => 'offen', 'sortierung' => 'stimmen']);
+            $pruefe('Übersicht gerendert', str_contains($seite, 'TEST Abfuhrtermine') && str_contains($seite, '2 Kommentare')
+                && str_contains($seite, 'Bitte die Abfuhrtermine'));
+            $leer = Yii::$app->view->renderFile('@vorschlaege/views/vorschlag/index.php', ['module' => $modul, 'space' => $space,
+                'vorschlaege' => [], 'summen' => [], 'meine' => [], 'kommentare' => [], 'anzahl' => [], 'stand' => 'offen', 'sortierung' => 'neu']);
+            $pruefe('Leere Übersicht', str_contains($leer, 'mach den Anfang'));
+            Yii::$app->language = 'en-US';
+            $en = Yii::$app->view->renderFile('@vorschlaege/views/vorschlag/index.php', ['module' => $modul, 'space' => $space,
+                'vorschlaege' => [], 'summen' => [], 'meine' => [], 'kommentare' => [], 'anzahl' => [], 'stand' => 'offen', 'sortierung' => 'neu']);
+            $pruefe('Übersetzung Englisch', str_contains($en, 'No suggestions yet') && \humhub\modules\vorschlaege\models\Vorschlag::anzeigeLabel('geplant') === 'Planned');
+            Yii::$app->language = 'de';
+            $neu = Yii::$app->view->renderFile('@vorschlaege/views/vorschlag/create.php', ['form' => $form, 'space' => $space, 'module' => $modul]);
+            $pruefe('Formularseite gerendert', str_contains($neu, 'VorschlagForm[titel]'));
+            $post->delete();
+            $pruefe('Gelöschter Beitrag fällt aus der Übersicht', !\humhub\modules\vorschlaege\models\Vorschlag::find()->alias('v')
+                ->innerJoinWith('content c')->where(['v.content_id' => $v->content_id, 'c.state' => \humhub\modules\content\models\Content::STATE_PUBLISHED])->exists());
+            \humhub\modules\content\models\Content::findOne($v->content_id)->hardDelete();
+            $pruefe('Endgültiges Löschen entfernt Vorschlag und Stimmen', \humhub\modules\vorschlaege\models\Vorschlag::findOne($v->content_id) === null
+                && !$S::find()->where(['content_id' => $v->content_id])->exists());
+        } catch (\Throwable $e) {
+            $fehler++;
+            $this->stderr("FEHL Ausnahme: " . $e->getMessage() . "\n" . $e->getTraceAsString() . "\n");
+        } finally {
+            $tx->rollBack();
+            Yii::$app->language = $sprache;
+        }
+        $this->stdout("\n$ok ok, $fehler Fehler (alles zurückgerollt)\n");
+        return $fehler ? ExitCode::SOFTWARE : ExitCode::OK;
+    }
+
+    /**
      * Startliste des Gewerbeverzeichnisses: setup/gewerbe-import (idempotent, Status „offen“ mit Quelle)
      * Quelle: Liste „Gastronomie und Unterkünfte“ der Stadt (modules/gewerbe/data/start.json, ohne Personennamen und
      * private E-Mail-Adressen). Danach den Ort aller Betriebe ohne Kartenpunkt über Nominatim bestimmen (1 Abfrage/s).

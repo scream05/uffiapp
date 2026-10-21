@@ -1,0 +1,10 @@
+{
+  "id": "vorschlaege",
+  "name": "Ideen & Vorschläge",
+  "description": "Verbesserungsvorschläge für die Plattform einreichen, kommentieren und abstimmen; Admins setzen den Bearbeitungsstand.",
+  "keywords": ["vorschläge", "ideen", "abstimmung"],
+  "version": "0.1.0",
+  "humhub": {
+    "minVersion": "1.18"
+  }
+}
