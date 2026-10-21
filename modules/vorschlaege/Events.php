@@ -38,6 +38,23 @@ class Events
         }
     }
 
+    /** Fußzeile (beide Designs, auch Anmeldeseite): Link zur Übersicht, vor „Quellcode“ */
+    public static function onFooterMenuInit($event)
+    {
+        try {
+            $space = Yii::$app->getModule('vorschlaege')->getSpace();
+            if ($space !== null) {
+                $event->sender->addEntry(new \humhub\modules\ui\menu\MenuLink([
+                    'label' => Yii::t('VorschlaegeModule.base', 'Ideen & Vorschläge'),
+                    'url' => $space->createUrl('/vorschlaege/vorschlag/index'),
+                    'sortOrder' => 890,
+                ]));
+            }
+        } catch (\Throwable $e) {
+            Yii::error($e, 'vorschlaege');
+        }
+    }
+
     public static function onSpaceMenuInit($event)
     {
         try {
