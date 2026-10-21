@@ -25,6 +25,8 @@ services:
       - ./design/imagemagick-policy.xml:/etc/ImageMagick-7/policy.xml:ro
       # PHP-Grenzen für Uploads (Standard 2 MB je Datei war für Handyfotos zu klein)
       - ./design/php-uploads.ini:/usr/local/etc/php/conf.d/zz-uploads.ini:ro
+      # Abhilfe CVE-2026-109618/109619 (memory_limit -1, kein Upload-Fortschritt), siehe Datei
+      - ./design/php-sicherheit.ini:/usr/local/etc/php/conf.d/zzz-sicherheit.ini:ro
       # Eigenes Modul aus diesem Repo (KI-Assistent, Claude)
       - ./modules/ki-assistent:/data/modules/ki-assistent:ro
       - ./modules/maengelmelder:/data/modules/maengelmelder:ro
@@ -60,6 +62,14 @@ services:
       - 'HUMHUB_WEB_CONFIG__COMPONENTS__REQUEST__TRUSTED_HOSTS=["192.168.178.0/24"]'
       - HUMHUB_WEB_CONFIG__COMPONENTS__REQUEST__SECURE_PORT=443
       - CLAUDE_MODEL=${CLAUDE_MODEL:-claude-haiku-5-5}
+      # Anfragekörper schon im Webserver begrenzen (passend zu post_max_size, auch ohne Content-Length)
+      - |
+        CADDY_SERVER_EXTRA_DIRECTIVES=request_body {
+        	max_size 64MB
+        }
+    # Ersetzt PHPs memory_limit (seit CVE-2026-109618 auf -1): Ausreißer beendet nur den Prozess, supervisord startet neu
+    mem_limit: 1200m
+    memswap_limit: 1200m
     logging:
       driver: json-file
       options:
