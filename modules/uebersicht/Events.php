@@ -13,7 +13,7 @@ class Events
 {
     /** Module dieses Projekts, deren Benutzereinstellungen beim Löschen eines Kontos mit gelöscht werden */
     public const EIGENE_MODULE = ['abfuhr', 'designwahl', 'uebersicht', 'ki-assistent', 'vereine', 'maengelmelder',
-        'mitteilungsblatt', 'notdienst', 'whatsapp', 'facebook'];
+        'mitteilungsblatt', 'notdienst', 'whatsapp', 'facebook', 'neuigkeiten'];
 
     public static function onUserLoeschen($event)
     {

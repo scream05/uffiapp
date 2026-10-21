@@ -1,0 +1,812 @@
+{
+    "ideen-vorschlaege": {
+        "en": {
+            "titel": "Ideas & Suggestions",
+            "text": "What's missing on the platform, and what could work better? Submit your idea, vote for or against others, and join the discussion. We always show the current status so you can see what comes of it. You'll find this section at the very bottom, under Imprint and Privacy.",
+            "quelle": "0d5edb419a0eb93a470f06420f788a0e8c891120"
+        },
+        "uk": {
+            "titel": "Ідеї та пропозиції",
+            "text": "Чого тобі бракує на платформі, що могло б працювати краще? Додай свою ідею, підтримай або відхили ідеї інших і обговори їх. Ми показуємо поточний стан, щоб ти бачив, що з цього виходить. Цей розділ знайдеш унизу, поруч із Impressum und Datenschutz.",
+            "quelle": "0d5edb419a0eb93a470f06420f788a0e8c891120"
+        },
+        "ar": {
+            "titel": "أفكار واقتراحات",
+            "text": "ما الذي تفتقده في المنصة، وما الذي يمكن أن يعمل بشكل أفضل؟ أرسل فكرتك، وصوّت لصالح أفكار الآخرين أو ضدها، وناقش معهم. نعرض في كل مرة الحالة الحالية، حتى ترى ماذا سيصبح منها. تجد هذا القسم في الأسفل بجانب الدمغة القانونية وحماية البيانات.",
+            "quelle": "0d5edb419a0eb93a470f06420f788a0e8c891120"
+        },
+        "tr": {
+            "titel": "Fikirler ve Öneriler",
+            "text": "Platformda neyin eksik olduğunu, neyin daha iyi çalışabileceğini düşünüyorsun? Fikrini paylaş, başkalarının fikirlerine destek ver veya karşı çık ve tartışmaya katıl. Her fikrin durumunu gösteriyoruz, böylece ne olduğunu takip edebilirsin. Bu bölümü en altta, Künye (Impressum) ve Gizlilik (Datenschutz) bağlantılarının yanında bulabilirsin.",
+            "quelle": "0d5edb419a0eb93a470f06420f788a0e8c891120"
+        },
+        "ru": {
+            "titel": "Идеи и предложения",
+            "text": "Чего тебе не хватает на платформе, что могло бы работать лучше? Предложи свою идею, голосуй за или против идей других и обсуждай их. Мы показываем текущий статус каждой идеи, чтобы ты видел, что из неё получается. Раздел находится внизу страницы, рядом с Impressum и Datenschutz.",
+            "quelle": "0d5edb419a0eb93a470f06420f788a0e8c891120"
+        }
+    },
+    "neuigkeiten": {
+        "en": {
+            "titel": "What's New",
+            "text": "On this page you can see what's new and what we've improved or fixed. We also briefly explain new features to you on the home page.",
+            "quelle": "15ff4441d2c2cb5b7ce1a4643019c60f939af8ff"
+        },
+        "uk": {
+            "titel": "Новини",
+            "text": "На цій сторінці ти бачиш, що нового і що ми покращили або виправили. Нові функції ми також коротко пояснюємо на головній сторінці.",
+            "quelle": "15ff4441d2c2cb5b7ce1a4643019c60f939af8ff"
+        },
+        "ar": {
+            "titel": "الجديد",
+            "text": "في هذه الصفحة ترى ما هو جديد، وما الذي حسّنّاه أو أصلحناه. وسنشرح لك الميزات الجديدة باختصار مرة واحدة في الصفحة الرئيسية.",
+            "quelle": "15ff4441d2c2cb5b7ce1a4643019c60f939af8ff"
+        },
+        "tr": {
+            "titel": "Yenilikler",
+            "text": "Bu sayfada neyin yeni olduğunu, neyi iyileştirdiğimizi veya düzelttiğimizi görebilirsin. Yeni özellikleri ayrıca ana sayfada sana kısaca anlatıyoruz.",
+            "quelle": "15ff4441d2c2cb5b7ce1a4643019c60f939af8ff"
+        },
+        "ru": {
+            "titel": "Новости",
+            "text": "На этой странице ты видишь, что нового и что мы улучшили или исправили. О новых функциях мы коротко расскажем тебе на главной странице.",
+            "quelle": "15ff4441d2c2cb5b7ce1a4643019c60f939af8ff"
+        }
+    },
+    "notdienst-neustart": {
+        "en": {
+            "titel": "Emergency Pharmacy Rota After Maintenance",
+            "text": "After maintenance, the emergency pharmacies briefly went missing, including for Uffi. The data now stays intact even during maintenance work.",
+            "quelle": "15c77c9e5efff89a8f50282743f4d4bddb41c534"
+        },
+        "uk": {
+            "titel": "Аптеки чергової служби після технічного обслуговування",
+            "text": "Після технічного обслуговування на короткий час зникли аптеки чергової служби, у тому числі й у Uffi. Тепер дані зберігаються навіть під час робіт з обслуговування.",
+            "quelle": "15c77c9e5efff89a8f50282743f4d4bddb41c534"
+        },
+        "ar": {
+            "titel": "صيدليات الطوارئ بعد الصيانة",
+            "text": "بعد أعمال الصيانة اختفت صيدليات الطوارئ لفترة قصيرة، بما في ذلك عند أوفي. البيانات تبقى محفوظة الآن حتى أثناء أعمال الصيانة.",
+            "quelle": "15c77c9e5efff89a8f50282743f4d4bddb41c534"
+        },
+        "tr": {
+            "titel": "Nöbetçi eczane bakımdan sonra",
+            "text": "Bir bakımdan sonra nöbetçi eczaneler kısa süreliğine eksikti, Uffi'de de öyleydi. Veriler artık bakım çalışmalarında da korunuyor.",
+            "quelle": "15c77c9e5efff89a8f50282743f4d4bddb41c534"
+        },
+        "ru": {
+            "titel": "Аптеки ночного и выходного дежурства после технических работ",
+            "text": "После технических работ на некоторое время пропали данные об аптеках дежурства, в том числе у Uffi. Теперь данные сохраняются и во время технических работ.",
+            "quelle": "15c77c9e5efff89a8f50282743f4d4bddb41c534"
+        }
+    },
+    "spritpreise": {
+        "en": {
+            "titel": "Fuel Prices",
+            "text": "Current prices at the petrol stations around Uffenheim are shown on the home page. On their own page you can see all petrol stations within 15 km and, soon, the time of day when fuel is usually cheapest.",
+            "quelle": "5dad669c599e0961cf70ad98828d492f25a65ff1"
+        },
+        "uk": {
+            "titel": "Ціни на пальне",
+            "text": "Актуальні ціни на АЗС навколо Uffenheim є на головній сторінці. На окремій сторінці ти бачиш усі АЗС у радіусі 15 км, а незабаром також, о котрій годині заправлятися найдешевше.",
+            "quelle": "5dad669c599e0961cf70ad98828d492f25a65ff1"
+        },
+        "ar": {
+            "titel": "أسعار الوقود",
+            "text": "أسعار محطات الوقود حول أوفنهايم معروضة في الصفحة الرئيسية. في صفحتها الخاصة ترى جميع المحطات حتى مسافة 15 كم، وقريباً أيضاً الوقت الذي يكون فيه التزود بالوقود أرخص عادةً.",
+            "quelle": "5dad669c599e0961cf70ad98828d492f25a65ff1"
+        },
+        "tr": {
+            "titel": "Akaryakıt fiyatları",
+            "text": "Uffenheim çevresindeki istasyonların güncel fiyatları ana sayfada duruyor. Kendi sayfasında 15 km'ye kadar tüm istasyonları görebilirsin, yakında da genelde hangi saatte yakıtın en ucuz olduğunu öğreneceksin.",
+            "quelle": "5dad669c599e0961cf70ad98828d492f25a65ff1"
+        },
+        "ru": {
+            "titel": "Цены на топливо",
+            "text": "Актуальные цены на заправках в окрестностях Uffenheim есть на главной странице. На отдельной странице ты видишь все заправки в радиусе 15 км, а скоро также узнаешь, в какое время заправляться обычно выгоднее всего.",
+            "quelle": "5dad669c599e0961cf70ad98828d492f25a65ff1"
+        }
+    },
+    "handy-lasche": {
+        "en": {
+            "titel": "Emergency Services, Fuel Prices and Dates on Your Phone",
+            "text": "On your phone or tablet, you can pull out the boxes with emergency services, fuel prices and dates using the small tab on the right edge of the screen, instead of scrolling all the way down.",
+            "quelle": "85270612c2b4167c25d79642ffb45325c1272981"
+        },
+        "uk": {
+            "titel": "Чергові служби, ціни на пальне та події на телефоні",
+            "text": "На телефоні та планшеті витягуєш блоки з черговими службами, цінами на пальне та подіями через маленьку вкладку на правому краю екрана – не треба прокручувати до самого низу.",
+            "quelle": "85270612c2b4167c25d79642ffb45325c1272981"
+        },
+        "ar": {
+            "titel": "الصيدليات والوقود والمواعيد على الهاتف",
+            "text": "على الهاتف والجهاز اللوحي تستدعي بطاقات الطوارئ وأسعار الوقود والمواعيد عبر الزر الصغير على الحافة اليمنى للشاشة – بدلاً من التمرير إلى الأسفل.",
+            "quelle": "85270612c2b4167c25d79642ffb45325c1272981"
+        },
+        "tr": {
+            "titel": "Telefonda nöbetçi hizmetler, akaryakıt fiyatları ve randevular",
+            "text": "Telefonda ve tablette nöbetçi hizmetler, akaryakıt fiyatları ve randevular kutularını ekranın sağ kenarındaki küçük sekmeden açabilirsin. En aşağıya kaydırmana gerek kalmıyor.",
+            "quelle": "85270612c2b4167c25d79642ffb45325c1272981"
+        },
+        "ru": {
+            "titel": "Дежурные службы, цены на топливо и события на телефоне",
+            "text": "На телефоне и планшете блоки с дежурными службами, ценами на топливо и событиями выдвигаются с помощью маленькой вкладки у правого края экрана. Прокручивать вниз больше не нужно.",
+            "quelle": "85270612c2b4167c25d79642ffb45325c1272981"
+        }
+    },
+    "bekanntmachungen": {
+        "en": {
+            "titel": "Official Notices",
+            "text": "An overview of notices from the Mitteilungsblatt, with date, deadline and a link to the original page. The overview is unofficial; the official gazette remains binding.",
+            "quelle": "f520b50e2f4f5ee9220a2355f7b00c32f28a5651"
+        },
+        "uk": {
+            "titel": "Офіційні оголошення",
+            "text": "Огляд оголошень із Mitteilungsblatt із датою, терміном і посиланням на оригінальну сторінку. Цей огляд неофіційний, обов'язковим лишається офіційний Amtsblatt.",
+            "quelle": "f520b50e2f4f5ee9220a2355f7b00c32f28a5651"
+        },
+        "ar": {
+            "titel": "الإعلانات الرسمية",
+            "text": "نظرة عامة على الإعلانات من النشرة البلدية مع التاريخ والمهلة ورابط إلى الصفحة الأصلية. هذه النظرة العامة غير رسمية، والملزم هو الجريدة الرسمية.",
+            "quelle": "f520b50e2f4f5ee9220a2355f7b00c32f28a5651"
+        },
+        "tr": {
+            "titel": "Resmî duyurular",
+            "text": "Mitteilungsblatt'taki duyuruların tarih, son başvuru tarihi ve orijinal sayfaya bağlantısıyla bir listesi. Bu liste resmî değil, bağlayıcı olan Amtsblatt'tır.",
+            "quelle": "f520b50e2f4f5ee9220a2355f7b00c32f28a5651"
+        },
+        "ru": {
+            "titel": "Официальные объявления",
+            "text": "Обзор объявлений из Mitteilungsblatt с датой, сроком и ссылкой на оригинальную страницу. Обзор не является официальным, обязательной остаётся версия в Amtsblatt.",
+            "quelle": "f520b50e2f4f5ee9220a2355f7b00c32f28a5651"
+        }
+    },
+    "uffi-karten": {
+        "en": {
+            "titel": "Uffi Shows Places on the Map",
+            "text": "If you ask Uffi where something is or how to get there, you'll get buttons for OpenStreetMap and Google Maps.",
+            "quelle": "a0bad048d0085676a05d910b19387cf60f57dc5c"
+        },
+        "uk": {
+            "titel": "Uffi показує місця на карті",
+            "text": "Якщо запитуєш Uffi, де щось знаходиться або як туди доїхати, отримаєш кнопки до OpenStreetMap і Google Maps.",
+            "quelle": "a0bad048d0085676a05d910b19387cf60f57dc5c"
+        },
+        "ar": {
+            "titel": "أوفي يعرض الأماكن على الخريطة",
+            "text": "إذا سألت أوفي أين يوجد شيء أو كيف تصل إليه، ستحصل على أزرار لـ OpenStreetMap وGoogle Maps.",
+            "quelle": "a0bad048d0085676a05d910b19387cf60f57dc5c"
+        },
+        "tr": {
+            "titel": "Uffi yerleri haritada gösteriyor",
+            "text": "Uffi'ye bir yerin nerede olduğunu veya oraya nasıl gidebileceğini sorarsan, OpenStreetMap ve Google Maps düğmelerini görürsün.",
+            "quelle": "a0bad048d0085676a05d910b19387cf60f57dc5c"
+        },
+        "ru": {
+            "titel": "Uffi показывает места на карте",
+            "text": "Если спросишь Uffi, где что-то находится или как туда добраться, получишь кнопки для OpenStreetMap и Google Maps.",
+            "quelle": "a0bad048d0085676a05d910b19387cf60f57dc5c"
+        }
+    },
+    "kalender-heute": {
+        "en": {
+            "titel": "Calendar Starts on Today",
+            "text": "When you open the calendar, it jumps straight to today's date.",
+            "quelle": "97307cd87fc0995ce827c416471fb90235c6454a"
+        },
+        "uk": {
+            "titel": "Календар починається із сьогодні",
+            "text": "Календар під час відкриття одразу переходить до сьогоднішнього дня.",
+            "quelle": "97307cd87fc0995ce827c416471fb90235c6454a"
+        },
+        "ar": {
+            "titel": "التقويم يبدأ من اليوم",
+            "text": "عند فتح التقويم ينتقل مباشرة إلى اليوم الحالي.",
+            "quelle": "97307cd87fc0995ce827c416471fb90235c6454a"
+        },
+        "tr": {
+            "titel": "Takvim bugünle başlıyor",
+            "text": "Takvim açıldığında doğrudan bugüne gider.",
+            "quelle": "97307cd87fc0995ce827c416471fb90235c6454a"
+        },
+        "ru": {
+            "titel": "Календарь открывается на сегодняшнем дне",
+            "text": "При открытии календарь сразу переходит к сегодняшнему дню.",
+            "quelle": "97307cd87fc0995ce827c416471fb90235c6454a"
+        }
+    },
+    "mehrsprachig": {
+        "en": {
+            "titel": "Available in Six Languages",
+            "text": "The platform is now also available in English, Ukrainian, Arabic, Turkish and Russian. You set your language in your account, and Uffi replies in the language of your question.",
+            "quelle": "808f9bfb69dc91b7ca4e1f4e158593ac8986643c"
+        },
+        "uk": {
+            "titel": "Шість мов",
+            "text": "Платформа тепер доступна також англійською, українською, арабською, турецькою та російською. Мову налаштовуєш у своєму обліковому записі; Uffi відповідає мовою твого запитання.",
+            "quelle": "808f9bfb69dc91b7ca4e1f4e158593ac8986643c"
+        },
+        "ar": {
+            "titel": "بست لغات",
+            "text": "المنصة متاحة الآن أيضاً بالإنجليزية والأوكرانية والعربية والتركية والروسية. تضبط اللغة في حسابك؛ ويجيبك أوفي بلغة سؤالك.",
+            "quelle": "808f9bfb69dc91b7ca4e1f4e158593ac8986643c"
+        },
+        "tr": {
+            "titel": "Altı dilde",
+            "text": "Platform artık İngilizce, Ukraynaca, Arapça, Türkçe ve Rusça dillerinde de var. Dili hesabında ayarlayabilirsin; Uffi sorunun dilinde cevap verir.",
+            "quelle": "808f9bfb69dc91b7ca4e1f4e158593ac8986643c"
+        },
+        "ru": {
+            "titel": "На шести языках",
+            "text": "Платформа теперь доступна также на английском, украинском, арабском, турецком и русском языках. Язык ты выбираешь в своём аккаунте, а Uffi отвечает на языке твоего вопроса.",
+            "quelle": "808f9bfb69dc91b7ca4e1f4e158593ac8986643c"
+        }
+    },
+    "uffi-landkreis": {
+        "en": {
+            "titel": "Uffi Knows the District and Streets",
+            "text": "Uffi now also helps with bulky waste, recycling centres and district offices, and knows every street in Uffenheim and the districts.",
+            "quelle": "fc4a376380dfccccaad064265b4b6744571b29ae"
+        },
+        "uk": {
+            "titel": "Uffi знає район і вулиці",
+            "text": "Uffi тепер допомагає з великогабаритним сміттям, пунктами прийому вторинної сировини та установами району і знає всі вулиці Uffenheim і його частин.",
+            "quelle": "fc4a376380dfccccaad064265b4b6744571b29ae"
+        },
+        "ar": {
+            "titel": "أوفي يعرف الإدارة الإقليمية والشوارع",
+            "text": "يساعدك أوفي الآن أيضاً في شأن النفايات الكبيرة ومراكز إعادة التدوير ومكاتب منطقة الريف (Landkreis)، ويعرف جميع شوارع أوفنهايم والأحياء التابعة لها.",
+            "quelle": "fc4a376380dfccccaad064265b4b6744571b29ae"
+        },
+        "tr": {
+            "titel": "Uffi Landkreis'i ve sokakları biliyor",
+            "text": "Uffi artık büyük eşya çöpü, geri dönüşüm merkezleri ve Landkreis'in dairelerinde de yardımcı oluyor. Uffenheim'deki tüm sokakları ve köy mahallelerini de biliyor.",
+            "quelle": "fc4a376380dfccccaad064265b4b6744571b29ae"
+        },
+        "ru": {
+            "titel": "Uffi знает район и улицы",
+            "text": "Uffi теперь помогает с крупногабаритным мусором, пунктами приёма вторсырья (Wertstoffhöfe) и учреждениями района и знает все улицы Uffenheim и её районов.",
+            "quelle": "fc4a376380dfccccaad064265b4b6744571b29ae"
+        }
+    },
+    "editor": {
+        "en": {
+            "titel": "Familiar Editor",
+            "text": "You can write comments and messages with the familiar editor again, including attachments and @-mentions.",
+            "quelle": "a54be79b4e673ff5b1a83564418ad48883e6aa75"
+        },
+        "uk": {
+            "titel": "Звичний редактор",
+            "text": "Коментарі та повідомлення знову пишеш у звичному редакторі, з вкладеннями та згадками через @.",
+            "quelle": "a54be79b4e673ff5b1a83564418ad48883e6aa75"
+        },
+        "ar": {
+            "titel": "المحرر المألوف",
+            "text": "تكتب التعليقات والرسائل من جديد بالمحرر المألوف، مع المرفقات والإشارات بـ @.",
+            "quelle": "a54be79b4e673ff5b1a83564418ad48883e6aa75"
+        },
+        "tr": {
+            "titel": "Alışık olduğun editör",
+            "text": "Yorumları ve mesajları yine alışık olduğun editörle yazıyorsun; ekler ve @-etiketlemeler de kullanılabilir.",
+            "quelle": "a54be79b4e673ff5b1a83564418ad48883e6aa75"
+        },
+        "ru": {
+            "titel": "Привычный редактор",
+            "text": "Комментарии и сообщения снова пишутся в привычном редакторе, с вложениями и упоминаниями через @.",
+            "quelle": "a54be79b4e673ff5b1a83564418ad48883e6aa75"
+        }
+    },
+    "wetter": {
+        "en": {
+            "titel": "Weather Forecast",
+            "text": "Tap the weather in the greeting: you'll see the forecast for today and tomorrow, sunshine hours and official warnings from the German Weather Service (Deutscher Wetterdienst).",
+            "quelle": "be5268268b355764d246993bb62fec15a22822a3"
+        },
+        "uk": {
+            "titel": "Прогноз погоди",
+            "text": "Натисни в привітанні на погоду: побачиш прогноз на сьогодні й завтра, час сонця та офіційні попередження від Deutscher Wetterdienst.",
+            "quelle": "be5268268b355764d246993bb62fec15a22822a3"
+        },
+        "ar": {
+            "titel": "توقعات الطقس",
+            "text": "انقر في الترحيب على الطقس: سترى توقعات اليوم والغد وأوقات الشمس والتحذيرات الرسمية من هيئة الأرصاد الألمانية (Deutscher Wetterdienst).",
+            "quelle": "be5268268b355764d246993bb62fec15a22822a3"
+        },
+        "tr": {
+            "titel": "Hava durumu tahmini",
+            "text": "Karşılama ekranındaki hava durumuna göz at: Bugün ve yarın için tahmini, güneşlenme sürelerini ve Deutscher Wetterdienst'in resmî uyarılarını görürsün.",
+            "quelle": "be5268268b355764d246993bb62fec15a22822a3"
+        },
+        "ru": {
+            "titel": "Прогноз погоды",
+            "text": "Нажми на погоду в приветствии: там ты увидишь прогноз на сегодня и завтра, время солнечного сияния и официальные предупреждения Немецкой метеорологической службы (Deutscher Wetterdienst).",
+            "quelle": "be5268268b355764d246993bb62fec15a22822a3"
+        }
+    },
+    "wertstoffhof": {
+        "en": {
+            "titel": "Recycling Centre Opening Hours",
+            "text": "The waste calendar now shows the opening hours of the recycling centre and compost site in Uffenheim.",
+            "quelle": "ecaa4e6cecc2e9f3d48e6484b1a1119863aede56"
+        },
+        "uk": {
+            "titel": "Години роботи пункту прийому вторинної сировини",
+            "text": "У календарі вивезення відходів тепер вказано години роботи пункту прийому вторинної сировини та компостного майданчика Uffenheim.",
+            "quelle": "ecaa4e6cecc2e9f3d48e6484b1a1119863aede56"
+        },
+        "ar": {
+            "titel": "أوقات عمل مركز إعادة التدوير",
+            "text": "في تقويم النفايات تظهر الآن أوقات عمل مركز إعادة التدوير وموقع التسميد في أوفنهايم.",
+            "quelle": "ecaa4e6cecc2e9f3d48e6484b1a1119863aede56"
+        },
+        "tr": {
+            "titel": "Geri dönüşüm merkezinin çalışma saatleri",
+            "text": "Çöp takviminde artık Uffenheim geri dönüşüm merkezi ve kompost sahasının çalışma saatleri de yer alıyor.",
+            "quelle": "ecaa4e6cecc2e9f3d48e6484b1a1119863aede56"
+        },
+        "ru": {
+            "titel": "Часы работы пункта приёма вторсырья",
+            "text": "В календаре вывоза мусора теперь указаны часы работы пункта приёма вторсырья (Wertstoffhof) и компостной площадки (Kompostplatz) в Uffenheim.",
+            "quelle": "ecaa4e6cecc2e9f3d48e6484b1a1119863aede56"
+        }
+    },
+    "gutscheine": {
+        "en": {
+            "titel": "Vouchers",
+            "text": "Businesses in Uffenheim offer discount vouchers, which you redeem in the shop by scanning the QR code at the checkout.",
+            "quelle": "73a0c65380e265614391a1813977548170865689"
+        },
+        "uk": {
+            "titel": "Ваучери",
+            "text": "Підприємства з Uffenheim пропонують знижкові ваучери, які ти погашаєш у магазині через QR-код на касі.",
+            "quelle": "73a0c65380e265614391a1813977548170865689"
+        },
+        "ar": {
+            "titel": "القسائم",
+            "text": "تقدم متاجر أوفنهايم قسائم خصم، تستبدلها في المتجر عبر رمز QR عند الصندوق.",
+            "quelle": "73a0c65380e265614391a1813977548170865689"
+        },
+        "tr": {
+            "titel": "Hediye çekleri",
+            "text": "Uffenheim'daki işletmeler indirim kuponları sunuyor. Bunları mağazada kasadaki QR kodu okutarak kullanabilirsin.",
+            "quelle": "73a0c65380e265614391a1813977548170865689"
+        },
+        "ru": {
+            "titel": "Ваучеры",
+            "text": "Предприятия Uffenheim предлагают скидочные ваучеры, которые ты активируешь в магазине по QR-коду на кассе.",
+            "quelle": "73a0c65380e265614391a1813977548170865689"
+        }
+    },
+    "gewerbe": {
+        "en": {
+            "titel": "Business Directory",
+            "text": "Shops, restaurants, trades and service providers in Uffenheim, with opening hours, contact details and a map. Businesses can maintain their own page.",
+            "quelle": "483d930865a6bb1d9890917ce7d7b5f55c2d71da"
+        },
+        "uk": {
+            "titel": "Довідник підприємств",
+            "text": "Магазини, заклади харчування, ремісники та сервісні компанії Uffenheim з годинами роботи, контактами та картою. Підприємства можуть самі вести свою сторінку.",
+            "quelle": "483d930865a6bb1d9890917ce7d7b5f55c2d71da"
+        },
+        "ar": {
+            "titel": "دليل الأعمال",
+            "text": "المتاجر والمطاعم والحرف والخدمات في أوفنهايم مع أوقات العمل والاتصال والخريطة. تستطيع الشركات تحديث صفحاتها بنفسها.",
+            "quelle": "483d930865a6bb1d9890917ce7d7b5f55c2d71da"
+        },
+        "tr": {
+            "titel": "İşletme rehberi",
+            "text": "Uffenheim'daki dükkânlar, lokantalar, zanaatkârlar ve hizmet sağlayıcılar; çalışma saatleri, iletişim bilgileri ve haritayla. İşletmeler kendi sayfalarını kendileri güncelleyebilir.",
+            "quelle": "483d930865a6bb1d9890917ce7d7b5f55c2d71da"
+        },
+        "ru": {
+            "titel": "Справочник предприятий",
+            "text": "Магазины, рестораны и кафе, ремесленники и сервисные компании Uffenheim с часами работы, контактами и картой. Предприятия могут сами вести свою страницу.",
+            "quelle": "483d930865a6bb1d9890917ce7d7b5f55c2d71da"
+        }
+    },
+    "barrierefreiheit": {
+        "en": {
+            "titel": "Easier to Read and Use",
+            "text": "Stronger contrast, clearly visible focus when using the keyboard, and larger buttons.",
+            "quelle": "b2f32940a63f40fd8bf8b1ecfc359a6afe67f516"
+        },
+        "uk": {
+            "titel": "Краще читається і керується",
+            "text": "Сильніші контрасти, добре помітне виділення під час керування клавіатурою та більші кнопки.",
+            "quelle": "b2f32940a63f40fd8bf8b1ecfc359a6afe67f516"
+        },
+        "ar": {
+            "titel": "أسهل قراءةً واستخداماً",
+            "text": "تباينات أقوى، وتمييز واضح عند التنقل بلوحة المفاتيح، وأزرار أكبر.",
+            "quelle": "b2f32940a63f40fd8bf8b1ecfc359a6afe67f516"
+        },
+        "tr": {
+            "titel": "Daha iyi okunur ve kullanılır",
+            "text": "Daha güçlü kontrast, klavyeyle kullanırken iyi görünen işaretleme ve daha büyük düğmeler.",
+            "quelle": "b2f32940a63f40fd8bf8b1ecfc359a6afe67f516"
+        },
+        "ru": {
+            "titel": "Лучше читается и удобнее в использовании",
+            "text": "Более сильные контрасты, хорошо заметная подсветка при управлении с клавиатуры и более крупные кнопки.",
+            "quelle": "b2f32940a63f40fd8bf8b1ecfc359a6afe67f516"
+        }
+    },
+    "meine-uebersicht": {
+        "en": {
+            "titel": "My Overview",
+            "text": "In the profile menu, you choose which areas' posts appear on your home page.",
+            "quelle": "3e600ac5a18013f27f88b506b1d3dee7e4dccb4a"
+        },
+        "uk": {
+            "titel": "Мій огляд",
+            "text": "У меню профілю обираєш, з яких розділів дописи з'являтимуться на твоїй головній сторінці.",
+            "quelle": "3e600ac5a18013f27f88b506b1d3dee7e4dccb4a"
+        },
+        "ar": {
+            "titel": "نظرتي",
+            "text": "من قائمة الملف الشخصي تختار المجالات التي تظهر مساهماتها في صفحتك الرئيسية.",
+            "quelle": "3e600ac5a18013f27f88b506b1d3dee7e4dccb4a"
+        },
+        "tr": {
+            "titel": "Benim özetim",
+            "text": "Profil menüsünde, ana sayfanda hangi alanlardan gönderilerin görüneceğini seçebilirsin.",
+            "quelle": "3e600ac5a18013f27f88b506b1d3dee7e4dccb4a"
+        },
+        "ru": {
+            "titel": "Моя лента",
+            "text": "В меню профиля ты выбираешь, из каких разделов записи появляются на твоей главной странице.",
+            "quelle": "3e600ac5a18013f27f88b506b1d3dee7e4dccb4a"
+        }
+    },
+    "kalender-abo": {
+        "en": {
+            "titel": "Subscribe to the Calendar",
+            "text": "You can add events and collection dates to your phone's calendar as a subscription.",
+            "quelle": "0dab577df00975f2c51faaaa1525a816d02c1ed9"
+        },
+        "uk": {
+            "titel": "Підписка на календар",
+            "text": "Події та дати вивезення можна додати як підписку до календаря свого телефону.",
+            "quelle": "0dab577df00975f2c51faaaa1525a816d02c1ed9"
+        },
+        "ar": {
+            "titel": "الاشتراك في التقويم",
+            "text": "يمكنك الاشتراك في الفعاليات ومواعيد الجمع كاشتراك وإضافتها إلى تقويم هاتفك.",
+            "quelle": "0dab577df00975f2c51faaaa1525a816d02c1ed9"
+        },
+        "tr": {
+            "titel": "Takvime abone ol",
+            "text": "Etkinlikleri ve çöp toplama tarihlerini abonelik olarak telefonunun takvimine aktarabilirsin.",
+            "quelle": "0dab577df00975f2c51faaaa1525a816d02c1ed9"
+        },
+        "ru": {
+            "titel": "Подписка на календарь",
+            "text": "События и даты вывоза мусора можно добавить в календарь твоего телефона как подписку.",
+            "quelle": "0dab577df00975f2c51faaaa1525a816d02c1ed9"
+        }
+    },
+    "maengel-ohne-konto": {
+        "en": {
+            "titel": "Report Issues Without an Account",
+            "text": "You can report issues without logging in. If you like, we'll let you know by email or WhatsApp when the status changes.",
+            "quelle": "9b71c41b010ff91a2633e3eef0d05e2b6bbf8ab1"
+        },
+        "uk": {
+            "titel": "Недоліки без облікового запису",
+            "text": "Недоліки можна повідомляти й без реєстрації. За бажанням ми повідомимо тебе електронною поштою або через WhatsApp, якщо стан зміниться.",
+            "quelle": "9b71c41b010ff91a2633e3eef0d05e2b6bbf8ab1"
+        },
+        "ar": {
+            "titel": "الإبلاغ عن الأعطال دون حساب",
+            "text": "يمكنك الإبلاغ عن الأعطال أيضاً دون تسجيل. وإذا أردت، نخبرك بالبريد الإلكتروني أو واتساب عندما تتغير الحالة.",
+            "quelle": "9b71c41b010ff91a2633e3eef0d05e2b6bbf8ab1"
+        },
+        "tr": {
+            "titel": "Hesap olmadan sorun bildirme",
+            "text": "Sorunları giriş yapmadan da bildirebilirsin. İstersen durum değiştiğinde sana e-posta veya WhatsApp ile haber veririz.",
+            "quelle": "9b71c41b010ff91a2633e3eef0d05e2b6bbf8ab1"
+        },
+        "ru": {
+            "titel": "Сообщать о проблемах без аккаунта",
+            "text": "О проблемах можно сообщать и без регистрации. По желанию мы сообщим тебе по электронной почте или в WhatsApp, если статус изменится.",
+            "quelle": "9b71c41b010ff91a2633e3eef0d05e2b6bbf8ab1"
+        }
+    },
+    "mitteilungsblatt": {
+        "en": {
+            "titel": "Mitteilungsblatt",
+            "text": "All issues of the Mitteilungsblatt (official town newsletter) to read and search, with an archive of older issues.",
+            "quelle": "a6c9fc2b9a5bafe091b531bd25cbf552947bfd1a"
+        },
+        "uk": {
+            "titel": "Mitteilungsblatt",
+            "text": "Усі випуски Mitteilungsblatt для читання та пошуку, з архівом старіших випусків.",
+            "quelle": "a6c9fc2b9a5bafe091b531bd25cbf552947bfd1a"
+        },
+        "ar": {
+            "titel": "النشرة البلدية",
+            "text": "جميع أعداد النشرة البلدية للقراءة والبحث، مع أرشيف للأعداد السابقة.",
+            "quelle": "a6c9fc2b9a5bafe091b531bd25cbf552947bfd1a"
+        },
+        "tr": {
+            "titel": "Mitteilungsblatt",
+            "text": "Mitteilungsblatt'ın tüm sayıları okunabilir ve aranabilir; eski sayılar da arşivde.",
+            "quelle": "a6c9fc2b9a5bafe091b531bd25cbf552947bfd1a"
+        },
+        "ru": {
+            "titel": "Mitteilungsblatt",
+            "text": "Все выпуски Mitteilungsblatt для чтения и поиска, с архивом старых выпусков.",
+            "quelle": "a6c9fc2b9a5bafe091b531bd25cbf552947bfd1a"
+        }
+    },
+    "gastzugang-uffi": {
+        "en": {
+            "titel": "Uffi and Reading Without an Account",
+            "text": "You can read the platform without an account. Our AI assistant Uffi answers questions about Uffenheim, via the button at the bottom right of every page.",
+            "quelle": "cba11fca6499bd4e691ba07d5a2d5aa1351d92d5"
+        },
+        "uk": {
+            "titel": "Uffi і читання без облікового запису",
+            "text": "Платформу можна читати й без облікового запису. Наш ШІ-асистент Uffi відповідає на запитання про Uffenheim – через кнопку внизу праворуч на кожній сторінці.",
+            "quelle": "cba11fca6499bd4e691ba07d5a2d5aa1351d92d5"
+        },
+        "ar": {
+            "titel": "أوفي والقراءة دون حساب",
+            "text": "يمكنك قراءة المنصة أيضاً دون حساب. مساعدنا الذكي أوفي يجيب عن أسئلة حول أوفنهايم – عبر الزر في الأسفل على اليمين في كل صفحة.",
+            "quelle": "cba11fca6499bd4e691ba07d5a2d5aa1351d92d5"
+        },
+        "tr": {
+            "titel": "Uffi ve hesapsız okuma",
+            "text": "Platformu hesap açmadan da okuyabilirsin. Yapay zekâ asistanımız Uffi, Uffenheim hakkındaki soruları yanıtlar; her sayfada sağ alttaki düğmeden ulaşabilirsin.",
+            "quelle": "cba11fca6499bd4e691ba07d5a2d5aa1351d92d5"
+        },
+        "ru": {
+            "titel": "Uffi и чтение без аккаунта",
+            "text": "Платформу можно читать и без аккаунта. Наш ИИ-ассистент Uffi отвечает на вопросы об Uffenheim – через кнопку внизу справа на каждой странице.",
+            "quelle": "cba11fca6499bd4e691ba07d5a2d5aa1351d92d5"
+        }
+    },
+    "design-uffi-frisch": {
+        "en": {
+            "titel": "New Look",
+            "text": "New design in the town's colours, with a greeting, weather and the bar at the bottom on mobile.",
+            "quelle": "343ebe33b26d015c5b17d53529f56d0d56687056"
+        },
+        "uk": {
+            "titel": "Новий вигляд",
+            "text": "Новий дизайн у кольорах міста, з привітанням, погодою та панеллю внизу на телефоні.",
+            "quelle": "343ebe33b26d015c5b17d53529f56d0d56687056"
+        },
+        "ar": {
+            "titel": "مظهر جديد",
+            "text": "تصميم جديد بألوان المدينة، مع الترحيب والطقس والشريط السفلي على الهاتف.",
+            "quelle": "343ebe33b26d015c5b17d53529f56d0d56687056"
+        },
+        "tr": {
+            "titel": "Yeni görünüm",
+            "text": "Kentin renklerinde yeni tasarım; karşılama ekranı, hava durumu ve telefondaki alt menü ile.",
+            "quelle": "343ebe33b26d015c5b17d53529f56d0d56687056"
+        },
+        "ru": {
+            "titel": "Новый вид",
+            "text": "Новый дизайн в цветах города с приветствием, погодой и панелью внизу на телефоне.",
+            "quelle": "343ebe33b26d015c5b17d53529f56d0d56687056"
+        }
+    },
+    "notdienste": {
+        "en": {
+            "titel": "Emergency Services",
+            "text": "Emergency numbers and the nearest emergency pharmacies at a glance, also on the home page.",
+            "quelle": "1158ed6e3a79f12d64413914a36d7e68beb37c98"
+        },
+        "uk": {
+            "titel": "Чергові служби",
+            "text": "Номери екстрених служб і найближчі аптеки чергової служби одним поглядом, також на головній сторінці.",
+            "quelle": "1158ed6e3a79f12d64413914a36d7e68beb37c98"
+        },
+        "ar": {
+            "titel": "الطوارئ",
+            "text": "أرقام الطوارئ وصيدليات الطوارئ القريبة في نظرة واحدة، أيضاً في الصفحة الرئيسية.",
+            "quelle": "1158ed6e3a79f12d64413914a36d7e68beb37c98"
+        },
+        "tr": {
+            "titel": "Nöbetçi hizmetler",
+            "text": "Acil çağrı numaraları ve en yakın nöbetçi eczaneler bir bakışta, ana sayfada da.",
+            "quelle": "1158ed6e3a79f12d64413914a36d7e68beb37c98"
+        },
+        "ru": {
+            "titel": "Дежурные службы",
+            "text": "Номера экстренных служб и ближайшие аптеки дежурства на одном экране, в том числе на главной странице.",
+            "quelle": "1158ed6e3a79f12d64413914a36d7e68beb37c98"
+        }
+    },
+    "abfuhr-erinnerung": {
+        "en": {
+            "titel": "Collection Reminder",
+            "text": "Get reminded the evening before or the morning of collection day – for the town centre or your district, and only for the bins you choose.",
+            "quelle": "9a936951238c2c256a81e6c5ac6dede14e863f2d"
+        },
+        "uk": {
+            "titel": "Нагадування про вивезення",
+            "text": "Отримуй нагадування напередодні ввечері або вранці про контейнери – для центру міста або окремої частини району і лише для тих контейнерів, які тобі потрібні.",
+            "quelle": "9a936951238c2c256a81e6c5ac6dede14e863f2d"
+        },
+        "ar": {
+            "titel": "تذكير بموعد الجمع",
+            "text": "دعنا نذكرك مساء اليوم السابق أو صباحاً بالحاويات – للمدينة أو الحي، وفقط للحاويات التي تريدها.",
+            "quelle": "9a936951238c2c256a81e6c5ac6dede14e863f2d"
+        },
+        "tr": {
+            "titel": "Çöp toplama hatırlatıcısı",
+            "text": "Bir gün önce akşam veya sabah çöp kutularını hatırlatmasını isteyebilirsin. Şehir merkezi veya köy mahallesi için ayarlayabilir, sadece istediğin kutular için hatırlatma alabilirsin.",
+            "quelle": "9a936951238c2c256a81e6c5ac6dede14e863f2d"
+        },
+        "ru": {
+            "titel": "Напоминание о вывозе мусора",
+            "text": "Получай напоминание накануне вечером или утром о том, что нужно выставить мусорные баки – для центра города или района и только для тех баков, которые тебе нужны.",
+            "quelle": "9a936951238c2c256a81e6c5ac6dede14e863f2d"
+        }
+    },
+    "betrifft-mich-auch": {
+        "en": {
+            "titel": "Affects Me Too",
+            "text": "When reporting, you can see reports nearby and join one with \"Affects me too\", instead of reporting the same issue again.",
+            "quelle": "a49592f841d8f19374ba4a7a4415e88254f984ca"
+        },
+        "uk": {
+            "titel": "Мене це теж стосується",
+            "text": "Під час повідомлення бачиш звернення поблизу і можеш приєднатися кнопкою „Betrifft mich auch“, замість того щоб повідомляти той самий недолік ще раз.",
+            "quelle": "a49592f841d8f19374ba4a7a4415e88254f984ca"
+        },
+        "ar": {
+            "titel": "يهمني أيضاً",
+            "text": "عند الإبلاغ ترى بلاغات قريبة، ويمكنك الانضمام بزر „يهمني أيضاً“ بدلاً من الإبلاغ عن العطل نفسه مرة أخرى.",
+            "quelle": "a49592f841d8f19374ba4a7a4415e88254f984ca"
+        },
+        "tr": {
+            "titel": "Bu beni de ilgilendiriyor",
+            "text": "Bildirim yaparken yakınındaki bildirimleri görebilir ve aynı sorunu tekrar bildirmek yerine „Betrifft mich auch“ ile katılabilirsin.",
+            "quelle": "a49592f841d8f19374ba4a7a4415e88254f984ca"
+        },
+        "ru": {
+            "titel": "Меня это тоже касается",
+            "text": "При создании сообщения ты видишь сообщения поблизости и можешь присоединиться к ним кнопкой „Betrifft mich auch“, вместо того чтобы сообщать о том же самом недостатке ещё раз.",
+            "quelle": "a49592f841d8f19374ba4a7a4415e88254f984ca"
+        }
+    },
+    "vereine": {
+        "en": {
+            "titel": "Club Directory",
+            "text": "All clubs in Uffenheim, each with its own profile page. Clubs can maintain their own page and add dates.",
+            "quelle": "21823facfcaad3a81c48eb849f16b4cd7d16372a"
+        },
+        "uk": {
+            "titel": "Довідник клубів",
+            "text": "Усі клуби Uffenheim зі своєю сторінкою. Клуби можуть самі вести свою сторінку та вносити події.",
+            "quelle": "21823facfcaad3a81c48eb849f16b4cd7d16372a"
+        },
+        "ar": {
+            "titel": "دليل الجمعيات",
+            "text": "جميع الجمعيات في أوفنهايم مع صفحة تعريف خاصة بها. تستطيع الجمعيات تحديث صفحتها بنفسها وإضافة المواعيد.",
+            "quelle": "21823facfcaad3a81c48eb849f16b4cd7d16372a"
+        },
+        "tr": {
+            "titel": "Dernekler rehberi",
+            "text": "Uffenheim'daki tüm derneklerin kendi tanıtım sayfası var. Dernekler sayfalarını kendileri güncelleyebilir ve etkinlik ekleyebilir.",
+            "quelle": "21823facfcaad3a81c48eb849f16b4cd7d16372a"
+        },
+        "ru": {
+            "titel": "Справочник клубов",
+            "text": "Все клубы Uffenheim с собственной страницей-представлением. Клубы могут сами вести свою страницу и добавлять мероприятия.",
+            "quelle": "21823facfcaad3a81c48eb849f16b4cd7d16372a"
+        }
+    },
+    "maengelmelder": {
+        "en": {
+            "titel": "Issue Reporter",
+            "text": "Potholes, broken street lamps or illegal dumping: report the issue with its location on the map and follow how it's being handled.",
+            "quelle": "014b74cc9bab73e7bde6dd8422720783e9b1e0ab"
+        },
+        "uk": {
+            "titel": "Mängelmelder",
+            "text": "Вибоїна, розбитий ліхтар або стихійне сміття: повідомляй про недолік із місцем на карті і стеж, як його опрацьовують.",
+            "quelle": "014b74cc9bab73e7bde6dd8422720783e9b1e0ab"
+        },
+        "ar": {
+            "titel": "مُبلِّغ الأعطال",
+            "text": "حفرة في الطريق أو مصباح معطل أو قمامة عشوائية: أبلغ عن العطل مع موقعه على الخريطة وتابع كيف يُعالج.",
+            "quelle": "014b74cc9bab73e7bde6dd8422720783e9b1e0ab"
+        },
+        "tr": {
+            "titel": "Sorun bildirimi",
+            "text": "Çukur, bozuk sokak lambası veya kaçak çöp: Sorunu haritada yeriyle birlikte bildir ve nasıl işlendiğini takip et.",
+            "quelle": "014b74cc9bab73e7bde6dd8422720783e9b1e0ab"
+        },
+        "ru": {
+            "titel": "Сообщения о проблемах",
+            "text": "Выбоина, сломанный фонарь или незаконно выброшенный мусор: сообщи о проблеме с указанием места на карте и следи, как её обрабатывают.",
+            "quelle": "014b74cc9bab73e7bde6dd8422720783e9b1e0ab"
+        }
+    },
+    "stadt-nachrichten": {
+        "en": {
+            "titel": "Town News and Events",
+            "text": "News and the events calendar from uffenheim.de appear on the platform automatically.",
+            "quelle": "b0ef24c625a6d201431ce0e2f72b8659fa515d1f"
+        },
+        "uk": {
+            "titel": "Новини та заходи міста",
+            "text": "Новини та календар заходів із uffenheim.de автоматично з'являються на платформі.",
+            "quelle": "b0ef24c625a6d201431ce0e2f72b8659fa515d1f"
+        },
+        "ar": {
+            "titel": "أخبار المدينة وفعالياتها",
+            "text": "تظهر أخبار وتقويم فعاليات uffenheim.de تلقائياً على المنصة.",
+            "quelle": "b0ef24c625a6d201431ce0e2f72b8659fa515d1f"
+        },
+        "tr": {
+            "titel": "Şehirden haberler ve etkinlikler",
+            "text": "uffenheim.de sitesindeki haberler ve etkinlik takvimi otomatik olarak platformda görünür.",
+            "quelle": "b0ef24c625a6d201431ce0e2f72b8659fa515d1f"
+        },
+        "ru": {
+            "titel": "Новости и мероприятия города",
+            "text": "Новости и календарь мероприятий с сайта uffenheim.de появляются на платформе автоматически.",
+            "quelle": "b0ef24c625a6d201431ce0e2f72b8659fa515d1f"
+        }
+    },
+    "abfallkalender": {
+        "en": {
+            "titel": "Waste Calendar",
+            "text": "All collection dates for Uffenheim and the districts in one calendar.",
+            "quelle": "cf5e0ea40f538fb8aa2f3ba2f4d55e153ebe9045"
+        },
+        "uk": {
+            "titel": "Календар відходів",
+            "text": "Усі дати вивезення для Uffenheim і його частин в одному календарі.",
+            "quelle": "cf5e0ea40f538fb8aa2f3ba2f4d55e153ebe9045"
+        },
+        "ar": {
+            "titel": "تقويم النفايات",
+            "text": "جميع مواعيد الجمع لأوفنهايم وأحيائها في تقويم واحد.",
+            "quelle": "cf5e0ea40f538fb8aa2f3ba2f4d55e153ebe9045"
+        },
+        "tr": {
+            "titel": "Çöp takvimi",
+            "text": "Uffenheim ve köy mahalleleri için tüm çöp toplama tarihleri tek bir takvimde.",
+            "quelle": "cf5e0ea40f538fb8aa2f3ba2f4d55e153ebe9045"
+        },
+        "ru": {
+            "titel": "Календарь вывоза мусора",
+            "text": "Все даты вывоза мусора для Uffenheim и её районов в одном календаре.",
+            "quelle": "cf5e0ea40f538fb8aa2f3ba2f4d55e153ebe9045"
+        }
+    },
+    "start": {
+        "en": {
+            "titel": "Rund um Uffni Launches",
+            "text": "The citizens' and club network for Uffenheim is now live – run on a voluntary basis by the Bürgerliste Uffenheim.",
+            "quelle": "47850814ae718a3dc1231392438d1b57fc25bce3"
+        },
+        "uk": {
+            "titel": "Старт Rund um Uffni",
+            "text": "Мережа громади для Uffenheim, зокрема мешканців і клубів, стартує. Її веде на громадських засадах Bürgerliste Uffenheim.",
+            "quelle": "47850814ae718a3dc1231392438d1b57fc25bce3"
+        },
+        "ar": {
+            "titel": "انطلاق Rund um Uffni",
+            "text": "شبكة المواطنين والجمعيات لأوفنهايم تنطلق الآن – تُدار تطوعاً من قبل قائمة المواطنين في أوفنهايم (Bürgerliste Uffenheim).",
+            "quelle": "47850814ae718a3dc1231392438d1b57fc25bce3"
+        },
+        "tr": {
+            "titel": "Rund um Uffni başlıyor",
+            "text": "Uffenheim için vatandaş ve dernek ağı yayında. Gönüllü olarak Bürgerliste Uffenheim tarafından işletiliyor.",
+            "quelle": "47850814ae718a3dc1231392438d1b57fc25bce3"
+        },
+        "ru": {
+            "titel": "Запуск Rund um Uffni",
+            "text": "Сеть жителей и клубов для Uffenheim запускается – её ведёт на общественных началах Bürgerliste Uffenheim.",
+            "quelle": "47850814ae718a3dc1231392438d1b57fc25bce3"
+        }
+    }
+}

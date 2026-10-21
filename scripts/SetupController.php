@@ -1789,6 +1789,143 @@ class SetupController extends Controller
     }
 
     /**
+     * Selbsttest Neuigkeiten (setup/neuigkeiten-test): Einträge, Popup-Auswahl je Konto, Wegklicken, Popup und Seite
+     * rendern (deutsch und englisch). Einstellungen in einer Transaktion mit Rollback.
+     */
+    public function actionNeuigkeitenTest($html = 0)
+    {
+        $modul = Yii::$app->getModule('neuigkeiten');
+        $sprache = Yii::$app->language;
+        $locale = Yii::$app->formatter->locale;
+        Yii::$app->language = Yii::$app->formatter->locale = 'de';
+        $ok = 0;
+        $fehler = 0;
+        $pruefe = function (string $was, bool $bedingung, string $zeige = '') use (&$ok, &$fehler) {
+            $bedingung ? $ok++ : $fehler++;
+            $this->stdout(($bedingung ? 'ok   ' : 'FEHL ') . "$was\n" . (!$bedingung && $zeige !== '' ? "     $zeige\n" : ''));
+        };
+        $tx = Yii::$app->db->beginTransaction();
+        try {
+            $alle = $modul->eintraege();
+            $ids = array_column($alle, 'id');
+            $pruefe('Einträge eindeutig und vollständig', count($ids) === count(array_unique($ids)) && !array_filter($alle,
+                fn($e) => empty($e['titel']) || empty($e['text']) || !isset(\humhub\modules\neuigkeiten\Module::ARTEN[$e['art']])
+                    || !preg_match('/^\d{4}-\d\d-\d\d$/', $e['datum'])));
+            $pruefe('Neueste zuerst', $alle[0]['datum'] >= end($alle)['datum']);
+            $ohneLink = array_filter($alle, fn($e) => !empty($e['link']) && $modul->linkUrl($e) === null);
+            $pruefe('Alle Links auflösbar', !$ohneLink, implode(', ', array_column($ohneLink, 'id')));
+            $tr = $modul->uebersetzungen();
+            $fehlt = [];
+            foreach ($alle as $e) {
+                foreach (array_keys(\humhub\modules\kiAssistent\components\Uebersetzer::SPRACHEN) as $l) {
+                    if (($tr[$e['id']][$l]['quelle'] ?? '') !== sha1($e['titel'] . "\n" . $e['text'])) {
+                        $fehlt[] = "{$e['id']}/$l";
+                    }
+                }
+            }
+            $pruefe('Übersetzungen aktuell', !$fehlt, implode(', ', array_slice($fehlt, 0, 10)));
+
+            $alt = User::find()->active()->andWhere(['<', 'created_at', '2026-10-01'])->one();
+            $modul->settings->user($alt)->delete('gesehen');
+            Yii::$app->cache->flush();
+            $popup = $modul->fuerPopup($alt);
+            $pruefe('Popup für älteres Konto: nur neue Funktionen mit popup, höchstens ' . $modul->popupMax, $popup
+                && count($popup) <= $modul->popupMax && !array_filter($popup, fn($e) => empty($e['popup'])), json_encode(array_column($popup, 'id')));
+            Yii::$app->user->switchIdentity($alt);
+            $popupHtml = \humhub\modules\neuigkeiten\widgets\Popup::widget();
+            if ($html) {
+                file_put_contents('/data/neuigkeiten/popup-test.html', $popupHtml); // nur für einen Screenshot, danach löschen
+            }
+            $pruefe('Popup gerendert', str_contains($popupHtml, 'id="nk-popup"') && str_contains($popupHtml, \humhub\helpers\Html::encode($popup[0]['titel'] ?? '###'))
+                && str_contains($popupHtml, 'neuigkeiten/index/gesehen'));
+            $modul->alleGesehen($alt);
+            Yii::$app->cache->flush();
+            $pruefe('Nach Wegklicken kein Popup mehr', $modul->fuerPopup($alt) === [] && \humhub\modules\neuigkeiten\widgets\Popup::widget() === '');
+
+            $neu = new User(['created_at' => date('Y-m-d H:i:s', strtotime('+1 day'))]);
+            $pruefe('Konto jünger als alle Einträge: kein Popup', $modul->fuerPopup($neu) === []);
+
+            $seite = Yii::$app->view->renderFile('@neuigkeiten/views/index/index.php', ['module' => $modul, 'art' => '', 'eintraege' => $alle]);
+            $pruefe('Seite gerendert (alle Einträge, Monate)', substr_count($seite, 'class="nk-eintrag"') === count($alle)
+                && str_contains($seite, 'Oktober 2026') && str_contains($seite, 'September 2026'));
+            Yii::$app->language = Yii::$app->formatter->locale = 'en-US';
+            $en = Yii::$app->view->renderFile('@neuigkeiten/views/index/index.php', ['module' => $modul, 'art' => 'neu', 'eintraege' => array_slice($alle, 0, 2)]);
+            $pruefe('Seite englisch', str_contains($en, 'What’s new') && str_contains($en, \humhub\helpers\Html::encode($tr['ideen-vorschlaege']['en']['titel'] ?? '###'))
+                && str_contains($en, 'October 2026'));
+            Yii::$app->language = 'de';
+        } catch (\Throwable $e) {
+            $fehler++;
+            $this->stderr("FEHL Ausnahme: " . $e->getMessage() . "\n" . $e->getTraceAsString() . "\n");
+        } finally {
+            $tx->rollBack();
+            Yii::$app->cache->flush();
+            Yii::$app->language = $sprache;
+            Yii::$app->formatter->locale = $locale;
+        }
+        $this->stdout("\n$ok ok, $fehler Fehler (alles zurückgerollt)\n");
+        return $fehler ? ExitCode::SOFTWARE : ExitCode::OK;
+    }
+
+    /**
+     * Neuigkeiten übersetzen (setup/neuigkeiten-uebersetzen [1 = alles neu]): fehlende oder seit der letzten Übersetzung
+     * geänderte Einträge aus modules/neuigkeiten/data/eintraege.php per Claude, eine Anfrage je Sprache. Ergebnis nach
+     * /data/neuigkeiten/uebersetzungen.json – von dort ins Repo kopieren (siehe README), das Modul liest die Repo-Datei.
+     */
+    public function actionNeuigkeitenUebersetzen($alles = 0)
+    {
+        $modul = Yii::$app->getModule('neuigkeiten');
+        $ki = Yii::$app->getModule('ki-assistent');
+        if ($ki->getApiKey() === null) {
+            $this->stderr("Kein Schlüssel in secrets/anthropic_api_key\n");
+            return ExitCode::CONFIG;
+        }
+        $tr = $alles ? [] : $modul->uebersetzungen();
+        $claude = new \humhub\modules\kiAssistent\components\Claude($ki->getApiKey(), $ki->getModel());
+        $ids = array_column($modul->eintraege(), 'id');
+        foreach (\humhub\modules\kiAssistent\components\Uebersetzer::SPRACHEN as $lang => $sprache) {
+            $offen = [];
+            foreach ($modul->eintraege() as $e) {
+                $quelle = sha1($e['titel'] . "\n" . $e['text']);
+                if (($tr[$e['id']][$lang]['quelle'] ?? null) !== $quelle) {
+                    $offen[$e['id']] = ['titel' => $e['titel'], 'text' => $e['text']];
+                }
+            }
+            if (!$offen) {
+                $this->stdout("$lang: nichts zu tun\n");
+                continue;
+            }
+            $system = "You translate release notes (\"what's new\") of a German local community platform for the town of Uffenheim "
+                . "(Bavaria) into {$sprache}. Input and output are JSON objects: id => {\"titel\": …, \"text\": …}. Translate titel and text, "
+                . "keep the ids, use the informal friendly form of address, keep names (Uffi, Rund um Uffni, Uffenheim, street, club and "
+                . "service names such as OpenStreetMap, Google Maps) unchanged. Output only the JSON object, no explanation, no code fence.";
+            [$antwort, $in, $out] = $claude->ask($system, [['role' => 'user', 'text' => json_encode($offen, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)]]);
+            $ki->addUebersetzungUsage($in, $out);
+            $antwort = preg_replace('/^```(?:json)?\s*|\s*```$/', '', trim($antwort));
+            $daten = json_decode($antwort, true);
+            if (!is_array($daten)) {
+                $this->stderr("$lang: Antwort ist kein JSON: " . mb_substr($antwort, 0, 300) . "\n");
+                return ExitCode::SOFTWARE;
+            }
+            $n = 0;
+            foreach ($offen as $id => $de) {
+                if (!empty($daten[$id]['titel']) && !empty($daten[$id]['text'])) {
+                    $tr[$id][$lang] = ['titel' => (string)$daten[$id]['titel'], 'text' => (string)$daten[$id]['text'],
+                        'quelle' => sha1($de['titel'] . "\n" . $de['text'])];
+                    $n++;
+                }
+            }
+            $this->stdout("$lang: $n von " . count($offen) . " übersetzt\n");
+        }
+        // Gelöschte Einträge entfernen, Reihenfolge wie in eintraege.php
+        $tr = array_intersect_key(array_replace(array_flip($ids), $tr), array_flip($ids));
+        $tr = array_filter($tr, 'is_array');
+        @mkdir('/data/neuigkeiten', 0775, true);
+        file_put_contents('/data/neuigkeiten/uebersetzungen.json', json_encode($tr, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) . "\n");
+        $this->stdout("Gespeichert: /data/neuigkeiten/uebersetzungen.json\n");
+        return ExitCode::OK;
+    }
+
+    /**
      * Startliste des Gewerbeverzeichnisses: setup/gewerbe-import (idempotent, Status „offen“ mit Quelle)
      * Quelle: Liste „Gastronomie und Unterkünfte“ der Stadt (modules/gewerbe/data/start.json, ohne Personennamen und
      * private E-Mail-Adressen). Danach den Ort aller Betriebe ohne Kartenpunkt über Nominatim bestimmen (1 Abfrage/s).

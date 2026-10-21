@@ -40,6 +40,7 @@ services:
       - ./modules/tanken:/data/modules/tanken:ro
       - ./modules/gewerbe:/data/modules/gewerbe:ro
       - ./modules/vorschlaege:/data/modules/vorschlaege:ro
+      - ./modules/neuigkeiten:/data/modules/neuigkeiten:ro
       # Stadtwissen von uffenheim.de (scripts/stadtwissen.py)
       - ./wissen:/srv/wissen:ro
     secrets:

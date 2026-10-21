@@ -20,6 +20,7 @@ nach § 13 der AGPL-3.0 veröffentlicht.
 | `modules/ki-assistent` | KI-Assistent „Uffi“ (Claude, Anthropic) mit Stadtwissen |
 | `modules/maengelmelder` | Mängelmelder mit Karte (OpenStreetMap) und Bauhof-Verwaltung per WhatsApp |
 | `modules/mitteilungsblatt` | Mitteilungsblatt der Stadt: Ausgaben, Archiv, Volltextsuche |
+| `modules/neuigkeiten` | Neuigkeiten-Seite (neue Funktionen, Verbesserungen, Fehlerbehebungen) und einmaliges Popup auf der Startseite |
 | `modules/notdienst` | Notrufnummern und Apotheken-Notdienst |
 | `modules/statistik` | Cookielose Besucherstatistik für Admins (Tages-Salz, keine IP gespeichert) |
 | `modules/tanken` | Spritpreise rund um Uffenheim (Daten MTS-K über Tankerkönig, CC BY 4.0; eigener API-Schlüssel nötig) |

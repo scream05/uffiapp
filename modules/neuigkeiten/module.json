@@ -1,0 +1,10 @@
+{
+  "id": "neuigkeiten",
+  "name": "Neuigkeiten",
+  "description": "Neuigkeiten der Plattform: Seite mit neuen Funktionen, Verbesserungen und Fehlerbehebungen, einmaliges Popup auf der Startseite.",
+  "keywords": ["neuigkeiten", "release", "changelog"],
+  "version": "0.1.0",
+  "humhub": {
+    "minVersion": "1.18"
+  }
+}
