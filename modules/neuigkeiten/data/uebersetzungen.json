@@ -1,4 +1,31 @@
 {
+    "uffi-wieder-da": {
+        "en": {
+            "titel": "Uffi is back to answering",
+            "text": "Uffi had only reported recently that he was taking a break for this month. That was due to a cost limit that had been calculated too strictly. Now he's answering your questions again.",
+            "quelle": "00f9a922305a68ce654f270212509347a3addcb0"
+        },
+        "uk": {
+            "titel": "Уффі знову відповідає",
+            "text": "Уффі востаннє лише повідомив, що цього місяця робить перерву. Причиною було занадто суворо розраховане обмеження витрат. Тепер він знову відповідає на твої запитання.",
+            "quelle": "00f9a922305a68ce654f270212509347a3addcb0"
+        },
+        "ar": {
+            "titel": "أوفي يجيب من جديد",
+            "text": "كان أوفي قد أعلن مؤخراً أنه يأخذ استراحة لهذا الشهر. السبب كان حداً للتكلفة قد حُسب بصرامة زائدة. الآن يجيب على أسئلتك من جديد.",
+            "quelle": "00f9a922305a68ce654f270212509347a3addcb0"
+        },
+        "tr": {
+            "titel": "Uffi yine cevap veriyor",
+            "text": "Uffi son olarak bu ay ara verdiğini bildirmişti. Bunun nedeni fazla sıkı hesaplanmış bir maliyet sınırıydı. Artık sorularını yeniden yanıtlıyor.",
+            "quelle": "00f9a922305a68ce654f270212509347a3addcb0"
+        },
+        "ru": {
+            "titel": "Uffi antwortet wieder",
+            "text": "Uffi hat zuletzt nur gemeldet, dass er für diesen Monat Pause macht. Das lag an einer zu streng gerechneten Kostengrenze. Jetzt beantwortet er deine Fragen wieder.",
+            "quelle": "00f9a922305a68ce654f270212509347a3addcb0"
+        }
+    },
     "uffi-antwort-mit-knopf": {
         "en": {
             "titel": "Uffi's answers with buttons now complete",

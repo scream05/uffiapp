@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'uffi-wieder-da', 'datum' => '2026-10-22', 'art' => 'behoben', 'popup' => false,
+        'titel' => 'Uffi antwortet wieder',
+        'text' => 'Uffi hat zuletzt nur gemeldet, dass er für diesen Monat Pause macht. Das lag an einer zu streng gerechneten Kostengrenze. Jetzt beantwortet er deine Fragen wieder.'],
     ['id' => 'uffi-antwort-mit-knopf', 'datum' => '2026-10-21', 'art' => 'behoben', 'popup' => false,
         'titel' => 'Uffis Antworten mit Knöpfen vollständig',
         'text' => 'Zeigte Uffi einen Knopf an (z. B. Karte oder Sperrmüll-Formular), fehlte manchmal der eigentliche Antworttext. Jetzt kommt die ganze Antwort an.'],

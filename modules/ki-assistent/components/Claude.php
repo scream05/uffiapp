@@ -65,8 +65,9 @@ class Claude
             throw new \RuntimeException('Claude hat die Anfrage abgelehnt (' . ($message->stopDetails?->category ?? '?') . ')');
         }
         $u = $message->usage;
-        // Eingabe inkl. Cache, damit das Monatsprotokoll alle verarbeiteten Tokens zeigt
-        $in = $u->inputTokens + (int)$u->cacheCreationInputTokens + (int)$u->cacheReadInputTokens;
+        // Eingabe nach Preis gewichtet (Cache schreiben 1,25-fach, Cache lesen 0,1-fach), damit die Kostenbremse
+        // die tatsächlichen Kosten abbildet und nicht jede Werkzeug-Runde voll zählt
+        $in = $u->inputTokens + (int)round(1.25 * (int)$u->cacheCreationInputTokens + 0.1 * (int)$u->cacheReadInputTokens);
         return [$message, $in, $u->outputTokens];
     }
 

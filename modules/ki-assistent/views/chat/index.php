@@ -38,7 +38,11 @@ $this->registerJs('window.kiChatDomains = ' . json_encode(Yii::$app->getModule('
                 </p>
                 <?php if (Yii::$app->user->isAdmin()): ?>
                 <p class="help-block" id="ki-usage">
-                    Diesen Monat: <?= $usage[0] ?> von <?= $limit ?> Anfragen (davon <?= $usage[3] ?? 0 ?> ohne Konto), <?= number_format($usage[1], 0, ',', '.') ?> Eingabe- / <?= number_format($usage[2], 0, ',', '.') ?> Ausgabe-Tokens
+                    Diesen Monat: <?= $usage[0] ?> von <?= $limit ?> Anfragen (davon <?= $usage[3] ?? 0 ?> ohne Konto), <?= number_format($usage[1], 0, ',', '.') ?> Eingabe- / <?= number_format($usage[2], 0, ',', '.') ?> Ausgabe-Tokens (Eingabe nach Preis gewichtet, Cache-Lesen = 0,1)
+                </p>
+                <p class="help-block">
+                    <?php $test = Yii::$app->getModule('ki-assistent')->getTestUsage() ?>
+                    Testläufe diesen Monat (zählen nicht zur Grenze): <?= number_format($test[0], 0, ',', '.') ?> Eingabe- / <?= number_format($test[1], 0, ',', '.') ?> Ausgabe-Tokens
                 </p>
                 <?php endif ?>
             </details>

@@ -880,7 +880,7 @@ class SetupController extends Controller
 
     /**
      * KI-Assistent testen: setup/ki  zeigt die Daten, die an Claude gehen;
-     * setup/ki "Wann kommt die Biotonne?"  stellt die Frage (zählt zum Monatslimit).
+     * setup/ki "Wann kommt die Biotonne?"  stellt die Frage (zählt nur im Testzähler, nicht zur Monatsgrenze).
      * setup/ki "Frage" 1  zeigt nur, welche Seiten des Stadtwissens mitgeschickt würden.
      */
     public function actionKi($question = null, $dryRun = 0)
@@ -903,7 +903,7 @@ class SetupController extends Controller
         $t = microtime(true);
         [$answer, $in, $out] = (new \humhub\modules\kiAssistent\components\Claude($module->getApiKey(), $module->getModel()))
             ->ask($prompt, [['role' => 'user', 'text' => $question]]);
-        $module->addUsage($in, $out);
+        $module->addTestUsage($in, $out);
         $this->stdout($answer . "\n\n(" . round(microtime(true) - $t, 1) . " s, $in Eingabe- / $out Ausgabe-Tokens)\n");
         return ExitCode::OK;
     }
@@ -939,7 +939,7 @@ class SetupController extends Controller
             try {
                 [$answer, $cards, , $in, $out] = \humhub\modules\kiAssistent\controllers\ChatController::converse($claude,
                     \humhub\modules\kiAssistent\controllers\ChatController::systemPrompt($t['frage']), $history);
-                $module->addUsage($in, $out);
+                $module->addTestUsage($in, $out);
             } catch (\Throwable $e) {
                 $this->stdout(sprintf("%2d ✗ %s\n   FEHLER %s\n", $i + 1, $t['frage'], $e->getMessage()));
                 continue;
@@ -1732,7 +1732,7 @@ class SetupController extends Controller
             foreach ($fragen as [$frage, $muster]) {
                 [$antwort, , , $in, $out] = \humhub\modules\kiAssistent\controllers\ChatController::converse($claude,
                     \humhub\modules\kiAssistent\controllers\ChatController::systemPrompt($frage), [['role' => 'user', 'text' => $frage]]);
-                $ki->addUsage($in, $out);
+                $ki->addTestUsage($in, $out);
                 $fehlt = array_filter($muster, fn($re) => !preg_match("/$re/iu", $antwort));
                 $pruefe("Uffi: $frage", !$fehlt, 'fehlt ' . implode(', ', $fehlt) . ' – ' . mb_substr(preg_replace('/\s+/u', ' ', $antwort), 0, 400));
             }

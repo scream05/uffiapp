@@ -108,6 +108,10 @@ class Module extends \humhub\components\Module
         try {
             [$requests, $in, $out, $guests] = $this->getUsage();
             if ($requests >= $this->monthlyLimit || $in + 5 * $out >= $this->monthlyTokenLimit) {
+                // einmal je Monat protokollieren, damit die Pause nicht unbemerkt bleibt
+                if (\Yii::$app->cache->add('ki-pause-gemeldet-' . date('Y-m'), 1, 32 * 86400)) {
+                    \Yii::warning("KI-Assistent: Monatsgrenze erreicht ($requests Anfragen, $in Eingabe- / $out Ausgabe-Tokens), Uffi pausiert bis zum Monatsende", 'ki-assistent');
+                }
                 return \Yii::t('KiAssistentModule.base', 'Uffi macht für diesen Monat Pause – das Kontingent ist aufgebraucht. Ab dem 1. geht es weiter.');
             }
             $gast = \Yii::$app->user->isGuest;
@@ -205,6 +209,19 @@ class Module extends \humhub\components\Module
         } finally {
             $mutex->release('ki-assistent-limit');
         }
+    }
+
+    /** Testläufe (setup/ki, ki-test, Modultests) zählen getrennt, damit sie Uffi nicht für alle abschalten: [Eingabe-, Ausgabe-Tokens] */
+    public function getTestUsage(): array
+    {
+        $usage = json_decode((string)$this->settings->get('usage-test-' . date('Y-m')), true);
+        return array_values(array_map('intval', is_array($usage) ? $usage + [0, 0] : [0, 0]));
+    }
+
+    public function addTestUsage(int $promptTokens, int $outputTokens): void
+    {
+        [$in, $out] = $this->getTestUsage();
+        $this->settings->set('usage-test-' . date('Y-m'), json_encode([$in + $promptTokens, $out + $outputTokens]));
     }
 
     /** Hosts, deren Links im Chat klickbar sind (Domain-Endungen + Websites der Vereine und Betriebe) */
