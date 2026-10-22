@@ -20,7 +20,8 @@ class Embeddings
             CURLOPT_POSTFIELDS => json_encode(['texte' => [$text], 'art' => 'frage'], JSON_UNESCAPED_UNICODE),
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_CONNECTTIMEOUT => 2,
-            CURLOPT_TIMEOUT => 15,
+            // Antwortet sonst in ~0,1 s; hängt der Dienst, lieber gleich die Stichwortsuche als den Nutzer warten lassen
+            CURLOPT_TIMEOUT => 3,
         ]);
         $data = json_decode((string)curl_exec($ch), true);
         $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
