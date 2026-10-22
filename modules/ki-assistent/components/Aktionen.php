@@ -146,6 +146,34 @@ class Aktionen
                 ],
             ];
         }
+        $bereiche = array_keys(array_filter([
+            'betriebe' => Yii::$app->hasModule('gewerbe') && Yii::$app->db->getTableSchema('gewerbe_betrieb') !== null,
+            'vereine' => Yii::$app->hasModule('vereine'),
+            'veranstaltungen' => Space::findOne(['url' => 'veranstaltungen']) !== null,
+        ]));
+        if ($bereiche) {
+            $tools[] = [
+                'name' => 'verzeichnis_suchen',
+                'description' => 'Sucht in den Verzeichnissen der Community und liefert die Einträge mit allen Angaben und Link: '
+                    . 'betriebe = Geschäfte, Gastronomie, Handwerk, Dienstleister (Angebot, Adresse, Telefon, Öffnungszeiten, ob gerade geöffnet); '
+                    . 'vereine = Vereine (Kategorie, Ortsteil, Treffpunkt, Beschreibung, Website); '
+                    . 'veranstaltungen = Termine bis 90 Tage voraus (oder im angegebenen Zeitraum). '
+                    . 'Aufrufen, sobald Angaben gebraucht werden, die im Prompt nur als Name stehen, oder für Termine nach den nächsten '
+                    . Context::TAGE_IM_PROMPT . ' Tagen. Gefunden wird, was eines der Stichwörter enthält (auch als Wortteil).',
+                'inputSchema' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'bereich' => ['type' => 'string', 'enum' => $bereiche],
+                        'stichwoerter' => ['type' => 'string', 'description' => 'Mehrere Stichwörter mit Leerzeichen: Namen oder Namensteile, '
+                            . 'Wortstämme und Synonyme (z. B. „Döner Imbiss Pizza“, „Friseur Frisör“, „Kirchweih Kerwa“, „Reusch“); leer = alle'],
+                        'nur_geoeffnet' => ['type' => 'boolean', 'description' => 'Nur bei betriebe: nur die gerade geöffneten'],
+                        'von' => ['type' => 'string', 'description' => 'Nur bei veranstaltungen: erstes Datum (JJJJ-MM-TT), Standard heute'],
+                        'bis' => ['type' => 'string', 'description' => 'Nur bei veranstaltungen: letztes Datum (JJJJ-MM-TT), Standard heute + 90 Tage'],
+                    ],
+                    'required' => ['bereich'],
+                ],
+            ];
+        }
         if (Formulare::all()) {
             $ids = array_keys(Formulare::all());
             $tools[] = [
@@ -196,6 +224,7 @@ class Aktionen
                 'abfallportal' => self::abfallportal($args),
                 'weg_zeigen' => self::weg($args),
                 'ort_zeigen' => self::ort($args),
+                'verzeichnis_suchen' => self::verzeichnis($args),
                 'formular_ausfuellen' => self::formularAusfuellen($args),
                 default => [['fehler' => "Unbekannte Aktion $name"], null],
             };
@@ -203,6 +232,66 @@ class Aktionen
             Yii::error("KI-Aktion $name: " . $e->getMessage(), 'ki-assistent');
             return [['fehler' => 'Die Aktion ist fehlgeschlagen: ' . $e->getMessage()], null];
         }
+    }
+
+    /** Höchstens so viele Treffer zurückgeben (Kosten); bei mehr soll die KI genauer suchen */
+    private const MAX_TREFFER = 20;
+
+    private static function verzeichnis(array $args): array
+    {
+        $woerter = array_values(array_filter(preg_split('/[^\p{L}\p{N}]+/u', mb_strtolower((string)($args['stichwoerter'] ?? ''))),
+            fn($w) => mb_strlen($w) >= 3));
+        // Treffer = Zahl der gefundenen Stichwörter, Treffer im Namen zählen doppelt
+        $punkte = function (string $name, string $text) use ($woerter): int {
+            $name = mb_strtolower($name);
+            $text = mb_strtolower($text);
+            $p = 0;
+            foreach ($woerter as $w) {
+                $p += str_contains($name, $w) ? 2 : (str_contains($text, $w) ? 1 : 0);
+            }
+            return $p;
+        };
+        $eintraege = []; // [Punkte, Zeile]
+        switch ($args['bereich'] ?? '') {
+            case 'betriebe':
+                foreach (\humhub\modules\gewerbe\models\Betrieb::find()->where(['!=', 'status', 'vorgeschlagen'])->orderBy(['name' => SORT_ASC])->all() as $b) {
+                    if (!empty($args['nur_geoeffnet']) && empty($b->getStand()['offen'])) {
+                        continue;
+                    }
+                    $eintraege[] = [$punkte($b->name, "$b->kategorie $b->ortsteil $b->angebot $b->adresse"), Context::betrieb($b)];
+                }
+                break;
+            case 'vereine':
+                foreach (\humhub\modules\vereine\models\Verein::find()->where(['!=', 'status', 'vorgeschlagen'])->orderBy(['name' => SORT_ASC])->all() as $v) {
+                    $eintraege[] = [$punkte($v->name, "$v->kategorie $v->ortsteil $v->treffpunkt $v->beschreibung"), Context::verein($v)];
+                }
+                break;
+            case 'veranstaltungen':
+                $datum = fn($d) => preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)$d) ? (string)$d : null;
+                $von = $datum($args['von'] ?? null) ?? date('Y-m-d');
+                $bis = date('Y-m-d', strtotime(($datum($args['bis'] ?? null) ?? date('Y-m-d', strtotime('+90 days'))) . ' +1 day'));
+                foreach (Context::veranstaltungen($von, $bis, 300) as $zeile) {
+                    $eintraege[] = [$punkte(strtok($zeile, "\n"), $zeile), $zeile];
+                }
+                break;
+            default:
+                return [['fehler' => 'Unbekannter Bereich'], null];
+        }
+        if ($woerter) {
+            $eintraege = array_filter($eintraege, fn($e) => $e[0] > 0);
+            // Betriebe und Vereine nach Treffern, Veranstaltungen bleiben nach Datum
+            if (($args['bereich'] ?? '') !== 'veranstaltungen') {
+                usort($eintraege, fn($a, $b) => $b[0] <=> $a[0]);
+            }
+        }
+        $gesamt = count($eintraege);
+        $ergebnis = ['ok' => true, 'anzahl' => $gesamt, 'eintraege' => implode("\n", array_column(array_slice($eintraege, 0, self::MAX_TREFFER), 1))];
+        if ($gesamt === 0) {
+            $ergebnis['hinweis'] = 'Nichts gefunden. Andere Stichwörter oder Wortstämme versuchen, sonst sagen, dass im Verzeichnis nichts dazu steht.';
+        } elseif ($gesamt > self::MAX_TREFFER) {
+            $ergebnis['hinweis'] = 'Nur die ersten ' . self::MAX_TREFFER . ' von ' . $gesamt . ' Treffern. Für mehr genauer suchen bzw. den Zeitraum eingrenzen.';
+        }
+        return [$ergebnis, null];
     }
 
     private static function mangel(array $args): array

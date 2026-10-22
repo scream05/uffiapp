@@ -349,5 +349,30 @@
     "erwartet": [
       "15\\.0?\\s?10|15\\. Oktober"
     ]
+  },
+  {
+    "frage": "Wo kann ich in Uffenheim Döner essen?",
+    "erwartet": [
+      "Anadolu"
+    ]
+  },
+  {
+    "frage": "Welche Friseure gibt es in Uffenheim?",
+    "erwartet": [
+      "Haarlekin|Haaroase|Friseurteam|Haarstudio"
+    ]
+  },
+  {
+    "frage": "Wann ist der Weihnachtsmarkt in Uffenheim?",
+    "erwartet": [
+      "0?5\\..{0,40}(12\\.|Dezember)"
+    ]
+  },
+  {
+    "frage": "Hat die Alte Kelterei heute geöffnet?",
+    "erwartet": [
+      "16(:00)? Uhr|geschlossen|geöffnet",
+      "betrieb\\/view\\?id=3\\b"
+    ]
   }
 ]

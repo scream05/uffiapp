@@ -17,6 +17,9 @@ class Context
 {
     private const DAYS = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
 
+    /** Veranstaltungen so viele Tage vollständig im Prompt; spätere (und Betriebe/Vereine im Detail) holt Uffi über verzeichnis_suchen */
+    public const TAGE_IM_PROMPT = 14;
+
     public static function get(): string
     {
         // Gemeinsamer Teil zwischengespeichert; Mängelmeldungen je Nutzer (nur was er im Mängelmelder lesen darf)
@@ -84,21 +87,9 @@ class Context
 
         $space = Space::findOne(['url' => 'veranstaltungen']);
         if ($space !== null) {
-            $lines = [];
-            $entries = CalendarEntry::find()->contentContainer($space)->andWhere(self::oeffentlich())
-                ->andWhere(['>=', 'calendar_entry.end_datetime', $today])
-                ->andWhere(['<', 'calendar_entry.start_datetime', date('Y-m-d', strtotime('+90 days'))])
-                ->orderBy(['calendar_entry.start_datetime' => SORT_ASC])->limit(80)->all();
-            $vereine = self::vereinByEntry(array_map(fn($e) => $e->id, $entries));
-            foreach ($entries as $e) {
-                $lines[] = '- ' . self::date($e->start_datetime, !$e->all_day)
-                    . (substr($e->end_datetime, 0, 10) > substr($e->start_datetime, 0, 10) ? ' bis ' . self::date($e->end_datetime, false) : '')
-                    . ': ' . $e->title . ($e->location ? " (Ort: {$e->location})" : '')
-                    . (isset($vereine[$e->id]) ? " (Veranstalter: {$vereine[$e->id]})" : '')
-                    . ' – ' . Url::to($e->content->getUrl(), true)
-                    . (($d = self::plain($e->description, 300)) !== '' ? "\n  $d" : '');
-            }
-            $parts[] = "## Veranstaltungen (nächste 90 Tage: Veranstaltungskalender von uffenheim.de und Termine der Vereine)\n"
+            $lines = self::veranstaltungen($today, date('Y-m-d', strtotime('+' . self::TAGE_IM_PROMPT . ' days')));
+            $parts[] = "## Veranstaltungen (nächste " . self::TAGE_IM_PROMPT . " Tage: Veranstaltungskalender von uffenheim.de und Termine der Vereine; "
+                . "spätere Termine und Suche nach Art/Ort/Veranstalter mit verzeichnis_suchen, Bereich veranstaltungen)\n"
                 . ($lines ? implode("\n", $lines) : '(keine Termine)');
         }
 
@@ -116,39 +107,23 @@ class Context
         }
 
         if (Yii::$app->hasModule('vereine') && Yii::$app->getModule('vereine') !== null) {
-            $lines = [];
-            foreach (\humhub\modules\vereine\models\Verein::find()->where(['!=', 'status', 'vorgeschlagen'])
-                         ->orderBy(['name' => SORT_ASC])->all() as $v) {
-                // Nur die Liste; Beschreibung, Treffpunkt, Ansprechpartner findet die Suche im Stadtwissen (wissen/community/vereine)
-                $lines[] = "- {$v->name} ({$v->kategorie}, {$v->ortsteil}) – " . $v->getUrl(true);
-            }
-            if ($lines) {
-                $parts[] = "## Vereinsverzeichnis der Community (Liste; Details zu passenden Vereinen ggf. weiter unten bei den Informationen)\n"
-                    . implode("\n", $lines);
+            // Nur Namen nach Kategorie; Link, Treffpunkt, Beschreibung über verzeichnis_suchen bzw. das Stadtwissen
+            $vereine = \humhub\modules\vereine\models\Verein::find()->where(['!=', 'status', 'vorgeschlagen'])
+                ->orderBy(['name' => SORT_ASC])->all();
+            if ($vereine) {
+                $parts[] = "## Vereinsverzeichnis der Community (nur Namen, Ortsteil in Klammern außer Kernstadt; Link und Details mit verzeichnis_suchen, "
+                    . "Bereich vereine, Details zu passenden Vereinen ggf. auch weiter unten bei den Informationen)\n" . self::namensliste($vereine);
             }
         }
 
         if (Yii::$app->hasModule('gewerbe') && Yii::$app->getModule('gewerbe') !== null
             && Yii::$app->db->getTableSchema('gewerbe_betrieb') !== null) {
-            $lines = [];
-            foreach (\humhub\modules\gewerbe\models\Betrieb::find()->where(['!=', 'status', 'vorgeschlagen'])
-                         ->orderBy(['name' => SORT_ASC])->all() as $b) {
-                $zeiten = \humhub\modules\gewerbe\components\Oeffnungszeiten::zeilen($b->getZeiten());
-                $stand = $b->getStand();
-                $lines[] = "- {$b->name} ({$b->kategorie}, {$b->ortsteil})"
-                    . ($b->angebot ? '; Angebot: ' . self::plain($b->angebot, 300) : '')
-                    . ($b->adresse ? '; Adresse: ' . $b->adresse : '')
-                    . ($b->telefon ? '; Tel. ' . $b->telefon : '')
-                    . (\humhub\modules\gewerbe\components\Oeffnungszeiten::hatZeiten($b->getZeiten())
-                        ? '; Öffnungszeiten: ' . implode(', ', array_map(fn($z) => "$z[0] $z[1]", $zeiten)) : '')
-                    . ($b->oeffnungszeiten ? ' (' . self::plain($b->oeffnungszeiten, 150) . ')' : '')
-                    . ($stand ? '; gerade: ' . $stand['text'] : '')
-                    . ($b->website ? '; ' . $b->website : '')
-                    . ' – ' . $b->getUrl(true);
-            }
-            if ($lines) {
-                $parts[] = "## Gewerbeverzeichnis der Community (Geschäfte, Gastronomie, Handwerk, Dienstleister; „gerade“ = Stand jetzt; Vorstellung und Leistungen passender Betriebe ggf. weiter unten bei den Informationen)\n"
-                    . implode("\n", $lines);
+            // Nur Namen nach Branche; Angebot, Adresse, Öffnungszeiten und „gerade geöffnet“ über verzeichnis_suchen
+            $betriebe = \humhub\modules\gewerbe\models\Betrieb::find()->where(['!=', 'status', 'vorgeschlagen'])
+                ->orderBy(['name' => SORT_ASC])->all();
+            if ($betriebe) {
+                $parts[] = "## Gewerbeverzeichnis der Community (Geschäfte, Gastronomie, Handwerk, Dienstleister; nur Namen nach Branche, Ortsteil in Klammern außer Kernstadt; "
+                    . "Angebot, Adresse, Telefon, Öffnungszeiten, „gerade geöffnet“ und Link mit verzeichnis_suchen, Bereich betriebe)\n" . self::namensliste($betriebe);
             }
 
             // Laufende Rabatt-Gutscheine (aktiv, Zeitraum nicht vorbei; pausierte nicht anbieten)
@@ -181,6 +156,68 @@ class Context
         $parts[] = "## Bereiche (Spaces) der Community\n" . implode("\n", $lines);
 
         return implode("\n\n", $parts);
+    }
+
+    /** Veranstaltungen im Zeitraum [$von, $bis) als Zeilen für die KI (nur öffentliche Termine des Space „Veranstaltungen“) */
+    public static function veranstaltungen(string $von, string $bis, int $limit = 80): array
+    {
+        $space = Space::findOne(['url' => 'veranstaltungen']);
+        if ($space === null) {
+            return [];
+        }
+        $entries = CalendarEntry::find()->contentContainer($space)->andWhere(self::oeffentlich())
+            ->andWhere(['>=', 'calendar_entry.end_datetime', $von])
+            ->andWhere(['<', 'calendar_entry.start_datetime', $bis])
+            ->orderBy(['calendar_entry.start_datetime' => SORT_ASC])->limit($limit)->all();
+        $vereine = self::vereinByEntry(array_map(fn($e) => $e->id, $entries));
+        $lines = [];
+        foreach ($entries as $e) {
+            $lines[] = '- ' . self::date($e->start_datetime, !$e->all_day)
+                . (substr($e->end_datetime, 0, 10) > substr($e->start_datetime, 0, 10) ? ' bis ' . self::date($e->end_datetime, false) : '')
+                . ': ' . $e->title . ($e->location ? " (Ort: {$e->location})" : '')
+                . (isset($vereine[$e->id]) ? " (Veranstalter: {$vereine[$e->id]})" : '')
+                . ' – ' . Url::to($e->content->getUrl(), true)
+                . (($d = self::plain($e->description, 300)) !== '' ? "\n  $d" : '');
+        }
+        return $lines;
+    }
+
+    /** Ein Betrieb mit allen Angaben für die KI */
+    public static function betrieb(\humhub\modules\gewerbe\models\Betrieb $b): string
+    {
+        $zeiten = \humhub\modules\gewerbe\components\Oeffnungszeiten::zeilen($b->getZeiten());
+        $stand = $b->getStand();
+        return "- {$b->name} ({$b->kategorie}, {$b->ortsteil})"
+            . ($b->angebot ? '; Angebot: ' . self::plain($b->angebot, 300) : '')
+            . ($b->adresse ? '; Adresse: ' . $b->adresse : '')
+            . ($b->telefon ? '; Tel. ' . $b->telefon : '')
+            . (\humhub\modules\gewerbe\components\Oeffnungszeiten::hatZeiten($b->getZeiten())
+                ? '; Öffnungszeiten: ' . implode(', ', array_map(fn($z) => "$z[0] $z[1]", $zeiten)) : '')
+            . ($b->oeffnungszeiten ? ' (' . self::plain($b->oeffnungszeiten, 150) . ')' : '')
+            . ($stand ? '; gerade: ' . $stand['text'] : '')
+            . ($b->website ? '; ' . $b->website : '')
+            . ' – ' . $b->getUrl(true);
+    }
+
+    /** Ein Verein für die KI (ohne Ansprechpartner; die stehen bei Bedarf im Stadtwissen) */
+    public static function verein(\humhub\modules\vereine\models\Verein $v): string
+    {
+        return "- {$v->name} ({$v->kategorie}, {$v->ortsteil})"
+            . ($v->treffpunkt ? '; Treffpunkt: ' . self::plain($v->treffpunkt, 150) : '')
+            . ($v->beschreibung ? '; ' . self::plain($v->beschreibung, 300) : '')
+            . ($v->website ? '; ' . $v->website : '')
+            . ' – ' . $v->getUrl(true);
+    }
+
+    /** Kompakte Liste „Kategorie: Name, Name (Ortsteil), …“ für Vereine und Betriebe */
+    private static function namensliste(array $models): string
+    {
+        $gruppen = [];
+        foreach ($models as $m) {
+            $gruppen[$m->kategorie ?: 'Sonstiges'][] = $m->name . ($m->ortsteil && $m->ortsteil !== 'Uffenheim' ? " ({$m->ortsteil})" : '');
+        }
+        ksort($gruppen);
+        return implode("\n", array_map(fn($k, $namen) => "- $k: " . implode(', ', $namen), array_keys($gruppen), $gruppen));
     }
 
     /** @return array Kalendereintrag-ID => Vereinsname (Termine, die ein Verein über das Vereinsverzeichnis eingetragen hat) */
