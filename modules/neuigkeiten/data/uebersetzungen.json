@@ -1,29 +1,29 @@
 {
     "app-nach-pause": {
         "en": {
-            "titel": "App responds again after a longer break",
-            "text": "If you reopened the app after a longer break, the page sometimes stayed blank and buttons didn't respond. In that case, it now reloads itself once briefly.",
-            "quelle": "56b9f334b090fdf8d90a662867a28e47f471237a"
+            "titel": "Page responds again after a long break",
+            "text": "If the page stayed open for a while without you doing anything, buttons sometimes stopped responding and new posts didn't load. Now, in that case, it reloads itself briefly.",
+            "quelle": "f67762ff15b0eae2d39d9f490e5bab85a2bbe64f"
         },
         "uk": {
-            "titel": "Застосунок знову реагує після тривалої паузи",
-            "text": "Якщо ти відкрив застосунок після довгої паузи, сторінка іноді залишалася порожньою, а кнопки не реагували. Тепер у такому разі він один раз коротко перезавантажується.",
-            "quelle": "56b9f334b090fdf8d90a662867a28e47f471237a"
+            "titel": "Сторінка знову реагує після тривалої паузи",
+            "text": "Якщо сторінка була відкрита довго, а ти нічого не робив, кнопки іноді перестават реагувати, і нові дописи не завантажувалися. Тепер у такому випадку сторінка коротко перезавантажується сама.",
+            "quelle": "f67762ff15b0eae2d39d9f490e5bab85a2bbe64f"
         },
         "ar": {
-            "titel": "التطبيق يستجيب مرة أخرى بعد توقف طويل",
-            "text": "عندما فتحت التطبيق مرة أخرى بعد توقف طويل، كانت الصفحة تبقى فارغة أحياناً ولا تستجيب الأزرار. الآن يتم تحميله من جديد لفترة وجيزة في هذه الحالة.",
-            "quelle": "56b9f334b090fdf8d90a662867a28e47f471237a"
+            "titel": "الصفحة تستجيب مرة أخرى بعد توقف طويل",
+            "text": "إذا بقيت الصفحة مفتوحة لفترة طويلة دون أن تقوم بأي شيء، كانت الأزرار تتوقف عن العمل أحياناً ولا تُحمَّل المنشورات الجديدة. الآن تُعاد تحميل الصفحة تلقائياً مرة واحدة قصيرة في هذه الحالة.",
+            "quelle": "f67762ff15b0eae2d39d9f490e5bab85a2bbe64f"
         },
         "tr": {
-            "titel": "Uygulama uzun bir aradan sonra tekrar yanıt veriyor",
-            "text": "Uygulamayı uzun bir aradan sonra tekrar açtığında sayfa bazen boş kalıyor ve düğmeler tepki vermiyordu. Artık bu durumda sayfa bir kez kısaca yeniden yükleniyor.",
-            "quelle": "56b9f334b090fdf8d90a662867a28e47f471237a"
+            "titel": "Sayfa uzun bir aradan sonra yeniden tepki veriyor",
+            "text": "Sayfa, sen bir şey yapmadan uzun süre açık kaldığında düğmeler bazen tepki vermiyor ve yeni gönderiler yüklenmiyordu. Artık bu durumda sayfa kısa bir süreliğine kendini yeniden yüklüyor.",
+            "quelle": "f67762ff15b0eae2d39d9f490e5bab85a2bbe64f"
         },
         "ru": {
-            "titel": "Приложение снова отвечает после долгой паузы",
-            "text": "Если ты открыл приложение после долгого перерыва, страница иногда оставалась пустой, а кнопки не реагировали. Теперь в таком случае оно один раз коротко перезагружается.",
-            "quelle": "56b9f334b090fdf8d90a662867a28e47f471237a"
+            "titel": "Страница снова реагирует после долгой паузы",
+            "text": "Если страница была открыта долго и ты ничего не делал, кнопки иногда переставали реагировать, а новые записи не загружались. Теперь в таком случае страница один раз коротко перезагружается.",
+            "quelle": "f67762ff15b0eae2d39d9f490e5bab85a2bbe64f"
         }
     },
     "hilfe-regeln": {
