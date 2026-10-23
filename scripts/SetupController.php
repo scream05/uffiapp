@@ -1977,6 +1977,26 @@ class SetupController extends Controller
     }
 
     /**
+     * Mail-Passwort (App-Passwort von Google) setzen: setup/mail-passwort – liest /tmp/mailpw (von scripts/mail-passwort.sh
+     * aus secrets/mail_app_passwort kopiert), entfernt Leerzeichen, speichert es als mailerPassword (gilt für Versand und
+     * Mail-Eingang) und löscht die Datei. Gibt das Passwort nie aus.
+     */
+    public function actionMailPasswort()
+    {
+        $datei = '/tmp/mailpw';
+        $pw = preg_replace('/\s+/', '', (string)@file_get_contents($datei));
+        @unlink($datei);
+        if (strlen($pw) < 8) {
+            $this->stderr("Kein Passwort gefunden (Datei leer oder fehlt)\n");
+            return ExitCode::DATAERR;
+        }
+        Yii::$app->settings->set('mailerPassword', $pw);
+        Yii::$app->cache->flush();
+        $this->stdout('mailerPassword gesetzt (' . strlen($pw) . " Zeichen)\n");
+        return ExitCode::OK;
+    }
+
+    /**
      * Hilfe-Seiten übersetzen (setup/hilfe-uebersetzen [1 = alles neu]): modules/neuigkeiten/hilfe/de/*.html per Claude in alle
      * Sprachen, nur wenn sich der deutsche Text geändert hat (Prüfsumme in der ersten Zeile). Ergebnis nach /data/neuigkeiten/hilfe/
      * – von dort ins Repo kopieren (siehe README). Platzhalter {{…}} und HTML bleiben unverändert (wird geprüft).
