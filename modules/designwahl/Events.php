@@ -263,6 +263,8 @@ class Events
                 $event->sender->addWidget(widgets\DesignNeu::class);
             }
             assets\KalenderAsset::register(Yii::$app->view);
+            assets\AufwachenAsset::register(Yii::$app->view);
+            Yii::$app->view->registerJs('window.dnSitzungSek = ' . (int) Yii::$app->user->authTimeout . ';', \yii\web\View::POS_HEAD, 'dn-sitzung');
             if (Yii::$app->user->isGuest) {
                 self::abbrechenKnopf();
             }
