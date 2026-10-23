@@ -1,31 +1,4 @@
 {
-    "app-nach-pause": {
-        "en": {
-            "titel": "Page responds again after a long break",
-            "text": "If the page stayed open for a while without you doing anything, buttons sometimes stopped responding and new posts didn't load. Now, in that case, it reloads itself briefly.",
-            "quelle": "f67762ff15b0eae2d39d9f490e5bab85a2bbe64f"
-        },
-        "uk": {
-            "titel": "Сторінка знову реагує після тривалої паузи",
-            "text": "Якщо сторінка була відкрита довго, а ти нічого не робив, кнопки іноді перестават реагувати, і нові дописи не завантажувалися. Тепер у такому випадку сторінка коротко перезавантажується сама.",
-            "quelle": "f67762ff15b0eae2d39d9f490e5bab85a2bbe64f"
-        },
-        "ar": {
-            "titel": "الصفحة تستجيب مرة أخرى بعد توقف طويل",
-            "text": "إذا بقيت الصفحة مفتوحة لفترة طويلة دون أن تقوم بأي شيء، كانت الأزرار تتوقف عن العمل أحياناً ولا تُحمَّل المنشورات الجديدة. الآن تُعاد تحميل الصفحة تلقائياً مرة واحدة قصيرة في هذه الحالة.",
-            "quelle": "f67762ff15b0eae2d39d9f490e5bab85a2bbe64f"
-        },
-        "tr": {
-            "titel": "Sayfa uzun bir aradan sonra yeniden tepki veriyor",
-            "text": "Sayfa, sen bir şey yapmadan uzun süre açık kaldığında düğmeler bazen tepki vermiyor ve yeni gönderiler yüklenmiyordu. Artık bu durumda sayfa kısa bir süreliğine kendini yeniden yüklüyor.",
-            "quelle": "f67762ff15b0eae2d39d9f490e5bab85a2bbe64f"
-        },
-        "ru": {
-            "titel": "Страница снова реагирует после долгой паузы",
-            "text": "Если страница была открыта долго и ты ничего не делал, кнопки иногда переставали реагировать, а новые записи не загружались. Теперь в таком случае страница один раз коротко перезагружается.",
-            "quelle": "f67762ff15b0eae2d39d9f490e5bab85a2bbe64f"
-        }
-    },
     "hilfe-regeln": {
         "en": {
             "titel": "App guide and community rules",

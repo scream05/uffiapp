@@ -10,9 +10,6 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
-    ['id' => 'app-nach-pause', 'datum' => '2026-10-23', 'art' => 'behoben', 'popup' => false,
-        'titel' => 'Seite reagiert wieder nach längerer Pause',
-        'text' => 'War die Seite länger offen, ohne dass du etwas getan hast, reagierten Knöpfe manchmal nicht mehr und neue Beiträge luden nicht. Jetzt lädt sie sich in diesem Fall einmal kurz neu.'],
     ['id' => 'hilfe-regeln', 'datum' => '2026-10-23', 'art' => 'neu', 'popup' => false,
         'link' => [null, '/neuigkeiten/hilfe/index'],
         'titel' => 'App-Anleitung und Community-Regeln',
