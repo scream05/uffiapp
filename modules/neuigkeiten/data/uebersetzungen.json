@@ -1,4 +1,31 @@
 {
+    "hilfe-regeln": {
+        "en": {
+            "titel": "App guide and community rules",
+            "text": "At the bottom of every page, under \"Help & Rules\", you'll now find how to set up the app, adjust your notifications and what to do if something goes wrong – plus our community rules in short form.",
+            "quelle": "41268c8f53697236ba1abfc48dbbc2217d4799d0"
+        },
+        "uk": {
+            "titel": "Інструкція до застосунку та правила спільноти",
+            "text": "Унизу кожної сторінки в розділі «Допомога та правила» тепер є інструкція з налаштування застосунку, керування сповіщеннями та порад на випадок проблем — а також коротко наші правила спільноти.",
+            "quelle": "41268c8f53697236ba1abfc48dbbc2217d4799d0"
+        },
+        "ar": {
+            "titel": "دليل التطبيق وقواعد المجتمع",
+            "text": "أسفل كل صفحة، في قسم „المساعدة والقواعد“، ستجد الآن شرحًا لكيفية إعداد التطبيق، وضبط الإشعارات، وما الذي يساعد عند حدوث مشكلات، بالإضافة إلى قواعد مجتمعنا باختصار.",
+            "quelle": "41268c8f53697236ba1abfc48dbbc2217d4799d0"
+        },
+        "tr": {
+            "titel": "Uygulama kılavuzu ve topluluk kuralları",
+            "text": "Her sayfanın en altındaki „Yardım ve Kurallar“ bölümünde artık uygulamayı nasıl kuracağın, bildirimleri nasıl ayarlayacağın ve sorunlarda neyin işe yarayabileceği yazıyor – ayrıca topluluk kurallarımız kısaca burada.",
+            "quelle": "41268c8f53697236ba1abfc48dbbc2217d4799d0"
+        },
+        "ru": {
+            "titel": "Инструкция по приложению и правила сообщества",
+            "text": "Внизу каждой страницы, в разделе «Помощь и правила», теперь есть инструкция о том, как настроить приложение, включить уведомления и что делать, если возникли проблемы, а также кратко изложены правила нашего сообщества.",
+            "quelle": "41268c8f53697236ba1abfc48dbbc2217d4799d0"
+        }
+    },
     "willkommensrundgang": {
         "en": {
             "titel": "Welcome tour",

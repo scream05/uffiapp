@@ -22,6 +22,9 @@ class Module extends \humhub\components\Module
 
     public const ARTEN = ['neu' => ['Neu', 'star'], 'besser' => ['Verbessert', 'magic'], 'behoben' => ['Behoben', 'wrench']];
 
+    /** Hilfe-Seiten: Schlüssel => deutscher Titel (Inhalt in hilfe/<sprache>/<schlüssel>.html) */
+    public const HILFE = ['app' => 'App-Anleitung', 'regeln' => 'Community-Regeln'];
+
     private ?array $eintraege = null;
 
     /** @return array[] alle Einträge, neueste zuerst */
@@ -105,5 +108,36 @@ class Module extends \humhub\components\Module
     {
         $ids = array_column(array_filter($this->eintraege(), fn($e) => !empty($e['popup'])), 'id');
         $this->settings->user($user)->set('gesehen', json_encode(array_values(array_unique(array_merge($this->gesehen($user), $ids)))));
+    }
+
+    public static function hilfeTitel(string $seite): string
+    {
+        return Yii::t('NeuigkeitenModule.base', self::HILFE[$seite] ?? $seite);
+    }
+
+    /**
+     * Inhalt einer Hilfe-Seite in der Sprache der Seite (sonst deutsch). Platzhalter im HTML:
+     * {{url:/route?a=b}} und {{space:<space-url>:/route}} (fehlt der Space, wird es die Startseite).
+     */
+    public function hilfeHtml(string $seite, ?string $lang = null): string
+    {
+        $lang ??= substr((string)Yii::$app->language, 0, 2);
+        $datei = $this->getBasePath() . "/hilfe/$lang/$seite.html";
+        if (!is_file($datei)) {
+            $datei = $this->getBasePath() . "/hilfe/de/$seite.html";
+        }
+        $route = function (string $r): array {
+            $teile = explode('?', $r, 2);
+            parse_str($teile[1] ?? '', $params);
+            return [$teile[0]] + $params;
+        };
+        return preg_replace_callback('/\{\{(url|space):([^}]+)\}\}/', function ($m) use ($route) {
+            if ($m[1] === 'url') {
+                return \yii\helpers\Html::encode(\yii\helpers\Url::to($route($m[2])));
+            }
+            [$spaceUrl, $r] = explode(':', $m[2], 2);
+            $space = Space::findOne(['url' => $spaceUrl]);
+            return \yii\helpers\Html::encode($space ? $space->createUrl($r) : \yii\helpers\Url::home());
+        }, (string)file_get_contents($datei));
     }
 }

@@ -1139,12 +1139,46 @@ def community_written():
         for d, _, files in os.walk(os.path.join(ROOT, 'community', 'mitteilungsblatt')):
             written += [(os.path.relpath(os.path.join(d, f), ROOT), False, False) for f in files if f.endswith('.md')]
     try:
+        written += [write(rel, title, url, text) for rel, title, url, text in community_hilfe()]
+    except Exception as e:
+        print(f'! Hilfe-Seiten nicht gelesen: {e}', file=sys.stderr)
+        for d, _, files in os.walk(os.path.join(ROOT, 'community', 'hilfe')):
+            written += [(os.path.relpath(os.path.join(d, f), ROOT), False, False) for f in files if f.endswith('.md')]
+    try:
         written += [write(rel, title, url, text, always=immer) for rel, title, url, text, immer in community_bekanntmachungen()]
     except Exception as e:
         print(f'! Bekanntmachungen nicht gelesen: {e}', file=sys.stderr)
         for d, _, files in os.walk(os.path.join(ROOT, 'community', 'bekanntmachungen')):
             written += [(os.path.relpath(os.path.join(d, f), ROOT), False, False) for f in files if f.endswith('.md')]
     return written
+
+
+HILFE_DIR = os.path.join(os.path.dirname(ROOT), 'modules', 'neuigkeiten', 'hilfe', 'de')
+HILFE_TITEL = {'app': 'Hilfe: App-Anleitung (App, Browser, Konto, Mitteilungen, erste Schritte, Probleme)',
+               'regeln': 'Hilfe: Community-Regeln der Plattform'}
+
+
+def community_hilfe():
+    """Hilfe-Seiten der Plattform (modules/neuigkeiten/hilfe/de/*.html, /hilfe/<seite>) als [(rel, titel, url, text)]."""
+    base = 'https://community.rundumuffni.de'
+    found = []
+    for seite, titel in HILFE_TITEL.items():
+        h = open(os.path.join(HILFE_DIR, seite + '.html'), encoding='utf-8').read()
+        h = re.sub(r'\{\{url:([^}]+)\}\}', lambda m: base + m.group(1), h)
+        h = re.sub(r'\{\{space:([^:}]+):([^}]+)\}\}', lambda m: f'{base}/s/{m.group(1)}{m.group(2)}', h)
+        h = re.sub(r'<nav.*?</nav>', '', h, flags=re.S)
+        h = re.sub(r'<a href="(?!#)([^"]+)">(.*?)</a>', lambda m: f'{m.group(2)} ({m.group(1).replace("mailto:", "")})', h, flags=re.S)
+        h = re.sub(r'<h1>.*?</h1>', '', h, flags=re.S)
+        h = re.sub(r'([^.,:!?])</b>\s', r'\1: ', h)  # „<b>Titel</b> Text“ → „Titel: Text“
+        h = re.sub(r'<h2>(.*?)</h2>', r'\n## \1\n', h, flags=re.S)
+        h = re.sub(r'<(li|dt)[^>]*>', '\n- ', h)
+        h = re.sub(r'<dd>', '\n  ', h)
+        h = re.sub(r'</?(p|section)[^>]*>', '\n', h)
+        text = html.unescape(re.sub(r'<[^>]+>', '', h))
+        text = re.sub(r'[ \t]+', ' ', text)
+        text = re.sub(r'\n\s*\n+', '\n\n', '\n'.join(l.strip() if not l.startswith('  ') else l.rstrip() for l in text.split('\n')))
+        found.append((f'community/hilfe/{seite}.md', titel, f'{base}/hilfe/{seite}', text.strip()))
+    return found
 
 
 MB_DIR = os.path.join(os.path.dirname(ROOT), 'humhub-data', 'mitteilungsblatt')

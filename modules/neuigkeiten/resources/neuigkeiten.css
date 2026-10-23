@@ -83,3 +83,43 @@ html.nk-offen, html.nk-offen body { overflow: hidden; }
 .nk-rg-punkte span { width: 8px; height: 8px; border-radius: 50%; background: var(--hh-border-color, #d6dbe0); transition: width .2s; }
 .nk-rg-punkte span.aktiv { width: 22px; border-radius: 4px; background: var(--hh-accent-color, #446e88); }
 .nk-rg-fuss [hidden] { display: none !important; }
+
+/* Hilfe-Seiten (/hilfe/app, /hilfe/regeln) */
+.hl-seite h1 { font-size: 1.5em; font-weight: 800; margin: 14px 0 6px; }
+.hl-seite h2 { font-size: 1.15em; font-weight: 800; margin: 26px 0 10px; scroll-margin-top: 80px; }
+.hl-seite h2 .fa { color: var(--hh-accent-color, #446e88); width: 1.3em; }
+.hl-seite section { scroll-margin-top: 80px; }
+.hl-seite p, .hl-seite li, .hl-seite dd { line-height: 1.55; }
+.hl-intro { font-size: 1.05em; color: var(--hh-text-color-soft, #5a6268); }
+.hl-sprung { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 4px; }
+.hl-sprung a { padding: 3px 12px; border-radius: 999px; font-size: 13px; border: 1px solid var(--hh-border-color, #d6dbe0);
+    color: inherit; text-decoration: none; white-space: nowrap; }
+.hl-sprung a:hover { background: var(--hh-background-color-secondary, #f1f3f5); }
+.hl-schritte { list-style: none; counter-reset: hl; margin: 0; padding: 0; }
+.hl-schritte li { counter-increment: hl; position: relative; padding: 0 0 12px 42px; }
+.hl-schritte li::before { content: counter(hl); position: absolute; left: 0; top: -2px; width: 28px; height: 28px; border-radius: 50%;
+    background: var(--hh-accent-color, #446e88); color: #fff; font-weight: 800; text-align: center; line-height: 28px; }
+.hl-liste { padding-left: 20px; }
+.hl-liste li { margin-bottom: 6px; }
+.hl-feld { display: inline-block; border: 1.5px solid var(--hh-accent-color, #446e88); border-radius: 8px; padding: 0 8px;
+    font-weight: 700; white-space: nowrap; }
+.hl-hinweis { font-size: 13.5px; color: var(--hh-text-color-soft, #5a6268); background: var(--hh-background-color-secondary, #f1f3f5);
+    border-radius: 12px; padding: 10px 14px; }
+.hl-karten { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+.hl-karten li { border: 1px solid var(--hh-border-color, #e5e7eb); border-radius: 14px; padding: 12px 14px; }
+.hl-karten b { display: block; margin-bottom: 3px; }
+.hl-karten a { display: inline-block; margin-top: 4px; font-weight: 700; }
+.hl-fragen dt { font-weight: 700; margin-top: 12px; }
+.hl-fragen dd { margin: 2px 0 0; }
+.hl-regeln { list-style: none; margin: 16px 0; padding: 0; display: grid; gap: 10px; }
+.hl-regeln li { display: flex; gap: 14px; align-items: flex-start; border: 1px solid var(--hh-border-color, #e5e7eb); border-radius: 14px; padding: 12px 14px; }
+.hl-regeln li > .fa { flex: 0 0 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+    background: #e3edf3; color: #1f5f8b; font-size: 19px; }
+.hl-regeln li:nth-child(3n+2) > .fa { background: #eef5d9; color: #4d6a08; }
+.hl-regeln li:nth-child(3n) > .fa { background: #f6e8e9; color: #7c1922; }
+.hl-regeln b, .hl-karten b, .hl-schritte b { font-weight: 800; }
+.hl-regeln b { display: block; margin-bottom: 2px; }
+[data-bs-theme="dark"] .hl-regeln li > .fa { background: rgba(255, 255, 255, .08) !important; color: #9cc0d6 !important; }
+.hl-notfall { display: flex; gap: 12px; align-items: center; background: #f6e8e9; color: #5c1219; border-radius: 14px; padding: 12px 16px; }
+.hl-notfall .fa { font-size: 22px; }
+[data-bs-theme="dark"] .hl-notfall { background: rgba(196, 60, 70, .18); color: inherit; }

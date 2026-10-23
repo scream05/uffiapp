@@ -1882,6 +1882,25 @@ class SetupController extends Controller
             $en = Yii::$app->view->renderFile('@neuigkeiten/views/index/index.php', ['module' => $modul, 'art' => 'neu', 'eintraege' => array_slice($alle, 0, 2)]);
             $pruefe('Seite englisch', str_contains($en, 'What’s new') && str_contains($en, \humhub\helpers\Html::encode($tr[$alle[0]['id']]['en']['titel'] ?? '###'))
                 && str_contains($en, 'October 2026'));
+            foreach (array_keys(\humhub\modules\neuigkeiten\Module::HILFE) as $seite) {
+                $de = (string)file_get_contents($modul->getBasePath() . "/hilfe/de/$seite.html");
+                $veraltet = [];
+                foreach (array_keys(\humhub\modules\kiAssistent\components\Uebersetzer::SPRACHEN) as $l) {
+                    $tr = @file_get_contents($modul->getBasePath() . "/hilfe/$l/$seite.html");
+                    if ($tr === false || !str_starts_with($tr, '<!-- quelle: ' . sha1($de) . ' -->')) {
+                        $veraltet[] = $l;
+                    }
+                }
+                $pruefe("Hilfe $seite: Übersetzungen aktuell", !$veraltet, implode(', ', $veraltet));
+                $h = $modul->hilfeHtml($seite, 'de');
+                $pruefe("Hilfe $seite: alle Platzhalter ersetzt, keine Links auf die Startseite", !str_contains($h, '{{')
+                    && !preg_match('#href="/?(dashboard)?"#', $h), mb_substr($h, 0, 200));
+            }
+            \humhub\modules\neuigkeiten\Events::onBeforeRequest(null); // Konsole: Regeln wie im Web
+            $pruefe('Hilfe-Adressen kurz', \yii\helpers\Url::to(['/neuigkeiten/hilfe/seite', 'seite' => 'regeln']) === '/hilfe/regeln',
+                \yii\helpers\Url::to(['/neuigkeiten/hilfe/seite', 'seite' => 'regeln']));
+            $hEn = $modul->hilfeHtml('app');
+            $pruefe('Hilfe englisch', !str_contains($hEn, 'So nutzt du') && str_contains($hEn, 'community.rundumuffni.de'));
             $rgEn = \humhub\modules\neuigkeiten\widgets\Rundgang::widget();
             $pruefe('Rundgang englisch', str_contains($rgEn, 'Ask Uffi') && str_contains($rgEn, 'Skip the tour') && !str_contains($rgEn, 'Weiter'));
             Yii::$app->language = 'de';
@@ -1955,6 +1974,57 @@ class SetupController extends Controller
         file_put_contents('/data/neuigkeiten/uebersetzungen.json', json_encode($tr, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) . "\n");
         $this->stdout("Gespeichert: /data/neuigkeiten/uebersetzungen.json\n");
         return ExitCode::OK;
+    }
+
+    /**
+     * Hilfe-Seiten übersetzen (setup/hilfe-uebersetzen [1 = alles neu]): modules/neuigkeiten/hilfe/de/*.html per Claude in alle
+     * Sprachen, nur wenn sich der deutsche Text geändert hat (Prüfsumme in der ersten Zeile). Ergebnis nach /data/neuigkeiten/hilfe/
+     * – von dort ins Repo kopieren (siehe README). Platzhalter {{…}} und HTML bleiben unverändert (wird geprüft).
+     */
+    public function actionHilfeUebersetzen($alles = 0)
+    {
+        $modul = Yii::$app->getModule('neuigkeiten');
+        $ki = Yii::$app->getModule('ki-assistent');
+        if ($ki->getApiKey() === null) {
+            $this->stderr("Kein Schlüssel in secrets/anthropic_api_key\n");
+            return ExitCode::CONFIG;
+        }
+        $claude = new \humhub\modules\kiAssistent\components\Claude($ki->getApiKey(), $ki->getModel());
+        $basis = $modul->getBasePath() . '/hilfe';
+        $fehler = 0;
+        foreach (array_keys(\humhub\modules\neuigkeiten\Module::HILFE) as $seite) {
+            $de = (string)file_get_contents("$basis/de/$seite.html");
+            $kopf = '<!-- quelle: ' . sha1($de) . ' -->';
+            foreach (\humhub\modules\kiAssistent\components\Uebersetzer::SPRACHEN as $lang => $sprache) {
+                $alt = @file_get_contents("$basis/$lang/$seite.html");
+                if (!$alles && $alt !== false && str_starts_with($alt, $kopf)) {
+                    $this->stdout("$lang/$seite: aktuell\n");
+                    continue;
+                }
+                $system = "You translate an HTML help page of a German local community platform for the town of Uffenheim (Bavaria) into {$sprache}. "
+                    . "Translate only the visible text and the aria-label values. Keep every HTML tag, attribute, class, id, href and every placeholder "
+                    . "in double curly braces exactly as it is. Use the informal friendly form of address. Keep names unchanged: Uffi, Rund um Uffni, "
+                    . "Uffenheim, HumHub, community.rundumuffni.de, App Store, Google Play, Safari, Chrome, e-mail addresses. Translate feature and menu names such as „Mängelmelder“ (report a problem), „Ideen & Vorschläge“ (ideas & suggestions) and „Melden“ (report) like a localized app would. Button and menu labels "
+                    . "of iOS/Android (e.g. „Zum Home-Bildschirm“, „App installieren“) use the official {$sprache} wording of those systems. "
+                    . "Output only the translated HTML, no explanation, no code fence.";
+                [$antwort, $in, $out] = $claude->ask($system, [['role' => 'user', 'text' => $de]]);
+                $ki->addUebersetzungUsage($in, $out);
+                $html = trim(preg_replace('/^```(?:html)?\s*|\s*```$/', '', trim($antwort)));
+                preg_match_all('/\{\{[^}]+\}\}/', $de, $soll);
+                preg_match_all('/\{\{[^}]+\}\}/', $html, $ist);
+                if ($soll[0] !== $ist[0] || preg_match('/<script|<iframe|\son\w+=|javascript:/i', $html)
+                    || substr_count($html, '<') !== substr_count($de, '<')) {
+                    $this->stderr("FEHL $lang/$seite: Platzhalter oder HTML verändert – nicht gespeichert\n");
+                    $fehler++;
+                    continue;
+                }
+                @mkdir("/data/neuigkeiten/hilfe/$lang", 0775, true);
+                file_put_contents("/data/neuigkeiten/hilfe/$lang/$seite.html", "$kopf\n$html\n");
+                $this->stdout("$lang/$seite: übersetzt\n");
+            }
+        }
+        $this->stdout("Gespeichert unter /data/neuigkeiten/hilfe/\n");
+        return $fehler ? ExitCode::SOFTWARE : ExitCode::OK;
     }
 
     /**

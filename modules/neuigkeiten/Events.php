@@ -23,6 +23,19 @@ class Events
         }
     }
 
+    /** Kurze Adressen /hilfe/app und /hilfe/regeln */
+    public static function onBeforeRequest($event)
+    {
+        try {
+            Yii::$app->urlManager->addRules([
+                'hilfe' => 'neuigkeiten/hilfe/index',
+                'hilfe/<seite:(app|regeln)>' => 'neuigkeiten/hilfe/seite',
+            ], false);
+        } catch (\Throwable $e) {
+            Yii::error($e, 'neuigkeiten');
+        }
+    }
+
     /** Fußzeile: Link „Neuigkeiten“ (vor „Ideen & Vorschläge“ und „Quellcode“) */
     public static function onFooterMenuInit($event)
     {
@@ -31,6 +44,11 @@ class Events
                 'label' => Yii::t('NeuigkeitenModule.base', 'Neuigkeiten'),
                 'url' => \yii\helpers\Url::to(['/neuigkeiten/index']),
                 'sortOrder' => 880,
+            ]));
+            $event->sender->addEntry(new MenuLink([
+                'label' => Yii::t('NeuigkeitenModule.base', 'Hilfe & Regeln'),
+                'url' => \yii\helpers\Url::to(['/neuigkeiten/hilfe/seite', 'seite' => 'app']),
+                'sortOrder' => 875,
             ]));
         } catch (\Throwable $e) {
             Yii::error($e, 'neuigkeiten');

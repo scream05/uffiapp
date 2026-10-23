@@ -10,6 +10,10 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'hilfe-regeln', 'datum' => '2026-10-23', 'art' => 'neu', 'popup' => false,
+        'link' => [null, '/neuigkeiten/hilfe/index'],
+        'titel' => 'App-Anleitung und Community-Regeln',
+        'text' => 'Unter „Hilfe & Regeln“ ganz unten auf jeder Seite steht jetzt, wie du die App einrichtest, Mitteilungen einstellst und was bei Problemen hilft – dazu unsere Community-Regeln in Kurzform.'],
     ['id' => 'willkommensrundgang', 'datum' => '2026-10-23', 'art' => 'neu', 'popup' => false,
         'titel' => 'Willkommensrundgang',
         'text' => 'Neu angemeldet? Ein kurzer Rundgang auf der Startseite zeigt dir in fünf Schritten das Wichtigste – Uffi, Abfuhr-Erinnerung, Mängelmelder und die App. Du kannst ihn oben auf dieser Seite jederzeit noch einmal ansehen.'],
