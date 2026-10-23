@@ -60,3 +60,26 @@ html.nk-offen, html.nk-offen body { overflow: hidden; }
 .nk-eintrag h3 { font-size: 1em; font-weight: 700; margin: 4px 0 2px; }
 .nk-eintrag p { margin: 0; line-height: 1.45; }
 @media (max-width: 480px) { .nk-eintrag { grid-template-columns: 1fr; } }
+
+/* Willkommensrundgang (nutzt das Popup-Gerüst) */
+.nk-rg-hallo { margin: 0 44px 10px 0; font-size: 13px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--hh-text-color-soft, #6c757d); }
+.nk-rg-schritt { text-align: center; padding: 4px 4px 2px; }
+.nk-rg-schritt[hidden] { display: none; }
+.nk-rg-schritt h2 { font-size: 1.35em; font-weight: 800; margin: 14px 0 8px; }
+.nk-rg-schritt p { line-height: 1.5; margin: 0 0 14px; }
+.nk-rg-bild { --nk-farbe: #446e88; --nk-grund: #e3edf3;
+    width: 84px; height: 84px; margin: 4px auto 0; border-radius: 26px; display: flex; align-items: center; justify-content: center;
+    background: var(--nk-grund); color: var(--nk-farbe); font-size: 40px; }
+.nk-rg-bild img { width: 72px; height: 72px; border-radius: 50%; }
+.nk-rg-bild-1 { --nk-grund: #dcf0f7; }
+.nk-rg-bild-2 { --nk-farbe: #5e7f0a; --nk-grund: #eef5d9; }
+.nk-rg-bild-3 { --nk-farbe: #9a6b00; --nk-grund: #fbf0cc; }
+.nk-rg-bild-4 { --nk-farbe: #7c1922; --nk-grund: #f6e8e9; }
+[data-bs-theme="dark"] .nk-rg-bild { --nk-grund: rgba(255, 255, 255, .08); --nk-farbe: #9cc0d6; }
+.nk-rg-ziel { border-radius: 999px; padding: 6px 18px; font-weight: 700; margin-bottom: 6px; }
+.nk-rg-fuss { align-items: center; }
+.nk-rg-punkte { display: flex; gap: 6px; margin-right: auto; }
+.nk-rg-punkte span { width: 8px; height: 8px; border-radius: 50%; background: var(--hh-border-color, #d6dbe0); transition: width .2s; }
+.nk-rg-punkte span.aktiv { width: 22px; border-radius: 4px; background: var(--hh-accent-color, #446e88); }
+.nk-rg-fuss [hidden] { display: none !important; }

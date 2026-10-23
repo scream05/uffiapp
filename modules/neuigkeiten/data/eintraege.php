@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'willkommensrundgang', 'datum' => '2026-10-23', 'art' => 'neu', 'popup' => false,
+        'titel' => 'Willkommensrundgang',
+        'text' => 'Neu angemeldet? Ein kurzer Rundgang auf der Startseite zeigt dir in fünf Schritten das Wichtigste – Uffi, Abfuhr-Erinnerung, Mängelmelder und die App. Du kannst ihn oben auf dieser Seite jederzeit noch einmal ansehen.'],
     ['id' => 'uffi-wieder-da', 'datum' => '2026-10-22', 'art' => 'behoben', 'popup' => false,
         'titel' => 'Uffi antwortet wieder',
         'text' => 'Uffi hat zuletzt nur gemeldet, dass er für diesen Monat Pause macht. Das lag an einer zu streng gerechneten Kostengrenze. Jetzt beantwortet er deine Fragen wieder.'],

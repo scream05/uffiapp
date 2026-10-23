@@ -1859,6 +1859,19 @@ class SetupController extends Controller
             Yii::$app->cache->flush();
             $pruefe('Nach Wegklicken kein Popup mehr', $modul->fuerPopup($alt) === [] && \humhub\modules\neuigkeiten\widgets\Popup::widget() === '');
 
+            $modul->settings->user($alt)->delete('rundgang');
+            $pruefe('Rundgang offen für Konto ohne Einstellung', $modul->rundgangOffen($alt));
+            $rg = \humhub\modules\neuigkeiten\widgets\Rundgang::widget();
+            if ($html) {
+                file_put_contents('/data/neuigkeiten/rundgang-test.html', $rg); // nur für einen Screenshot, danach löschen
+            }
+            $pruefe('Rundgang gerendert (5 Schritte, Ziele Uffi/Abfuhr/Mängelmelder)', substr_count($rg, 'data-nk-rg-schritt=') === 5
+                && str_contains($rg, 'data-nk-rg-uffi') && str_contains($rg, 'abfuhr/einstellungen')
+                && str_contains($rg, 'maengelmelder/meldung/create') && str_contains($rg, 'neuigkeiten/index/rundgang'), mb_substr(strip_tags($rg), 0, 300));
+            $modul->rundgangGesehen($alt);
+            Yii::$app->cache->flush();
+            $pruefe('Nach Rundgang nicht mehr offen', !$modul->rundgangOffen($alt));
+
             $neu = new User(['created_at' => date('Y-m-d H:i:s', strtotime('+1 day'))]);
             $pruefe('Konto jünger als alle Einträge: kein Popup', $modul->fuerPopup($neu) === []);
 
@@ -1869,6 +1882,8 @@ class SetupController extends Controller
             $en = Yii::$app->view->renderFile('@neuigkeiten/views/index/index.php', ['module' => $modul, 'art' => 'neu', 'eintraege' => array_slice($alle, 0, 2)]);
             $pruefe('Seite englisch', str_contains($en, 'What’s new') && str_contains($en, \humhub\helpers\Html::encode($tr[$alle[0]['id']]['en']['titel'] ?? '###'))
                 && str_contains($en, 'October 2026'));
+            $rgEn = \humhub\modules\neuigkeiten\widgets\Rundgang::widget();
+            $pruefe('Rundgang englisch', str_contains($rgEn, 'Ask Uffi') && str_contains($rgEn, 'Skip the tour') && !str_contains($rgEn, 'Weiter'));
             Yii::$app->language = 'de';
         } catch (\Throwable $e) {
             $fehler++;

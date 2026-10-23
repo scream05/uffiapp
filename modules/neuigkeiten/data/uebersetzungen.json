@@ -1,4 +1,31 @@
 {
+    "willkommensrundgang": {
+        "en": {
+            "titel": "Welcome tour",
+            "text": "Just signed up? A short tour on the start page shows you the most important things in five steps – Uffi, waste collection reminders, the defect reporter and the app. You can view it again at any time at the top of this page.",
+            "quelle": "d7ecd1553801a5f1e3b9f4960d50dafae039f92f"
+        },
+        "uk": {
+            "titel": "Вітальний огляд",
+            "text": "Щойно зареєструвався? Короткий огляд на головній сторінці за п'ять кроків покаже тобі найважливіше – Uffi, нагадування про вивезення відходів, Mängelmelder і застосунок. Ти можеш переглянути його знову будь-коли, вгорі на цій сторінці.",
+            "quelle": "d7ecd1553801a5f1e3b9f4960d50dafae039f92f"
+        },
+        "ar": {
+            "titel": "جولة الترحيب",
+            "text": "مسجّل جديد؟ جولة قصيرة في الصفحة الرئيسية تعرّفك في خمس خطوات على أهم الأشياء – Uffi وتذكير مواعيد جمع النفايات وأداة الإبلاغ عن المشكلات والتطبيق. يمكنك أن تعيد مشاهدتها في أي وقت من أعلى هذه الصفحة.",
+            "quelle": "d7ecd1553801a5f1e3b9f4960d50dafae039f92f"
+        },
+        "tr": {
+            "titel": "Hoş geldin turu",
+            "text": "Yeni kayıt oldun mu? Ana sayfadaki kısa tur sana beş adımda en önemli şeyleri gösterir – Uffi, çöp toplama hatırlatıcısı, sorun bildirici ve uygulama. Bu sayfanın üstünden turu istediğin zaman tekrar izleyebilirsin.",
+            "quelle": "d7ecd1553801a5f1e3b9f4960d50dafae039f92f"
+        },
+        "ru": {
+            "titel": "Приветственный обзор",
+            "text": "Только что зарегистрировался? Короткий обзор на главной странице за пять шагов покажет тебе самое важное – Uffi, напоминание о вывозе мусора, Mängelmelder и приложение. Ты можешь в любое время посмотреть его ещё раз вверху этой страницы.",
+            "quelle": "d7ecd1553801a5f1e3b9f4960d50dafae039f92f"
+        }
+    },
     "uffi-wieder-da": {
         "en": {
             "titel": "Uffi is back to answering",

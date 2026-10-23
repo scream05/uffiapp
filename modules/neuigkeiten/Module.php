@@ -10,6 +10,7 @@ use Yii;
  * Neuigkeiten: Einträge in data/eintraege.php (deutsch, im Repo gepflegt), Übersetzungen in data/uebersetzungen.json
  * (erzeugt mit `scripts/run-setup.sh neuigkeiten-uebersetzen`). Seite /neuigkeiten/index für alle, Popup einmalig
  * für Angemeldete; gesehene Einträge merkt sich die Benutzereinstellung „gesehen“ (Liste der IDs).
+ * Dazu der Willkommensrundgang (widgets/Rundgang): einmal je Konto statt des Popups, erledigt = Einstellung „rundgang“.
  */
 class Module extends \humhub\components\Module
 {
@@ -85,6 +86,18 @@ class Module extends \humhub\components\Module
         $liste = array_filter($this->eintraege(), fn($e) => !empty($e['popup']) && $e['datum'] >= $ab
             && $e['datum'] <= date('Y-m-d') && !in_array($e['id'], $gesehen, true));
         return array_slice(array_values($liste), 0, $this->popupMax);
+    }
+
+    /** Willkommensrundgang noch nicht gesehen (einmal für jedes Konto, auch für bestehende) */
+    public function rundgangOffen(User $user): bool
+    {
+        return !$this->settings->user($user)->get('rundgang');
+    }
+
+    /** Rundgang beendet oder übersprungen: nicht wieder von selbst zeigen */
+    public function rundgangGesehen(User $user): void
+    {
+        $this->settings->user($user)->set('rundgang', date('Y-m-d'));
     }
 
     /** Alle Popup-Einträge als gesehen merken (auch die, die wegen $popupMax nicht angezeigt wurden) */

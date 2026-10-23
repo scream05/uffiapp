@@ -15,7 +15,7 @@ class IndexController extends Controller
 {
     protected function getAccessRules()
     {
-        return [['login' => ['gesehen']], ['post' => ['gesehen']]];
+        return [['login' => ['gesehen', 'rundgang']], ['post' => ['gesehen', 'rundgang']]];
     }
 
     public function actionIndex($art = '')
@@ -34,6 +34,13 @@ class IndexController extends Controller
     public function actionGesehen()
     {
         $this->module->alleGesehen(Yii::$app->user->getIdentity());
+        return $this->asJson(['ok' => true]);
+    }
+
+    /** Willkommensrundgang beendet oder übersprungen */
+    public function actionRundgang()
+    {
+        $this->module->rundgangGesehen(Yii::$app->user->getIdentity());
         return $this->asJson(['ok' => true]);
     }
 }

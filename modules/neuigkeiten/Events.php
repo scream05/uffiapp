@@ -3,6 +3,7 @@
 namespace humhub\modules\neuigkeiten;
 
 use humhub\modules\neuigkeiten\widgets\Popup;
+use humhub\modules\neuigkeiten\widgets\Rundgang;
 use humhub\modules\ui\menu\MenuLink;
 use Yii;
 
@@ -12,7 +13,10 @@ class Events
     {
         try {
             if (!Yii::$app->user->isGuest) {
-                $event->sender->addWidget(Popup::class, [], ['sortOrder' => 1]);
+                // Erst der Willkommensrundgang (einmal, oder auf Wunsch per ?rundgang=1), danach die Neuigkeiten
+                $module = Yii::$app->getModule('neuigkeiten');
+                $rundgang = Yii::$app->request->get('rundgang') || $module->rundgangOffen(Yii::$app->user->getIdentity());
+                $event->sender->addWidget($rundgang ? Rundgang::class : Popup::class, [], ['sortOrder' => 1]);
             }
         } catch (\Throwable $e) {
             Yii::error($e, 'neuigkeiten');

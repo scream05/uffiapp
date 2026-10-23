@@ -19,7 +19,10 @@ $monat = null;
         <p class="help-block"><?= Yii::t('NeuigkeitenModule.base', 'Was ist neu auf der Plattform, was haben wir verbessert oder behoben? Hier steht es, neueste zuerst. Wünsche und Ideen nehmen wir gern unter {ideen} entgegen.',
             ['ideen' => ($s = \humhub\modules\space\models\Space::findOne(['url' => 'vorschlaege']))
                 ? Html::a(Yii::t('NeuigkeitenModule.base', 'Ideen & Vorschläge'), $s->createUrl('/vorschlaege/vorschlag/index'))
-                : Yii::t('NeuigkeitenModule.base', 'Ideen & Vorschläge')]) ?></p>
+                : Yii::t('NeuigkeitenModule.base', 'Ideen & Vorschläge')]) ?>
+            <?php if (!Yii::$app->user->isGuest): ?>
+                <?= Html::a(Yii::t('NeuigkeitenModule.base', 'Willkommensrundgang noch einmal ansehen'), ['/dashboard/dashboard', 'rundgang' => 1], ['data-pjax-prevent' => 1]) ?>
+            <?php endif ?></p>
         <nav class="nk-filter" aria-label="<?= Yii::t('NeuigkeitenModule.base', 'Nach Art filtern') ?>">
             <?= Html::a(Yii::t('NeuigkeitenModule.base', 'Alle'), ['/neuigkeiten/index'], ['class' => $art === '' ? 'aktiv' : null, 'aria-current' => $art === '' ? 'page' : null]) ?>
             <?php foreach (array_keys(Module::ARTEN) as $key): ?>
