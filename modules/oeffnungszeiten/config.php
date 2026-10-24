@@ -8,6 +8,9 @@ return [
     'id' => 'oeffnungszeiten',
     'class' => 'humhub\modules\oeffnungszeiten\Module',
     'namespace' => 'humhub\modules\oeffnungszeiten',
+    'consoleControllerMap' => [
+        'oeffnungszeiten' => 'humhub\modules\oeffnungszeiten\commands\OeffnungszeitenController',
+    ],
     'events' => [
         ['class' => Sidebar::class, 'event' => Sidebar::EVENT_INIT, 'callback' => [Events::class, 'onDashboardSidebarInit']],
         ['class' => Menu::class, 'event' => Menu::EVENT_INIT, 'callback' => [Events::class, 'onSpaceMenuInit']],

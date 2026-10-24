@@ -2669,7 +2669,7 @@ class SetupController extends Controller
 
     /**
      * Öffnungszeiten: Berechnung „jetzt geöffnet“/„öffnet …“ zu festen Zeitpunkten, Feiertage, Saisons, Zeilen,
-     * Uffi-Abschnitt und Übersetzungen (alle Texte des Moduls in allen Sprachen).
+     * Uffi-Abschnitt, Quellen der nächtlichen Prüfung und Übersetzungen (alle Texte des Moduls in allen Sprachen).
      *   scripts/run-setup.sh oeffnungszeiten-test
      */
     public function actionOeffnungszeitenTest()
@@ -2716,6 +2716,17 @@ class SetupController extends Controller
             $gleich('Rathaus Zeilen (1. Do heute)', $zeilen('rathaus', '2026-11-05 09:00')[2], 'am 1. Donnerstag im Monat 8:00–12:00, 14:00–18:00 Uhr *');
             $gleich('Kompostplatz Zeilen', $zeilen('kompostplatz', '2026-10-24 09:00'), ['Mo.–Mi., Fr. 8:00–12:30, 13:00–16:00 Uhr', 'Do. 12:30–17:00 Uhr', 'Sa. 9:00–14:00 Uhr *']);
             $gleich('Freibad täglich', $zeilen('freibad', '2026-10-24 09:00')[0], 'täglich 10:00–20:00 Uhr *');
+            $ohneQuelle = [];
+            foreach ($o as $id => $ort) {
+                if (empty($ort['pruefen']) || \humhub\modules\oeffnungszeiten\commands\OeffnungszeitenController::auszug($ort['pruefen']) === null) {
+                    $ohneQuelle[] = $id;
+                }
+            }
+            $gleich('Nächtliche Prüfung findet alle Quellen in wissen/', $ohneQuelle, []);
+            $meldung = (new \ReflectionMethod(\humhub\modules\oeffnungszeiten\commands\OeffnungszeitenController::class, 'meldung'))
+                ->invoke(null, $o['rathaus'], ['Montag bis Freitag: 08:00-12:00 Uhr'], null);
+            $gleich('Mailtext bei Änderung', str_contains($meldung, "Vorher:\n  Montag bis Freitag") && str_contains($meldung, 'nicht gefunden')
+                && str_contains($meldung, "Bei uns eingetragen:\n  Mo., Di., Do.: 8:00–12:00, 14:00–15:30 Uhr"), true);
             $uffi = $Z::forAssistant();
             $gleich('Uffi-Abschnitt mit allen Einrichtungen', count(array_filter(array_column($o, 'name'), fn($n) => str_contains($uffi, "- $n"))), count($o));
             // Übersetzungen: alle Texte aus Code und Daten in jeder Sprache

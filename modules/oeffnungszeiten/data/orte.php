@@ -8,6 +8,9 @@
  * ersterImMonat  optional: am ersten solchen Wochentag des Monats gelten diese Zeiten statt der normalen
  * saisons        optional: [[von, bis], …] (Y-m-d, null = offen) oder Funktion(Jahr) => [von, bis]; außerhalb geschlossen
  * feiertagZu     true = an gesetzlichen Feiertagen in Bayern geschlossen (bei false wissen wir es nicht)
+ * pruefen        nächtlicher Abgleich mit der Quelle (oeffnungszeiten/pruefen): Datei in wissen/ (stadtwissen.py),
+ *                optional Abschnitt von „ab“ bis vor „bis“ (Regex); verglichen werden nur Zeilen mit Zeiten/Tagen/Saison
+ *                (oder, falls angegeben, Zeilen passend zu „nur“)
  * name/hinweis   deutsch, übersetzt über OeffnungszeitenModule.base
  */
 $buero = [['08:00', '12:00'], ['14:00', '15:30']];
@@ -23,6 +26,7 @@ return [
         'hinweis' => 'Bitte möglichst vorher einen Termin vereinbaren, dann musst du nicht warten.',
         'link' => ['Termin buchen', 'https://www.terminland.de/uffenheim/?m=38075'],
         'quelle' => 'https://www.uffenheim.de/',
+        'pruefen' => ['datei' => 'rathaus-kontakt-oeffnungszeiten.md', 'ab' => '/^## Öffnungszeiten/', 'bis' => '/^## /'],
     ],
     'buecherei' => [
         'name' => 'Stadtbücherei', 'icon' => 'book',
@@ -31,6 +35,7 @@ return [
         'feiertagZu' => true,
         'hinweis' => 'Ausgeliehenes kannst du jederzeit in den Rückgabekasten werfen.',
         'quelle' => 'https://www.uffenheim.de/leben/kinderbetreuung-bildung/stadtbuecherei',
+        'pruefen' => ['datei' => 'leben/kinderbetreuung-bildung/stadtbuecherei.md', 'ab' => '/zu folgenden Zeiten geöffnet/', 'bis' => '/^#/'],
     ],
     'hallenbad' => [
         'name' => 'Hallenbad', 'icon' => 'tint',
@@ -40,6 +45,7 @@ return [
         'feiertagZu' => false,
         'hinweis' => 'Einlass bis eine Stunde vor Schluss, Badezeit endet 30 Minuten vor Schluss.',
         'quelle' => 'https://www.uffenheim.de/erleben/sport-freizeiteinrichtungen/hallenbad',
+        'pruefen' => ['datei' => 'erleben/sport-freizeiteinrichtungen/hallenbad.md', 'bis' => '/^## Eintrittspreise/'],
     ],
     'freibad' => [
         'name' => 'Freibad', 'icon' => 'sun-o',
@@ -49,6 +55,7 @@ return [
         'feiertagZu' => false,
         'hinweis' => 'Frühschwimmen dienstags und donnerstags 6:30 bis 9:00 Uhr.',
         'quelle' => 'https://www.uffenheim.de/erleben/sport-freizeiteinrichtungen/freibad',
+        'pruefen' => ['datei' => 'erleben/sport-freizeiteinrichtungen/freibad.md', 'bis' => '/^## Eintrittspreise/', 'nur' => '/Öffnungszeit|öffnet|schließt|Frühschwimmen|Einlass|\\d{1,2}[:.]\\d{2}/u'],
     ],
     'wertstoffhof' => [
         'name' => 'Wertstoffhof', 'icon' => 'recycle',
@@ -56,6 +63,7 @@ return [
         'zeiten' => [1 => [['09:00', '12:30']], 3 => [['11:30', '17:00']], 5 => [['09:00', '15:00']], 6 => [['09:00', '12:30']]],
         'feiertagZu' => true,
         'quelle' => 'https://www.kreis-nea.de/service-themen/abfall-natur-umwelt/abfallentsorgung/annahmestellen-oeffnungszeiten/wertstoffhoefe.html',
+        'pruefen' => ['datei' => 'landkreis/lebenslagen/abfallwirtschaft/annahmestellen-und-oeffnungszeiten/wertstoffhoefe.md', 'ab' => '/^Wertstoffhof Uffenheim$/', 'bis' => '/^(Wertstoffhof|Kompostplatz) |^#{1,2} /'],
     ],
     'kompostplatz' => [
         'name' => 'Kompostplatz', 'icon' => 'leaf',
@@ -68,6 +76,7 @@ return [
         'feiertagZu' => true,
         'hinweis' => 'Gartenabfälle, Reisig und Baumschnitt. Kleine Mengen Grüngut auch an den Containern am Geckenheimer Steig.',
         'quelle' => 'https://www.kreis-nea.de/service-themen/abfall-natur-umwelt/abfallentsorgung/annahmestellen-oeffnungszeiten/wertstoffhoefe.html',
+        'pruefen' => ['datei' => 'landkreis/lebenslagen/abfallwirtschaft/annahmestellen-und-oeffnungszeiten/kompostplaetze.md', 'ab' => '/^Kompostplatz Uffenheim$/', 'bis' => '/^(Wertstoffhof|Kompostplatz) |^#{1,2} /'],
     ],
     'museum' => [
         'name' => 'Gollachgaumuseum', 'icon' => 'institution',
@@ -77,6 +86,7 @@ return [
         'feiertagZu' => false,
         'hinweis' => 'Gruppenführungen nach Anmeldung das ganze Jahr.',
         'quelle' => 'https://www.uffenheim.de/erleben/sport-freizeiteinrichtungen/heimatmuseum',
+        'pruefen' => ['datei' => 'erleben/sport-freizeiteinrichtungen/heimatmuseum.md', 'nur' => '/Öffnungszeit|Führung/u'],
     ],
     'juff' => [
         'name' => 'Jugendtreff JUFF', 'icon' => 'gamepad',
@@ -85,5 +95,6 @@ return [
         'feiertagZu' => false,
         'hinweis' => 'Jeden zweiten Samstag bei Bedarf – die Termine stehen auf Instagram („Jugendtreff Uffenheim“).',
         'quelle' => 'https://www.uffenheim.de/leben/angebote-fuer-kinder-jugendliche/staedtischer-jugendteff-juff',
+        'pruefen' => ['datei' => 'leben/angebote-fuer-kinder-jugendliche/staedtischer-jugendteff-juff.md', 'ab' => '/Unsere Öffnungszeiten/', 'bis' => '/^#|^Falls ihr Fragen/'],
     ],
 ];
