@@ -10,6 +10,10 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'app-blaue-flaeche', 'datum' => '2026-10-24', 'art' => 'besser', 'popup' => false,
+        'link' => [null, '/hilfe/app'],
+        'titel' => 'Tipp bei blauer Fläche in der App',
+        'text' => 'Zeigt die App „HumHub“ nach einer Pause nur eine blaue Fläche, liegt das an der App selbst. In der App-Anleitung steht, wie du Rund um Uffni bis zu einer neuen App-Version stattdessen als Symbol auf dem Startbildschirm nutzt.'],
     ['id' => 'hilfe-regeln', 'datum' => '2026-10-23', 'art' => 'neu', 'popup' => false,
         'link' => [null, '/neuigkeiten/hilfe/index'],
         'titel' => 'App-Anleitung und Community-Regeln',
