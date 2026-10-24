@@ -78,6 +78,7 @@ return [
             5 => [['08:00', '12:30'], ['13:00', '16:00']], 6 => [['09:00', '14:00']],
         ],
         'feiertagZu' => true,
+        'zuAn' => ['12-24' => 'Heiligabend', '12-31' => 'Silvester'], // laut Nutzer 24.10.2026
         'hinweis' => 'Gartenabfälle, Reisig und Baumschnitt. Kleine Mengen Grüngut auch an den Containern am Geckenheimer Steig.',
         'quelle' => 'https://www.kreis-nea.de/service-themen/abfall-natur-umwelt/abfallentsorgung/annahmestellen-oeffnungszeiten/wertstoffhoefe.html',
         'pruefen' => ['datei' => 'landkreis/lebenslagen/abfallwirtschaft/annahmestellen-und-oeffnungszeiten/kompostplaetze.md', 'ab' => '/^Kompostplatz Uffenheim$/', 'bis' => '/^(Wertstoffhof|Kompostplatz) |^#{1,2} /'],
