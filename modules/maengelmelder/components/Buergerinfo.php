@@ -293,9 +293,19 @@ class Buergerinfo
         if (($nr = self::startNummer($d)) !== null) {
             return MaengelKontakt::find()->where(['content_id' => $nr, 'wa_id' => $von])->exists();
         }
+        if (self::knopfId($d) !== null) {
+            return true;
+        }
         $bezug = $d['context']['id'] ?? null;
         return $bezug !== null && BauhofNachricht::find()
             ->where(['wamid' => $bezug, 'buerger' => 1, 'richtung' => BauhofNachricht::AUS])->exists();
+    }
+
+    /** Knopf der Rückfrage „Wohin gehört das Foto?“: „bm:<Nr>“ (zur Meldung) oder „bt“ (Veranstaltung), sonst null */
+    private static function knopfId(array $d): ?string
+    {
+        $id = (string)($d['interactive']['button_reply']['id'] ?? '');
+        return ($d['type'] ?? '') === 'interactive' && ($id === 'bt' || preg_match('/^bm:\d+$/', $id)) ? $id : null;
     }
 
     /** Meldungsnummer aus „START 123“ (auch „start nr. 123“), sonst null */
@@ -322,16 +332,27 @@ class Buergerinfo
                 self::start($nr, $von, (string)$d['id']);
                 return;
             }
+            if (($knopf = self::knopfId($d)) !== null) {
+                $event->handled = true;
+                Yii::$app->queue->push(new BuergerJob(['knopf' => $knopf, 'von' => $von]));
+                return;
+            }
             $bezug = $d['context']['id'] ?? null;
             $contentId = $bezug ? BauhofNachricht::find()->select('content_id')
                 ->where(['wamid' => $bezug, 'buerger' => 1, 'richtung' => BauhofNachricht::AUS])->scalar() : null;
             $weitergeleitet = !empty($d['context']['forwarded']) || !empty($d['context']['frequently_forwarded']);
+            $frage = false;
             if (!$contentId) {
                 // Weitergeleitete Beiträge (z. B. Veranstaltungsplakate) ohne Bezug gehören in den Termin-Eingang
                 if ($weitergeleitet) {
                     return;
                 }
                 $contentId = self::letzteMeldung($von);
+                // Direkt geschicktes Foto ohne Antwort-Bezug kann auch ein Plakat sein → im Job nachfragen, außer
+                // zur Meldung lief gerade erst etwas (z. B. Statusinfo bekommen, dann Foto geschickt)
+                $frage = $contentId && in_array($d['type'] ?? '', ['image', 'document'], true)
+                    && !BauhofNachricht::find()->where(['content_id' => $contentId, 'buerger' => 1])
+                        ->andWhere(['>', 'created_at', date('Y-m-d H:i:s', time() - 1800)])->exists();
             }
             if (!$contentId) {
                 return;
@@ -356,6 +377,7 @@ class Buergerinfo
                 'media_id' => in_array($typ, ['image', 'document'], true) ? ($d[$typ]['id'] ?? null) : null,
                 'wamid' => $d['id'],
                 'bezug_wamid' => $bezug,
+                'zustellung' => $frage ? 'frage' : null,
                 'created_at' => date('Y-m-d H:i:s', (int)($d['timestamp'] ?? time())),
             ]);
             $n->save(false);
@@ -456,27 +478,107 @@ class Buergerinfo
             if (in_array($n->typ, ['image', 'document'], true) && $n->media_id) {
                 self::datei($n);
             }
-            // Bestätigung höchstens einmal pro Stunde und Meldung
-            $key = "maengel-buerger-ack-{$n->content_id}";
-            if (!Yii::$app->cache->get($key)) {
-                Yii::$app->cache->set($key, 1, 3600);
-                $ack = new BauhofNachricht(['content_id' => $n->content_id, 'richtung' => BauhofNachricht::AUS, 'buerger' => 1,
-                    'typ' => 'text', 'verarbeitet' => 1,
-                    'text' => "Danke, deine Nachricht zu Meldung Nr. {$n->content_id} ist beim Bauhof angekommen."]);
-                try {
-                    $ack->wamid = Api::sendeText($k->wa_id, $ack->text, $n->wamid);
-                    $ack->zustellung = 'gesendet';
-                } catch (\Throwable $e) {
-                    $ack->zustellung = 'fehler';
-                    $ack->fehler = mb_substr($e->getMessage(), 0, 255);
-                }
-                $ack->save(false);
+            if ($n->zustellung === 'frage') {
+                self::fragen($n, $k);
+                return;
             }
-            self::glocke($n);
-            self::anMitarbeiter($n);
+            self::zustellen($n, $k);
         } catch (\Throwable $e) {
             Yii::error("Bürger-Nachricht $id: " . $e->getMessage(), 'maengelmelder');
         }
+    }
+
+    /**
+     * „Wohin gehört das Foto?“ – nur einmal für mehrere Fotos kurz hintereinander. Ohne Antwort geht das Foto nach
+     * Bauhof::FRAGE_FRIST doch an die Meldung.
+     */
+    private static function fragen(BauhofNachricht $n, MaengelKontakt $k): void
+    {
+        Yii::$app->queue->delay(Bauhof::FRAGE_FRIST)->push(new BuergerJob(['id' => $n->id, 'frist' => true]));
+        $schonGefragt = BauhofNachricht::find()->where(['buerger' => 1, 'richtung' => BauhofNachricht::EIN, 'zustellung' => 'frage',
+            'content_id' => self::meldungenDerNummer($k->wa_id)])->andWhere(['<', 'id', $n->id])
+            ->andWhere(['>', 'created_at', date('Y-m-d H:i:s', strtotime($n->created_at) - 120)])->exists();
+        if ($schonGefragt) {
+            return;
+        }
+        try {
+            Api::sendeKnoepfe($k->wa_id, 'Wohin gehört das Foto?',
+                ["bm:{$n->content_id}" => "📷 Meldung Nr. {$n->content_id}", 'bt' => '🗓️ Veranstaltung'], $n->wamid);
+        } catch (\Throwable $e) {
+            // Ohne Rückfrage lieber gleich an die Meldung als liegen lassen
+            Yii::warning('Bürger-Rückfrage: ' . $e->getMessage(), 'maengelmelder');
+            $n->updateAttributes(['zustellung' => null]);
+            self::zustellen($n, $k);
+        }
+    }
+
+    /** Hintergrundjob nach Bauhof::FRAGE_FRIST: unbeantwortete Rückfrage → Foto geht an die Meldung */
+    public static function frageFrist(int $id): void
+    {
+        $n = BauhofNachricht::findOne($id);
+        if ($n === null || $n->zustellung !== 'frage' || !($k = MaengelKontakt::findOne($n->content_id))) {
+            return;
+        }
+        $n->updateAttributes(['zustellung' => null]);
+        try {
+            self::zustellen($n, $k);
+        } catch (\Throwable $e) {
+            Yii::error("Bürger-Nachricht $id: " . $e->getMessage(), 'maengelmelder');
+        }
+    }
+
+    /** Antwort auf die Rückfrage: „bm:<Nr>“ → offene Fotos an die Meldung, „bt“ → in den Termin-Eingang */
+    public static function knopf(string $von, string $knopf): void
+    {
+        $fragen = BauhofNachricht::find()->where(['buerger' => 1, 'richtung' => BauhofNachricht::EIN, 'zustellung' => 'frage',
+            'content_id' => self::meldungenDerNummer($von)])->orderBy('id')->all();
+        try {
+            if ($fragen === []) {
+                Api::sendeText($von, 'Dazu habe ich kein offenes Foto mehr gefunden.');
+            } elseif ($knopf === 'bt') {
+                $anzahl = Bauhof::inTermine($fragen, $von);
+                Api::sendeText($von, '🗓️ Danke! ' . ($anzahl === 1 ? 'Das Plakat geht' : "Die $anzahl Bilder gehen")
+                    . ' an unseren Veranstaltungskalender – du bekommst gleich Bescheid, was erkannt wurde.');
+            } else {
+                foreach ($fragen as $n) {
+                    $n->updateAttributes(['zustellung' => null]);
+                    if ($k = MaengelKontakt::findOne($n->content_id)) {
+                        self::zustellen($n, $k);
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            Yii::error("Bürger-Rückfrage ($knopf): " . $e->getMessage(), 'maengelmelder');
+        }
+    }
+
+    /** @return int[] Meldungen, bei denen diese Nummer angegeben ist */
+    private static function meldungenDerNummer(string $waId): array
+    {
+        return array_map('intval', MaengelKontakt::find()->select('content_id')->where(['wa_id' => $waId])->column());
+    }
+
+    /** Bestätigung an die meldende Person, Glocke an den Bauhof, Weiterleitung an den Mitarbeiter */
+    private static function zustellen(BauhofNachricht $n, MaengelKontakt $k): void
+    {
+        // Bestätigung höchstens einmal pro Stunde und Meldung
+        $key = "maengel-buerger-ack-{$n->content_id}";
+        if (!Yii::$app->cache->get($key)) {
+            Yii::$app->cache->set($key, 1, 3600);
+            $ack = new BauhofNachricht(['content_id' => $n->content_id, 'richtung' => BauhofNachricht::AUS, 'buerger' => 1,
+                'typ' => 'text', 'verarbeitet' => 1,
+                'text' => "Danke, deine Nachricht zu Meldung Nr. {$n->content_id} ist beim Bauhof angekommen."]);
+            try {
+                $ack->wamid = Api::sendeText($k->wa_id, $ack->text, $n->wamid);
+                $ack->zustellung = 'gesendet';
+            } catch (\Throwable $e) {
+                $ack->zustellung = 'fehler';
+                $ack->fehler = mb_substr($e->getMessage(), 0, 255);
+            }
+            $ack->save(false);
+        }
+        self::glocke($n);
+        self::anMitarbeiter($n);
     }
 
     private static function datei(BauhofNachricht $n): void

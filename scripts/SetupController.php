@@ -2501,6 +2501,36 @@ class SetupController extends Controller
             $knopf->invoke(null, $m, $foto(['typ' => 'knopf', 'text' => "z:$id"]));
             $f3->refresh();
             $pruefe('Knopf „Auftrag Nr.“ → Foto beim Auftrag', (int)$f3->content_id === (int)$id && $f3->zustellung === null);
+
+            // Meldende Person (Auftrag ist oben dem Test-Mitarbeiter zugewiesen → keine echte Weiterleitung)
+            $I = \humhub\modules\maengelmelder\components\Buergerinfo::class;
+            $buerger = '490000000004';
+            \humhub\modules\maengelmelder\models\MaengelKontakt::deleteAll(['content_id' => (int)$id]);
+            (new \humhub\modules\maengelmelder\models\MaengelKontakt(['content_id' => (int)$id, 'wa_id' => $buerger,
+                'info_whatsapp' => 1, 'wa_bestaetigt' => date('Y-m-d H:i:s'), 'created_at' => date('Y-m-d H:i:s')]))->save(false);
+            $N::deleteAll(['content_id' => (int)$id, 'buerger' => 1]);
+            $empfang = function (array $extra = []) use ($I, $buerger) {
+                $d = $extra + ['id' => 'test-b-' . uniqid(), 'from' => $buerger, 'type' => 'image',
+                    'image' => ['id' => 'x'], 'timestamp' => time()];
+                $ev = new \humhub\modules\whatsapp\events\EmpfangEvent(['daten' => $d]);
+                $I::onEmpfangen($ev);
+                return [$ev->handled, \humhub\modules\maengelmelder\models\BauhofNachricht::findOne(['wamid' => $d['id']])];
+            };
+            [$h, $b1] = $empfang();
+            $pruefe('Bürger: Foto ohne Bezug → bei der Meldung, aber Rückfrage offen', $h && $b1 && (int)$b1->content_id === (int)$id && $b1->zustellung === 'frage');
+            [$h] = $empfang(['context' => ['forwarded' => true]]);
+            $pruefe('Bürger: weitergeleitetes Foto → Termin-Eingang', $h === false);
+            $knopfDaten = ['type' => 'interactive', 'from' => $buerger, 'interactive' => ['button_reply' => ['id' => 'bt', 'title' => 'x']]];
+            $pruefe('Bürger-Knopf gehört zur Meldung (auch bei Mitarbeiter-Nummern)', $I::gehoertZuMeldung($knopfDaten));
+            $I::knopf($buerger, "bm:$id");
+            $b1->refresh();
+            $pruefe('Bürger-Knopf „Meldung Nr.“ → Rückfrage erledigt', $b1->zustellung === null && (int)$b1->content_id === (int)$id);
+            [$h, $b2] = $empfang();
+            $pruefe('Bürger: gerade erst geschrieben → keine Rückfrage', $h && $b2 && $b2->zustellung === null);
+            $b2->updateAttributes(['zustellung' => 'frage']);
+            $I::frageFrist($b2->id);
+            $b2->refresh();
+            $pruefe('Bürger: Frist abgelaufen → Foto bleibt bei der Meldung', $b2->zustellung === null);
         } finally {
             $tx->rollBack();
         }

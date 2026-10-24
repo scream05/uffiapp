@@ -627,19 +627,21 @@ class Bauhof
     }
 
     /**
-     * Fotos/PDFs eines Mitarbeiters, die eigentlich Veranstaltungen sind, in den Termin-Eingang (WhatsApp-Modul)
+     * Fotos/PDFs eines Mitarbeiters oder einer meldenden Person, die eigentlich Veranstaltungen sind, in den Termin-Eingang (WhatsApp-Modul)
      * verschieben – samt Datei; beim Bauhof bleibt nichts zurück. @return int Anzahl verschobener Nachrichten
      */
-    public static function inTermine(array $nachrichten): int
+    public static function inTermine(array $nachrichten, ?string $buergerNummer = null): int
     {
         $anzahl = 0;
         foreach ($nachrichten as $n) {
             $file = $n->file;
-            if (!$n->mitarbeiter || $file === null || !$n->wamid) {
+            // Fotos meldender Personen (buerger = 1) mit deren Nummer, ohne Namen
+            $nummer = $n->buerger ? $buergerNummer : $n->mitarbeiter?->telefon;
+            if (!$nummer || $file === null || !$n->wamid) {
                 continue;
             }
             $data = file_get_contents($file->store->get());
-            if ($data === false || !Verarbeitung::uebernehmen($n->mitarbeiter->telefon, $n->mitarbeiter->name, $n->wamid,
+            if ($data === false || !Verarbeitung::uebernehmen($nummer, $n->buerger ? null : $n->mitarbeiter->name, $n->wamid,
                     $n->typ, $n->text, $data, (string)$file->mime_type, $n->created_at)) {
                 continue;
             }

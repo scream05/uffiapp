@@ -55,6 +55,7 @@ class BauhofController extends ContentContainerController
         $auch = MaengelAuch::counts($ids);
         $ungelesen = BauhofNachricht::find()->select(['n' => 'COUNT(*)', 'content_id'])
             ->where(['richtung' => BauhofNachricht::EIN, 'gelesen_at' => null, 'content_id' => $ids])
+            ->andWhere(['or', ['zustellung' => null], ['not', ['zustellung' => 'frage']]])
             ->groupBy('content_id')->indexBy('content_id')->column();
         $letzte = BauhofNachricht::find()->select(['m' => 'MAX(created_at)', 'content_id'])
             ->where(['content_id' => $ids])->andWhere(['not', ['typ' => 'teil']])
@@ -312,7 +313,8 @@ class BauhofController extends ContentContainerController
             'liste' => Mitarbeiter::find()->orderBy(['aktiv' => SORT_DESC, 'name' => SORT_ASC])->all(),
             'offen' => $offen,
             'ungelesen' => BauhofNachricht::find()->select(['n' => 'COUNT(*)', 'mitarbeiter_id'])
-                ->where(['richtung' => BauhofNachricht::EIN, 'gelesen_at' => null])->groupBy('mitarbeiter_id')->indexBy('mitarbeiter_id')->column(),
+                ->where(['richtung' => BauhofNachricht::EIN, 'gelesen_at' => null])
+                ->andWhere(['or', ['zustellung' => null], ['not', ['zustellung' => 'frage']]])->groupBy('mitarbeiter_id')->indexBy('mitarbeiter_id')->column(),
             'module' => $this->module,
         ]);
     }
@@ -387,7 +389,9 @@ class BauhofController extends ContentContainerController
 
     private function verlauf(array $where): array
     {
+        // Fotos mit offener Rückfrage „Wohin gehört das Foto?“ (vielleicht ein Plakat) erst nach der Antwort zeigen
         return BauhofNachricht::find()->where($where)->andWhere(['not', ['typ' => ['teil', 'knopf']]])
+            ->andWhere(['or', ['zustellung' => null], ['not', ['zustellung' => 'frage']]])
             ->with(['mitarbeiter', 'user', 'file'])->orderBy(['created_at' => SORT_ASC, 'id' => SORT_ASC])->all();
     }
 
