@@ -71,4 +71,9 @@ return [
     'Allerheiligen' => 'День всех святых',
     '1. Weihnachtstag' => 'Рождество (1-й день)',
     '2. Weihnachtstag' => 'Рождество (2-й день)',
+    'An Feiertagen sowie an {tage} geschlossen.' => 'Закрыто в праздничные дни, а также: {tage}.',
+    '{tage} geschlossen.' => '{tage}: закрыто.',
+    'Heiligabend' => 'Сочельник',
+    'Silvester' => 'Канун Нового года',
+    'und' => 'и',
 ];

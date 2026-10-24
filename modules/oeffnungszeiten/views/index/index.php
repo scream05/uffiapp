@@ -58,8 +58,8 @@ $feiertag = Zeiten::feiertag(date('Y-m-d'));
                     <?php if (($saison = Zeiten::saisonText($ort)) !== null): ?>
                         <p class="oez-hinweis"><i class="fa fa-calendar" aria-hidden="true"></i> <?= Html::encode($saison) ?></p>
                     <?php endif ?>
-                    <?php if (!empty($ort['feiertagZu'])): ?>
-                        <p class="oez-hinweis"><?= $t('An Feiertagen geschlossen.') ?></p>
+                    <?php if (($zu = Zeiten::geschlossenText($ort)) !== null): ?>
+                        <p class="oez-hinweis"><?= Html::encode($zu) ?></p>
                     <?php endif ?>
                     <?php if (!empty($ort['hinweis'])): ?>
                         <p class="oez-hinweis"><?= Html::encode($t($ort['hinweis'])) ?></p>

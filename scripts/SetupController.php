@@ -2697,6 +2697,10 @@ class SetupController extends Controller
             $gleich('Rathaus Samstag', $text('rathaus', '2026-10-24 10:00'), 'öffnet Montag um 8:00 Uhr');
             $gleich('Rathaus Allerheiligen am Sonntag', $text('rathaus', '2026-10-31 10:00'), 'öffnet Montag um 8:00 Uhr');
             $gleich('Rathaus über Weihnachten', $text('rathaus', '2026-12-25 10:00'), 'öffnet Montag um 8:00 Uhr');
+            $gleich('Rathaus Heiligabend zu', $text('rathaus', '2026-12-24 07:00'), 'öffnet Montag um 8:00 Uhr');
+            $gleich('Rathaus Silvester vormittags zu', $text('rathaus', '2026-12-31 10:00'), 'öffnet Montag um 8:00 Uhr');
+            $gleich('Rathaus Hinweis Schließtage', $Z::geschlossenText($o['rathaus']), 'An Feiertagen sowie an Heiligabend und Silvester geschlossen.');
+            $gleich('Bücherei Heiligabend normal (nicht erfasst)', $text('buecherei', '2027-12-24 14:00'), 'öffnet um 15:00 Uhr');
             $gleich('Rathaus Ostermontag 2027 zu', $text('rathaus', '2027-03-29 09:00'), 'öffnet morgen um 8:00 Uhr');
             $gleich('Feiertag Karfreitag 2027', $Z::feiertag('2027-03-26'), 'Karfreitag');
             $gleich('Feiertag Fronleichnam 2026', $Z::feiertag('2026-06-04'), 'Fronleichnam');
@@ -2742,6 +2746,7 @@ class SetupController extends Controller
                         $texte[] = $ort[$feld];
                     }
                 }
+                $texte = array_merge($texte, array_values($ort['zuAn'] ?? []));
                 if (!empty($ort['link'])) {
                     $texte[] = $ort['link'][0];
                 }

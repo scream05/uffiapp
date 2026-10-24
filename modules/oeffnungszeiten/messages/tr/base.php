@@ -71,4 +71,9 @@ return [
     'Allerheiligen' => 'Azizler Günü',
     '1. Weihnachtstag' => 'Noel (1. gün)',
     '2. Weihnachtstag' => 'Noel (2. gün)',
+    'An Feiertagen sowie an {tage} geschlossen.' => 'Resmî tatillerde ve {tage} günlerinde kapalı.',
+    '{tage} geschlossen.' => '{tage}: kapalı.',
+    'Heiligabend' => 'Noel arifesi',
+    'Silvester' => 'Yılbaşı gecesi',
+    'und' => 've',
 ];

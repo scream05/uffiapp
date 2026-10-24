@@ -86,7 +86,8 @@ class Zeiten
     public static function anTag(array $ort, int $ts): array
     {
         $datum = date('Y-m-d', $ts);
-        if (!self::inSaison($ort, $datum) || (!empty($ort['feiertagZu']) && self::feiertag($datum) !== null)) {
+        if (!self::inSaison($ort, $datum) || (!empty($ort['feiertagZu']) && self::feiertag($datum) !== null)
+            || isset($ort['zuAn'][substr($datum, 5)])) {
             return [];
         }
         return array_map(fn($z) => [strtotime("$datum {$z[0]}"), strtotime("$datum {$z[1]}")], self::regulaer($ort, $ts));
@@ -186,6 +187,20 @@ class Zeiten
         return count($tage) === 7 ? Yii::t('OeffnungszeitenModule.base', 'täglich') : implode(', ', $teile);
     }
 
+    /** „An Feiertagen geschlossen.“ samt festen Schließtagen (Heiligabend …) oder null */
+    public static function geschlossenText(array $ort): ?string
+    {
+        $tage = array_map(fn($n) => Yii::t('OeffnungszeitenModule.base', $n), array_values($ort['zuAn'] ?? []));
+        $letzter = array_pop($tage);
+        $tage = $tage ? implode(', ', $tage) . ' ' . Yii::t('OeffnungszeitenModule.base', 'und') . ' ' . $letzter : $letzter;
+        if (!empty($ort['feiertagZu'])) {
+            return $tage
+                ? Yii::t('OeffnungszeitenModule.base', 'An Feiertagen sowie an {tage} geschlossen.', ['tage' => $tage])
+                : Yii::t('OeffnungszeitenModule.base', 'An Feiertagen geschlossen.');
+        }
+        return $tage ? Yii::t('OeffnungszeitenModule.base', '{tage} geschlossen.', ['tage' => $tage]) : null;
+    }
+
     /** Saisonzeile für die Anzeige oder null */
     public static function saisonText(array $ort, ?int $jetzt = null): ?string
     {
@@ -233,6 +248,7 @@ class Zeiten
                     $teile[] = $s;
                 }
                 $teile[] = !empty($ort['feiertagZu']) ? 'an Feiertagen geschlossen' : '';
+                $teile[] = !empty($ort['zuAn']) ? 'außerdem geschlossen: ' . implode(', ', $ort['zuAn']) : '';
                 $lines[] = '- ' . $ort['name'] . (!empty($ort['adresse']) ? " ({$ort['adresse']})" : '')
                     . ': ' . implode('; ', array_filter($teile))
                     . (!empty($ort['telefon']) ? "; Tel. {$ort['telefon']}" : '')

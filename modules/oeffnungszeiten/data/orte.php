@@ -8,6 +8,7 @@
  * ersterImMonat  optional: am ersten solchen Wochentag des Monats gelten diese Zeiten statt der normalen
  * saisons        optional: [[von, bis], …] (Y-m-d, null = offen) oder Funktion(Jahr) => [von, bis]; außerhalb geschlossen
  * feiertagZu     true = an gesetzlichen Feiertagen in Bayern geschlossen (bei false wissen wir es nicht)
+ * zuAn           optional: jedes Jahr zusätzlich geschlossen, ['MM-TT' => Name]
  * pruefen        nächtlicher Abgleich mit der Quelle (oeffnungszeiten/pruefen): Datei in wissen/ (stadtwissen.py),
  *                optional Abschnitt von „ab“ bis vor „bis“ (Regex); verglichen werden nur Zeilen mit Zeiten/Tagen/Saison
  *                (oder, falls angegeben, Zeilen passend zu „nur“)
@@ -23,6 +24,7 @@ return [
         'zeiten' => [1 => $buero, 2 => $buero, 3 => [['08:00', '12:00']], 4 => $buero, 5 => [['08:00', '12:00']]],
         'ersterImMonat' => [4 => [['08:00', '12:00'], ['14:00', '18:00']]],
         'feiertagZu' => true,
+        'zuAn' => ['12-24' => 'Heiligabend', '12-31' => 'Silvester'], // laut Nutzer 24.10.2026
         'hinweis' => 'Bitte möglichst vorher einen Termin vereinbaren, dann musst du nicht warten.',
         'link' => ['Termin buchen', 'https://www.terminland.de/uffenheim/?m=38075'],
         'quelle' => 'https://www.uffenheim.de/',

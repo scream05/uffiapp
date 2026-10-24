@@ -71,4 +71,9 @@ return [
     'Allerheiligen' => 'عيد جميع القديسين',
     '1. Weihnachtstag' => 'عيد الميلاد (اليوم الأول)',
     '2. Weihnachtstag' => 'عيد الميلاد (اليوم الثاني)',
+    'An Feiertagen sowie an {tage} geschlossen.' => 'مغلق في العطل الرسمية وكذلك في: {tage}.',
+    '{tage} geschlossen.' => '{tage}: مغلق.',
+    'Heiligabend' => 'ليلة عيد الميلاد',
+    'Silvester' => 'ليلة رأس السنة',
+    'und' => 'و',
 ];

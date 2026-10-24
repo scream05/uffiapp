@@ -71,4 +71,9 @@ return [
     'Allerheiligen' => 'All Saints\' Day',
     '1. Weihnachtstag' => 'Christmas Day',
     '2. Weihnachtstag' => 'Boxing Day',
+    'An Feiertagen sowie an {tage} geschlossen.' => 'Closed on public holidays and on {tage}.',
+    '{tage} geschlossen.' => '{tage}: closed.',
+    'Heiligabend' => 'Christmas Eve',
+    'Silvester' => 'New Year\'s Eve',
+    'und' => 'and',
 ];
