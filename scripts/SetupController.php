@@ -2437,6 +2437,78 @@ class SetupController extends Controller
         return $fehl ? ExitCode::UNSPECIFIED_ERROR : ExitCode::OK;
     }
 
+    /**
+     * Fotos von Bauhof-Mitarbeitern ohne Antwort-Bezug: Rückfrage „Wohin gehört das Foto?“ statt stiller Zuordnung.
+     * Prüft Zuordnung (sicher/vermutet), Frist und Knopf „Keinem Auftrag“ in einer Transaktion mit Rollback
+     * (Antworten gehen an eine Fantasienummer und scheitern bei Meta).
+     *   scripts/run-setup.sh bauhof-foto-test [content-id einer offenen Meldung]
+     */
+    public function actionBauhofFotoTest($id = 524)
+    {
+        $B = \humhub\modules\maengelmelder\components\Bauhof::class;
+        $N = \humhub\modules\maengelmelder\models\BauhofNachricht::class;
+        $ok = 0;
+        $fehl = 0;
+        $pruefe = function (string $was, bool $bed) use (&$ok, &$fehl) {
+            $bed ? $ok++ : $fehl++;
+            $this->stdout(($bed ? '  ok   ' : '  FEHL ') . "$was\n");
+        };
+        $zuordnen = new \ReflectionMethod($B, 'zuordnen');
+        $knopf = new \ReflectionMethod($B, 'knopf');
+        $tx = Yii::$app->db->beginTransaction();
+        try {
+            $m = new \humhub\modules\maengelmelder\models\Mitarbeiter(['name' => 'Test Foto', 'telefon' => '490000000003', 'aktiv' => 1]);
+            $m->save(false);
+            $auftrag = \humhub\modules\maengelmelder\models\Auftrag::forContentId((int)$id);
+            $auftrag->mitarbeiter_id = $m->id;
+            $auftrag->save(false);
+            $pruefe("Meldung $id ist einziger offener Auftrag", count($m->getOffeneAuftraege()) === 1);
+            $foto = function (array $a = []) use ($m, $N) {
+                $n = new $N($a + ['mitarbeiter_id' => $m->id, 'richtung' => $N::EIN, 'typ' => 'image',
+                    'wamid' => 'test-' . uniqid(), 'verarbeitet' => 1, 'created_at' => date('Y-m-d H:i:s')]);
+                $n->save(false);
+                return $n;
+            };
+            $n = $foto();
+            $sicher = null;
+            $r = $zuordnen->invokeArgs(null, [$m, $n, &$sicher]);
+            $pruefe('Foto ohne Bezug, nichts los am Auftrag → vermutet, nicht sicher (Rückfrage)', $r === (int)$id && $sicher === false);
+            $aus = new $N(['mitarbeiter_id' => $m->id, 'content_id' => (int)$id, 'richtung' => $N::AUS, 'typ' => 'text',
+                'wamid' => 'test-aus-' . uniqid(), 'verarbeitet' => 1, 'created_at' => date('Y-m-d H:i:s', time() - 600)]);
+            $aus->save(false);
+            $r = $zuordnen->invokeArgs(null, [$m, $n, &$sicher]);
+            $pruefe('Auftrag vor 10 Min. angezeigt → sicher (keine Rückfrage)', $r === (int)$id && $sicher === true);
+            $aus->updateAttributes(['created_at' => date('Y-m-d H:i:s', time() - 3600)]);
+            $r = $zuordnen->invokeArgs(null, [$m, $n, &$sicher]);
+            $pruefe('Auftrag vor 1 Std. angezeigt → wieder Rückfrage', $sicher === false);
+            $antwort = $foto(['bezug_wamid' => $aus->wamid]);
+            $r = $zuordnen->invokeArgs(null, [$m, $antwort, &$sicher]);
+            $pruefe('Antwort auf Auftragsnachricht → sicher', $r === (int)$id && $sicher === true);
+
+            $n->updateAttributes(['zustellung' => 'frage']);
+            $B::frageFrist($n->id);
+            $n->refresh();
+            $pruefe('Frist abgelaufen → Foto beim vermuteten Auftrag, Frage erledigt', (int)$n->content_id === (int)$id && $n->zustellung === null);
+
+            $f1 = $foto(['zustellung' => 'frage']);
+            $f2 = $foto(['zustellung' => 'frage']);
+            $knopf->invoke(null, $m, $foto(['typ' => 'knopf', 'text' => 'n']));
+            $f1->refresh();
+            $f2->refresh();
+            $pruefe('Knopf „Keinem Auftrag“ → beide Fotos ohne Auftrag, Frage erledigt',
+                $f1->content_id === null && $f2->content_id === null && $f1->zustellung === null && $f2->zustellung === null);
+            $f3 = $foto(['zustellung' => 'frage']);
+            $knopf->invoke(null, $m, $foto(['typ' => 'knopf', 'text' => "z:$id"]));
+            $f3->refresh();
+            $pruefe('Knopf „Auftrag Nr.“ → Foto beim Auftrag', (int)$f3->content_id === (int)$id && $f3->zustellung === null);
+        } finally {
+            $tx->rollBack();
+        }
+        $pruefe('Alles zurückgerollt', !\humhub\modules\maengelmelder\models\Mitarbeiter::find()->where(['telefon' => '490000000003'])->exists());
+        $this->stdout("$ok ok, $fehl Fehler\n");
+        return $fehl ? ExitCode::UNSPECIFIED_ERROR : ExitCode::OK;
+    }
+
     public function actionGutscheinTest($behalten = 0)
     {
         $D = \humhub\modules\gewerbe\components\GutscheinDienst::class;

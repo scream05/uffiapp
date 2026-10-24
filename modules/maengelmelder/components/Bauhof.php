@@ -17,7 +17,9 @@ use humhub\modules\maengelmelder\notifications\BauhofNichtZugestellt;
 use humhub\modules\post\models\Post;
 use humhub\modules\user\models\Group;
 use humhub\modules\user\models\User;
+use humhub\modules\notification\models\Notification;
 use humhub\modules\whatsapp\components\Api;
+use humhub\modules\whatsapp\components\Verarbeitung;
 use humhub\modules\whatsapp\events\EmpfangEvent;
 use Yii;
 
@@ -29,7 +31,8 @@ use Yii;
  * auf deren Knopf, ist das Fenster offen und die eigentlichen Inhalte (Text, Fotos, Standort, Knöpfe) folgen.
  *
  * Knopf-/Listen-IDs: d:<id> Auftrag anzeigen · s:<id>:<status> Status setzen · x:<id> weitere Status ·
- * l Auftragsliste · z:<id> Foto/Text diesem Auftrag zuordnen · n keinem Auftrag · m wartende Nachrichten zeigen
+ * l Auftragsliste · z:<id> Foto/Text diesem Auftrag zuordnen · n keinem Auftrag · t Foto ist eine Veranstaltung
+ * (→ Termin-Eingang) · m wartende Nachrichten zeigen
  */
 class Bauhof
 {
@@ -41,6 +44,9 @@ class Bauhof
         'erledigt' => 'Erledigt',
         'abgelehnt' => 'Nicht zuständig',
     ];
+
+    /** Sekunden, nach denen eine unbeantwortete „Wohin gehört das Foto?“-Frage zugunsten des Auftrags entschieden wird */
+    public const FRAGE_FRIST = 7200;
 
     public const HILFE = "So funktioniert's 👷\n\n"
         . "• Neue Aufträge kommen hier mit Beschreibung, Fotos und Ort an.\n"
@@ -492,13 +498,28 @@ class Bauhof
                     ->andWhere(['>', 'created_at', date('Y-m-d H:i:s', time() - 6 * 3600)])->all();
                 if ($teile[0] === 'z' && $mangel) {
                     foreach ($offen as $o) {
-                        $o->updateAttributes(['content_id' => $id]);
+                        $o->updateAttributes(['content_id' => $id, 'zustellung' => null]);
                     }
                     $m->updateAttributes(['aktuell_content_id' => $id]);
                     self::antwort('sendeText', $m->telefon, '📎 ' . (count($offen) === 1 ? 'Gespeichert' : count($offen) . ' Nachrichten gespeichert') . " bei Auftrag Nr. $id.");
                 } else {
+                    foreach ($offen as $o) {
+                        $o->updateAttributes(['zustellung' => null]);
+                    }
                     self::antwort('sendeText', $m->telefon, '📎 Gespeichert (ohne Auftrag). Der Bauhof sieht es trotzdem.');
                 }
+                if ($offen) {
+                    self::benachrichtigen($m, end($offen), $teile[0] === 'z' && $mangel ? "hat ein Foto zu Auftrag Nr. $id geschickt" : 'hat ein Foto geschickt');
+                }
+                return;
+            case 't':
+                // Foto(s) mit offener Rückfrage sind Veranstaltungen → Termin-Eingang
+                $fragen = BauhofNachricht::find()->where(['mitarbeiter_id' => $m->id, 'richtung' => BauhofNachricht::EIN,
+                    'zustellung' => 'frage'])->all();
+                $anzahl = self::inTermine($fragen);
+                self::antwort('sendeText', $m->telefon, $anzahl
+                    ? '🗓️ Danke! ' . ($anzahl === 1 ? 'Das Plakat geht' : "Die $anzahl Bilder gehen") . ' in den Termin-Eingang – du bekommst gleich Bescheid, was erkannt wurde.'
+                    : 'Dazu habe ich kein offenes Foto mehr gefunden.');
                 return;
         }
     }
@@ -545,55 +566,116 @@ class Bauhof
         $file->setStoredFileContent($data);
         $n->updateAttributes(['file_id' => $file->id, 'media_id' => null]);
 
-        $id = self::zuordnen($m, $n);
-        if ($id) {
-            $n->updateAttributes(['content_id' => $id]);
-            // Bei mehreren Fotos hintereinander nur einmal bestätigen
-            $kurzVorher = BauhofNachricht::find()->where(['mitarbeiter_id' => $m->id, 'richtung' => BauhofNachricht::EIN,
-                'content_id' => $id, 'typ' => ['image', 'document']])->andWhere(['<', 'id', $n->id])
-                ->andWhere(['>', 'created_at', date('Y-m-d H:i:s', strtotime($n->created_at) - 120)])->exists();
-            if (!$kurzVorher) {
-                self::antwort('sendeText', $m->telefon, "📷 Gespeichert bei Auftrag Nr. $id.");
-            }
-            self::benachrichtigen($m, $n, "hat ein Foto zu Auftrag Nr. $id geschickt");
+        $id = self::zuordnen($m, $n, $sicher);
+        if ($id && $sicher) {
+            self::fotoZuAuftrag($m, $n, $id);
             return;
         }
+        // Ohne Antwort-Bezug kann das Foto auch ein Plakat sein (Mitarbeiter schicken auch Veranstaltungen an die
+        // Nummer) → nachfragen; ohne Antwort bleibt es nach FRAGE_FRIST beim vermuteten Auftrag
+        $schonGefragt = BauhofNachricht::find()->where(['mitarbeiter_id' => $m->id, 'richtung' => BauhofNachricht::EIN,
+            'zustellung' => 'frage'])->andWhere(['<', 'id', $n->id])
+            ->andWhere(['>', 'created_at', date('Y-m-d H:i:s', strtotime($n->created_at) - 120)])->exists();
+        $n->updateAttributes(['zustellung' => 'frage']);
+        Yii::$app->queue->delay(self::FRAGE_FRIST)->push(new BauhofJob(['id' => $n->id, 'frist' => true]));
+        if ($schonGefragt) {
+            return;
+        }
+        $frage = 'Wohin gehört das Foto?';
         $offen = $m->getOffeneAuftraege();
         if (count($offen) > 1) {
             $zeilen = [];
-            foreach (array_slice($offen, 0, 9) as $a) {
+            foreach (array_slice($offen, 0, 8) as $a) {
                 if ($mg = self::mangelZu($a->content_id)) {
                     $zeilen['z:' . $a->content_id] = ["Nr. {$a->content_id} {$mg->kategorie}", $mg->getOrt()];
                 }
             }
+            $zeilen['t'] = ['🗓️ Veranstaltung', 'Plakat/Termin für den Kalender'];
             $zeilen['n'] = ['Keinem Auftrag', 'Nur an den Bauhof'];
-            $schonGefragt = BauhofNachricht::find()->where(['mitarbeiter_id' => $m->id, 'richtung' => BauhofNachricht::EIN, 'content_id' => null])
-                ->andWhere(['typ' => ['image', 'document']])->andWhere(['<', 'id', $n->id])
-                ->andWhere(['>', 'created_at', date('Y-m-d H:i:s', strtotime($n->created_at) - 120)])->exists();
-            if (!$schonGefragt) {
-                self::antwort('sendeListe', $m->telefon, 'Zu welchem Auftrag gehört das Foto?', 'Auftrag wählen', $zeilen);
-            }
+            self::antwort('sendeListe', $m->telefon, $frage, 'Auswählen', $zeilen, $n->wamid);
         } else {
-            self::antwort('sendeText', $m->telefon, '📷 Gespeichert (ohne Auftrag). Der Bauhof sieht es trotzdem.');
+            $knoepfe = $id ? ["z:$id" => "📷 Auftrag Nr. $id"] : [];
+            $knoepfe['t'] = '🗓️ Veranstaltung';
+            $knoepfe['n'] = $id ? 'Keinem Auftrag' : 'An den Bauhof';
+            self::antwort('sendeKnoepfe', $m->telefon, $frage, $knoepfe, $n->wamid);
         }
-        self::benachrichtigen($m, $n, 'hat ein Foto geschickt');
+    }
+
+    private static function fotoZuAuftrag(Mitarbeiter $m, BauhofNachricht $n, int $id): void
+    {
+        $n->updateAttributes(['content_id' => $id, 'zustellung' => null]);
+        // Bei mehreren Fotos hintereinander nur einmal bestätigen
+        $kurzVorher = BauhofNachricht::find()->where(['mitarbeiter_id' => $m->id, 'richtung' => BauhofNachricht::EIN,
+            'content_id' => $id, 'typ' => ['image', 'document']])->andWhere(['<', 'id', $n->id])
+            ->andWhere(['>', 'created_at', date('Y-m-d H:i:s', strtotime($n->created_at) - 120)])->exists();
+        if (!$kurzVorher) {
+            self::antwort('sendeText', $m->telefon, "📷 Gespeichert bei Auftrag Nr. $id.");
+        }
+        self::benachrichtigen($m, $n, "hat ein Foto zu Auftrag Nr. $id geschickt");
+    }
+
+    /** Hintergrundjob nach FRAGE_FRIST: unbeantwortete Rückfrage → Foto zum vermuteten Auftrag (oder ohne Auftrag) */
+    public static function frageFrist(int $id): void
+    {
+        $n = BauhofNachricht::findOne($id);
+        if ($n === null || $n->zustellung !== 'frage' || !($m = $n->mitarbeiter)) {
+            return;
+        }
+        $auftrag = self::zuordnen($m, $n);
+        $n->updateAttributes(['content_id' => $auftrag, 'zustellung' => null]);
+        self::benachrichtigen($m, $n, $auftrag ? "hat ein Foto zu Auftrag Nr. $auftrag geschickt" : 'hat ein Foto geschickt');
+    }
+
+    /**
+     * Fotos/PDFs eines Mitarbeiters, die eigentlich Veranstaltungen sind, in den Termin-Eingang (WhatsApp-Modul)
+     * verschieben – samt Datei; beim Bauhof bleibt nichts zurück. @return int Anzahl verschobener Nachrichten
+     */
+    public static function inTermine(array $nachrichten): int
+    {
+        $anzahl = 0;
+        foreach ($nachrichten as $n) {
+            $file = $n->file;
+            if (!$n->mitarbeiter || $file === null || !$n->wamid) {
+                continue;
+            }
+            $data = file_get_contents($file->store->get());
+            if ($data === false || !Verarbeitung::uebernehmen($n->mitarbeiter->telefon, $n->mitarbeiter->name, $n->wamid,
+                    $n->typ, $n->text, $data, (string)$file->mime_type, $n->created_at)) {
+                continue;
+            }
+            Notification::deleteAll(['source_class' => BauhofNachricht::class, 'source_pk' => $n->id]);
+            $file->delete();
+            $n->delete();
+            $anzahl++;
+        }
+        return $anzahl;
     }
 
     /**
      * Auftrag einer eingehenden Nachricht: 1. Antwort auf eine unserer Nachrichten, 2. zuletzt angezeigter Auftrag
      * des Mitarbeiters (wenn noch offen und ihm zugewiesen), 3. sein einziger offener Auftrag.
+     * $sicher: Antwort auf eine unserer Nachrichten oder zum Auftrag lief in den letzten 30 Minuten etwas
+     * (z. B. Status „Erledigt“ getippt, dann Foto vom Ergebnis) – sonst ist es nur eine Vermutung.
      */
-    private static function zuordnen(Mitarbeiter $m, BauhofNachricht $n): ?int
+    private static function zuordnen(Mitarbeiter $m, BauhofNachricht $n, ?bool &$sicher = null): ?int
     {
+        $sicher = false;
         if ($n->bezug_wamid && ($bezug = BauhofNachricht::findOne(['wamid' => $n->bezug_wamid])) && $bezug->content_id) {
+            $sicher = true;
             return (int)$bezug->content_id;
         }
         $offen = $m->getOffeneAuftraege();
         $ids = array_map(fn(Auftrag $a) => (int)$a->content_id, $offen);
+        $id = null;
         if ($m->aktuell_content_id && in_array((int)$m->aktuell_content_id, $ids, true)) {
-            return (int)$m->aktuell_content_id;
+            $id = (int)$m->aktuell_content_id;
+        } elseif (count($ids) === 1) {
+            $id = $ids[0];
         }
-        return count($ids) === 1 ? $ids[0] : null;
+        $sicher = $id !== null && BauhofNachricht::find()->where(['mitarbeiter_id' => $m->id, 'content_id' => $id,
+            'richtung' => [BauhofNachricht::EIN, BauhofNachricht::AUS]])->andWhere(['<>', 'id', $n->id])
+            ->andWhere(['>', 'created_at', date('Y-m-d H:i:s', strtotime($n->created_at) - 1800)])->exists();
+        return $id;
     }
 
     private static function sendeListe(Mitarbeiter $m): void

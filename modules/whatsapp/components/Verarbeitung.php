@@ -99,6 +99,38 @@ class Verarbeitung
     }
 
     /**
+     * Bild/PDF, das zuerst woanders gelandet ist (z. B. Foto eines Bauhof-Mitarbeiters, das ein Plakat war),
+     * nachträglich als eigene Einreichung in den Termin-Eingang legen. Ausgewertet wird im nächsten Lauf.
+     */
+    public static function uebernehmen(string $waId, ?string $name, string $wamid, string $typ, ?string $text,
+                                       string $data, string $mime, string $empfangenAt): bool
+    {
+        if (Nachricht::find()->where(['wamid' => $wamid])->exists()) {
+            return false;
+        }
+        $datei = sha1($wamid) . ($mime === 'application/pdf' ? '.pdf' : '.' . (explode('/', $mime)[1] ?: 'jpg'));
+        file_put_contents(Nachricht::dir() . '/' . $datei, $data);
+        $n = new Nachricht([
+            'wamid' => $wamid,
+            'wa_id' => preg_replace('/\D/', '', $waId),
+            'absender_name' => $name !== null ? mb_substr($name, 0, 150) : null,
+            'typ' => $typ,
+            'text' => $text,
+            'media_id' => 'uebernommen', // nur als Kennzeichen „Bild/PDF“ für aufteilen(); die Datei ist schon da
+            'mime' => $mime,
+            'datei' => $datei,
+            'empfangen_at' => $empfangenAt,
+            'status' => Nachricht::STATUS_NEU,
+        ]);
+        if (!$n->save()) {
+            @unlink(Nachricht::dir() . '/' . $datei);
+            return false;
+        }
+        Yii::$app->queue->delay(self::module()->sammelSekunden + 5)->push(new VerarbeitenJob());
+        return true;
+    }
+
+    /**
      * Alle fälligen Einreichungen auswerten (Hintergrundjob nach dem Webhook, zusätzlich per Crontab als Absicherung).
      * @param callable|null $log function(string $zeile)
      */

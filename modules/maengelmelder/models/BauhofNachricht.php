@@ -21,7 +21,7 @@ use humhub\modules\user\models\User;
  * @property string|null $media_id
  * @property string|null $wamid
  * @property string|null $bezug_wamid
- * @property string|null $zustellung
+ * @property string|null $zustellung ausgehend: Zustellstatus; eingehend „frage“ = Rückfrage „Wohin gehört das Foto?“ offen
  * @property string|null $fehler
  * @property int|null $user_id
  * @property int $verarbeitet

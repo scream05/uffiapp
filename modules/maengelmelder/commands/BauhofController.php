@@ -23,6 +23,7 @@ use yii\console\ExitCode;
  *   /app/yii bauhof/gastmeldungen       Meldungen ohne Konto: Stand anzeigen
  *   /app/yii bauhof/gastmeldungen an    einschalten (legt das Systemkonto an), „aus“ schaltet ab
  *   /app/yii bauhof/buergerinfo an|aus  Infos an Meldende bei Statusänderung (E-Mail/WhatsApp)
+ *   /app/yii bauhof/in-termine 228,229  Mitarbeiter-Fotos, die Veranstaltungen sind, in den Termin-Eingang verschieben
  */
 class BauhofController extends Controller
 {
@@ -159,6 +160,16 @@ class BauhofController extends Controller
     {
         $this->stdout(\humhub\modules\maengelmelder\components\MailEingang::verarbeiten((string)file_get_contents($datei), (bool)$probelauf) . "\n");
         return ExitCode::OK;
+    }
+
+    /** Mitarbeiter-Fotos (bauhof_nachricht-IDs, kommagetrennt) in den Termin-Eingang verschieben */
+    public function actionInTermine($ids)
+    {
+        $nachrichten = BauhofNachricht::find()->where(['id' => array_map('intval', explode(',', (string)$ids)),
+            'richtung' => BauhofNachricht::EIN, 'buerger' => 0, 'typ' => ['image', 'document']])->all();
+        $anzahl = \humhub\modules\maengelmelder\components\Bauhof::inTermine($nachrichten);
+        $this->stdout("$anzahl von " . count($nachrichten) . " Foto(s) in den Termin-Eingang verschoben\n");
+        return $anzahl ? ExitCode::OK : ExitCode::UNSPECIFIED_ERROR;
     }
 
     public function actionAufraeumen()

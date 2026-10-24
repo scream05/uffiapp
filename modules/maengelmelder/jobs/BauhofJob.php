@@ -9,9 +9,11 @@ use humhub\modules\queue\ActiveJob;
 class BauhofJob extends ActiveJob
 {
     public int $id = 0;
+    /** true: Frist der Rückfrage „Wohin gehört das Foto?“ abgelaufen */
+    public bool $frist = false;
 
     public function run()
     {
-        Bauhof::verarbeiten($this->id);
+        $this->frist ? Bauhof::frageFrist($this->id) : Bauhof::verarbeiten($this->id);
     }
 }
