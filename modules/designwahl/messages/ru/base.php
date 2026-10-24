@@ -89,7 +89,7 @@ return [
     'Die Vorhersage ist gerade nicht erreichbar. Bitte später noch einmal versuchen.' => 'Прогноз сейчас недоступен. Попробуй ещё раз позже.',
     'Hinweis aufklappen' => 'Развернуть подсказку',
     'Hinweis einklappen' => 'Свернуть подсказку',
-    'Notdienste, Spritpreise und Termine' => 'Дежурные службы, цены на топливо и мероприятия',
+    'Notdienste, Öffnungszeiten, Spritpreise und Termine' => 'Дежурные службы, часы работы, цены на топливо и мероприятия',
     'Auf einen Blick' => 'Коротко',
     'Wertstoffhof Uffenheim' => 'Пункт приёма вторсырья Уффенхайм',
     'Buchenweg 3 (im Kreisbauhof)' => 'Buchenweg 3 (на территории районного хоздвора)',

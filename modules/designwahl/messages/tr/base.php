@@ -89,7 +89,7 @@ return [
     'Die Vorhersage ist gerade nicht erreichbar. Bitte später noch einmal versuchen.' => 'Tahmine şu anda ulaşılamıyor. Lütfen daha sonra tekrar dene.',
     'Hinweis aufklappen' => 'Bilgiyi aç',
     'Hinweis einklappen' => 'Bilgiyi kapat',
-    'Notdienste, Spritpreise und Termine' => 'Nöbetçi hizmetler, akaryakıt fiyatları ve etkinlikler',
+    'Notdienste, Öffnungszeiten, Spritpreise und Termine' => 'Nöbetçi hizmetler, açılış saatleri, akaryakıt fiyatları ve etkinlikler',
     'Auf einen Blick' => 'Bir bakışta',
     'Wertstoffhof Uffenheim' => 'Uffenheim geri dönüşüm merkezi',
     'Buchenweg 3 (im Kreisbauhof)' => 'Buchenweg 3 (ilçe şantiyesinde)',

@@ -10,6 +10,10 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'oeffnungszeiten', 'datum' => '2026-10-24', 'art' => 'neu', 'popup' => true,
+        'link' => [null, '/oeffnungszeiten/index'],
+        'titel' => 'Öffnungszeiten auf einen Blick',
+        'text' => 'Rathaus, Bücherei, Hallenbad, Wertstoffhof und mehr: Auf der Startseite siehst du jetzt, was gerade geöffnet hat und wann es wieder aufmacht – am Handy im Fach am rechten Rand, alle Zeiten unter „Mehr“ → „Öffnungszeiten“. Auch Uffi kennt sie.'],
     ['id' => 'app-blaue-flaeche', 'datum' => '2026-10-24', 'art' => 'besser', 'popup' => false,
         'link' => [null, '/hilfe/app'],
         'titel' => 'Tipp bei blauer Fläche in der App',

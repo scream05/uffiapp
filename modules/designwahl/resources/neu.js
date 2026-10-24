@@ -261,8 +261,8 @@
         knopf.setAttribute('aria-haspopup', 'dialog');
         knopf.setAttribute('aria-expanded', 'false');
         knopf.setAttribute('aria-controls', 'dn-kastenfach');
-        knopf.setAttribute('aria-label', t('Notdienste, Spritpreise und Termine'));
-        knopf.title = t('Notdienste, Spritpreise und Termine');
+        knopf.setAttribute('aria-label', t('Notdienste, Öffnungszeiten, Spritpreise und Termine'));
+        knopf.title = t('Notdienste, Öffnungszeiten, Spritpreise und Termine');
         knopf.innerHTML = '<i class="fa fa-chevron-left" aria-hidden="true"></i>';
         document.body.appendChild(knopf);
         kastenKnopf = knopf;

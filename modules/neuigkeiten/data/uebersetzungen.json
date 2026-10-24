@@ -1,4 +1,31 @@
 {
+    "oeffnungszeiten": {
+        "en": {
+            "titel": "Opening hours at a glance",
+            "text": "Town hall, library, indoor pool, recycling center and more: On the home page you can now see what's open right now and when it opens again – on your phone in the panel on the right edge, all hours under \"More\" → \"Opening hours\". Uffi knows them too.",
+            "quelle": "7e80e29c888adc719fc751bf12f9e9f5fe577849"
+        },
+        "uk": {
+            "titel": "Години роботи на перший погляд",
+            "text": "Ратуша, бібліотека, криті басейни, пункт прийому вторсировини та інше: на головній сторінці ти тепер бачиш, що зараз відкрито і коли знову відчинять – на телефоні у панелі з правого краю, усі години роботи в розділі „Більше“ → „Години роботи“. Їх також знає Uffi.",
+            "quelle": "7e80e29c888adc719fc751bf12f9e9f5fe577849"
+        },
+        "ar": {
+            "titel": "أوقات الفتح في لمحة",
+            "text": "البلدية والمكتبة وحمام السباحة الداخلي ومركز إعادة التدوير وغيرها: في الصفحة الرئيسية ترى الآن ما هو مفتوح حالياً ومتى يفتح مرة أخرى – على الهاتف في القائمة الجانبية على اليمين، وجميع الأوقات تحت „المزيد“ ← „أوقات الفتح“. وأوفي يعرفها أيضاً.",
+            "quelle": "7e80e29c888adc719fc751bf12f9e9f5fe577849"
+        },
+        "tr": {
+            "titel": "Çalışma saatleri bir bakışta",
+            "text": "Belediye binası, kütüphane, kapalı yüzme havuzu, geri dönüşüm merkezi ve daha fazlası: Ana sayfada artık neyin şu an açık olduğunu ve ne zaman yeniden açılacağını görebilirsin – telefonda sağ kenardaki sekmede, tüm saatler ise „Mehr“ → „Öffnungszeiten“ altında. Uffi de bunları biliyor.",
+            "quelle": "7e80e29c888adc719fc751bf12f9e9f5fe577849"
+        },
+        "ru": {
+            "titel": "Часы работы на одном экране",
+            "text": "Ратуша, библиотека, бассейн, пункт приёма вторсырья и не только: на главной странице ты теперь сразу видишь, что сейчас открыто и когда откроется снова – на телефоне в панели у правого края, все часы работы в разделе «Ещё» → «Часы работы». Uffi тоже их знает.",
+            "quelle": "7e80e29c888adc719fc751bf12f9e9f5fe577849"
+        }
+    },
     "app-blaue-flaeche": {
         "en": {
             "titel": "Tip for a blue screen in the app",

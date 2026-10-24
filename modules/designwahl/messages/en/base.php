@@ -89,7 +89,7 @@ return [
     'Die Vorhersage ist gerade nicht erreichbar. Bitte später noch einmal versuchen.' => 'The forecast isn\'t available right now. Please try again later.',
     'Hinweis aufklappen' => 'Show info',
     'Hinweis einklappen' => 'Hide info',
-    'Notdienste, Spritpreise und Termine' => 'Emergency services, fuel prices and events',
+    'Notdienste, Öffnungszeiten, Spritpreise und Termine' => 'Emergency services, opening hours, fuel prices and events',
     'Auf einen Blick' => 'At a glance',
     'Wertstoffhof Uffenheim' => 'Uffenheim recycling centre',
     'Buchenweg 3 (im Kreisbauhof)' => 'Buchenweg 3 (at the district depot)',

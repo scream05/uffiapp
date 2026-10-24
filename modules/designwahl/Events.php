@@ -455,10 +455,10 @@ JS, ['DN_ABBRECHEN' => json_encode(Yii::t('DesignwahlModule.base', 'Abbrechen'),
     private static function oeffnungszeiten($legend): string
     {
         $space = $legend->contentContainer;
-        if (!$space instanceof \humhub\modules\space\models\Space || $space->url !== 'abfall-and-termine') {
+        if (!$space instanceof \humhub\modules\space\models\Space || $space->url !== 'abfall-and-termine' || !Yii::$app->hasModule('oeffnungszeiten')) {
             return '';
         }
-        return $legend->view->render('@designwahl/widgets/views/oeffnungszeiten');
+        return \humhub\modules\oeffnungszeiten\components\Zeiten::ortszeit(fn() => $legend->view->render('@designwahl/widgets/views/oeffnungszeiten'));
     }
 
     /** Kasten „Kalender abonnieren“ (öffentliche Abos ohne Konto) für Veranstaltungen und Abfuhrtermine */

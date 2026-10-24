@@ -2666,4 +2666,87 @@ class SetupController extends Controller
         }
         return ExitCode::OK;
     }
+
+    /**
+     * Öffnungszeiten: Berechnung „jetzt geöffnet“/„öffnet …“ zu festen Zeitpunkten, Feiertage, Saisons, Zeilen,
+     * Uffi-Abschnitt und Übersetzungen (alle Texte des Moduls in allen Sprachen).
+     *   scripts/run-setup.sh oeffnungszeiten-test
+     */
+    public function actionOeffnungszeitenTest()
+    {
+        $Z = \humhub\modules\oeffnungszeiten\components\Zeiten::class;
+        $sprache = Yii::$app->language;
+        $locale = Yii::$app->formatter->locale;
+        Yii::$app->language = Yii::$app->formatter->locale = 'de';
+        $ok = 0;
+        $fehler = 0;
+        $gleich = function (string $was, $ist, $soll) use (&$ok, &$fehler) {
+            $bedingung = $ist === $soll;
+            $bedingung ? $ok++ : $fehler++;
+            $this->stdout(($bedingung ? 'ok   ' : 'FEHL ') . "$was\n" . (!$bedingung ? '     ist: ' . var_export($ist, true) . ', soll: ' . var_export($soll, true) . "\n" : ''));
+        };
+        try {
+            $o = $Z::modul()->orte();
+            $text = fn(string $id, string $zeit) => $Z::status($o[$id], strtotime($zeit))['text'];
+            $gleich('Rathaus Mo 9:00 geöffnet', $text('rathaus', '2026-10-26 09:00'), 'geöffnet bis 12:00 Uhr');
+            $gleich('Rathaus Mo 11:45 schließt bald', $Z::status($o['rathaus'], strtotime('2026-10-26 11:45'))['bald'], true);
+            $gleich('Rathaus Mo Mittagspause', $text('rathaus', '2026-10-26 12:30'), 'öffnet um 14:00 Uhr');
+            $gleich('Rathaus Mi nachmittags zu', $text('rathaus', '2026-10-28 13:00'), 'öffnet morgen um 8:00 Uhr');
+            $gleich('Rathaus 1. Donnerstag bis 18 Uhr', $text('rathaus', '2026-11-05 17:00'), 'geöffnet bis 18:00 Uhr');
+            $gleich('Rathaus 2. Donnerstag nur bis 15:30', $text('rathaus', '2026-11-12 17:00'), 'öffnet morgen um 8:00 Uhr');
+            $gleich('Rathaus Samstag', $text('rathaus', '2026-10-24 10:00'), 'öffnet Montag um 8:00 Uhr');
+            $gleich('Rathaus Allerheiligen am Sonntag', $text('rathaus', '2026-10-31 10:00'), 'öffnet Montag um 8:00 Uhr');
+            $gleich('Rathaus über Weihnachten', $text('rathaus', '2026-12-25 10:00'), 'öffnet Montag um 8:00 Uhr');
+            $gleich('Rathaus Ostermontag 2027 zu', $text('rathaus', '2027-03-29 09:00'), 'öffnet morgen um 8:00 Uhr');
+            $gleich('Feiertag Karfreitag 2027', $Z::feiertag('2027-03-26'), 'Karfreitag');
+            $gleich('Feiertag Fronleichnam 2026', $Z::feiertag('2026-06-04'), 'Fronleichnam');
+            $gleich('Mariä Himmelfahrt in Uffenheim kein Feiertag', $Z::feiertag('2026-08-15'), null);
+            $gleich('Bücherei Mo Pause', $text('buecherei', '2026-10-26 14:30'), 'öffnet um 15:00 Uhr');
+            $gleich('Freibad nach Saisonende', $text('freibad', '2026-10-24 12:00'), 'Saisonpause');
+            $gleich('Freibad nicht im Kasten', $Z::status($o['freibad'], strtotime('2026-10-24 12:00'))['saison'], false);
+            $gleich('Hallenbad vor Saisonbeginn', $text('hallenbad', '2026-09-28 12:00'), 'öffnet Mittwoch um 16:00 Uhr');
+            $gleich('Hallenbad Sonntag', $text('hallenbad', '2026-10-25 10:00'), 'geöffnet bis 14:00 Uhr');
+            $gleich('Museum letzter Oktobersonntag offen', $Z::status($o['museum'], strtotime('2026-10-25 14:00'))['offen'], true);
+            $gleich('Museum November Saisonpause', $text('museum', '2026-11-01 14:00'), 'Saisonpause');
+            $gleich('Museum Saisontext', $Z::saisonText($o['museum'], strtotime('2026-11-01 12:00')), 'Saison 01.05.2027 bis 31.10.2027');
+            $gleich('Freibad Saisontext', $Z::saisonText($o['freibad'], strtotime('2026-10-24 12:00')), 'Saison beendet (letzter Tag 13.09.2026) – der neue Termin steht noch nicht fest.');
+            $gleich('Hallenbad Saisontext', $Z::saisonText($o['hallenbad'], strtotime('2026-10-24 12:00')), 'Saison seit 30.09.2026');
+            $zeilen = fn(string $id, string $zeit) => array_map(fn($z) => $z[0] . ' ' . $z[1] . ($z[2] ? ' *' : ''), $Z::zeilen($o[$id], strtotime($zeit)));
+            $gleich('Rathaus Zeilen (Mo heute)', $zeilen('rathaus', '2026-10-26 09:00'), ['Mo., Di., Do. 8:00–12:00, 14:00–15:30 Uhr *', 'Mi., Fr. 8:00–12:00 Uhr', 'am 1. Donnerstag im Monat 8:00–12:00, 14:00–18:00 Uhr']);
+            $gleich('Rathaus Zeilen (1. Do heute)', $zeilen('rathaus', '2026-11-05 09:00')[2], 'am 1. Donnerstag im Monat 8:00–12:00, 14:00–18:00 Uhr *');
+            $gleich('Kompostplatz Zeilen', $zeilen('kompostplatz', '2026-10-24 09:00'), ['Mo.–Mi., Fr. 8:00–12:30, 13:00–16:00 Uhr', 'Do. 12:30–17:00 Uhr', 'Sa. 9:00–14:00 Uhr *']);
+            $gleich('Freibad täglich', $zeilen('freibad', '2026-10-24 09:00')[0], 'täglich 10:00–20:00 Uhr *');
+            $uffi = $Z::forAssistant();
+            $gleich('Uffi-Abschnitt mit allen Einrichtungen', count(array_filter(array_column($o, 'name'), fn($n) => str_contains($uffi, "- $n"))), count($o));
+            // Übersetzungen: alle Texte aus Code und Daten in jeder Sprache
+            $quellen = '';
+            foreach (\yii\helpers\FileHelper::findFiles('/data/modules/oeffnungszeiten', ['only' => ['*.php'], 'except' => ['messages/']]) as $f) {
+                $quellen .= file_get_contents($f);
+            }
+            preg_match_all("/(?:Yii::t\('OeffnungszeitenModule\.base', |\\\$t\()'((?:[^'\\\\]|\\\\.)*)'/", $quellen, $m);
+            $texte = array_map('stripslashes', $m[1]);
+            foreach ($o as $ort) {
+                foreach (['name', 'unterzeile', 'adresse', 'hinweis'] as $feld) {
+                    if (!empty($ort[$feld])) {
+                        $texte[] = $ort[$feld];
+                    }
+                }
+                if (!empty($ort['link'])) {
+                    $texte[] = $ort['link'][0];
+                }
+            }
+            $texte = array_merge($texte, array_values($Z::TAGE), array_values($Z::KURZ), array_values($Z::feiertage(2026)));
+            $texte = array_unique(array_filter($texte, fn($t) => !str_contains($t, '$')));
+            foreach (['en', 'uk', 'ar', 'tr', 'ru'] as $l) {
+                $msg = require "/data/modules/oeffnungszeiten/messages/$l/base.php";
+                $fehlt = array_values(array_filter($texte, fn($t) => !isset($msg[$t])));
+                $gleich("Übersetzung $l vollständig", $fehlt, []);
+            }
+        } finally {
+            Yii::$app->language = $sprache;
+            Yii::$app->formatter->locale = $locale;
+        }
+        $this->stdout("\n$ok ok, $fehler Fehler\n");
+        return $fehler ? 1 : 0;
+    }
 }

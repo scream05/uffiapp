@@ -75,6 +75,10 @@ class Context
             $parts[] = \humhub\modules\notdienst\components\Notdienst::forAssistant();
         }
 
+        if (Yii::$app->hasModule('oeffnungszeiten')) {
+            $parts[] = \humhub\modules\oeffnungszeiten\components\Zeiten::forAssistant();
+        }
+
         $parts[] = Warnungen::forAssistant();
 
         if (Yii::$app->hasModule('vorschlaege') && ($v = \humhub\modules\vorschlaege\components\Uffi::forAssistant()) !== null) {

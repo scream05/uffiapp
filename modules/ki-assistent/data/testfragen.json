@@ -374,5 +374,19 @@
       "16(:00)? Uhr|geschlossen|geöffnet",
       "betrieb\\/view\\?id=3\\b"
     ]
+  },
+  {
+    "frage": "Hat der Wertstoffhof am Samstag offen und bis wann?",
+    "erwartet": [
+      "12(:|\\.)30",
+      "oeffnungszeiten\\/index"
+    ]
+  },
+  {
+    "frage": "Wann hat das Rathaus am Donnerstagnachmittag geöffnet?",
+    "erwartet": [
+      "15(:|\\.)30",
+      "18(:|\\.)00|18 Uhr"
+    ]
   }
 ]

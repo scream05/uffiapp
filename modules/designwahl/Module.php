@@ -41,6 +41,7 @@ class Module extends \humhub\components\Module
         'gewerbe' => ['Gewerbe', 'shopping-bag', 'gewerbe', '/gewerbe/betrieb/index', 'gruen'],
         'rathaus' => ['Rathaus', 'university', 'rathaus-uffenheim', '/space/space/home', 'bordeaux'],
         'notdienste' => ['Notdienste', 'medkit', null, '/notdienst/index', 'rot'],
+        'oeffnungszeiten' => ['Öffnungszeiten', 'clock-o', null, '/oeffnungszeiten/index', 'gold'],
         'mitteilungsblatt' => ['Mitteilungsblatt', 'newspaper-o', null, '/mitteilungsblatt/index', 'blau'],
     ];
 
@@ -55,6 +56,7 @@ class Module extends \humhub\components\Module
             'gewerbe' => Yii::t('DesignwahlModule.base', 'Gewerbe'),
             'rathaus' => Yii::t('DesignwahlModule.base', 'Rathaus'),
             'notdienste' => Yii::t('DesignwahlModule.base', 'Notdienste'),
+            'oeffnungszeiten' => Yii::t('DesignwahlModule.base', 'Öffnungszeiten'),
             'mitteilungsblatt' => Yii::t('DesignwahlModule.base', 'Mitteilungsblatt'),
             default => self::LEISTE[$id][0] ?? self::MEHR[$id][0] ?? $id,
         };

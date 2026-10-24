@@ -1,0 +1,10 @@
+{
+  "id": "oeffnungszeiten",
+  "name": "Öffnungszeiten",
+  "description": "Öffnungszeiten städtischer Einrichtungen in Uffenheim mit Anzeige „jetzt geöffnet“.",
+  "keywords": ["öffnungszeiten", "rathaus", "bücherei", "hallenbad", "wertstoffhof"],
+  "version": "0.1.0",
+  "humhub": {
+    "minVersion": "1.18"
+  }
+}
