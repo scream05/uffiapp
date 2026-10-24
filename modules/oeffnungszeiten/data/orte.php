@@ -46,6 +46,7 @@ return [
         'zeiten' => [3 => [['16:00', '21:00']], 5 => [['16:00', '21:00']], 7 => [['09:00', '14:00']]],
         'saisons' => [['2026-09-30', null]],
         'feiertagZu' => false,
+        'zuAn' => ['12-24' => 'Heiligabend', '12-31' => 'Silvester'], // laut Nutzer 24.10.2026
         'hinweis' => 'Einlass bis eine Stunde vor Schluss, Badezeit endet 30 Minuten vor Schluss.',
         'quelle' => 'https://www.uffenheim.de/erleben/sport-freizeiteinrichtungen/hallenbad',
         'pruefen' => ['datei' => 'erleben/sport-freizeiteinrichtungen/hallenbad.md', 'bis' => '/^## Eintrittspreise/'],
@@ -98,6 +99,7 @@ return [
         'adresse' => 'Marktplatz 8', 'telefon' => '',
         'zeiten' => [1 => [['14:30', '20:00']], 2 => [['14:30', '22:00']], 3 => [['14:30', '21:00']], 4 => [['14:30', '18:30']], 5 => [['14:30', '22:00']]],
         'feiertagZu' => false,
+        'zuAn' => ['12-24' => 'Heiligabend', '12-31' => 'Silvester'], // laut Nutzer 24.10.2026
         'hinweis' => 'Jeden zweiten Samstag bei Bedarf – die Termine stehen auf Instagram („Jugendtreff Uffenheim“).',
         'quelle' => 'https://www.uffenheim.de/leben/angebote-fuer-kinder-jugendliche/staedtischer-jugendteff-juff',
         'pruefen' => ['datei' => 'leben/angebote-fuer-kinder-jugendliche/staedtischer-jugendteff-juff.md', 'ab' => '/Unsere Öffnungszeiten/', 'bis' => '/^#|^Falls ihr Fragen/'],
