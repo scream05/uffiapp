@@ -2700,7 +2700,9 @@ class SetupController extends Controller
             $gleich('Rathaus Heiligabend zu', $text('rathaus', '2026-12-24 07:00'), 'öffnet Montag um 8:00 Uhr');
             $gleich('Rathaus Silvester vormittags zu', $text('rathaus', '2026-12-31 10:00'), 'öffnet Montag um 8:00 Uhr');
             $gleich('Rathaus Hinweis Schließtage', $Z::geschlossenText($o['rathaus']), 'An Feiertagen sowie an Heiligabend und Silvester geschlossen.');
-            $gleich('Bücherei Heiligabend normal (nicht erfasst)', $text('buecherei', '2027-12-24 14:00'), 'öffnet um 15:00 Uhr');
+            $gleich('Bücherei Heiligabend zu', $text('buecherei', '2027-12-24 14:00'), 'öffnet Montag um 11:30 Uhr');
+            $gleich('Wertstoffhof Silvester zu', $text('wertstoffhof', '2027-12-31 10:00'), 'öffnet Montag um 9:00 Uhr');
+            $gleich('Kompostplatz Silvester normal (nicht erfasst)', $text('kompostplatz', '2027-12-31 10:00'), 'geöffnet bis 12:30 Uhr');
             $gleich('Rathaus Ostermontag 2027 zu', $text('rathaus', '2027-03-29 09:00'), 'öffnet morgen um 8:00 Uhr');
             $gleich('Feiertag Karfreitag 2027', $Z::feiertag('2027-03-26'), 'Karfreitag');
             $gleich('Feiertag Fronleichnam 2026', $Z::feiertag('2026-06-04'), 'Fronleichnam');

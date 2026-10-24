@@ -35,6 +35,7 @@ return [
         'adresse' => 'Schloßstraße 3', 'telefon' => '09842 952489',
         'zeiten' => [1 => [['11:30', '14:00'], ['15:00', '18:00']], 3 => [['09:00', '11:00'], ['15:00', '18:00']], 5 => [['15:00', '18:00']]],
         'feiertagZu' => true,
+        'zuAn' => ['12-24' => 'Heiligabend', '12-31' => 'Silvester'], // laut Nutzer 24.10.2026
         'hinweis' => 'Ausgeliehenes kannst du jederzeit in den Rückgabekasten werfen.',
         'quelle' => 'https://www.uffenheim.de/leben/kinderbetreuung-bildung/stadtbuecherei',
         'pruefen' => ['datei' => 'leben/kinderbetreuung-bildung/stadtbuecherei.md', 'ab' => '/zu folgenden Zeiten geöffnet/', 'bis' => '/^#/'],
@@ -64,6 +65,7 @@ return [
         'adresse' => 'Buchenweg 3 (im Kreisbauhof)', 'telefon' => '09161 92-6375',
         'zeiten' => [1 => [['09:00', '12:30']], 3 => [['11:30', '17:00']], 5 => [['09:00', '15:00']], 6 => [['09:00', '12:30']]],
         'feiertagZu' => true,
+        'zuAn' => ['12-24' => 'Heiligabend', '12-31' => 'Silvester'], // laut Nutzer 24.10.2026
         'quelle' => 'https://www.kreis-nea.de/service-themen/abfall-natur-umwelt/abfallentsorgung/annahmestellen-oeffnungszeiten/wertstoffhoefe.html',
         'pruefen' => ['datei' => 'landkreis/lebenslagen/abfallwirtschaft/annahmestellen-und-oeffnungszeiten/wertstoffhoefe.md', 'ab' => '/^Wertstoffhof Uffenheim$/', 'bis' => '/^(Wertstoffhof|Kompostplatz) |^#{1,2} /'],
     ],

@@ -33,6 +33,9 @@ $orte = array_intersect_key(Zeiten::modul()->orte(), array_flip(['wertstoffhof',
                         <tr><th><?= Html::encode($tage) ?></th><td><?= Html::encode($zeit) ?></td></tr>
                     <?php endforeach ?>
                 </table>
+                <?php if (($zu = Zeiten::geschlossenText($ort)) !== null) : ?>
+                    <p class="text-muted small"><?= Html::encode($zu) ?></p>
+                <?php endif ?>
                 <?php if (!empty($ort['hinweis'])) : ?>
                     <p class="text-muted small"><?= Html::encode($t($ort['hinweis'])) ?></p>
                 <?php endif ?>
