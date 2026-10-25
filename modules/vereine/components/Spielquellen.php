@@ -27,9 +27,9 @@ class Spielquellen
             'unentschieden' => true, 'diff' => 'Tordifferenz', 'diffKurz' => 'Diff.'],
         'dbb' => ['sport' => 'Basketball', 'icon' => 'fa-dribbble', 'kurz' => 'DBB', 'verband' => 'Deutscher Basketball Bund',
             'unentschieden' => false, 'diff' => 'Korbdifferenz', 'diffKurz' => 'Diff.'],
-        'bvv' => ['sport' => 'Volleyball', 'icon' => 'fa-trophy', 'kurz' => 'BVV', 'verband' => 'Bayerischer Volleyball-Verband',
+        'bvv' => ['sport' => 'Volleyball', 'icon' => 'fa-uffi-volleyball', 'kurz' => 'BVV', 'verband' => 'Bayerischer Volleyball-Verband',
             'unentschieden' => false, 'diff' => 'Sätze', 'diffKurz' => 'Sätze'],
-        'bbv' => ['sport' => 'Badminton', 'icon' => 'fa-trophy', 'kurz' => 'BBV', 'verband' => 'Bayerischer Badminton-Verband',
+        'bbv' => ['sport' => 'Badminton', 'icon' => 'fa-uffi-badminton', 'kurz' => 'BBV', 'verband' => 'Bayerischer Badminton-Verband',
             'unentschieden' => true, 'diff' => 'Spiele', 'diffKurz' => 'Spiele'],
     ];
 

@@ -41,6 +41,18 @@ class Events
         }
     }
 
+    /** Eigene Sportsymbole (assets/SportIconAsset) für Menü, Startseiten-Kasten und Verzeichnis */
+    public static function onLayoutAddons($event)
+    {
+        try {
+            if (!Yii::$app->request->isConsoleRequest) {
+                \humhub\modules\vereine\assets\SportIconAsset::register(Yii::$app->view);
+            }
+        } catch (\Throwable $e) {
+            Yii::error($e);
+        }
+    }
+
     /** Startseite: an Spieltagen Kasten mit den heutigen Spielen und dem Live-Stand (am Handy im Fach rechts) */
     public static function onDashboardSidebarInit($event)
     {

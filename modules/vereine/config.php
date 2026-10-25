@@ -14,6 +14,8 @@ return [
     ],
     'events' => [
         ['class' => Menu::class, 'event' => Menu::EVENT_INIT, 'callback' => [Events::class, 'onSpaceMenuInit']],
+        // Eigene Sportsymbole (Volleyball, Badminton) auf allen Seiten
+        ['class' => \humhub\widgets\LayoutAddons::class, 'event' => \humhub\widgets\LayoutAddons::EVENT_BEFORE_RUN, 'callback' => [Events::class, 'onLayoutAddons']],
         ['class' => WallEntryAddons::class, 'event' => WallEntryAddons::EVENT_INIT, 'callback' => [Events::class, 'onWallEntryAddonsInit']],
         // Kontolöschung: Verwaltungen und nicht veröffentlichte Beiträge der Person löschen
         ['class' => 'humhub\modules\user\models\User', 'event' => 'beforeSoftDelete', 'callback' => [Events::class, 'onUserLoeschen']],
