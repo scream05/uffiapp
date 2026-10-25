@@ -50,7 +50,6 @@ return [
     'Zur Meldung' => 'Bildirime git',
     'Wir haben dir eine E-Mail geschickt. Bitte bestätige darin deine Adresse – erst dann bekommst du Infos und Rückfragen per E-Mail.' => 'Sana bir e-posta gönderdik. Lütfen içindeki bağlantıyla adresini onayla – ancak o zaman bilgileri ve soruları e-posta ile alırsın.',
     'Noch ein Schritt für WhatsApp-Infos:' => 'WhatsApp bilgileri için bir adım daha:',
-    'Schick uns „START {nr}“ von der angegebenen Handynummer. Erst dann schreiben wir dir per WhatsApp.' => 'Girdiğin cep telefonu numarasından bize “START {nr}” gönder. Ancak o zaman sana WhatsApp\'tan yazarız.',
     'WhatsApp-Infos einschalten' => 'WhatsApp bilgilerini aç',
     'Am Computer: Nachricht „START {nr}“ an {nummer} schicken.' => 'Bilgisayardan: “START {nr}” mesajını {nummer} numarasına gönder.',
     'Um einen Mangel zu melden, melde dich bitte an oder leg ein kostenloses Konto an.' => 'Bir sorun bildirmek için lütfen giriş yap ya da ücretsiz bir hesap oluştur.',
@@ -165,4 +164,5 @@ return [
     'Du bekommst diese E-Mail, weil du beim Melden Infos per E-Mail gewünscht hast. Keine Infos mehr? Antworte mit STOPP.' => 'Bu e-postayı, bildirim yaparken e-posta ile bilgi almak istediğin için alıyorsun. Artık bilgi istemiyor musun? STOPP yazarak yanıtla.',
     'Geprüft und freigegeben' => 'Kontrol edildi ve yayınlandı',
     'Deine Meldung ist jetzt auf der Karte zu sehen.' => 'Bildirimin artık haritada görünüyor.',
+    'Tipp auf den Knopf und in WhatsApp auf Senden. Damit bestätigst du, dass die angegebene Nummer deine ist – so bekommt niemand Nachrichten, der sie nicht will. Erst danach schreiben wir dir per WhatsApp.' => 'Düğmeye dokun ve WhatsApp’ta Gönder’e bas. Böylece girdiğin numaranın sana ait olduğunu onaylarsın – istemeyen kimse mesaj almaz. Ancak bundan sonra sana WhatsApp’tan yazarız.',
 ];

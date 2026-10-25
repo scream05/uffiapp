@@ -50,7 +50,6 @@ return [
     'Zur Meldung' => 'View report',
     'Wir haben dir eine E-Mail geschickt. Bitte bestätige darin deine Adresse – erst dann bekommst du Infos und Rückfragen per E-Mail.' => 'We\'ve sent you an email. Please confirm your address in it – only then will you get updates and questions by email.',
     'Noch ein Schritt für WhatsApp-Infos:' => 'One more step for WhatsApp updates:',
-    'Schick uns „START {nr}“ von der angegebenen Handynummer. Erst dann schreiben wir dir per WhatsApp.' => 'Send us “START {nr}” from the mobile number you entered. Only then will we message you on WhatsApp.',
     'WhatsApp-Infos einschalten' => 'Turn on WhatsApp updates',
     'Am Computer: Nachricht „START {nr}“ an {nummer} schicken.' => 'On a computer: send the message “START {nr}” to {nummer}.',
     'Um einen Mangel zu melden, melde dich bitte an oder leg ein kostenloses Konto an.' => 'To report a problem, please log in or create a free account.',
@@ -165,4 +164,5 @@ return [
     'Du bekommst diese E-Mail, weil du beim Melden Infos per E-Mail gewünscht hast. Keine Infos mehr? Antworte mit STOPP.' => 'You are receiving this e-mail because you asked for updates by e-mail when reporting. No more updates? Reply with STOPP.',
     'Geprüft und freigegeben' => 'Checked and approved',
     'Deine Meldung ist jetzt auf der Karte zu sehen.' => 'Your report can now be seen on the map.',
+    'Tipp auf den Knopf und in WhatsApp auf Senden. Damit bestätigst du, dass die angegebene Nummer deine ist – so bekommt niemand Nachrichten, der sie nicht will. Erst danach schreiben wir dir per WhatsApp.' => 'Tap the button and then Send in WhatsApp. This confirms that the number you entered is yours – so nobody gets messages they don’t want. Only then will we message you on WhatsApp.',
 ];

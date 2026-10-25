@@ -50,7 +50,6 @@ return [
     'Zur Meldung' => 'До повідомлення',
     'Wir haben dir eine E-Mail geschickt. Bitte bestätige darin deine Adresse – erst dann bekommst du Infos und Rückfragen per E-Mail.' => 'Ми надіслали тобі листа. Будь ласка, підтверди в ньому свою адресу – лише тоді ти отримуватимеш новини й питання електронною поштою.',
     'Noch ein Schritt für WhatsApp-Infos:' => 'Ще один крок для новин у WhatsApp:',
-    'Schick uns „START {nr}“ von der angegebenen Handynummer. Erst dann schreiben wir dir per WhatsApp.' => 'Надішли нам «START {nr}» із вказаного номера мобільного. Лише тоді ми писатимемо тобі у WhatsApp.',
     'WhatsApp-Infos einschalten' => 'Увімкнути новини у WhatsApp',
     'Am Computer: Nachricht „START {nr}“ an {nummer} schicken.' => 'На комп\'ютері: надішли повідомлення «START {nr}» на номер {nummer}.',
     'Um einen Mangel zu melden, melde dich bitte an oder leg ein kostenloses Konto an.' => 'Щоб повідомити про проблему, увійди або створи безкоштовний обліковий запис.',
@@ -165,4 +164,5 @@ return [
     'Du bekommst diese E-Mail, weil du beim Melden Infos per E-Mail gewünscht hast. Keine Infos mehr? Antworte mit STOPP.' => 'Ви отримуєте цей лист, бо під час повідомлення попросили надсилати оновлення e-mail. Більше не надсилати? Відповідайте STOPP.',
     'Geprüft und freigegeben' => 'Перевірено та опубліковано',
     'Deine Meldung ist jetzt auf der Karte zu sehen.' => 'Ваше повідомлення тепер видно на карті.',
+    'Tipp auf den Knopf und in WhatsApp auf Senden. Damit bestätigst du, dass die angegebene Nummer deine ist – so bekommt niemand Nachrichten, der sie nicht will. Erst danach schreiben wir dir per WhatsApp.' => 'Натисни кнопку, а потім «Надіслати» у WhatsApp. Так ти підтверджуєш, що вказаний номер належить тобі, – і ніхто не отримає небажаних повідомлень. Лише після цього ми писатимемо тобі у WhatsApp.',
 ];

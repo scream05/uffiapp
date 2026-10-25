@@ -50,7 +50,6 @@ return [
     'Zur Meldung' => 'عرض البلاغ',
     'Wir haben dir eine E-Mail geschickt. Bitte bestätige darin deine Adresse – erst dann bekommst du Infos und Rückfragen per E-Mail.' => 'أرسلنا إليك بريدًا إلكترونيًا. يرجى تأكيد عنوانك فيه – بعد ذلك فقط ستتلقى التحديثات والأسئلة عبر البريد الإلكتروني.',
     'Noch ein Schritt für WhatsApp-Infos:' => 'خطوة أخرى لتلقي التحديثات عبر واتساب:',
-    'Schick uns „START {nr}“ von der angegebenen Handynummer. Erst dann schreiben wir dir per WhatsApp.' => 'أرسل إلينا „START {nr}“ من رقم الهاتف المحمول الذي أدخلته. بعد ذلك فقط سنراسلك عبر واتساب.',
     'WhatsApp-Infos einschalten' => 'تفعيل التحديثات عبر واتساب',
     'Am Computer: Nachricht „START {nr}“ an {nummer} schicken.' => 'على الكمبيوتر: أرسل الرسالة „START {nr}“ إلى {nummer}.',
     'Um einen Mangel zu melden, melde dich bitte an oder leg ein kostenloses Konto an.' => 'للإبلاغ عن مشكلة، يرجى تسجيل الدخول أو إنشاء حساب مجاني.',
@@ -165,4 +164,5 @@ return [
     'Du bekommst diese E-Mail, weil du beim Melden Infos per E-Mail gewünscht hast. Keine Infos mehr? Antworte mit STOPP.' => 'تصلك هذه الرسالة لأنك طلبت عند الإبلاغ تلقي التحديثات عبر البريد الإلكتروني. لا تريد المزيد؟ رُدّ بكلمة STOPP.',
     'Geprüft und freigegeben' => 'تم الفحص والنشر',
     'Deine Meldung ist jetzt auf der Karte zu sehen.' => 'بلاغك ظاهر الآن على الخريطة.',
+    'Tipp auf den Knopf und in WhatsApp auf Senden. Damit bestätigst du, dass die angegebene Nummer deine ist – so bekommt niemand Nachrichten, der sie nicht will. Erst danach schreiben wir dir per WhatsApp.' => 'اضغط على الزر ثم على «إرسال» في واتساب. بذلك تؤكد أن الرقم الذي أدخلته هو رقمك – فلا يتلقى أحد رسائل لا يريدها. بعد ذلك فقط نراسلك عبر واتساب.',
 ];

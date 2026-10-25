@@ -47,7 +47,7 @@ $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '
             <?php if ($nr && $req->get('wa') && $module->buergerWhatsappAktiv()): ?>
                 <div class="alert alert-info">
                     <strong><i class="fa fa-whatsapp"></i> <?= Yii::t('MaengelmelderModule.base', 'Noch ein Schritt für WhatsApp-Infos:') ?></strong>
-                    <?= Yii::t('MaengelmelderModule.base', 'Schick uns „START {nr}“ von der angegebenen Handynummer. Erst dann schreiben wir dir per WhatsApp.', ['nr' => $nr]) ?><br>
+                    <?= Yii::t('MaengelmelderModule.base', 'Tipp auf den Knopf und in WhatsApp auf Senden. Damit bestätigst du, dass die angegebene Nummer deine ist – so bekommt niemand Nachrichten, der sie nicht will. Erst danach schreiben wir dir per WhatsApp.') ?><br>
                     <?php // Die HumHub-App öffnet wa.me-Links in ihrem eigenen Browser; whatsapp:// gibt sie direkt an WhatsApp weiter
                     $inApp = \humhub\helpers\DeviceDetectorHelper::isAppRequest(); ?>
                     <?= Html::a('<i class="fa fa-whatsapp"></i> ' . Yii::t('MaengelmelderModule.base', 'WhatsApp-Infos einschalten'),
