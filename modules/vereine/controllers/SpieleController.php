@@ -51,14 +51,16 @@ class SpieleController extends ContentContainerController
             return SpieltagKasten::widget(); // Kasten auf der Startseite
         }
 
-        // Nur das nächste Spiel je Mannschaft (abgesetzte übersprungen)
+        // Nur das nächste Spiel je Mannschaft; abgesetzte davor bleiben stehen, damit niemand umsonst hinfährt
         $kommend = [];
         foreach ($auswahl ? [$auswahl] : $mannschaften as $m) {
             foreach (VereinSpiel::find()->where(['mannschaft_id' => $m->id])->andWhere(['>=', 'datum', date('Y-m-d', strtotime('-1 day'))])
                          ->orderBy(['datum' => SORT_ASC, 'uhrzeit' => SORT_ASC])->limit(20)->all() as $s) {
-                if (!$s->istVorbei() && !$s->laeuft() && $s->getZustand() === null) {
+                if (!$s->istVorbei() && !$s->laeuft()) {
                     $kommend[] = $s;
-                    break;
+                    if ($s->getZustand() === null) {
+                        break;
+                    }
                 }
             }
         }

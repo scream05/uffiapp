@@ -13,7 +13,7 @@ return [
     ['id' => 'fussball-startseite', 'datum' => '2026-10-25', 'art' => 'besser', 'popup' => false,
         'link' => ['vereine-and-ehrenamt', '/vereine/spiele/index'],
         'titel' => 'Fußball heute auf der Startseite',
-        'text' => 'Spielt der 1. FV Uffenheim, steht das Spiel am selben Tag auf der Startseite – vor dem Anpfiff mit Uhrzeit, danach mit dem aktuellen Spielstand, am Handy im Fach am rechten Rand. Auf der Spieleseite siehst du jetzt nur noch das nächste Spiel je Mannschaft, und die Bereiche lassen sich einklappen.'],
+        'text' => 'Spielt der 1. FV Uffenheim, steht das Spiel am selben Tag auf der Startseite – vor dem Anpfiff mit Uhrzeit, danach mit dem aktuellen Spielstand, am Handy im Fach am rechten Rand. Auf der Spieleseite siehst du jetzt nur noch das nächste Spiel je Mannschaft – abgesetzte Spiele stehen weiter mit dabei –, und die Bereiche lassen sich einklappen.'],
     ['id' => 'fvu-spiele', 'datum' => '2026-10-25', 'art' => 'neu', 'popup' => true,
         'link' => ['vereine-and-ehrenamt', '/vereine/spiele/index'],
         'titel' => 'Spiele & Ergebnisse des 1. FV Uffenheim',

@@ -19,8 +19,9 @@ class SpieltagKasten extends Widget
                 $label[$m->id] = (count($vereine) > 1 ? ($v->bfv_name ?: $v->name) . ' ' : '') . $m->getLabel();
             }
         }
-        $spiele = $label ? array_values(array_filter(VereinSpiel::find()->where(['mannschaft_id' => array_keys($label), 'datum' => date('Y-m-d')])
-            ->orderBy(['uhrzeit' => SORT_ASC])->all(), fn(VereinSpiel $s) => $s->getZustand() === null)) : [];
+        // Abgesetzte Spiele stehen mit drin, damit niemand umsonst hinfährt
+        $spiele = $label ? VereinSpiel::find()->where(['mannschaft_id' => array_keys($label), 'datum' => date('Y-m-d')])
+            ->orderBy(['uhrzeit' => SORT_ASC])->all() : [];
         if (!$spiele || $vereine[0]->getSpieleUrl() === null) {
             return '';
         }

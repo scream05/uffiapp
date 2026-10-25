@@ -9,8 +9,9 @@
 use humhub\helpers\Html;
 use humhub\modules\vereine\components\Bfv;
 
-$offen = array_filter($spiele, fn($s) => !$s->istVorbei());
+$offen = array_filter($spiele, fn($s) => !$s->istVorbei() && $s->getZustand() === null);
 $live = array_filter($spiele, fn($s) => $s->laeuft());
+$gestrichen = fn($s) => $s->getZustand() !== null;
 $seite = $verein->getSpieleUrl();
 $wertungText = ['s' => Yii::t('VereineModule.base', 'gewonnen'), 'u' => Yii::t('VereineModule.base', 'unentschieden'), 'n' => Yii::t('VereineModule.base', 'verloren')];
 ?>
@@ -31,6 +32,8 @@ $wertungText = ['s' => Yii::t('VereineModule.base', 'gewonnen'), 'u' => Yii::t('
         #fvs-heute .fvh-punkt { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #c62828; margin-right: 2px; animation: fvh-puls 1.6s ease-in-out infinite; }
         @keyframes fvh-puls { 50% { opacity: .25; } }
         @media (prefers-reduced-motion: reduce) { #fvs-heute .fvh-punkt { animation: none; } }
+        #fvs-heute .fvh-abgesetzt { color: var(--bs-danger-text-emphasis, #58151c); }
+        #fvs-heute .fvh-weg .fvh-team, #fvs-heute .fvh-weg .fvh-gegner { text-decoration: line-through; opacity: .7; }
         #fvs-heute .fvh-alle { display: inline-block; margin-top: 8px; }
     </style>
     <div class="panel-heading">
@@ -40,7 +43,7 @@ $wertungText = ['s' => Yii::t('VereineModule.base', 'gewonnen'), 'u' => Yii::t('
     <div class="panel-body">
         <?php foreach ($spiele as $s): ?>
             <?php $stand = $s->getAnzeigeStand(); $wertung = $s->getWertung(); ?>
-            <a class="fvh-zeile" href="<?= Html::encode($seite) ?>">
+            <a class="fvh-zeile<?= $gestrichen($s) ? ' fvh-weg' : '' ?>" href="<?= Html::encode($seite) ?>">
                 <span class="fvh-mitte">
                     <span class="fvh-team"><?= Html::encode($label[$s->mannschaft_id] ?? '') ?></span>
                     <span class="fvh-gegner"><?= $s->heim_eigen ? Yii::t('VereineModule.base', 'gegen {gegner}', ['gegner' => Html::encode($s->gast)])
@@ -49,6 +52,8 @@ $wertungText = ['s' => Yii::t('VereineModule.base', 'gewonnen'), 'u' => Yii::t('
                 <?php if ($s->laeuft()): ?>
                     <span class="fvh-stand fvh-live"><?= $stand !== null ? Html::encode($stand) : Yii::t('VereineModule.base', 'läuft') ?>
                         <?php if ($s->ticker_minute !== null): ?><small><?= (int)$s->ticker_minute ?>.</small><?php endif ?></span>
+                <?php elseif ($gestrichen($s)): ?>
+                    <span class="fvh-stand fvh-leise fvh-abgesetzt"><?= Html::encode($s->getZustand()) ?></span>
                 <?php elseif ($wertung !== null): ?>
                     <span class="fvh-stand fvh-<?= $wertung ?>" title="<?= Html::encode($wertungText[$wertung]) ?>"><?= Html::encode($stand) ?></span>
                 <?php elseif ($s->istVorbei()): ?>

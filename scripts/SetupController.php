@@ -2819,7 +2819,8 @@ class SetupController extends Controller
             $html = $kasten();
             $gleich('Startseite: laufendes Spiel mit Stand und Minute', [str_contains($html, 'Test-Herren-Gegner'), str_contains($html, '2:1'), str_contains($html, '41.')], [true, true, true]);
             $S::updateAll(['ergebnis' => 'Abse.', 'ticker_status' => null], ['spiel_id' => $s6]);
-            $gleich('Startseite: abgesetztes Spiel nicht im Kasten', str_contains($kasten(), 'Test-Herren-Gegner'), false);
+            $html = $kasten();
+            $gleich('Startseite: abgesetztes Spiel mit Hinweis im Kasten', [str_contains($html, 'Test-Herren-Gegner'), str_contains($html, 'abgesetzt')], [true, true]);
             // Täglicher Abgleich: Ticker älterer Spiele werden geleert
             $S::updateAll(['ticker' => '[]', 'ticker_status' => 'beendet'], ['spiel_id' => str_repeat('2', 32)]);
             $Bfv::abrufen($verein);
