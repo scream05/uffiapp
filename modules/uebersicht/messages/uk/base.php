@@ -13,4 +13,6 @@ return [
     'Beiträge aus {bereich} in meiner Übersicht' => 'Дописи з {bereich} у моєму огляді',
     'Speichern' => 'Зберегти',
     'Abbrechen' => 'Скасувати',
+    'Mehr …' => 'Більше …',
+    'Weniger' => 'Менше',
 ];

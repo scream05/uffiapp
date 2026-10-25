@@ -29,28 +29,28 @@
     "miniaturbilder-stream": {
         "en": {
             "titel": "Pictures next to the text",
-            "text": "In the overview and in the sections, the picture of a post or event now appears as a small thumbnail on the left next to the text – so the list stays clearer. If you tap on it, you see it large; if a post has several pictures, \"+2\" and the like show how many more are coming.",
-            "quelle": "2dae5fdd21488a2aa7e101ba1790dafcd7f64f99"
+            "text": "In the overview and in the sections, the picture of a post or event now appears as a small thumbnail on the left next to the text, and the text is initially only as tall as the picture – tap „Mehr …“ to expand it fully. Tap the picture and you see it large; if a post has several pictures, „+2“ and so on shows how many more are coming.",
+            "quelle": "107aecb47306b7b80511c2f857e1fcb10b627836"
         },
         "uk": {
-            "titel": "Бідо поруч із текстом",
-            "text": "В огляді та в розділах зображення допису або події тепер показується як маленьке прев’ю ліворуч від тексту – так список стає зрозуміліше. Торкнися його, і побачиш велике зображення; якщо в дописі кілька фото, „+2“ і подібні позначки показують, скільки ще є.",
-            "quelle": "2dae5fdd21488a2aa7e101ba1790dafcd7f64f99"
+            "titel": "Бішки поруч із текстом",
+            "text": "В огляді та в розділах зображення допису або події тепер показується як невелике попереднє зображення ліворуч від тексту, і текст спочатку має лише таку довжину, як зображення – натисни „Більше …“, щоб розгорнути його повністю. Торкнися зображення, і побачиш його у великому вигляді; якщо в дописі кілька зображень, „+2“ та інші позначки показують, скільки ще буде.",
+            "quelle": "107aecb47306b7b80511c2f857e1fcb10b627836"
         },
         "ar": {
-            "titel": "صور بجانب النص",
-            "text": "في النظرة العامة وفي الأقسام، تظهر صورة المنشور أو الموعد الآن كصورة مصغّرة صغيرة على يسار النص، وبذلك تبقى القائمة أوضح. عندما تضغط عليها، تراها بحجم كبير؛ وإذا كان للمنشور عدة صور، يُظهر „+2“ وما شابهها عدد الصور المتبقية.",
-            "quelle": "2dae5fdd21488a2aa7e101ba1790dafcd7f64f99"
+            "titel": "صور مصغّرة بجانب النص",
+            "text": "في النظرة العامة والأقسام، صار صورة المنشور أو الموعد تظهر الآن كصورة مصغّرة صغيرة على يسار النص، ويكون النص في البداية بنفس طول الصورة فقط – مع \"Mehr …\" تفتحه بالكامل. إذا نقرت على الصورة، تراها كبيرة؛ وإذا كان للمنشور عدة صور، يُظهر \"+2\" وما شابهها عدد الصور المتبقية.",
+            "quelle": "107aecb47306b7b80511c2f857e1fcb10b627836"
         },
         "tr": {
             "titel": "Resimler metnin yanında",
-            "text": "Genel görünümde ve bölümlerde bir gönderinin ya da etkinliğin resmi artık metnin soluna küçük bir önizleme resmi olarak görünüyor – böylece liste daha düzenli kalıyor. Üzerine dokunursan resmi büyük görürsün; bir gönderinin birden fazla resmi varsa, „+2“ ve benzeri, daha kaç tane geleceğini gösterir.",
-            "quelle": "2dae5fdd21488a2aa7e101ba1790dafcd7f64f99"
+            "text": "Genel bakışta ve bölümlerde, bir yazı veya etkinliğin resmi artık metnin solunda küçük bir önizleme resmi olarak görünüyor. Metin de başlangıçta yalnızca resim kadar uzun gösteriliyor – tamamını açmak için „Devamı …“ yazısına dokunabilirsin. Resme dokunursan büyük halini görürsün; bir yazının birden fazla resmi varsa, „+2“ ve benzeri işaret, daha kaç resim olduğunu gösterir.",
+            "quelle": "107aecb47306b7b80511c2f857e1fcb10b627836"
         },
         "ru": {
             "titel": "Bilder neben dem Text",
-            "text": "In der Übersicht und in den Bereichen steht das Bild eines Beitrags oder Termins jetzt als kleines Vorschaubild links neben dem Text – so bleibt die Liste übersichtlicher. Tippst du darauf, siehst du es groß; hat ein Beitrag mehrere Bilder, zeigt „+2“ und Co., wie viele noch kommen.",
-            "quelle": "2dae5fdd21488a2aa7e101ba1790dafcd7f64f99"
+            "text": "In der Übersicht und in den Bereichen steht das Bild eines Beitrags oder Termins jetzt als kleines Vorschaubild links neben dem Text, und der Text ist zunächst nur so lang wie das Bild – mit „Mehr …“ klappst du ihn ganz auf. Tippst du aufs Bild, siehst du es groß; hat ein Beitrag mehrere Bilder, zeigt „+2“ und Co., wie viele noch kommen.",
+            "quelle": "107aecb47306b7b80511c2f857e1fcb10b627836"
         }
     },
     "fussball-startseite": {

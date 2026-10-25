@@ -13,4 +13,6 @@ return [
     'Beiträge aus {bereich} in meiner Übersicht' => '{bereich} gönderileri genel bakışımda',
     'Speichern' => 'Kaydet',
     'Abbrechen' => 'İptal',
+    'Mehr …' => 'Daha fazla …',
+    'Weniger' => 'Daha az',
 ];

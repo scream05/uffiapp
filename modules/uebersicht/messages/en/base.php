@@ -13,4 +13,6 @@ return [
     'Beiträge aus {bereich} in meiner Übersicht' => 'Posts from {bereich} in my overview',
     'Speichern' => 'Save',
     'Abbrechen' => 'Cancel',
+    'Mehr …' => 'More …',
+    'Weniger' => 'Less',
 ];

@@ -26,6 +26,16 @@ html.design-neu .miniatur-mit-bild > .miniatur img { border-radius: var(--dn-r-s
 .miniatur-mit-bild .calendar-wall-entry { margin-top: 0 !important; }
 .miniatur-versteckt { display: none !important; }
 
+/* Text nur so hoch wie das Bild, „Mehr …“ klappt auf; HumHubs eigenes „Mehr anzeigen“ entfällt hier */
+.miniatur-mit-bild [data-ui-show-more] { max-height: none !important; }
+.miniatur-mit-bild .showMore, .miniatur-mit-bild .showMoreGradient { display: none !important; }
+.wall-entry-content.miniatur-kurz { overflow: hidden; position: relative; }
+.wall-entry-content.miniatur-kurz::after {
+    content: ""; position: absolute; top: var(--miniatur-schnitt, 100%); bottom: 0; inset-inline-start: var(--miniatur-spalte, 0); inset-inline-end: 0;
+    background: var(--miniatur-hg, #fff); pointer-events: none;
+}
+.miniatur-mehr-link { display: inline-block; margin: 2px 0 6px; font-weight: 600; font-size: 13px; }
+
 @media (max-width: 575.98px) {
     .miniatur-mit-bild > .miniatur { width: 88px; margin-inline-end: 12px; }
     .miniatur-mit-bild > .miniatur img { max-height: 120px; min-height: 56px; }

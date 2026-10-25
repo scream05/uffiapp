@@ -168,6 +168,8 @@ class Events
                 return;
             }
             MiniaturAsset::register(Yii::$app->view);
+            Yii::$app->view->registerJsConfig('uebersichtMiniatur', ['text' => ['mehr' => Yii::t('UebersichtModule.base', 'Mehr …'),
+                'weniger' => Yii::t('UebersichtModule.base', 'Weniger')]]);
             if (Yii::$app->controller->module->id !== 'dashboard') {
                 return;
             }

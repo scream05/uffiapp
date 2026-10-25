@@ -13,4 +13,6 @@ return [
     'Beiträge aus {bereich} in meiner Übersicht' => 'Публикации из {bereich} в моём обзоре',
     'Speichern' => 'Сохранить',
     'Abbrechen' => 'Отмена',
+    'Mehr …' => 'Ещё …',
+    'Weniger' => 'Свернуть',
 ];

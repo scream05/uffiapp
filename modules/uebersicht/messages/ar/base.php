@@ -13,4 +13,6 @@ return [
     'Beiträge aus {bereich} in meiner Übersicht' => 'منشورات من {bereich} في نظرتي العامة',
     'Speichern' => 'حفظ',
     'Abbrechen' => 'إلغاء',
+    'Mehr …' => 'المزيد …',
+    'Weniger' => 'أقل',
 ];
