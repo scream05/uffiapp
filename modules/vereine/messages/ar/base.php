@@ -306,4 +306,6 @@ return [
     'männlich' => 'ذكور',
     'weiblich' => 'إناث',
     'mix' => 'مختلط',
+    'Ergebnisse und Tabellen der Mannschaften veröffentlicht der Verband auf seiner eigenen Seite.' => 'ينشر الاتحاد نتائج الفرق وجداول الترتيب على موقعه الخاص.',
+    'Ergebnisse & Tabellen {wo}' => 'النتائج والترتيب {wo}',
 ];

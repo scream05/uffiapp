@@ -306,4 +306,6 @@ return [
     'männlich' => 'boys',
     'weiblich' => 'girls',
     'mix' => 'mixed',
+    'Ergebnisse und Tabellen der Mannschaften veröffentlicht der Verband auf seiner eigenen Seite.' => 'The association publishes the teams’ results and tables on its own website.',
+    'Ergebnisse & Tabellen {wo}' => 'Results & tables {wo}',
 ];

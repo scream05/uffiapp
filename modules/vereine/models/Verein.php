@@ -38,6 +38,8 @@ use yii\helpers\Url;
  *                            Vereinsnummer beim BBV), gesetzt = Spiele werden abgerufen
  * @property string|null $bfv_name Vereinsname bei der Spielquelle
  * @property string $spiele_quelle bfv | dbb | bvv | bbv (components/Spielquellen.php)
+ * @property string|null $ergebnisse_url Ergebnisse/Tabellen bei einer Quelle ohne Abruf (nur Link), z. B. RWK-Onlinemelder
+ * @property string|null $ergebnisse_text wo, z. B. „beim Schützengau Uffenheim“
  */
 class Verein extends ActiveRecord implements ViewableInterface
 {

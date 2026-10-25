@@ -306,4 +306,6 @@ return [
     'männlich' => 'хлопці',
     'weiblich' => 'дівчата',
     'mix' => 'змішана',
+    'Ergebnisse und Tabellen der Mannschaften veröffentlicht der Verband auf seiner eigenen Seite.' => 'Результати й таблиці команд федерація публікує на власному сайті.',
+    'Ergebnisse & Tabellen {wo}' => 'Результати й таблиці {wo}',
 ];

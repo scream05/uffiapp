@@ -306,4 +306,6 @@ return [
     'männlich' => 'erkek',
     'weiblich' => 'kız',
     'mix' => 'karma',
+    'Ergebnisse und Tabellen der Mannschaften veröffentlicht der Verband auf seiner eigenen Seite.' => 'Takımların sonuçlarını ve puan tablolarını federasyon kendi sitesinde yayımlar.',
+    'Ergebnisse & Tabellen {wo}' => 'Sonuçlar ve puan tabloları {wo}',
 ];

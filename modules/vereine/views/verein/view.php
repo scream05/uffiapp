@@ -163,6 +163,17 @@ $module = Yii::$app->getModule('vereine');
 </div>
 <?php endif ?>
 
+<?php if ($verein->ergebnisse_url && !$verein->bfv_id): // nur Link (Quelle erlaubt keinen Abruf) ?>
+<div class="panel panel-default">
+    <div class="panel-heading"><strong><i class="fa fa-trophy"></i> <?= Yii::t('VereineModule.base', 'Spiele & Ergebnisse') ?></strong></div>
+    <div class="panel-body">
+        <p style="margin:0 0 10px"><?= Yii::t('VereineModule.base', 'Ergebnisse und Tabellen der Mannschaften veröffentlicht der Verband auf seiner eigenen Seite.') ?></p>
+        <?= Html::a('<i class="fa fa-external-link"></i> ' . Html::encode(Yii::t('VereineModule.base', 'Ergebnisse & Tabellen {wo}', ['wo' => $verein->ergebnisse_text ?: preg_replace('#^https?://(www\.)?([^/]+).*$#', '$2', $verein->ergebnisse_url)])),
+            $verein->ergebnisse_url, ['class' => 'btn btn-primary btn-sm', 'target' => '_blank', 'rel' => 'noopener nofollow']) ?>
+    </div>
+</div>
+<?php endif ?>
+
 <?php if ($verein->bfv_id && ($kurz = \humhub\modules\vereine\components\Bfv::kurz($verein)) && $kurz['label']): ?>
 <?= $this->render('@vereine/views/spiele/_stil') ?>
 <div class="panel panel-default">

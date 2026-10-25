@@ -16,6 +16,8 @@ use yii\console\ExitCode;
  *   /app/yii vereine/ticker <spiel-id>   Liveticker eines Spiels anzeigen (Prüfung, speichert nichts)
  *   /app/yii vereine/name-sperren "Vorname Name"   Namen nach Widerspruch aus allen Spielberichten entfernen (auch künftig)
  *   /app/yii vereine/bfv <verein-id> <bfv-kennung|->   Verein mit dem BFV verknüpfen bzw. lösen („-“)
+ *   /app/yii vereine/ergebnis-link <verein-id> <https-adresse|-> ["wo, z. B. beim Schützengau Uffenheim"]   nur Link
+ *       zu Ergebnissen (für Quellen, die keinen Abruf erlauben); „-“ entfernt ihn
  *   /app/yii vereine/spielquelle <verein-id> <dbb|bvv|bbv|-> [kennung] [name]   Verein mit einer anderen Quelle verknüpfen
  *       bzw. lösen; Kennung: dbb Vereinsnummer (3777), bvv Suchbegriff im Mannschaftsnamen („SB Uffenheim“), bbv Vereinsnummer (07-0350)
  */
@@ -90,6 +92,19 @@ class VereineController extends Controller
         $verein->updateAttributes(['bfv_id' => $bfvId, 'spiele_quelle' => 'bfv']);
         $this->stdout("{$verein->name}: mit dem BFV verknüpft, rufe Spiele ab …\n");
         return $this->actionSpiele();
+    }
+
+    public function actionErgebnisLink($id, $url, $wo = null)
+    {
+        $verein = Verein::findOne((int)$id);
+        if ($verein === null || $url !== '-' && !preg_match('#^https://[^\s]{4,250}$#', $url)) {
+            $this->stderr("Verein nicht gefunden oder Adresse ungültig (https://…)\n");
+            return ExitCode::DATAERR;
+        }
+        $verein->updateAttributes($url === '-' ? ['ergebnisse_url' => null, 'ergebnisse_text' => null]
+            : ['ergebnisse_url' => $url, 'ergebnisse_text' => $wo ? mb_substr($wo, 0, 100) : null]);
+        $this->stdout("{$verein->name}: " . ($url === '-' ? 'Link entfernt' : "Link gesetzt ($url)") . "\n");
+        return ExitCode::OK;
     }
 
     public function actionSpielquelle($id, $quelle, $kennung = null, $name = null)
