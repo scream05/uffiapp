@@ -5,10 +5,12 @@
  */
 
 use humhub\helpers\Html;
+use humhub\modules\content\widgets\richtext\RichText;
 
 $bilder = $beitrag->getBilder();
 ?>
-<div style="white-space:pre-line;overflow-wrap:anywhere"><?= Html::encode($beitrag->text) ?></div>
+<?php // Markdown wie im HumHub-Beitrag (fett, Links, Zeilenumbrüche); Text kommt vom Verwalter bzw. aus dem Mitteilungsblatt ?>
+<div class="verein-beitrag-text" style="overflow-wrap:anywhere"><?= RichText::convert($beitrag->text, RichText::FORMAT_HTML) ?></div>
 <?php if ($bilder): ?>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-top:10px">
         <?php foreach ($bilder as $file): ?>

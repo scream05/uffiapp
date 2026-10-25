@@ -386,7 +386,7 @@ class SetupController extends Controller
 
         // Alle Bürger als Mitglieder (für die Abfuhr-Erinnerung), nicht die Import-Konten
         foreach (User::find()->active()->all() as $user) {
-            $import = in_array($user->username, [self::RSS_USER, self::FB_USER], true);
+            $import = in_array($user->username, [self::RSS_USER, self::FB_USER, self::MB_USER], true);
             if (!$import && !$space->isMember($user->id)) {
                 $space->addMember($user->id, 1, false);
                 $this->stdout("+ Mitglied {$user->username}\n");
@@ -482,6 +482,105 @@ class SetupController extends Controller
     private const RSS_USER = 'stadt-uffenheim';
     /** Konto der Facebook-Übernahme (modules/facebook, Module::$konto) */
     private const FB_USER = 'stadt-uffenheim-fb';
+    /** Verfasser der aus dem Mitteilungsblatt übernommenen Vereinsbeiträge (setup/mb-vereinsbeitraege) */
+    private const MB_USER = 'mitteilungsblatt';
+
+    /**
+     * Vereinsbeiträge aus dem Mitteilungsblatt übernehmen (mit Genehmigung der Vereine und der LINUS WITTICH Medien KG,
+     * Stand 25.10.2026): setup/mb-vereinsbeitraege /tmp/mb/beitraege.json [1 = Probelauf]
+     * JSON: [{schluessel, verein_id, ausgabe, seite, datum, text, bilder: [{datei, name}]}], Bilder im selben Ordner.
+     * Verfasser ist das Konto „Mitteilungsblatt (Vereinsbeiträge)“ (ohne Anmeldung, wird bei Bedarf angelegt).
+     * Jeder Beitrag erscheint auf der Vereinsseite und still (ohne Benachrichtigungen) in der Übersicht, datiert auf die
+     * Ausgabe. Schon übernommene (gleicher Verein, gleiche erste Zeile, gleiche Ausgabe) werden nicht neu angelegt, aber Text
+     * und Datum angeglichen. Einfache Zeilenumbrüche im JSON werden harte Umbrüche.
+     */
+    public function actionMbVereinsbeitraege($json, $probelauf = 0)
+    {
+        $liste = json_decode((string)@file_get_contents($json), true);
+        if (!is_array($liste)) {
+            $this->stderr("JSON nicht lesbar: $json\n");
+            return ExitCode::DATAERR;
+        }
+        $ordner = dirname($json);
+        $konto = User::findOne(['username' => self::MB_USER]);
+        if ($konto === null && !$probelauf) {
+            $konto = new User(['scenario' => 'editAdmin']);
+            $konto->username = self::MB_USER;
+            $konto->email = 'mitteilungsblatt@vereinsbeitraege.invalid';
+            $konto->status = User::STATUS_ENABLED;
+            if (!$konto->save()) {
+                $this->stderr('Konto: ' . json_encode($konto->getErrors()) . "\n");
+                return ExitCode::UNSPECIFIED_ERROR;
+            }
+            $konto->profile->scenario = 'editAdmin';
+            $konto->profile->firstname = 'Mitteilungsblatt';
+            $konto->profile->lastname = '(Vereinsbeiträge)';
+            $konto->profile->about = 'Beiträge der Vereine aus dem Mitteilungsblatt der Stadt Uffenheim, übernommen mit Genehmigung '
+                . 'der Vereine und der LINUS WITTICH Medien KG. Dieses Konto wird nicht betreut – Fragen bitte an den jeweiligen Verein.';
+            $konto->profile->save();
+            $this->stdout("+ Konto " . self::MB_USER . "\n");
+        }
+        $admin = User::find()->where(['username' => 'admin'])->one();
+        $V = \humhub\modules\vereine\models\VereinBeitrag::class;
+        $fehler = 0;
+        foreach ($liste as $e) {
+            $verein = \humhub\modules\vereine\models\Verein::findOne((int)$e['verein_id']);
+            $ersteZeile = strtok($e['text'], "\n");
+            if ($verein === null) {
+                $this->stderr("! {$e['schluessel']}: Verein {$e['verein_id']} fehlt\n");
+                $fehler++;
+                continue;
+            }
+            // Einfacher Zeilenumbruch innerhalb eines Absatzes = harter Umbruch (HumHub-Markdown: „\“ am Zeilenende)
+            $e['text'] = preg_replace('/(?<![\n\\\\])\n(?!\n)/', "\\\\\n", $e['text']);
+            $schon = $konto ? $V::find()->where(['verein_id' => $verein->id, 'user_id' => $konto->id])
+                ->andWhere(['like', 'text', $ersteZeile])->andWhere(['like', 'text', 'Ausgabe ' . $e['ausgabe'] . '/'])->one() : null;
+            if ($schon && !$probelauf) {
+                // Schon übernommen: Text und Datum angleichen (z. B. nach Korrekturen im JSON)
+                $schon->updateAttributes(['text' => $e['text'], 'created_at' => $e['datum'], 'geprueft_am' => $e['datum']]);
+                if (($post = $schon->content?->getModel()) !== null) {
+                    $post->updateAttributes(['message' => $e['text']]);
+                    $schon->content->updateAttributes(['created_at' => $e['datum'], 'updated_at' => $e['datum'], 'stream_sort_date' => $e['datum']]);
+                }
+            }
+            $bilder = array_map(fn($b) => $ordner . '/' . basename($b['datei']), $e['bilder']);
+            $fehlend = array_filter($bilder, fn($f) => !is_file($f));
+            $this->stdout(sprintf("%s %s → %s (%d Zeichen, %d Bilder)%s\n", $schon ? '=' : '+', $e['schluessel'], $verein->name,
+                mb_strlen($e['text']), count($bilder), $fehlend ? ' ! fehlt: ' . implode(', ', $fehlend) : ''));
+            if ($fehlend) {
+                $fehler++;
+            }
+            if ($schon || $probelauf || $fehlend) {
+                continue;
+            }
+            $tx = Yii::$app->db->beginTransaction();
+            try {
+                Yii::$app->user->switchIdentity($konto); // Verfasser = geprüft von → keine Benachrichtigung an das Konto
+                $b = new $V(['verein_id' => $verein->id, 'user_id' => $konto->id, 'text' => $e['text'], 'status' => $V::STATUS_EINGEREICHT]);
+                $b->save(false);
+                foreach ($e['bilder'] as $i => $bild) {
+                    $pfad = $bilder[$i];
+                    $file = new \humhub\modules\file\models\File(['file_name' => $bild['name'], 'mime_type' => 'image/jpeg', 'size' => filesize($pfad)]);
+                    $file->save();
+                    $file->setStoredFileContent(file_get_contents($pfad));
+                    $b->fileManager->attach($file);
+                }
+                \humhub\modules\vereine\components\BeitragDienst::freigeben($b, true, true, true);
+                $b->refresh();
+                $b->updateAttributes(['created_at' => $e['datum'], 'geprueft_am' => $e['datum'], 'geprueft_von' => $admin?->id ?? $konto->id]);
+                if ($b->content) {
+                    $b->content->updateAttributes(['created_at' => $e['datum'], 'updated_at' => $e['datum'], 'stream_sort_date' => $e['datum']]);
+                }
+                $tx->commit();
+            } catch (\Throwable $ex) {
+                $tx->rollBack();
+                $this->stderr("! {$e['schluessel']}: " . $ex->getMessage() . "\n");
+                $fehler++;
+            }
+        }
+        Yii::$app->cache->delete('ki-assistent-context');
+        return $fehler ? ExitCode::UNSPECIFIED_ERROR : ExitCode::OK;
+    }
 
     /**
      * Konto „Stadt Uffenheim (Website)“ als Verfasser der Stadt-Nachrichten anlegen: setup/rssuser

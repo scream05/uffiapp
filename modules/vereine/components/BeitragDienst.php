@@ -33,8 +33,9 @@ class BeitragDienst
     /**
      * Freigeben: auf der Vereinsseite und/oder als HumHub-Beitrag (Verfasser: Vereinsverwalter) im Space des
      * Verzeichnisses, der in der Übersicht erscheint (Bereich „Vereine & Ehrenamt“ in „Meine Übersicht“, Standard an).
+     * $still: ohne Benachrichtigungen an die Mitglieder des Space (Übernahme älterer Beiträge, z. B. aus dem Mitteilungsblatt).
      */
-    public static function freigeben(VereinBeitrag $b, bool $vereinsseite, bool $uebersicht): void
+    public static function freigeben(VereinBeitrag $b, bool $vereinsseite, bool $uebersicht, bool $still = false): void
     {
         if (!$vereinsseite && !$uebersicht) {
             throw new Exception('Mindestens ein Ort muss gewählt sein.');
@@ -50,6 +51,7 @@ class BeitragDienst
                 $post->message = $b->text;
                 $post->content->visibility = Content::VISIBILITY_PUBLIC;
                 $post->content->created_by = $b->user_id;
+                $post->silentContentCreation = $still;
                 if (!$post->save()) {
                     throw new Exception('Beitrag konnte nicht angelegt werden: ' . json_encode($post->getErrors()));
                 }
