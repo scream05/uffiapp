@@ -1,5 +1,6 @@
 /*
- * Eigene Sportsymbole (Font Awesome 4.7 in HumHub hat weder Volleyball noch Badminton). Selbst gezeichnet, als Maske
+ * Eigene Sportsymbole (Font Awesome 4.7 in HumHub hat weder Volleyball noch Badminton): Volleyball = Spieler beim
+ * Sprungaufschlag, Badminton = Federball. Selbst gezeichnet, als Maske
  * in der Textfarbe; Verwendung wie Font Awesome: <i class="fa fa-uffi-volleyball"></i>. Geladen auf allen Seiten
  * (Events::onLayoutAddons), weil Menü, Startseiten-Kasten und Verzeichnis sie nutzen.
  */
@@ -7,5 +8,5 @@
     content: ""; display: inline-block; width: 1em; height: 1em; vertical-align: -0.125em;
     background-color: currentColor; -webkit-mask: var(--uffi-icon) center / contain no-repeat; mask: var(--uffi-icon) center / contain no-repeat;
 }
-.fa.fa-uffi-volleyball { --uffi-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'%3E%3Cdefs%3E%3CclipPath id='k'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3C/clipPath%3E%3C/defs%3E%3Cg clip-path='url%28%23k%29'%3E%3Ccircle cx='8.58' cy='2.60' r='9'/%3E%3Ccircle cx='8.58' cy='2.60' r='5'/%3E%3Ccircle cx='21.85' cy='13.74' r='9'/%3E%3Ccircle cx='21.85' cy='13.74' r='5'/%3E%3Ccircle cx='5.57' cy='19.66' r='9'/%3E%3Ccircle cx='5.57' cy='19.66' r='5'/%3E%3C/g%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3C/svg%3E"); }
+.fa.fa-uffi-volleyball { --uffi-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='19' cy='3.5' r='2.4' fill='black' stroke='none'/%3E%3Ccircle cx='7.6' cy='6.4' r='2.2' fill='black' stroke='none'/%3E%3Cpath d='M8.6 9.8 7.6 15.2'/%3E%3Cpath d='M8.8 10l4.2-2.4 3.6-3'/%3E%3Cpath d='M8.4 10.6 5 9'/%3E%3Cpath d='M7.6 15.2l3.4 1.6 1 4'/%3E%3Cpath d='M7.6 15.2 5 18.6l-2 1.6'/%3E%3C/svg%3E"); } /* Spieler beim Sprungaufschlag */
 .fa.fa-uffi-badminton { --uffi-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9.2 17.5h5.6v1.2a2.8 2.8 0 0 1-5.6 0z'/%3E%3Cpath d='M9.2 17.5 5.5 3.8'/%3E%3Cpath d='M14.8 17.5 18.5 3.8'/%3E%3Cpath d='M5.5 3.8c4.2-1.4 8.8-1.4 13 0'/%3E%3Cpath d='M12 17.5V2.8'/%3E%3Cpath d='M7.1 10.2h9.8'/%3E%3C/svg%3E"); }
