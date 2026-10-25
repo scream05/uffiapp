@@ -120,6 +120,11 @@ class Context
             }
         }
 
+        if (Yii::$app->hasModule('vereine') && Yii::$app->db->getTableSchema('verein_spiel') !== null
+            && ($fussball = \humhub\modules\vereine\components\Bfv::forAssistant()) !== null) {
+            $parts[] = $fussball;
+        }
+
         if (Yii::$app->hasModule('gewerbe') && Yii::$app->getModule('gewerbe') !== null
             && Yii::$app->db->getTableSchema('gewerbe_betrieb') !== null) {
             // Nur Namen nach Branche; Angebot, Adresse, Öffnungszeiten und „gerade geöffnet“ über verzeichnis_suchen

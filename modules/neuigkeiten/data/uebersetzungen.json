@@ -1,4 +1,31 @@
 {
+    "fvu-spiele": {
+        "en": {
+            "titel": "Games & results of 1. FV Uffenheim",
+            "text": "In the section \"Vereine & Ehrenamt\" you can now find all games, results and tables of the FVU teams – from the senior men's team down to the F-juniors, including home games and venues. The data comes from the Bavarian Football Association every hour, and Uffi knows it too.",
+            "quelle": "949e1d55623a1733a0d45d5008b9b73483461de7"
+        },
+        "uk": {
+            "titel": "Матчі та результати 1. FV Uffenheim",
+            "text": "У розділі «Клуби та волонтерство» тепер ти можеш знайти всі матчі, результати й турнірні таблиці команд FVU – від чоловічої команди до F-юніорів, з домашніми матчами та місцем проведення. Дані оновлюються щогодини з Баварського футбольного союзу, і Uffi їх теж знає.",
+            "quelle": "949e1d55623a1733a0d45d5008b9b73483461de7"
+        },
+        "ar": {
+            "titel": "مباريات ونتائج 1. FV أوفنهايم",
+            "text": "في قسم „النوادي والعمل التطوعي“ يمكنك الآن إيجاد جميع المباريات والنتائج والترتيب لفرق FVU – من فريق الرجال حتى فئة F للناشئين، مع المباريات المنزلية ومكان اللعب. تأتي البيانات كل ساعة من اتحاد كرة القدم البافاري، و Uffi يعرفها هو أيضاً.",
+            "quelle": "949e1d55623a1733a0d45d5008b9b73483461de7"
+        },
+        "tr": {
+            "titel": "1. FV Uffenheim'in maçları ve sonuçları",
+            "text": "\"Dernekler ve Gönüllülük\" bölümünde artık FVU takımlarının tüm maçlarını, sonuçlarını ve puan durumlarını bulabilirsin – Herren'den F-Junioren'e kadar, ev sahibi maçları ve maç yeri dahil. Veriler Bayerischen Fußball-Verband'dan saatlik olarak geliyor ve Uffi de bunları biliyor.",
+            "quelle": "949e1d55623a1733a0d45d5008b9b73483461de7"
+        },
+        "ru": {
+            "titel": "Spiele und Ergebnisse des 1. FV Uffenheim",
+            "text": "В разделе «Клубы и волонтёрство» ты теперь найдёшь все матчи, результаты и таблицы команд 1. FV Uffenheim – от команды мужчин до команды F-юниоров, с домашними матчами и местом игры. Данные приходят каждый час от Баварского футбольного союза, и Uffi тоже их знает.",
+            "quelle": "949e1d55623a1733a0d45d5008b9b73483461de7"
+        }
+    },
     "oeffnungszeiten": {
         "en": {
             "titel": "Opening hours at a glance",

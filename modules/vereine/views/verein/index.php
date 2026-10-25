@@ -29,6 +29,28 @@ $filtered = trim($q) !== '' || $kategorie !== '' || $ortsteil !== '';
 </div>
 <?php endif ?>
 
+<?php // Fußballvereine mit Spielplan vom BFV: Hinweis mit dem nächsten Spiel
+foreach (\humhub\modules\vereine\models\Verein::find()->where(['not', ['bfv_id' => null]])->orderBy(['name' => SORT_ASC])->all() as $fv):
+    $kurz = \humhub\modules\vereine\components\Bfv::kurz($fv, 6);
+    if (!$kurz['label']) {
+        continue;
+    }
+    $naechstes = current(array_filter($kurz['kommend'], fn($s) => $s->getZustand() === null)) ?: null; // abgesetzte überspringen ?>
+<a class="panel panel-default" href="<?= Html::encode($fv->getSpieleUrl()) ?>" style="display:flex;align-items:center;gap:12px;padding:12px 15px;color:inherit;text-decoration:none">
+    <?= $this->render('_logo', ['verein' => $fv, 'size' => 40]) ?>
+    <span style="flex:1;min-width:0">
+        <strong style="display:block"><i class="fa fa-futbol-o"></i> <?= Yii::t('VereineModule.base', 'Spiele & Ergebnisse: {verein}', ['verein' => Html::encode($fv->bfv_name ?: $fv->name)]) ?></strong>
+        <?php if ($naechstes): ?>
+            <small class="text-muted"><?= Yii::t('VereineModule.base', 'Nächstes Spiel') ?>:
+                <?= Html::encode(\humhub\modules\vereine\components\Bfv::format($naechstes->getZeitpunkt(), $naechstes->uhrzeit ? 'EEEdMHm' : 'EEEdM')) ?>,
+                <?= Html::encode($kurz['label'][$naechstes->mannschaft_id]) ?> –
+                <?= Html::encode($naechstes->getGegner()) ?> (<?= $naechstes->heim_eigen ? Yii::t('VereineModule.base', 'Heimspiel') : Yii::t('VereineModule.base', 'Auswärts') ?>)</small>
+        <?php endif ?>
+    </span>
+    <i class="fa fa-chevron-right text-muted"></i>
+</a>
+<?php endforeach ?>
+
 <div class="panel panel-default">
     <div class="panel-heading"><strong><?= Yii::t('VereineModule.base', 'Vereinsverzeichnis') ?></strong></div>
     <div class="panel-body">

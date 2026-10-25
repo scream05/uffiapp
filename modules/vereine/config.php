@@ -9,6 +9,9 @@ return [
     'id' => 'vereine',
     'class' => 'humhub\modules\vereine\Module',
     'namespace' => 'humhub\modules\vereine',
+    'consoleControllerMap' => [
+        'vereine' => 'humhub\modules\vereine\commands\VereineController',
+    ],
     'events' => [
         ['class' => Menu::class, 'event' => Menu::EVENT_INIT, 'callback' => [Events::class, 'onSpaceMenuInit']],
         ['class' => WallEntryAddons::class, 'event' => WallEntryAddons::EVENT_INIT, 'callback' => [Events::class, 'onWallEntryAddonsInit']],

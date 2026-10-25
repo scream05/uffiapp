@@ -10,6 +10,10 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'fvu-spiele', 'datum' => '2026-10-25', 'art' => 'neu', 'popup' => true,
+        'link' => ['vereine-and-ehrenamt', '/vereine/spiele/index'],
+        'titel' => 'Spiele & Ergebnisse des 1. FV Uffenheim',
+        'text' => 'Im Bereich „Vereine & Ehrenamt“ findest du jetzt alle Spiele, Ergebnisse und Tabellen der FVU-Mannschaften – von den Herren bis zu den F-Junioren, mit Heimspielen und Spielort. Die Daten kommen stündlich vom Bayerischen Fußball-Verband, und Uffi kennt sie auch.'],
     ['id' => 'oeffnungszeiten', 'datum' => '2026-10-24', 'art' => 'neu', 'popup' => true,
         'link' => [null, '/oeffnungszeiten/index'],
         'titel' => 'Öffnungszeiten auf einen Blick',

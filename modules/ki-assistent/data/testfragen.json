@@ -388,5 +388,19 @@
       "15(:|\\.)30",
       "18(:|\\.)00|18 Uhr"
     ]
+  },
+  {
+    "frage": "Wann spielt der FVU als Nächstes?",
+    "erwartet": [
+      "vereine.spiele",
+      "\\d{1,2}[:.]\\d{2}"
+    ]
+  },
+  {
+    "frage": "Wie hat die erste Mannschaft des 1. FV Uffenheim zuletzt gespielt, und auf welchem Tabellenplatz steht sie?",
+    "erwartet": [
+      "\\d+ ?: ?\\d+",
+      "Platz \\d+"
+    ]
   }
 ]

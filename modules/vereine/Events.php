@@ -4,6 +4,7 @@ namespace humhub\modules\vereine;
 
 use humhub\modules\calendar\models\CalendarEntry;
 use humhub\modules\post\models\Post;
+use humhub\modules\vereine\models\Verein;
 use humhub\modules\vereine\models\VereinBeitrag;
 use humhub\modules\vereine\models\VereinVerwalter;
 use humhub\modules\vereine\widgets\VereinAddon;
@@ -60,9 +61,20 @@ class Events
                 'group' => 'modules',
                 'url' => $space->createUrl('/vereine/verein/index'),
                 'icon' => '<i class="fa fa-users"></i>',
-                'isActive' => $active && !in_array(Yii::$app->controller->action->id, ['anfragen', 'pruefen'], true),
+                'isActive' => $active && Yii::$app->controller->id !== 'spiele' && !in_array(Yii::$app->controller->action->id, ['anfragen', 'pruefen'], true),
                 'sortOrder' => 90,
             ]);
+            // Je Fußballverein mit BFV-Kennung eine Seite „Spiele & Ergebnisse“
+            foreach (Verein::find()->where(['not', ['bfv_id' => null]])->orderBy(['name' => SORT_ASC])->all() as $verein) {
+                $event->sender->addItem([
+                    'label' => Yii::t('VereineModule.base', 'Fußball: {verein}', ['verein' => $verein->bfv_name ?: $verein->name]),
+                    'group' => 'modules',
+                    'url' => $verein->getSpieleUrl(),
+                    'icon' => '<i class="fa fa-futbol-o"></i>',
+                    'isActive' => $active && Yii::$app->controller->id === 'spiele' && (int)Yii::$app->request->get('verein') === $verein->id,
+                    'sortOrder' => 89,
+                ]);
+            }
             if (Module::canManageAll()) {
                 $open = VereinVerwalter::find()->where(['status' => VereinVerwalter::STATUS_ANGEFRAGT])->count();
                 $event->sender->addItem([

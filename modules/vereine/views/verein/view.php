@@ -163,6 +163,24 @@ $module = Yii::$app->getModule('vereine');
 </div>
 <?php endif ?>
 
+<?php if ($verein->bfv_id && ($kurz = \humhub\modules\vereine\components\Bfv::kurz($verein)) && $kurz['label']): ?>
+<?= $this->render('@vereine/views/spiele/_stil') ?>
+<div class="panel panel-default">
+    <div class="panel-heading"><strong><i class="fa fa-futbol-o"></i> <?= Yii::t('VereineModule.base', 'Spiele & Ergebnisse') ?></strong></div>
+    <div class="panel-body">
+        <?php foreach (['kommend' => 'Nächste Spiele', 'ergebnisse' => 'Letzte Ergebnisse'] as $art => $titel): ?>
+            <?php if ($kurz[$art]): ?>
+                <div class="fvs-datum"><?= Yii::t('VereineModule.base', $titel) ?></div>
+                <?php foreach ($kurz[$art] as $s): ?>
+                    <?= $this->render('@vereine/views/spiele/_spiel', ['spiel' => $s, 'label' => $kurz['label'][$s->mannschaft_id] ?? '', 'mitDatum' => true]) ?>
+                <?php endforeach ?>
+            <?php endif ?>
+        <?php endforeach ?>
+        <p style="margin:12px 0 0"><?= Html::a(Yii::t('VereineModule.base', 'Alle Spiele, Ergebnisse und Tabellen') . ' <i class="fa fa-arrow-right"></i>', $verein->getSpieleUrl(), ['class' => 'btn btn-primary btn-sm']) ?></p>
+    </div>
+</div>
+<?php endif ?>
+
 <div class="panel panel-default">
     <div class="panel-heading"><strong><?= Yii::t('VereineModule.base', 'Nächste Termine') ?></strong></div>
     <div class="panel-body">

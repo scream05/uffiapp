@@ -2668,6 +2668,120 @@ class SetupController extends Controller
     }
 
     /**
+     * Spiele & Ergebnisse vom BFV: Abruf mit nachgestellten Antworten (Mannschaften, Spiele, SPIELFREI, Spielorte,
+     * „Keine Angabe“, Tabellen, keine Tabelle im Kinderfußball, Entfernen), Wertung, Zustand, Bezeichnungen, Uffi.
+     * Läuft in einer Transaktion, die zurückgerollt wird; ruft nichts beim BFV ab.
+     *   scripts/run-setup.sh vereine-spiele-test
+     */
+    public function actionVereineSpieleTest()
+    {
+        $Bfv = \humhub\modules\vereine\components\Bfv::class;
+        $ok = 0;
+        $fehler = 0;
+        $gleich = function (string $was, $ist, $soll) use (&$ok, &$fehler) {
+            $bedingung = $ist === $soll;
+            $bedingung ? $ok++ : $fehler++;
+            $this->stdout(($bedingung ? 'ok   ' : 'FEHL ') . "$was\n" . (!$bedingung ? '     ist: ' . var_export($ist, true) . ', soll: ' . var_export($soll, true) . "\n" : ''));
+        };
+        $sprache = Yii::$app->language;
+        Yii::$app->language = 'de';
+        $tx = Yii::$app->db->beginTransaction();
+        try {
+            $club = str_repeat('C', 32);
+            $h1 = str_repeat('H', 32);
+            $e1 = str_repeat('E', 32);
+            $morgen = date('d.m.Y', strtotime('+1 day'));
+            $spiel = fn($id, $datum, $zeit, $heim, $gast, $heimId, $ergebnis, $typ = 'Meisterschaften') => ['matchId' => $id, 'kickoffDate' => $datum,
+                'kickoffTime' => $zeit, 'competitionName' => 'Liga', 'competitionType' => $typ, 'homeTeamName' => $heim, 'guestTeamName' => $gast,
+                'homeTeamPermanentId' => $heimId, 'result' => $ergebnis];
+            $antworten = [
+                'https://www.bfv.de/vereine/-/' . $club => '<a href="https://www.bfv.de/mannschaften/test/' . $h1 . '">x</a><a href="https://www.bfv.de/mannschaften/test-e/' . $e1 . '">x</a>'
+                    . '<div class="bfv-spieltag-eintrag"><a href="https://www.bfv.de/ergebnisse/spiel/-/' . str_repeat('1', 32) . '"></a>'
+                    . '<div class="bfv-spieltag-eintrag__location"> Sportanlage Uffenheim An den Seewiesen, Platz 1 | An den Seewiesen | 97215 Uffenheim </div></div>',
+                $Bfv::API . "team/$h1/matches" => json_encode(['state' => 0, 'data' => ['team' => ['name' => 'Test FV II', 'typeName' => 'Herren', 'clubId' => $club,
+                    'clubName' => 'Test FV', 'compoundId' => 'LIGA-G', 'competitionName' => 'Kreisliga'], 'matches' => [
+                    $spiel(str_repeat('1', 32), $morgen, '15:00', 'Test FV II', 'Gast SV', $h1, ''),
+                    $spiel(str_repeat('2', 32), '01.09.2026', '15:00', 'Heim SV', 'Test FV II', 'X', '1:3'),
+                    $spiel(str_repeat('3', 32), '02.09.2026', '15:00', 'Test FV II', 'Gast SV', $h1, '2:2', 'Pokale'),
+                    $spiel(str_repeat('4', 32), '03.09.2026', '', 'Test FV II', 'Gast SV', $h1, 'Abse.'),
+                    $spiel(str_repeat('5', 32), $morgen, '', 'SPIELFREI', 'Test FV II', 'X', ''),
+                    $spiel(str_repeat('6', 32), $morgen, '17:00', 'Test FV II', 'Gast SV', $h1, ''),
+                ]]]),
+                $Bfv::API . "team/$e1/matches" => json_encode(['state' => 0, 'data' => ['team' => ['name' => '(SG) Test/Nachbar I', 'typeName' => 'E-Junioren',
+                    'clubId' => $club, 'compoundId' => 'E-LIGA-G', 'competitionName' => 'U11'], 'matches' => [
+                    $spiel(str_repeat('7', 32), '05.09.2026', '10:00', 'Fremd', '(SG) Test/Nachbar I', 'X', '7:9 nE'),
+                ]]]),
+                $Bfv::API . 'competition/LIGA-G/table' => json_encode(['state' => 0, 'data' => ['table' => [
+                    ['position' => 1, 'matches' => 3, 'matchesWon' => 3, 'matchesDrawn' => 0, 'matchesLost' => 0, 'goalsDiff' => 5, 'points' => 9, 'team' => ['permanentId' => 'X', 'name' => 'Heim SV']],
+                    ['position' => 2, 'matches' => 3, 'matchesWon' => 1, 'matchesDrawn' => 1, 'matchesLost' => 1, 'goalsDiff' => 1, 'points' => 4, 'team' => ['permanentId' => $h1, 'name' => 'Test FV II']],
+                ]]]),
+                'https://www.bfv.de/ergebnisse/spiel/-/' . str_repeat('6', 32) => '<span class="a">Adresse</span><span class="b">Keine Angabe</span>',
+            ];
+            $abgerufen = [];
+            $Bfv::$holen = function (string $url) use (&$antworten, &$abgerufen) {
+                $abgerufen[] = $url;
+                if (!isset($antworten[$url])) {
+                    throw new \RuntimeException("HTTP 404 bei $url");
+                }
+                return $antworten[$url];
+            };
+            $verein = new \humhub\modules\vereine\models\Verein(['name' => 'Testverein Spiele ' . uniqid(), 'kategorie' => 'Sport', 'ortsteil' => 'Uffenheim', 'status' => 'offen']);
+            $verein->save(false);
+            $verein->updateAttributes(['bfv_id' => $club]);
+            $log = $Bfv::abrufen($verein);
+            $gleich('Abruf ohne Fehler', preg_grep('/^!/', $log), []);
+            $gleich('BFV-Name übernommen', $verein->bfv_name, 'Test FV');
+            $S = \humhub\modules\vereine\models\VereinSpiel::class;
+            $M = \humhub\modules\vereine\models\VereinMannschaft::class;
+            $gleich('Spiele Herren II (ohne SPIELFREI)', (int)$S::find()->where(['mannschaft_id' => $h1])->count(), 5);
+            $s1 = $S::findOne(['spiel_id' => str_repeat('1', 32)]);
+            $gleich('Spielort aus der Vereinsseite', $s1->ort, 'Sportanlage Uffenheim An den Seewiesen, Platz 1 | An den Seewiesen | 97215 Uffenheim');
+            $gleich('Ort kurz', $Bfv::ortKurz($s1->ort), 'Sportanlage Uffenheim An den Seewiesen, Platz 1');
+            $gleich('„Keine Angabe“ wird leer', $S::findOne(['spiel_id' => str_repeat('6', 32)])->ort, '');
+            $gleich('Heimspiel erkannt', (int)$s1->heim_eigen, 1);
+            $gleich('kommendes Spiel nicht vorbei', $s1->istVorbei(), false);
+            $s2 = $S::findOne(['spiel_id' => str_repeat('2', 32)]);
+            $gleich('Auswärtssieg 1:3', [$s2->getWertung(), $s2->getGegner(), (int)$s2->heim_eigen], ['s', 'Heim SV', 0]);
+            $gleich('Unentschieden', $S::findOne(['spiel_id' => str_repeat('3', 32)])->getWertung(), 'u');
+            $s4 = $S::findOne(['spiel_id' => str_repeat('4', 32)]);
+            $gleich('abgesetzt ohne Uhrzeit', [$s4->getZustand(), $s4->uhrzeit, $s4->getWertung()], ['abgesetzt', null, null]);
+            $gleich('Elfmeterschießen 7:9 nE als Sieg der SG (Gast)', $S::findOne(['spiel_id' => str_repeat('7', 32)])->getWertung(), 's');
+            $herren = $M::findOne($h1);
+            $gleich('Bezeichnung Herren II', $herren->getLabel(), 'Herren II');
+            $gleich('Bezeichnung SG E-Junioren I', $M::findOne($e1)->getLabel(), 'E-Junioren I (SG)');
+            $gleich('Tabellenplatz', [$herren->getPlatz()['platz'] ?? null, $herren->getPlatz()['punkte'] ?? null], [2, 4]);
+            $gleich('keine Tabelle im Kinderfußball', [$M::findOne($e1)->tabelle, in_array($Bfv::API . 'competition/E-LIGA-G/table', $abgerufen, true)], [null, false]);
+            $gleich('Reihenfolge Herren vor E-Junioren', array_map(fn($m) => $m->typ, $M::sortieren([$M::findOne($e1), $herren])), ['Herren', 'E-Junioren']);
+            $kurz = $Bfv::kurz($verein, 2);
+            $gleich('Kurzübersicht: nächste Spiele', array_map(fn($s) => $s->spiel_id, $kurz['kommend']), [str_repeat('1', 32), str_repeat('6', 32)]);
+            $uffi = (string)$Bfv::forAssistant();
+            $gleich('Uffi: Heimspiel mit Ort', str_contains($uffi, 'Herren II: Test FV II – Gast SV (Heimspiel, Sportanlage Uffenheim An den Seewiesen, Platz 1)'), true);
+            $gleich('Uffi: Tabellenplatz', str_contains($uffi, '- Herren II (Kreisliga): Platz 2 von 2, 4 Punkte aus 3 Spielen'), true);
+            $gleich('Uffi: Link zur Seite', str_contains($uffi, '/vereine/spiele/index?verein=' . $verein->id), true);
+
+            // Zweiter Lauf: ein Spiel und die E-Junioren sind beim BFV verschwunden, Mannschaftsabruf scheitert nicht
+            $daten = json_decode($antworten[$Bfv::API . "team/$h1/matches"], true);
+            array_shift($daten['data']['matches']);
+            $antworten[$Bfv::API . "team/$h1/matches"] = json_encode($daten);
+            $antworten['https://www.bfv.de/vereine/-/' . $club] = '<a href="https://www.bfv.de/mannschaften/test/' . $h1 . '">x</a>';
+            $Bfv::abrufen($verein);
+            $gleich('verschwundenes Spiel entfernt', $S::findOne(['spiel_id' => str_repeat('1', 32)]), null);
+            $gleich('verschwundene Mannschaft samt Spielen entfernt', [$M::findOne($e1), (int)$S::find()->where(['mannschaft_id' => $e1])->count()], [null, 0]);
+            // Dritter Lauf: Spiele-Abruf scheitert → Daten bleiben
+            unset($antworten[$Bfv::API . "team/$h1/matches"]);
+            $log = $Bfv::abrufen($verein);
+            $gleich('Fehler wird gemeldet', count(preg_grep('/^! Mannschaft/', $log)), 1);
+            $gleich('bei Fehler bleiben die Spiele', (int)$S::find()->where(['mannschaft_id' => $h1])->count(), 4);
+        } finally {
+            $Bfv::$holen = null;
+            $tx->rollBack();
+            Yii::$app->language = $sprache;
+        }
+        $this->stdout("\n$ok ok, $fehler Fehler\n");
+        return $fehler ? ExitCode::UNSPECIFIED_ERROR : ExitCode::OK;
+    }
+
+    /**
      * Öffnungszeiten: Berechnung „jetzt geöffnet“/„öffnet …“ zu festen Zeitpunkten, Feiertage, Saisons, Zeilen,
      * Uffi-Abschnitt, Quellen der nächtlichen Prüfung und Übersetzungen (alle Texte des Moduls in allen Sprachen).
      *   scripts/run-setup.sh oeffnungszeiten-test

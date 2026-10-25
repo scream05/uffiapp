@@ -34,6 +34,8 @@ use yii\helpers\Url;
  * @property string|null $bildnachweise JSON {guid: {beschreibung,urheber,lizenz,seite}}
  * @property string|null $quellen JSON [url]
  * @property string|null $recherchiert_am
+ * @property string|null $bfv_id Kennung beim BFV, gesetzt = Spiele werden abgerufen
+ * @property string|null $bfv_name Vereinsname beim BFV
  */
 class Verein extends ActiveRecord implements ViewableInterface
 {
@@ -263,6 +265,18 @@ class Verein extends ActiveRecord implements ViewableInterface
     {
         $space = Yii::$app->getModule('vereine')->getDirectorySpace();
         return $space ? $space->createUrl('/vereine/verein/view', ['id' => $this->id], $scheme) : Url::home($scheme);
+    }
+
+    /** Seite „Spiele & Ergebnisse“ (nur bei Vereinen mit bfv_id) */
+    public function getSpieleUrl(bool $scheme = false): ?string
+    {
+        $space = Yii::$app->getModule('vereine')->getDirectorySpace();
+        return $space && $this->bfv_id ? $space->createUrl('/vereine/spiele/index', ['verein' => $this->id], $scheme) : null;
+    }
+
+    public function getMannschaften()
+    {
+        return $this->hasMany(VereinMannschaft::class, ['verein_id' => 'id']);
     }
 
     public function getVerwalter()
