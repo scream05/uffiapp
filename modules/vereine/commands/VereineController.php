@@ -9,8 +9,11 @@ use yii\console\Controller;
 use yii\console\ExitCode;
 
 /**
- * Spiele der Fußballvereine vom BFV (Crontab stündlich, am Wochenende nachmittags halbstündlich):
- *   /app/yii vereine/spiele
+ * Spiele der Fußballvereine vom BFV:
+ *   /app/yii vereine/spiele        Abgleich (Crontab täglich 5:20)
+ *   /app/yii vereine/live          Liveticker laufender Spiele (Crontab minütlich, ruft ohne laufendes Spiel nichts ab)
+ *   /app/yii vereine/ticker <spiel-id>   Liveticker eines Spiels anzeigen (Prüfung, speichert nichts)
+ *   /app/yii vereine/name-sperren "Vorname Name"   Namen nach Widerspruch aus allen Spielberichten entfernen (auch künftig)
  *   /app/yii vereine/bfv <verein-id> <bfv-kennung|->   Verein mit dem BFV verknüpfen bzw. lösen („-“)
  */
 class VereineController extends Controller
@@ -29,6 +32,41 @@ class VereineController extends Controller
         }
         Yii::$app->cache->delete('ki-assistent-context');
         return $fehler ? ExitCode::UNSPECIFIED_ERROR : ExitCode::OK;
+    }
+
+    public function actionLive()
+    {
+        $log = Bfv::live();
+        if ($log) {
+            $this->stdout(date('Y-m-d H:i:s') . ' ' . implode('; ', $log) . "\n");
+        }
+        return preg_grep('/^!/', $log) ? ExitCode::UNSPECIFIED_ERROR : ExitCode::OK;
+    }
+
+    public function actionTicker($spielId, $mitNamen = 1)
+    {
+        $this->stdout(json_encode(Bfv::ticker($spielId, (bool)$mitNamen), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) . "\n");
+        return ExitCode::OK;
+    }
+
+    public function actionNameSperren($name)
+    {
+        $name = trim($name);
+        if (mb_strlen($name) < 3) {
+            $this->stderr("Bitte den vollständigen Namen angeben\n");
+            return ExitCode::DATAERR;
+        }
+        $liste = array_values(array_unique(array_merge(Bfv::gesperrteNamen(), [$name])));
+        Yii::$app->getModule('vereine')->settings->set('tickerGesperrt', json_encode($liste, JSON_UNESCAPED_UNICODE));
+        $n = 0;
+        foreach (\humhub\modules\vereine\models\VereinSpiel::find()->where(['like', 'ticker', $name])->all() as $spiel) {
+            $ereignisse = array_map(fn($e) => ['t' => str_ireplace($name, '–', $e['t']), 'k' => str_ireplace($name, '–', $e['k'])] + $e,
+                json_decode((string)$spiel->ticker, true) ?: []);
+            $spiel->updateAttributes(['ticker' => json_encode($ereignisse, JSON_UNESCAPED_UNICODE)]);
+            $n++;
+        }
+        $this->stdout("„{$name}“ gesperrt, in $n Spielberichten entfernt (gesperrt: " . count($liste) . ")\n");
+        return ExitCode::OK;
     }
 
     public function actionBfv($id, $bfvId)

@@ -3,8 +3,11 @@
  * @var \humhub\modules\vereine\models\Verein $verein
  * @var \humhub\modules\vereine\models\VereinMannschaft[] $mannschaften
  * @var \humhub\modules\vereine\models\VereinMannschaft|null $auswahl
+ * @var string[] $label Mannschaft-ID => Bezeichnung
+ * @var \humhub\modules\vereine\models\VereinSpiel[] $live laufende Spiele
  * @var \humhub\modules\vereine\models\VereinSpiel[] $kommend nächste zuerst
- * @var \humhub\modules\vereine\models\VereinSpiel[] $ergebnisse neueste zuerst
+ * @var \humhub\modules\vereine\models\VereinSpiel[] $letzte letztes Spiel je Mannschaft, neueste zuerst
+ * @var \humhub\modules\vereine\models\VereinSpiel[] $fruehere frühere Spiele der gewählten Mannschaft
  * @var string|null $stand
  */
 
@@ -14,10 +17,6 @@ use humhub\modules\vereine\controllers\SpieleController;
 
 $space = $this->context->contentContainer;
 $name = $verein->bfv_name ?: $verein->name;
-$label = [];
-foreach ($mannschaften as $m) {
-    $label[$m->id] = $m->getLabel();
-}
 $filterUrl = fn(?string $id) => $space->createUrl('/vereine/spiele/index', array_filter(['verein' => $verein->id, 'mannschaft' => $id]));
 $tagUeberschrift = function (string $datum): string {
     $t = (new DateTime($datum, new DateTimeZone('Europe/Berlin')))->getTimestamp();
@@ -82,6 +81,37 @@ $tabelle = $auswahl ? $auswahl->getTabelleList() : [];
     </div>
 </div>
 
+<?php // Laufende Spiele; neu laden, solange heute noch Spiele anstehen oder laufen
+$heute = $live || array_filter($kommend, fn($s) => $s->datum === date('Y-m-d') && $s->getZustand() === null);
+$liveUrl = $space->createUrl('/vereine/spiele/index', array_filter(['verein' => $verein->id, 'mannschaft' => $auswahl?->id, 'teil' => 'live'])); ?>
+<div id="fvs-live" data-url="<?= Html::encode($liveUrl) ?>" data-aktiv="<?= $heute ? 1 : 0 ?>">
+    <?= $this->render('_live', ['live' => $live, 'label' => $label]) ?>
+</div>
+<?php if ($heute) {
+    $this->registerJs(<<<JS
+(function () {
+    if (window.fvsLiveTimer) { return; } // läuft schon (PJAX), findet das neue Feld selbst
+    function laden() {
+        var box = document.getElementById('fvs-live');
+        if (!box || box.dataset.aktiv !== '1') { clearInterval(window.fvsLiveTimer); window.fvsLiveTimer = null; return; }
+        if (document.hidden) { return; }
+        // Auf- bzw. zugeklappte Berichte beibehalten
+        var zu = {};
+        box.querySelectorAll('details.fvs-bericht').forEach(function (d, i) { zu[i] = !d.open; });
+        fetch(box.dataset.url, {credentials: 'same-origin', headers: {'X-Requested-With': 'XMLHttpRequest'}})
+            .then(function (r) { return r.ok ? r.text() : null; })
+            .then(function (html) {
+                if (html === null || !document.body.contains(box)) { return; }
+                box.innerHTML = html;
+                box.querySelectorAll('details.fvs-bericht').forEach(function (d, i) { if (zu[i]) { d.open = false; } });
+            }).catch(function () {});
+    }
+    window.fvsLiveTimer = setInterval(laden, 60000);
+    document.addEventListener('visibilitychange', function () { if (!document.hidden && window.fvsLiveTimer) { laden(); } });
+})();
+JS);
+} ?>
+
 <div class="panel panel-default">
     <div class="panel-heading"><strong><?= Yii::t('VereineModule.base', 'Nächste Spiele') ?></strong></div>
     <div class="panel-body">
@@ -125,17 +155,37 @@ $tabelle = $auswahl ? $auswahl->getTabelleList() : [];
 <?php endif ?>
 
 <div class="panel panel-default">
-    <div class="panel-heading"><strong><?= Yii::t('VereineModule.base', 'Ergebnisse') ?></strong>
-        <?php if (!$auswahl): ?><span class="text-muted"><?= Yii::t('VereineModule.base', 'der letzten {n} Tage', ['n' => SpieleController::TAGE_ZURUECK]) ?></span><?php endif ?>
+    <div class="panel-heading"><strong><?= $auswahl ? Yii::t('VereineModule.base', 'Letztes Spiel') : Yii::t('VereineModule.base', 'Letzte Spiele') ?></strong>
+        <?php if (!$auswahl): ?><span class="text-muted"><?= Yii::t('VereineModule.base', 'je Mannschaft') ?></span><?php endif ?>
     </div>
     <div class="panel-body">
-        <?php if ($ergebnisse): ?>
-            <?php $liste($ergebnisse) ?>
+        <?php if ($letzte): ?>
+            <?php foreach ($letzte as $s): ?>
+                <div class="fvs-letztes">
+                    <?= $this->render('_spiel', ['spiel' => $s, 'label' => $label[$s->mannschaft_id] ?? '', 'mitDatum' => true]) ?>
+                    <?= $this->render('_bericht', ['spiel' => $s]) ?>
+                    <?php if (!$auswahl): ?>
+                        <?= Html::a(Yii::t('VereineModule.base', 'Frühere Spiele: {mannschaft}', ['mannschaft' => Html::encode($label[$s->mannschaft_id] ?? '')]) . ' <i class="fa fa-angle-right"></i>',
+                            $filterUrl($s->mannschaft_id) . '#fvs-frueher', ['class' => 'fvs-mehr']) ?>
+                    <?php endif ?>
+                </div>
+            <?php endforeach ?>
         <?php else: ?>
             <p class="text-muted" style="margin:0"><?= Yii::t('VereineModule.base', 'Noch keine Ergebnisse.') ?></p>
         <?php endif ?>
     </div>
 </div>
+
+<?php if ($fruehere): ?>
+<div class="panel panel-default" id="fvs-frueher">
+    <div class="panel-heading"><strong><?= Yii::t('VereineModule.base', 'Frühere Spiele') ?></strong></div>
+    <div class="panel-body">
+        <?php foreach ($fruehere as $s): ?>
+            <?= $this->render('_spiel', ['spiel' => $s, 'label' => $label[$s->mannschaft_id] ?? '', 'mitDatum' => true]) ?>
+        <?php endforeach ?>
+    </div>
+</div>
+<?php endif ?>
 
 <?php if (!$auswahl): ?>
 <div class="panel panel-default">
@@ -158,6 +208,6 @@ $tabelle = $auswahl ? $auswahl->getTabelleList() : [];
 <?php endif ?>
 
 <p class="text-muted" style="font-size:.85em;padding:0 4px">
-    <?= Yii::t('VereineModule.base', 'Quelle: Bayerischer Fußball-Verband ({link}). Wir rufen die Daten stündlich ab, am Wochenende nachmittags öfter. Angaben ohne Gewähr.', ['link' => Html::a('bfv.de', Bfv::WEB . 'vereine/-/' . rawurlencode($verein->bfv_id), ['target' => '_blank', 'rel' => 'noopener'])]) ?>
+    <?= Yii::t('VereineModule.base', 'Quelle: Bayerischer Fußball-Verband ({link}). Wir gleichen Spielplan und Ergebnisse täglich ab; während eines Spiels holen wir den Liveticker jede Minute. Angaben ohne Gewähr.', ['link' => Html::a('bfv.de', Bfv::WEB . 'vereine/-/' . rawurlencode($verein->bfv_id), ['target' => '_blank', 'rel' => 'noopener'])]) ?>
     <?php if ($stand): ?><?= Yii::t('VereineModule.base', 'Stand: {zeit}', ['zeit' => Html::encode(Bfv::format(strtotime($stand), 'dMMMMHm'))]) ?><?php endif ?>
 </p>

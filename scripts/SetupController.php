@@ -2759,6 +2759,59 @@ class SetupController extends Controller
             $gleich('Uffi: Tabellenplatz', str_contains($uffi, '- Herren II (Kreisliga): Platz 2 von 2, 4 Punkte aus 3 Spielen'), true);
             $gleich('Uffi: Link zur Seite', str_contains($uffi, '/vereine/spiele/index?verein=' . $verein->id), true);
 
+            // Liveticker: Seite mit eingebettetem JSON wie bei bfv.de
+            $e = fn($typ, $min, $text, $score, $sek, $kommentar = '') => ['typeId' => $typ, 'minute' => $min, 'description' => $text,
+                'comment' => $kommentar, 'score' => $score, 'timestamp' => '$D2026-11-01T15:' . sprintf('%02d', intdiv($sek, 60)) . ':' . sprintf('%02d', $sek % 60) . '.000Z'];
+            $tickerSeite = fn(array $ev) => '<html><script>self.__next_f.push([1,' . json_encode('5:["$","x",{"events":[{"icon":"goal"}]}]' . "\n" . '7:{"events":' . json_encode($ev) . '}') . '])</script></html>';
+            $ev = [$e(28, 1, 'Anpfiff der Begegnung', '0:0', 1), $e(1, 12, 'Tor durch Max Muster (9)', '1:0', 12, 'Toller Schuss'),
+                $e(5, 20, 'Ecke für Gast SV', '1:0', 20), $e(2, 30, 'Gelbe Karte für Erika Beispiel (4)', '1:0', 30),
+                $e(3, 40, 'Rote Karte für Hans Probe (7)', '1:0', 40), $e(4, 41, 'Anna (3) für Berta (5)', '1:0', 41)];
+            $s6 = str_repeat('6', 32);
+            $antworten["https://www.bfv.de/ergebnisse/spiel/-/$s6/liveticker"] = $tickerSeite($ev);
+            $t = $Bfv::ticker($s6, true);
+            $gleich('Ticker: läuft, Stand, Minute', [$t['status'], $t['stand'], $t['minute']], ['live', '1:0', 41]);
+            $gleich('Ticker: nur Tore, Karten, Phasen (neueste zuerst)', array_column($t['ereignisse'], 'art'), ['rot', 'gelb', 'tor', 'phase']);
+            $gleich('Ticker: Torschütze und Kommentar (Erwachsene)', [$t['ereignisse'][2]['t'], $t['ereignisse'][2]['k']], ['Tor durch Max Muster (9)', 'Toller Schuss']);
+            $t = $Bfv::ticker($s6, false);
+            $gleich('Ticker Jugend: ohne Namen und Kommentare', array_map(fn($x) => $x['t'] . '|' . $x['k'], $t['ereignisse']),
+                ['Rote Karte|', 'Gelbe Karte|', 'Tor|', 'Anpfiff der Begegnung|']);
+            Yii::$app->getModule('vereine')->settings->set('tickerGesperrt', json_encode(['Max Muster']));
+            $t = $Bfv::ticker($s6, true);
+            $gleich('gesperrter Name entfernt', [$t['ereignisse'][2]['t'], $t['ereignisse'][1]['t']], ['Tor durch – (9)', 'Gelbe Karte für Erika Beispiel (4)']);
+            Yii::$app->getModule('vereine')->settings->delete('tickerGesperrt');
+            $antworten["https://www.bfv.de/ergebnisse/spiel/-/x/liveticker"] = '<html>kein Ticker</html>';
+            $gleich('ohne Ticker: null', $Bfv::ticker('x', true), null);
+
+            $sp6 = fn() => $S::findOne(['mannschaft_id' => $h1, 'spiel_id' => $s6]);
+            $anstoss = $sp6()->getZeitpunkt();
+            $gleich('Live: ohne laufendes Spiel nichts', $Bfv::live($anstoss - 4 * 3600), []);
+            $Bfv::live($anstoss + 41 * 60);
+            $gleich('Live: Ticker gespeichert, Spiel läuft', [$sp6()->ticker_status, $sp6()->ticker_stand, $sp6()->laeuft($anstoss + 41 * 60)], ['live', '1:0', true]);
+            $gleich('Live: Herren mit Namen', str_contains((string)$sp6()->ticker, 'Max Muster'), true);
+            $ev[] = $e(29, 92, 'Abpfiff der Begegnung', '1:0', 200);
+            $antworten["https://www.bfv.de/ergebnisse/spiel/-/$s6/liveticker"] = $tickerSeite($ev);
+            $daten = json_decode($antworten[$Bfv::API . "team/$h1/matches"], true);
+            foreach ($daten['data']['matches'] as &$x) {
+                if ($x['matchId'] === $s6) {
+                    $x['result'] = '1:0';
+                }
+            }
+            unset($x);
+            $antworten[$Bfv::API . "team/$h1/matches"] = json_encode($daten);
+            $abgerufen = [];
+            $Bfv::live($anstoss + 100 * 60);
+            $gleich('Live: Abpfiff → beendet, Sieg', [$sp6()->ticker_status, $sp6()->istVorbei($anstoss + 100 * 60), $sp6()->getWertung()], ['beendet', true, 's']);
+            $gleich('Live: ab Minute 100 Ergebnis aus der Schnittstelle', $sp6()->ergebnis, '1:0');
+            $abgerufen = [];
+            $gleich('Live: beendetes Spiel nicht erneut abgerufen', [$Bfv::live($anstoss + 105 * 60), $abgerufen], [[], []]);
+            $S::updateAll(['ticker_status' => 'live', 'ergebnis' => null], ['spiel_id' => $s6]);
+            $Bfv::live($anstoss + 200 * 60);
+            $gleich('Live: Ticker ohne Abpfiff nach 3 Stunden beendet', $sp6()->ticker_status, 'beendet');
+            // Täglicher Abgleich: Ticker älterer Spiele werden geleert
+            $S::updateAll(['ticker' => '[]', 'ticker_status' => 'beendet'], ['spiel_id' => str_repeat('2', 32)]);
+            $Bfv::abrufen($verein);
+            $gleich('älterer Spielbericht geleert', $S::findOne(['spiel_id' => str_repeat('2', 32)])->ticker, null);
+
             // Zweiter Lauf: ein Spiel und die E-Junioren sind beim BFV verschwunden, Mannschaftsabruf scheitert nicht
             $daten = json_decode($antworten[$Bfv::API . "team/$h1/matches"], true);
             array_shift($daten['data']['matches']);

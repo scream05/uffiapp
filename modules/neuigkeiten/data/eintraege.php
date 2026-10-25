@@ -13,7 +13,7 @@ return [
     ['id' => 'fvu-spiele', 'datum' => '2026-10-25', 'art' => 'neu', 'popup' => true,
         'link' => ['vereine-and-ehrenamt', '/vereine/spiele/index'],
         'titel' => 'Spiele & Ergebnisse des 1. FV Uffenheim',
-        'text' => 'Im Bereich „Vereine & Ehrenamt“ findest du jetzt alle Spiele, Ergebnisse und Tabellen der FVU-Mannschaften – von den Herren bis zu den F-Junioren, mit Heimspielen und Spielort. Die Daten kommen stündlich vom Bayerischen Fußball-Verband, und Uffi kennt sie auch.'],
+        'text' => 'Im Bereich „Vereine & Ehrenamt“ findest du jetzt alle Spiele, Ergebnisse und Tabellen der FVU-Mannschaften – von den Herren bis zu den F-Junioren, mit Spielort und aufklappbarem Spielbericht. Läuft ein Spiel mit Liveticker, siehst du den Spielstand minütlich aktuell. Die Daten kommen vom Bayerischen Fußball-Verband, und Uffi kennt sie auch.'],
     ['id' => 'oeffnungszeiten', 'datum' => '2026-10-24', 'art' => 'neu', 'popup' => true,
         'link' => [null, '/oeffnungszeiten/index'],
         'titel' => 'Öffnungszeiten auf einen Blick',

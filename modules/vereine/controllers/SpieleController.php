@@ -12,14 +12,16 @@ use yii\web\NotFoundHttpException;
 
 /**
  * Spiele & Ergebnisse eines Fußballvereins (Daten vom BFV, siehe components/Bfv.php), auch für Gäste.
+ * Laufende Spiele lädt die Seite jede Minute neu (?teil=live).
  */
 class SpieleController extends ContentContainerController
 {
-    /** Ohne Mannschaftsfilter: Ergebnisse und Spiele so viele Tage zurück bzw. voraus */
-    public const TAGE_ZURUECK = 21;
+    /** Ohne Mannschaftsfilter: Spiele so viele Tage voraus */
     public const TAGE_VORAUS = 35;
+    /** Mit Mannschaftsfilter: so viele frühere Spiele unter dem letzten */
+    public const FRUEHERE = 30;
 
-    public function actionIndex($verein = null, $mannschaft = null)
+    public function actionIndex($verein = null, $mannschaft = null, $teil = null)
     {
         $query = Verein::find()->where(['not', ['bfv_id' => null]]);
         $verein = $verein !== null ? $query->andWhere(['id' => (int)$verein])->one() : $query->orderBy(['name' => SORT_ASC])->one();
@@ -33,27 +35,55 @@ class SpieleController extends ContentContainerController
                 $auswahl = $m;
             }
         }
+        $ids = $auswahl ? [$auswahl->id] : (array_map(fn($m) => $m->id, $mannschaften) ?: ['-']);
+        $label = [];
+        foreach ($mannschaften as $m) {
+            $label[$m->id] = $m->getLabel();
+        }
 
-        $spiele = VereinSpiel::find()->where(['mannschaft_id' => $auswahl ? $auswahl->id : (array_map(fn($m) => $m->id, $mannschaften) ?: ['-'])])
+        // Laufende Spiele (gestern mitnehmen: Spiele über Mitternacht gibt es nicht, aber die Zeitzone des Kontos kann abweichen)
+        $live = array_values(array_filter(VereinSpiel::find()->where(['mannschaft_id' => $ids])
+            ->andWhere(['between', 'datum', date('Y-m-d', strtotime('-1 day')), date('Y-m-d')])
+            ->orderBy(['datum' => SORT_ASC, 'uhrzeit' => SORT_ASC])->all(), fn(VereinSpiel $s) => $s->laeuft()));
+        if ($teil === 'live') {
+            return $this->renderPartial('_live', ['live' => $live, 'label' => $label, 'verein' => $verein, 'auswahl' => $auswahl]);
+        }
+
+        $kommend = VereinSpiel::find()->where(['mannschaft_id' => $ids])->andWhere(['>=', 'datum', date('Y-m-d', strtotime('-1 day'))])
             ->orderBy(['datum' => SORT_ASC, 'uhrzeit' => SORT_ASC]);
         if ($auswahl === null) {
-            $spiele->andWhere(['between', 'datum', date('Y-m-d', strtotime('-' . self::TAGE_ZURUECK . ' days')), date('Y-m-d', strtotime('+' . self::TAGE_VORAUS . ' days'))]);
+            $kommend->andWhere(['<=', 'datum', date('Y-m-d', strtotime('+' . self::TAGE_VORAUS . ' days'))]);
         }
-        $kommend = $ergebnisse = [];
-        foreach ($spiele->all() as $s) {
-            if ($s->istVorbei()) {
-                array_unshift($ergebnisse, $s); // neueste zuerst
-            } else {
-                $kommend[] = $s;
+        $kommend = array_values(array_filter($kommend->all(), fn(VereinSpiel $s) => !$s->istVorbei() && !$s->laeuft()));
+
+        // Letztes Spiel je Mannschaft (mit Spielbericht), bei gewählter Mannschaft darunter die früheren
+        $letzte = [];
+        $fruehere = [];
+        foreach ($auswahl ? [$auswahl] : $mannschaften as $m) {
+            $vorbei = array_values(array_filter(VereinSpiel::find()->where(['mannschaft_id' => $m->id])->andWhere(['<=', 'datum', date('Y-m-d')])
+                ->orderBy(['datum' => SORT_DESC, 'uhrzeit' => SORT_DESC])->limit(self::FRUEHERE + 5)->all(), fn(VereinSpiel $s) => $s->istVorbei()));
+            // Als „letztes Spiel“ das letzte gespielte (abgesetzte stehen bei den früheren)
+            foreach ($vorbei as $i => $s) {
+                if ($s->getZustand() === null) {
+                    $letzte[] = $s;
+                    unset($vorbei[$i]);
+                    $vorbei = array_values($vorbei);
+                    break;
+                }
             }
+            $fruehere = array_slice($vorbei, 0, self::FRUEHERE); // nur bei gewählter Mannschaft angezeigt
         }
+        usort($letzte, fn($a, $b) => $b->getZeitpunkt() <=> $a->getZeitpunkt());
 
         return $this->render('index', [
             'verein' => $verein,
             'mannschaften' => $mannschaften,
+            'label' => $label,
             'auswahl' => $auswahl,
+            'live' => $live,
             'kommend' => $kommend,
-            'ergebnisse' => $ergebnisse,
+            'letzte' => $letzte,
+            'fruehere' => $auswahl ? $fruehere : [],
             'stand' => Bfv::stand($verein),
         ]);
     }

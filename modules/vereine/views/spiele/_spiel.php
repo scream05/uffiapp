@@ -11,6 +11,7 @@ use humhub\modules\vereine\components\Bfv;
 
 $mitDatum ??= false;
 $wertung = $spiel->getWertung();
+$laeuft = $spiel->laeuft();
 $zustand = $spiel->getZustand();
 $t = $spiel->getZeitpunkt();
 // Lange Namen von Spielgemeinschaften („(SG) A/B/C“) nach den Schrägstrichen umbrechen
@@ -29,6 +30,9 @@ $wertungText = ['s' => Yii::t('VereineModule.base', 'gewonnen'), 'u' => Yii::t('
     <span class="fvs-mitte">
         <span class="fvs-kopf">
             <span class="fvs-team"><?= Html::encode($label) ?></span>
+            <?php if ($laeuft): ?>
+                <span class="fvs-live-marke"><?= Yii::t('VereineModule.base', 'Live') ?><?= $spiel->ticker_minute !== null ? ' · ' . (int)$spiel->ticker_minute . '.' : '' ?></span>
+            <?php endif ?>
             <span class="fvs-ort-art"><?= $spiel->heim_eigen ? '<i class="fa fa-home"></i> ' . Yii::t('VereineModule.base', 'Heimspiel') : Yii::t('VereineModule.base', 'Auswärts') ?></span>
             <?php if ($spiel->wettbewerb_typ && $spiel->wettbewerb_typ !== 'Meisterschaften'): ?>
                 <span class="fvs-wettbewerb"><?= Html::encode(Yii::t('VereineModule.base', $spiel->wettbewerb_typ)) ?></span>
@@ -39,9 +43,11 @@ $wertungText = ['s' => Yii::t('VereineModule.base', 'gewonnen'), 'u' => Yii::t('
             <span class="fvs-ort"><i class="fa fa-map-marker"></i> <?= Html::encode(Bfv::ortKurz($spiel->ort)) ?></span>
         <?php endif ?>
     </span>
-    <?php if ($wertung !== null): ?>
+    <?php if ($laeuft): ?>
+        <span class="fvs-ergebnis fvs-live"><?= $spiel->getAnzeigeStand() !== null ? Html::encode($spiel->getAnzeigeStand()) : Yii::t('VereineModule.base', 'läuft') ?></span>
+    <?php elseif ($wertung !== null): ?>
         <span class="fvs-ergebnis fvs-<?= $wertung ?>" title="<?= Html::encode($wertungText[$wertung]) ?>">
-            <?= Html::encode($spiel->ergebnis) ?><span class="visually-hidden"> (<?= Html::encode($wertungText[$wertung]) ?>)</span>
+            <?= Html::encode($spiel->getAnzeigeStand()) ?><span class="visually-hidden"> (<?= Html::encode($wertungText[$wertung]) ?>)</span>
         </span>
     <?php elseif ($zustand !== null): ?>
         <span class="fvs-ergebnis fvs-zustand"><?= Html::encode($zustand) ?></span>

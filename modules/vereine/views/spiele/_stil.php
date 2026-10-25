@@ -30,4 +30,30 @@ use humhub\helpers\Html;
     .fvs-tabelle .zahl { text-align: right; width: 1%; white-space: nowrap; }
     .fvs-tabelle tr.eigen td { font-weight: 700; background: var(--bs-primary-bg-subtle, #e3ecf2); }
     @media (max-width: 575.98px) { .fvs-tabelle .breit { display: none; } }
+    .fvs-live { background: #c62828; color: #fff; }
+    .fvs-live-marke { background: #c62828; color: #fff; border-radius: 4px; padding: 0 5px; font-weight: 600; }
+    .fvs-live-punkt { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #c62828; margin-right: 2px;
+        animation: fvs-puls 1.6s ease-in-out infinite; }
+    @keyframes fvs-puls { 50% { opacity: .25; } }
+    @media (prefers-reduced-motion: reduce) { .fvs-live-punkt { animation: none; } }
+    .fvs-letztes { border-top: 1px solid var(--bs-border-color, #e5e5e5); padding-bottom: 8px; }
+    .fvs-letztes:first-child { border-top: 0; }
+    .fvs-letztes > .fvs-spiel { border-top: 0; }
+    .fvs-mehr { display: inline-block; font-size: .85em; margin: 2px 0 0 62px; }
+    .fvs-hinweis { font-size: .85em; margin: 0 0 8px 62px; }
+    .fvs-bericht { margin: 0 0 4px 62px; font-size: .9em; }
+    .fvs-bericht > summary { cursor: pointer; color: var(--bs-primary, #446e88); padding: 2px 0; }
+    .fvs-bericht ol { list-style: none; padding: 0; margin: 6px 0; }
+    .fvs-bericht li { display: flex; gap: 8px; padding: 4px 0; border-top: 1px dashed var(--bs-border-color, #e5e5e5); }
+    .fvs-min { flex: 0 0 30px; text-align: right; font-variant-numeric: tabular-nums; color: var(--bs-secondary-color, #777); }
+    .fvs-sym { flex: 0 0 16px; text-align: center; }
+    .fvs-txt { flex: 1 1 auto; min-width: 0; }
+    .fvs-e-tor .fvs-txt { font-weight: 600; }
+    .fvs-e-phase .fvs-txt { color: var(--bs-secondary-color, #777); }
+    .fvs-kommentar { display: block; font-weight: 400; color: var(--bs-secondary-color, #666); font-style: italic; }
+    .fvs-karte { display: inline-block; width: 10px; height: 14px; border-radius: 2px; vertical-align: -2px; }
+    .fvs-karte-gelb { background: #f9c80e; }
+    .fvs-karte-rot { background: #d32f2f; }
+    .fvs-karte-gelbrot { background: linear-gradient(135deg, #f9c80e 50%, #d32f2f 50%); }
+    @media (max-width: 575.98px) { .fvs-bericht, .fvs-mehr, .fvs-hinweis { margin-left: 0; } }
 </style>

@@ -21,6 +21,11 @@ use Yii;
  * @property string|null $ergebnis
  * @property string|null $ort
  * @property string $aktualisiert_am
+ * @property string|null $ticker JSON [{m,s,t,k,art}] aus dem Liveticker, neueste zuerst
+ * @property string|null $ticker_status live | beendet | keiner
+ * @property string|null $ticker_stand Spielstand laut Liveticker
+ * @property int|null $ticker_minute
+ * @property string|null $ticker_am
  */
 class VereinSpiel extends ActiveRecord
 {
@@ -69,7 +74,11 @@ class VereinSpiel extends ActiveRecord
     /** s = gewonnen, u = unentschieden, n = verloren (aus Sicht der eigenen Mannschaft) */
     public function getWertung(): ?string
     {
-        if (($t = $this->getTore()) === null) {
+        $t = $this->getTore();
+        if ($t === null && $this->ticker_status === 'beendet' && preg_match('/^(\d+):(\d+)$/', (string)$this->ticker_stand, $m)) {
+            $t = [(int)$m[1], (int)$m[2]];
+        }
+        if ($t === null) {
             return null;
         }
         [$eigen, $fremd] = $this->heim_eigen ? $t : [$t[1], $t[0]];
@@ -88,8 +97,36 @@ class VereinSpiel extends ActiveRecord
 
     public function istVorbei(?int $jetzt = null): bool
     {
-        // Ein Spiel gilt zwei Stunden nach Anstoß als vorbei (ohne Uhrzeit: am Folgetag)
+        if ($this->ticker_status === 'beendet') {
+            return true;
+        }
+        if ($this->ticker_status === 'live') {
+            return false;
+        }
+        // Sonst gilt ein Spiel zwei Stunden nach Anstoß als vorbei (ohne Uhrzeit: am Folgetag)
         $jetzt ??= time();
         return $this->uhrzeit ? $this->getZeitpunkt() + 7200 < $jetzt : $this->datum < date('Y-m-d', $jetzt);
+    }
+
+    /** Angepfiffen und noch nicht vorbei (abgesetzte Spiele nie) */
+    public function laeuft(?int $jetzt = null): bool
+    {
+        $jetzt ??= time();
+        return $this->getZustand() === null && $this->uhrzeit !== null && $this->getZeitpunkt() <= $jetzt && !$this->istVorbei($jetzt);
+    }
+
+    /** Einträge des Livetickers in zeitlicher Reihenfolge (älteste zuerst) */
+    public function getTickerList(): array
+    {
+        return array_reverse(json_decode((string)$this->ticker, true) ?: []);
+    }
+
+    /** Ergebnis bzw. laufender Spielstand für die Anzeige */
+    public function getAnzeigeStand(): ?string
+    {
+        if ($this->getTore() !== null) {
+            return $this->ergebnis;
+        }
+        return $this->ticker_stand && preg_match('/^\d+:\d+$/', $this->ticker_stand) ? $this->ticker_stand : null;
     }
 }

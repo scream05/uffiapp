@@ -1,29 +1,29 @@
 {
     "fvu-spiele": {
         "en": {
-            "titel": "Games & results of 1. FV Uffenheim",
-            "text": "In the section \"Vereine & Ehrenamt\" you can now find all games, results and tables of the FVU teams – from the senior men's team down to the F-juniors, including home games and venues. The data comes from the Bavarian Football Association every hour, and Uffi knows it too.",
-            "quelle": "949e1d55623a1733a0d45d5008b9b73483461de7"
+            "titel": "Games & Results of 1. FV Uffenheim",
+            "text": "In the section \"Vereine & Ehrenamt\" you can now find all games, results and tables of the FVU teams – from the senior men's team down to the F-juniors, with venue and expandable match reports. If a game has a live ticker, you can see the score updated every minute. The data comes from the Bavarian Football Association, and Uffi knows it too.",
+            "quelle": "e0f37112782bd8d6e5b1484bc723b7d2c7965623"
         },
         "uk": {
             "titel": "Матчі та результати 1. FV Uffenheim",
-            "text": "У розділі «Клуби та волонтерство» тепер ти можеш знайти всі матчі, результати й турнірні таблиці команд FVU – від чоловічої команди до F-юніорів, з домашніми матчами та місцем проведення. Дані оновлюються щогодини з Баварського футбольного союзу, і Uffi їх теж знає.",
-            "quelle": "949e1d55623a1733a0d45d5008b9b73483461de7"
+            "text": "У розділі «Клуби та волонтерство» тепер є всі матчі, результати й таблиці команд FVU – від чоловічої команди до F-юніорів, із місцем проведення та розгортаним звітом про матч. Якщо триває матч із лайв-трансляцією, ти бачиш рахунок, який оновлюється щохвилини. Дані надходять від Баварського футбольного союзу, і Uffi їх теж знає.",
+            "quelle": "e0f37112782bd8d6e5b1484bc723b7d2c7965623"
         },
         "ar": {
-            "titel": "مباريات ونتائج 1. FV أوفنهايم",
-            "text": "في قسم „النوادي والعمل التطوعي“ يمكنك الآن إيجاد جميع المباريات والنتائج والترتيب لفرق FVU – من فريق الرجال حتى فئة F للناشئين، مع المباريات المنزلية ومكان اللعب. تأتي البيانات كل ساعة من اتحاد كرة القدم البافاري، و Uffi يعرفها هو أيضاً.",
-            "quelle": "949e1d55623a1733a0d45d5008b9b73483461de7"
+            "titel": "مباريات ونتائج 1. FV أوففنهايم",
+            "text": "في قسم \"الأندية والعمل التطوعي\" يمكنك الآن العثور على جميع مباريات ونتائج وجداول فرق FVU – من فريق الرجال حتى فرق الناشئين F، مع مكان المباراة وتقرير المباراة القابل للفتح. وإذا كانت هناك مباراة مباشرة مع التعليق المباشر، فسترى النتيجة محدثة كل دقيقة. البيانات تأتي من اتحاد كرة القدم البافاري، وأوفي يعرفها أيضاً.",
+            "quelle": "e0f37112782bd8d6e5b1484bc723b7d2c7965623"
         },
         "tr": {
             "titel": "1. FV Uffenheim'in maçları ve sonuçları",
-            "text": "\"Dernekler ve Gönüllülük\" bölümünde artık FVU takımlarının tüm maçlarını, sonuçlarını ve puan durumlarını bulabilirsin – Herren'den F-Junioren'e kadar, ev sahibi maçları ve maç yeri dahil. Veriler Bayerischen Fußball-Verband'dan saatlik olarak geliyor ve Uffi de bunları biliyor.",
-            "quelle": "949e1d55623a1733a0d45d5008b9b73483461de7"
+            "text": "\"Dernekler & Gönüllülük\" bölümünde artık FVU takımlarının tüm maçlarını, sonuçlarını ve puan durumlarını bulabilirsin – Herren takımından F-Junioren'lere kadar, maç yeri ve açılır maç raporuyla birlikte. Bir maç canlı skor takibiyle oynanıyorsa, skoru dakika dakika güncel olarak görürsün. Veriler Bayern Futbol Federasyonu'ndan geliyor ve Uffi de onları biliyor.",
+            "quelle": "e0f37112782bd8d6e5b1484bc723b7d2c7965623"
         },
         "ru": {
             "titel": "Spiele und Ergebnisse des 1. FV Uffenheim",
-            "text": "В разделе «Клубы и волонтёрство» ты теперь найдёшь все матчи, результаты и таблицы команд 1. FV Uffenheim – от команды мужчин до команды F-юниоров, с домашними матчами и местом игры. Данные приходят каждый час от Баварского футбольного союза, и Uffi тоже их знает.",
-            "quelle": "949e1d55623a1733a0d45d5008b9b73483461de7"
+            "text": "У тебя теперь есть раздел „Vereine & Ehrenamt“ со всеми матчами, результатами и таблицами команд FVU – от взрослых мужских команд до F-юниоров, с местом игры и раскрывающимся отчётом о матче. Если идёт матч с живым табло, ты видишь текущий счёт с минутной точностью. Данные предоставляет Баварский футбольный союз, и Uffi их тоже знает.",
+            "quelle": "e0f37112782bd8d6e5b1484bc723b7d2c7965623"
         }
     },
     "oeffnungszeiten": {
