@@ -166,7 +166,7 @@ $module = Yii::$app->getModule('vereine');
 <?php if ($verein->bfv_id && ($kurz = \humhub\modules\vereine\components\Bfv::kurz($verein)) && $kurz['label']): ?>
 <?= $this->render('@vereine/views/spiele/_stil') ?>
 <div class="panel panel-default">
-    <div class="panel-heading"><strong><i class="fa fa-futbol-o"></i> <?= Yii::t('VereineModule.base', 'Spiele & Ergebnisse') ?></strong></div>
+    <div class="panel-heading"><strong><i class="fa <?= \humhub\modules\vereine\components\Spielquellen::quelle($verein)['icon'] ?>"></i> <?= Yii::t('VereineModule.base', 'Spiele & Ergebnisse') ?></strong></div>
     <div class="panel-body">
         <?php foreach (['kommend' => 'Nächste Spiele', 'ergebnisse' => 'Letzte Ergebnisse'] as $art => $titel): ?>
             <?php if ($kurz[$art]): ?>

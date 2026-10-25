@@ -12,7 +12,8 @@ use Yii;
 use yii\web\NotFoundHttpException;
 
 /**
- * Spiele & Ergebnisse eines Fußballvereins (Daten vom BFV, siehe components/Bfv.php), auch für Gäste.
+ * Spiele & Ergebnisse eines Vereins (Daten vom BFV bzw. einer anderen Spielquelle, siehe components/Bfv.php und
+ * components/Spielquellen.php), auch für Gäste.
  * Laufende Spiele lädt die Seite jede Minute neu (?teil=live), den Kasten auf der Startseite ebenso (?teil=heute).
  */
 class SpieleController extends ContentContainerController
@@ -23,7 +24,7 @@ class SpieleController extends ContentContainerController
     public function actionIndex($verein = null, $mannschaft = null, $teil = null)
     {
         $query = Verein::find()->where(['not', ['bfv_id' => null]]);
-        $verein = $verein !== null ? $query->andWhere(['id' => (int)$verein])->one() : $query->orderBy(['name' => SORT_ASC])->one();
+        $verein = $verein !== null ? $query->andWhere(['id' => (int)$verein])->one() : $query->orderBy(\humhub\modules\vereine\components\Spielquellen::reihenfolge())->one();
         if ($verein === null) {
             throw new NotFoundHttpException(Yii::t('VereineModule.base', 'Für diesen Verein gibt es keine Spiele.'));
         }

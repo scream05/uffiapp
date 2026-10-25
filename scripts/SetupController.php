@@ -2669,8 +2669,9 @@ class SetupController extends Controller
 
     /**
      * Spiele & Ergebnisse vom BFV: Abruf mit nachgestellten Antworten (Mannschaften, Spiele, SPIELFREI, Spielorte,
-     * „Keine Angabe“, Tabellen, keine Tabelle im Kinderfußball, Entfernen), Wertung, Zustand, Bezeichnungen, Uffi.
-     * Läuft in einer Transaktion, die zurückgerollt wird; ruft nichts beim BFV ab.
+     * „Keine Angabe“, Tabellen, keine Tabelle im Kinderfußball, Entfernen), Wertung, Zustand, Bezeichnungen, Uffi;
+     * dazu Basketball (DBB), Volleyball (BVV) und Badminton (BBV) über components/Spielquellen.php.
+     * Läuft in einer Transaktion, die zurückgerollt wird; ruft nichts bei den Verbänden ab.
      *   scripts/run-setup.sh vereine-spiele-test
      */
     public function actionVereineSpieleTest()
@@ -2839,6 +2840,148 @@ class SetupController extends Controller
             $log = $Bfv::abrufen($verein);
             $gleich('Fehler wird gemeldet', count(preg_grep('/^! Mannschaft/', $log)), 1);
             $gleich('bei Fehler bleiben die Spiele', (int)$S::find()->where(['mannschaft_id' => $h1])->count(), 4);
+
+            // ---------- Weitere Sportarten (components/Spielquellen.php) ----------
+            $Q = \humhub\modules\vereine\components\Spielquellen::class;
+            $neuerVerein = function (string $quelle, string $kennung) {
+                $v = new \humhub\modules\vereine\models\Verein(['name' => "Testverein $quelle " . uniqid(), 'kategorie' => 'Sport', 'ortsteil' => 'Uffenheim', 'status' => 'offen']);
+                $v->save(false);
+                $v->updateAttributes(['bfv_id' => $kennung, 'spiele_quelle' => $quelle, 'bfv_name' => 'Test SB']);
+                return $v;
+            };
+            $gleich('Art aus Ligaangaben', [$Q::typAus('U14 männlich'), $Q::typAus('männlich'), $Q::typAus('U18 Bezirksliga weiblich', 'Herren', 'Frauen'),
+                $Q::typAus('Landesliga Nord-West Frauen', 'Herren', 'Frauen'), $Q::typAus('MFR U20m'), $Q::typAus('Aktive Bezirksliga - Süd')],
+                ['U14 männlich', 'Herren', 'U18 weiblich', 'Frauen', 'U20 männlich', 'Erwachsene']);
+            $gleich('Spielklasse als Zusatz', [$Q::stufe('UFR Bezirksklasse Herren Ost'), $Q::stufe('Landesliga Nord-West Frauen'), $Q::stufe(null)],
+                ['Bezirksklasse', 'Landesliga', 'Pokal']);
+
+            // Basketball: Spiele der nächsten Wochen nach Verein → Ligen; Spielplan, Tabelle, Halle
+            $morgenIso = date('Y-m-d', strtotime('+1 day'));
+            $team = fn($id, $name, $club, $saison) => ['teamPermanentId' => $id, 'seasonTeamId' => $saison, 'teamname' => $name, 'clubId' => $club];
+            $bb = fn($id, $datum, $heim, $gast, $ergebnis, $abgesagt = false) => ['matchId' => $id, 'kickoffDate' => $datum, 'kickoffTime' => '18:00',
+                'homeTeam' => $heim, 'guestTeam' => $gast, 'result' => $ergebnis, 'abgesagt' => $abgesagt, 'verzicht' => false];
+            $wir = $team(111, 'Test SB', 9001, 501);
+            $sie = $team(222, 'Fremd BC', 9002, 502);
+            $liga = fn($id, $name, $ak, $g) => ['ligaId' => $id, 'liganame' => $name, 'akName' => $ak, 'geschlecht' => $g, 'tableExists' => true];
+            $antworten[$Q::DBB . 'rest/club/id/9001/actualmatches?justHome=false&rangeDays=400'] = json_encode(['status' => '0', 'data' => ['club' => ['vereinsname' => 'SG Test'],
+                'matches' => [['ligaData' => ['ligaId' => 70001]], ['ligaData' => ['ligaId' => 70002]]]]]);
+            $antworten[$Q::DBB . 'rest/competition/spielplan/id/70001'] = json_encode(['status' => '0', 'data' => ['ligaData' => $liga(70001, 'UFR Bezirksklasse Herren Ost', 'Senioren', 'männlich'),
+                'matches' => [$bb(1, '2026-10-11', $wir, $sie, '57:49'), $bb(2, $morgenIso, $sie, $wir, null), $bb(3, '2026-10-01', $wir, $sie, null, true),
+                    $bb(4, '2026-10-02', $sie, $team(333, 'Dritte', 9003, 503), '10:20')]]]);
+            $antworten[$Q::DBB . 'rest/competition/spielplan/id/70002'] = json_encode(['status' => '0', 'data' => ['ligaData' => $liga(70002, 'UFR Bezirkspokal Herren', 'Senioren', 'männlich'),
+                'matches' => [$bb(5, '2026-10-27', $wir, $sie, '80:70')]]]);
+            $antworten[$Q::DBB . 'rest/competition/table/id/70001'] = json_encode(['status' => '0', 'data' => ['tabelle' => ['entries' => [
+                ['rang' => 1, 'team' => $wir, 'anzspiele' => 1, 's' => 1, 'n' => 0, 'korbdiff' => 8, 'anzGewinnpunkte' => 2],
+                ['rang' => 2, 'team' => $sie, 'anzspiele' => 1, 's' => 0, 'n' => 1, 'korbdiff' => -8, 'anzGewinnpunkte' => 0]]]]]);
+            $antworten[$Q::DBB . 'rest/match/id/2/matchInfo'] = json_encode(['status' => '0', 'data' => ['matchInfo' => ['spielfeld' =>
+                ['bezeichnung' => 'Halle Fremd', 'strasse' => 'Weg 1', 'plz' => '97000', 'ort' => 'Fremdstadt'], 'srList' => [['personData' => ['vorname' => 'Schieds', 'nachname' => 'Richter']]]]]]);
+            $vb = $neuerVerein('dbb', '9001');
+            $log = $Q::abrufen($vb);
+            $gleich('Basketball: Abruf ohne Fehler', preg_grep('/^!/', $log), []);
+            $herrenB = $M::findOne('dbb:111');
+            $gleich('Basketball: eine Mannschaft (Pokal dazu), Art, Liga', [(int)$M::find()->where(['verein_id' => $vb->id])->count(), $herrenB->typ, $herrenB->liga, $herrenB->getLabel()],
+                [1, 'Herren', 'UFR Bezirksklasse Herren Ost', 'Herren']);
+            $gleich('Basketball: 4 eigene Spiele, fremdes nicht', (int)$S::find()->where(['mannschaft_id' => 'dbb:111'])->count(), 4);
+            $sb1 = $S::findOne(['mannschaft_id' => 'dbb:111', 'spiel_id' => '1']);
+            $gleich('Basketball: Heimsieg', [$sb1->getWertung(), (bool)$sb1->heim_eigen, $sb1->getHeimspiel(), $sb1->getQuelle()], ['s', true, true, 'dbb']);
+            $gleich('Basketball: abgesagt', $S::findOne(['mannschaft_id' => 'dbb:111', 'spiel_id' => '3'])->getZustand(), 'abgesetzt');
+            $gleich('Basketball: Pokal', $S::findOne(['mannschaft_id' => 'dbb:111', 'spiel_id' => '5'])->wettbewerb_typ, 'Pokale');
+            $gleich('Basketball: Halle ohne Schiedsrichter', $S::findOne(['mannschaft_id' => 'dbb:111', 'spiel_id' => '2'])->ort, 'Halle Fremd | Weg 1 | 97000 Fremdstadt');
+            $gleich('Basketball: Tabelle mit eigener Zeile', [$herrenB->getPlatz()['platz'] ?? null, $herrenB->getPlatz()['diff'] ?? null], [1, 8]);
+            $gleich('Basketball: kein Live ohne Ticker', $S::findOne(['mannschaft_id' => 'dbb:111', 'spiel_id' => '2'])->laeuft(strtotime("$morgenIso 18:30")), false);
+            $gleich('Basketball: Link zur Liga', $S::findOne(['mannschaft_id' => 'dbb:111', 'spiel_id' => '1'])->getUrl(), $Q::DBB . 'static/#/liga/70001');
+
+            // Volleyball: Ligen suchen (Bereiche), Liga-Seite mit Sätzen, Tabelle, Pokal zur Ligamannschaft, Halle
+            $vbBlock = fn($id, $datum, $a, $b, array $sa, array $sb, $pfad = 'erwachsene/mittelfranken') => '<h4 class="fs-5 bg-primary">Sa., ' . $datum . ' , 14:00 Uhr <span>Spielnr. 1</span>'
+                . '<a href="/ergebnisse/' . $pfad . '/spiel-' . $id . '">x</a></h4><table><tbody>'
+                . '<tr><th scope="row"> ' . $a . ' </th><td><strong>' . ($sa ? array_sum(array_map(fn($x, $y) => (int)($x > $y), $sa, $sb)) : 0) . '</strong></td>' . implode('', array_map(fn($x) => "<td>$x</td>", $sa)) . '</tr>'
+                . '<tr><th scope="row"> ' . $b . ' </th><td><strong>' . ($sb ? array_sum(array_map(fn($x, $y) => (int)($y > $x), $sa, $sb)) : 0) . '</strong></td>' . implode('', array_map(fn($x) => "<td>$x</td>", $sb)) . '</tr></tbody></table>';
+            $vbLiga = fn($titel, $bloecke, $tabelle = '') => '<h2 class="text-uppercase flex-grow-1 text-center mb-0"> ' . $titel . ' </h2>' . $bloecke . $tabelle;
+            $vbTab = '<div class="mt-4" id="tabellenrunde0"><table><thead><tr><th>#</th></tr></thead><tbody>'
+                . '<tr><th>1</th><td></td><td><a href="/ergebnisse/erwachsene/mittelfranken/team-501">VSG Test / SB Uffenheim</a></td><td>1</td><td>1</td><td>0</td><td>3</td><td>3:0</td><td>Max</td><td>75:40</td><td>1,8</td></tr>'
+                . '<tr><th>2</th><td></td><td><a href="/ergebnisse/erwachsene/mittelfranken/team-502">TV Gegner</a></td><td>1</td><td>0</td><td>1</td><td>0</td><td>0:3</td><td>0</td><td>40:75</td><td>0,5</td></tr></tbody></table>';
+            $morgenDe = date('d.m.Y', strtotime('+1 day'));
+            foreach ($Q::BVV_BEREICHE as $bereich) {
+                $antworten[$Q::BVV . "/ergebnisse/$bereich"] = $bereich === 'erwachsene/mittelfranken'
+                    ? '<a href="/ergebnisse/erwachsene/mittelfranken/wettbewerb-1">x</a><a href="/ergebnisse/erwachsene/mittelfranken/wettbewerb-2">x</a><a href="/ergebnisse/erwachsene/mittelfranken/wettbewerb-3">x</a>' : '<html></html>';
+            }
+            $antworten[$Q::BVV . '/ergebnisse/erwachsene/mittelfranken/wettbewerb-1'] = $vbLiga('Bezirksklasse 2 Frauen',
+                $vbBlock(11, '24.10.2026', 'VSG Test / SB Uffenheim', 'TV Gegner', [25, 25, 25], [20, 7, 20])
+                . $vbBlock(11, '24.10.2026', 'VSG Test / SB Uffenheim', 'TV Gegner', [25, 25, 25], [20, 7, 20]) // „Aktuelle“ und „Alle“: doppelt
+                . $vbBlock(12, $morgenDe, 'TV Gegner', 'VSG Test / SB Uffenheim', [], []), $vbTab);
+            $antworten[$Q::BVV . '/ergebnisse/erwachsene/mittelfranken/wettbewerb-2'] = $vbLiga('Bezirkspokal Vorrunde Frauen',
+                $vbBlock(13, '21.10.2026', 'VSG Test/SB Uffenheim', 'TV Pokal', [25, 25, 25], [17, 22, 21]));
+            $antworten[$Q::BVV . '/ergebnisse/erwachsene/mittelfranken/wettbewerb-3'] = $vbLiga('Landesliga Frauen', $vbBlock(14, '01.10.2026', 'Fremd A', 'Fremd B', [25], [1]));
+            $antworten[$Q::BVV . '/ergebnisse/erwachsene/mittelfranken/spiel-12'] = '<h3><svg></svg> Halle </h3> <div> <p><strong>Halle Test</strong><br> Weg 2<br> 91438 Bad Windsheim </p></div>'
+                . '<h3>Spieler</h3><p>Erika Muster</p>';
+            $vv = $neuerVerein('bvv', 'SB Uffenheim');
+            $log = $Q::abrufen($vv);
+            $gleich('Volleyball: Abruf ohne Fehler, 2 von 3 Ligen gefunden', [preg_grep('/^!/', $log), $log[0]], [[], 'Ligen durchsucht: 3, mit eigenen Mannschaften: 2']);
+            $frauen = $M::findOne('bvv:501');
+            $gleich('Volleyball: Mannschaft aus der Tabelle, Art', [$frauen->typ, $frauen->liga, $frauen->liga_id, (int)$M::find()->where(['verein_id' => $vv->id])->count()],
+                ['Frauen', 'Bezirksklasse 2 Frauen', 'wettbewerb-1', 1]);
+            $gleich('Volleyball: doppelte Spiele einmal, Pokal dazu', array_map(fn($s) => $s->spiel_id . '/' . $s->wettbewerb_typ,
+                $S::find()->where(['mannschaft_id' => 'bvv:501'])->orderBy(['spiel_id' => SORT_ASC])->all()), ['11/Meisterschaften', '12/Meisterschaften', '13/Pokale']);
+            $sv = $S::findOne(['mannschaft_id' => 'bvv:501', 'spiel_id' => '11']);
+            $gleich('Volleyball: Sätze und Ergebnis', [$sv->ergebnis, $sv->details, $sv->getWertung(), $sv->getHeimspiel()], ['3:0', '25:20, 25:7, 25:20', 's', null]);
+            $sk = $S::findOne(['mannschaft_id' => 'bvv:501', 'spiel_id' => '12']);
+            $gleich('Volleyball: kommendes Spiel ohne Ergebnis, Halle ohne Spielernamen', [$sk->ergebnis, $sk->ort, $sk->getUrl()],
+                [null, 'Halle Test | Weg 2 | 91438 Bad Windsheim', $Q::BVV . '/ergebnisse/erwachsene/mittelfranken/spiel-12']);
+            $gleich('Volleyball: Tabelle mit Sätzen', [$frauen->getPlatz()['platz'] ?? null, $frauen->getPlatz()['diff'] ?? null], [1, '3:0']);
+            // Zweiter Lauf nutzt die gespeicherte Ligenliste (keine Bereichsseiten); Liga weg (410) → neu suchen
+            $abgerufen = [];
+            $Q::abrufen($vv);
+            $gleich('Volleyball: zweiter Lauf ohne Suche', count(array_filter($abgerufen, fn($u) => !str_contains($u, 'wettbewerb-') && !str_contains($u, 'spiel-'))), 0);
+            unset($antworten[$Q::BVV . '/ergebnisse/erwachsene/mittelfranken/wettbewerb-2']);
+            $antworten[$Q::BVV . '/ergebnisse/erwachsene/mittelfranken'] = '<a href="/ergebnisse/erwachsene/mittelfranken/wettbewerb-1">x</a>';
+            $log = $Q::abrufen($vv);
+            $gleich('Volleyball: fehlende Liga → neu gesucht, Pokalspiel entfernt', [$log[0], (int)$S::find()->where(['mannschaft_id' => 'bvv:501'])->count()],
+                ['Ligen durchsucht: 1, mit eigenen Mannschaften: 1', 2]);
+
+            // Badminton: Mannschaften (ohne Mannschaftsführer), Spiele mit Halle, Tabelle
+            $bbvPost = fn($teil) => $Q::BBV . '/liga2/backend/ajax.php|' . http_build_query(['path' => "/liga/club/BBV/07-9999/$teil"]);
+            $antworten[$bbvPost('teams')] = '<table><tr><td><a href="/liga/team/700/26/27">Aktive</a></td><td><a href="/liga/liga/26/27/41">Bezirksliga - Süd</a></td>'
+                . '<td>Muster Max (0160/1234567)</td><td>5(2:4)</td></tr></table>';
+            $bmZeile = fn($id, $datum, $heim, $gast, $a, $b, $halle) => '<tr><td>Sa. ' . $datum . ' <span>14:00</span></td>'
+                . '<td><a href="/liga/team/' . $heim[0] . '/26/27">' . $heim[1] . '</a></td><td>-</td><td><a href="/liga/team/' . $gast[0] . '/26/27">' . $gast[1] . '</a></td>'
+                . '<td class="align-right score">' . $a . '</td><td>:</td><td class="score">' . $b . '</td><td></td>'
+                . '<td><a href="/liga/hall/1">' . $halle . '</a></td><td><a href="https://badminton-bbv.de/liga2/ics.php?meeting=' . $id . '">k</a></td></tr>';
+            $bWir = [700, 'SG Test Uffenheim'];
+            $bSie = [800, 'TSV Fremd'];
+            $zeilen = $bmZeile(91, '10.10.2026', $bSie, $bWir, 6, 2, 'Halle Fremd') . $bmZeile(92, $morgenDe, $bWir, $bSie, '', '', 'Turnhalle III');
+            $antworten[$bbvPost('meetings')] = "<table>$zeilen</table><table>$zeilen</table>";
+            $antworten[$bbvPost('tables')] = '<table class="d-md-block"><thead><tr><th>gespielt</th></tr></thead><tbody>'
+                . '<tr><td>1</td><td><a href="/liga/team/800/26/27">TSV Fremd</a></td><td>1</td><td>2</td><td>:</td><td>0</td><td>1</td><td>0</td><td>0</td><td>6</td><td>:</td><td>2</td></tr>'
+                . '<tr><td>2</td><td><a href="/liga/team/700/26/27">SG Test Uffenheim</a></td><td>1</td><td>0</td><td>:</td><td>2</td><td>0</td><td>0</td><td>1</td><td>2</td><td>:</td><td>6</td></tr></tbody></table>';
+            $vd = $neuerVerein('bbv', '07-9999');
+            $log = $Q::abrufen($vd);
+            $gleich('Badminton: Abruf ohne Fehler', preg_grep('/^!/', $log), []);
+            $bm = $M::findOne('bbv:700');
+            $gleich('Badminton: Name aus den Spielen, Art, keine Telefonnummer', [$bm->name, $bm->typ, str_contains(json_encode($bm->attributes), '0160')], ['SG Test Uffenheim', 'Erwachsene', false]);
+            $gleich('Badminton: Spiele einmal (Liste doppelt), kommendes mit Kennung aus dem Kalender-Link',
+                array_map(fn($s) => [$s->spiel_id, $s->ergebnis, $s->ort], $S::find()->where(['mannschaft_id' => 'bbv:700'])->orderBy(['datum' => SORT_ASC])->all()),
+                [['91', '6:2', 'Halle Fremd'], ['92', null, 'Turnhalle III']]);
+            $gleich('Badminton: Auswärtsniederlage, Link', [$S::findOne(['spiel_id' => '91', 'mannschaft_id' => 'bbv:700'])->getWertung(),
+                $S::findOne(['spiel_id' => '92', 'mannschaft_id' => 'bbv:700'])->getUrl()], ['n', $Q::BBV . '/liga/liga/26/27/41/meeting/92']);
+            $gleich('Badminton: Tabelle', [$bm->getPlatz()['platz'] ?? null, $bm->getPlatz()['diff'] ?? null, $bm->getPlatz()['punkte'] ?? null], [2, '2:6', 0]);
+
+            // Gemeinsam: Uffi-Abschnitt je Sportart, Live nur Fußball, Menü-Reihenfolge, Startseite
+            $uffi = (string)$Bfv::forAssistant();
+            $gleich('Uffi: Basketball und Volleyball mit Sätzen', [str_contains($uffi, '## Basketball: Spiele und Ergebnisse von Test SB (Quelle: DBB'),
+                str_contains($uffi, '3:0 (25:20, 25:7, 25:20)'), str_contains($uffi, '## Badminton:')], [true, true, true]);
+            $abgerufen = [];
+            $Bfv::live(strtotime("$morgenIso 18:30"));
+            $gleich('Live: keine Abrufe für andere Sportarten', array_values(array_filter($abgerufen, fn($u) => !str_starts_with($u, 'https://www.bfv.de/')
+                && !str_starts_with($u, $Bfv::API))), []);
+            $reihe = array_map(fn($v) => $v->spiele_quelle, \humhub\modules\vereine\models\Verein::find()->where(['id' => [$verein->id, $vb->id, $vv->id, $vd->id]])
+                ->orderBy($Q::reihenfolge())->all());
+            $gleich('Reihenfolge Fußball, Basketball, Volleyball, Badminton', $reihe, ['bfv', 'dbb', 'bvv', 'bbv']);
+            $S::updateAll(['datum' => date('Y-m-d')], ['mannschaft_id' => ['bvv:501', 'bbv:700'], 'spiel_id' => ['11', '91']]);
+            $html = $kasten();
+            // Badminton hat Heimrecht: „bei TSV Fremd 6:2“ wie beim Fußball
+            $gleich('Startseite: „Sport heute“, Volleyball eigenes Ergebnis zuerst, Badminton Heim:Gast, Links je Sportart',
+                [str_contains($html, 'Sport heute'), str_contains($html, '>3:0<'), str_contains($html, 'bei TSV Fremd'), str_contains($html, '>6:2<'), str_contains($html, 'Badminton: Test SB')],
+                [true, true, true, true, true]);
         } finally {
             $Bfv::$holen = null;
             $tx->rollBack();

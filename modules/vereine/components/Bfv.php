@@ -8,7 +8,8 @@ use humhub\modules\vereine\models\VereinSpiel;
 use Yii;
 
 /**
- * Spiele, Ergebnisse und Tabellen von Fußballvereinen beim Bayerischen Fußball-Verband (bfv.de).
+ * Spiele, Ergebnisse und Tabellen von Fußballvereinen beim Bayerischen Fußball-Verband (bfv.de). Die anderen
+ * Sportarten kommen über components/Spielquellen.php; Anzeige, Kurzübersicht und Uffi-Abschnitt hier gelten für alle.
  *
  * Die Mannschaften stehen auf der Vereinsseite bfv.de/vereine/-/<bfv_id>; Spiele und Tabellen liefert die
  * Widget-Schnittstelle des BFV als JSON (dieselbe, die Vereine auf ihren Websites einbinden). Auf den Webseiten
@@ -27,13 +28,14 @@ class Bfv
     /** Mannschaftsarten ohne Tabelle (Kinderfußball nach den DFB-Spielformen) */
     public const OHNE_TABELLE = ['E-Junioren', 'E-Juniorinnen', 'F-Junioren', 'F-Juniorinnen', 'G-Junioren', 'G-Juniorinnen'];
 
-    /** Testhilfe: ersetzt den Abruf (URL => Antwort) */
+    /** Testhilfe: ersetzt den Abruf (URL bzw. „URL|POST-Daten“ => Antwort) */
     public static $holen = null;
 
-    public static function holen(string $url): string
+    /** Abruf per HTTPS (auch für die anderen Spielquellen); mit $post als POST (Formulardaten) */
+    public static function holen(string $url, ?string $post = null): string
     {
         if (self::$holen !== null) {
-            return (self::$holen)($url);
+            return (self::$holen)($post === null ? $url : "$url|$post");
         }
         $ch = curl_init($url);
         curl_setopt_array($ch, [
@@ -44,6 +46,9 @@ class Bfv
             CURLOPT_TIMEOUT => 30,
             CURLOPT_USERAGENT => 'community.rundumuffni.de Vereinsspiele',
         ]);
+        if ($post !== null) {
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+        }
         $raw = curl_exec($ch);
         $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
@@ -300,8 +305,9 @@ class Bfv
     {
         $jetzt ??= time();
         $log = [];
-        $spiele = VereinSpiel::find()->with('mannschaft')->where(['datum' => [date('Y-m-d', $jetzt - 86400), date('Y-m-d', $jetzt)]])
-            ->andWhere(['not', ['uhrzeit' => null]])->all();
+        // Nur Fußball: die anderen Quellen haben keinen Liveticker
+        $spiele = VereinSpiel::find()->innerJoinWith('mannschaft.verein v')->where(['datum' => [date('Y-m-d', $jetzt - 86400), date('Y-m-d', $jetzt)]])
+            ->andWhere(['not', ['uhrzeit' => null]])->andWhere(['v.spiele_quelle' => 'bfv'])->all();
         $ergebnisTeams = [];
         foreach ($spiele as $spiel) {
             $seit = intdiv($jetzt - $spiel->getZeitpunkt(), 60);
@@ -503,7 +509,7 @@ class Bfv
     /** Für Uffi: Ergebnisse der letzten 8 Tage, Spiele der nächsten 14 Tage und Tabellenplätze */
     public static function forAssistant(): ?string
     {
-        $vereine = Verein::find()->where(['not', ['bfv_id' => null]])->orderBy(['name' => SORT_ASC])->all();
+        $vereine = Verein::find()->where(['not', ['bfv_id' => null]])->orderBy(\humhub\modules\vereine\components\Spielquellen::reihenfolge())->all();
         if (!$vereine) {
             return null;
         }
@@ -526,11 +532,12 @@ class Bfv
                     $text .= ' – läuft gerade' . ($s->getAnzeigeStand() !== null ? ', Stand ' . $s->getAnzeigeStand() : '')
                         . ($s->ticker_minute !== null ? ", {$s->ticker_minute}. Minute" : '') . ' laut Liveticker (Stand vor bis zu 10 Minuten)';
                 } elseif ($s->getAnzeigeStand() !== null) {
-                    $text .= ' ' . $s->getAnzeigeStand();
+                    $text .= ' ' . $s->getAnzeigeStand() . ($s->details ? " ({$s->details})" : '');
                 } elseif ($s->getZustand() !== null) {
                     $text .= ' (' . $s->getZustand() . ')';
                 }
-                $text .= ' (' . ($s->heim_eigen ? 'Heimspiel' : 'auswärts') . ($s->ort ? ', ' . self::ortKurz($s->ort) : '') . ')';
+                $wo = array_filter([$s->getHeimspiel() === null ? null : ($s->heim_eigen ? 'Heimspiel' : 'auswärts'), $s->ort ? self::ortKurz($s->ort) : null]);
+                $text .= $wo ? ' (' . implode(', ', $wo) . ')' : '';
                 if ($s->wettbewerb_typ && $s->wettbewerb_typ !== 'Meisterschaften') {
                     $text .= ', ' . $s->wettbewerb_typ;
                 }
@@ -555,7 +562,8 @@ class Bfv
             }
             $name = $verein->bfv_name ?: $verein->name;
             $stand = self::stand($verein);
-            $out[] = "## Fußball: Spiele und Ergebnisse von $name (Quelle: BFV, Stand " . date('d.m. H:i', strtotime((string)$stand)) . " Uhr; "
+            $q = Spielquellen::quelle($verein);
+            $out[] = "## {$q['sport']}: Spiele und Ergebnisse von $name (Quelle: {$q['kurz']}, Stand " . date('d.m. H:i', strtotime((string)$stand)) . " Uhr; "
                 . "Spielplan, Ergebnisse und Tabellen aller Mannschaften: " . $verein->getSpieleUrl(true) . ")\n"
                 . "Mannschaften: " . implode(', ', $label) . "\n"
                 . "Ergebnisse der letzten 8 Tage (ohne Ergebnis = noch nicht gemeldet):\n" . ($vorbei ? implode("\n", $vorbei) : '(keine)') . "\n"

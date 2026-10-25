@@ -8,6 +8,7 @@
 
 use humhub\helpers\Html;
 use humhub\modules\vereine\components\Bfv;
+use humhub\modules\vereine\components\Spielquellen;
 
 $mitDatum ??= false;
 $wertung = $spiel->getWertung();
@@ -22,7 +23,7 @@ $name = function (string $n, bool $eigen) {
 $wertungText = ['s' => Yii::t('VereineModule.base', 'gewonnen'), 'u' => Yii::t('VereineModule.base', 'unentschieden'), 'n' => Yii::t('VereineModule.base', 'verloren')];
 ?>
 <a class="fvs-spiel" href="<?= Html::encode($spiel->getUrl()) ?>" target="_blank" rel="noopener"
-   title="<?= Html::encode(Yii::t('VereineModule.base', 'Spiel beim BFV ansehen')) ?>">
+   title="<?= Html::encode(Yii::t('VereineModule.base', 'Spiel beim {verband} ansehen', ['verband' => Spielquellen::QUELLEN[$spiel->getQuelle()]['kurz'] ?? 'BFV'])) ?>">
     <span class="fvs-zeit">
         <?php if ($mitDatum): ?><span class="fvs-tag"><?= Html::encode(Bfv::format($t, 'EEEdM')) ?></span><?php endif ?>
         <?= $spiel->uhrzeit ? Html::encode(Bfv::format($t, 'Hm')) : '–' ?>
@@ -33,12 +34,17 @@ $wertungText = ['s' => Yii::t('VereineModule.base', 'gewonnen'), 'u' => Yii::t('
             <?php if ($laeuft): ?>
                 <span class="fvs-live-marke"><?= Yii::t('VereineModule.base', 'Live') ?><?= $spiel->ticker_minute !== null ? ' · ' . (int)$spiel->ticker_minute . '.' : '' ?></span>
             <?php endif ?>
-            <span class="fvs-ort-art"><?= $spiel->heim_eigen ? '<i class="fa fa-home"></i> ' . Yii::t('VereineModule.base', 'Heimspiel') : Yii::t('VereineModule.base', 'Auswärts') ?></span>
+            <?php if ($spiel->getHeimspiel() !== null): ?>
+                <span class="fvs-ort-art"><?= $spiel->heim_eigen ? '<i class="fa fa-home"></i> ' . Yii::t('VereineModule.base', 'Heimspiel') : Yii::t('VereineModule.base', 'Auswärts') ?></span>
+            <?php endif ?>
             <?php if ($spiel->wettbewerb_typ && $spiel->wettbewerb_typ !== 'Meisterschaften'): ?>
                 <span class="fvs-wettbewerb"><?= Html::encode(Yii::t('VereineModule.base', $spiel->wettbewerb_typ)) ?></span>
             <?php endif ?>
         </span>
         <span class="fvs-paarung"><?= $name($spiel->heim, (bool)$spiel->heim_eigen) ?> – <?= $name($spiel->gast, !$spiel->heim_eigen) ?></span>
+        <?php if ($spiel->details && $spiel->getTore() !== null): ?>
+            <span class="fvs-ort"><?= Yii::t('VereineModule.base', 'Sätze') ?>: <?= Html::encode($spiel->details) ?></span>
+        <?php endif ?>
         <?php if ($spiel->ort && !$spiel->istVorbei()): ?>
             <span class="fvs-ort"><i class="fa fa-map-marker"></i> <?= Html::encode(Bfv::ortKurz($spiel->ort)) ?></span>
         <?php endif ?>

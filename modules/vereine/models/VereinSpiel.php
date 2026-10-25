@@ -6,11 +6,12 @@ use humhub\components\ActiveRecord;
 use Yii;
 
 /**
- * Spiel einer Mannschaft laut BFV (abgerufen von components/Bfv.php). Datum und Uhrzeit sind Ortszeit (Europe/Berlin).
+ * Spiel einer Mannschaft laut BFV bzw. einer anderen Spielquelle (components/Bfv.php, components/Spielquellen.php).
+ * Datum und Uhrzeit sind Ortszeit (Europe/Berlin).
  *
  * @property int $id
  * @property string $mannschaft_id
- * @property string $spiel_id matchId beim BFV
+ * @property string $spiel_id matchId beim BFV bzw. Kennung des Spiels bei der Quelle
  * @property string $datum
  * @property string|null $uhrzeit
  * @property string|null $wettbewerb
@@ -20,6 +21,8 @@ use Yii;
  * @property bool|int $heim_eigen
  * @property string|null $ergebnis
  * @property string|null $ort
+ * @property string|null $url Spiel bei der Quelle (leer = BFV-Spielseite)
+ * @property string|null $details Satzergebnisse (Volleyball), z. B. „25:20, 25:7, 25:20“
  * @property string $aktualisiert_am
  * @property string|null $ticker JSON [{m,s,t,k,art}] aus dem Liveticker, neueste zuerst
  * @property string|null $ticker_status live | beendet | keiner
@@ -51,7 +54,22 @@ class VereinSpiel extends ActiveRecord
 
     public function getUrl(): string
     {
-        return 'https://www.bfv.de/ergebnisse/spiel/-/' . rawurlencode($this->spiel_id);
+        return $this->url ?: 'https://www.bfv.de/ergebnisse/spiel/-/' . rawurlencode($this->spiel_id);
+    }
+
+    /** bfv, dbb, bvv oder bbv (aus der Kennung der Mannschaft, ohne Datenbankabfrage) */
+    public function getQuelle(): string
+    {
+        return VereinMannschaft::quelleVon($this->mannschaft_id);
+    }
+
+    /**
+     * Heimspiel? null, wenn die Quelle das nicht sagt: beim Volleyball heißt „zuerst genannt“ nicht „zu Hause“,
+     * Spieltage richtet oft ein dritter Verein aus.
+     */
+    public function getHeimspiel(): ?bool
+    {
+        return $this->getQuelle() === 'bvv' ? null : (bool)$this->heim_eigen;
     }
 
     public function getGegner(): string
@@ -108,9 +126,12 @@ class VereinSpiel extends ActiveRecord
         return $this->uhrzeit ? $this->getZeitpunkt() + 7200 < $jetzt : $this->datum < date('Y-m-d', $jetzt);
     }
 
-    /** Angepfiffen und noch nicht vorbei (abgesetzte Spiele nie) */
+    /** Angepfiffen und noch nicht vorbei (abgesetzte Spiele nie; nur Fußball, die anderen Quellen haben keinen Liveticker) */
     public function laeuft(?int $jetzt = null): bool
     {
+        if ($this->getQuelle() !== 'bfv') {
+            return false;
+        }
         $jetzt ??= time();
         return $this->getZustand() === null && $this->uhrzeit !== null && $this->getZeitpunkt() <= $jetzt && !$this->istVorbei($jetzt);
     }

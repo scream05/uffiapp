@@ -13,9 +13,12 @@
 
 use humhub\helpers\Html;
 use humhub\modules\vereine\components\Bfv;
+use humhub\modules\vereine\components\Spielquellen;
 
 $space = $this->context->contentContainer;
 $name = $verein->bfv_name ?: $verein->name;
+$quelle = Spielquellen::quelle($verein);
+$quelleUrl = Spielquellen::vereinUrl($verein);
 $filterUrl = fn(?string $id) => $space->createUrl('/vereine/spiele/index', array_filter(['verein' => $verein->id, 'mannschaft' => $id]));
 $tagUeberschrift = function (string $datum): string {
     $t = (new DateTime($datum, new DateTimeZone('Europe/Berlin')))->getTimestamp();
@@ -47,7 +50,7 @@ $tabelle = $auswahl ? $auswahl->getTabelleList() : [];
             <?= $this->render('@vereine/views/verein/_logo', ['verein' => $verein, 'size' => 56]) ?>
             <div style="flex:1;min-width:200px">
                 <h1 style="margin:0 0 2px;font-size:1.4em"><?= Html::encode($name) ?></h1>
-                <span class="text-muted"><i class="fa fa-futbol-o"></i> <?= Yii::t('VereineModule.base', 'Spiele & Ergebnisse aller Mannschaften') ?></span>
+                <span class="text-muted"><i class="fa <?= $quelle['icon'] ?>"></i> <?= Html::encode(Spielquellen::sport($verein)) ?> · <?= Yii::t('VereineModule.base', 'Spiele & Ergebnisse aller Mannschaften') ?></span>
             </div>
         </div>
         <p style="margin:12px 0 0;display:flex;flex-wrap:wrap;gap:4px 16px">
@@ -55,7 +58,7 @@ $tabelle = $auswahl ? $auswahl->getTabelleList() : [];
             <?php if ($verein->website): ?>
                 <?= Html::a('<i class="fa fa-globe"></i> ' . Html::encode(preg_replace('#^https?://(www\.)?|/$#', '', $verein->website)), $verein->website, ['target' => '_blank', 'rel' => 'noopener']) ?>
             <?php endif ?>
-            <?= Html::a('<i class="fa fa-external-link"></i> ' . Yii::t('VereineModule.base', 'Beim BFV'), Bfv::WEB . 'vereine/-/' . rawurlencode($verein->bfv_id), ['target' => '_blank', 'rel' => 'noopener']) ?>
+            <?= Html::a('<i class="fa fa-external-link"></i> ' . Yii::t('VereineModule.base', 'Beim {verband}', ['verband' => $quelle['kurz']]), $quelleUrl, ['target' => '_blank', 'rel' => 'noopener']) ?>
         </p>
     </div>
 </div>
@@ -140,8 +143,12 @@ JS); ?>
             <thead><tr>
                 <th class="zahl">#</th><th><?= Yii::t('VereineModule.base', 'Mannschaft') ?></th>
                 <th class="zahl" title="<?= Html::encode(Yii::t('VereineModule.base', 'Spiele')) ?>"><?= Yii::t('VereineModule.base', 'Sp.') ?></th>
-                <th class="zahl breit" title="<?= Html::encode(Yii::t('VereineModule.base', 'Siege – Unentschieden – Niederlagen')) ?>"><?= Yii::t('VereineModule.base', 'S-U-N') ?></th>
-                <th class="zahl" title="<?= Html::encode(Yii::t('VereineModule.base', 'Tordifferenz')) ?>"><?= Yii::t('VereineModule.base', 'Diff.') ?></th>
+                <?php if ($quelle['unentschieden']): ?>
+                    <th class="zahl breit" title="<?= Html::encode(Yii::t('VereineModule.base', 'Siege – Unentschieden – Niederlagen')) ?>"><?= Yii::t('VereineModule.base', 'S-U-N') ?></th>
+                <?php else: ?>
+                    <th class="zahl breit" title="<?= Html::encode(Yii::t('VereineModule.base', 'Siege – Niederlagen')) ?>"><?= Yii::t('VereineModule.base', 'S-N') ?></th>
+                <?php endif ?>
+                <th class="zahl" title="<?= Html::encode(Yii::t('VereineModule.base', $quelle['diff'])) ?>"><?= Yii::t('VereineModule.base', $quelle['diffKurz']) ?></th>
                 <th class="zahl"><?= Yii::t('VereineModule.base', 'Pkt.') ?></th>
             </tr></thead>
             <tbody>
@@ -150,8 +157,9 @@ JS); ?>
                     <td class="zahl"><?= (int)$z['platz'] ?></td>
                     <td><?= Html::encode($z['name']) ?></td>
                     <td class="zahl"><?= (int)$z['spiele'] ?></td>
-                    <td class="zahl breit"><?= (int)$z['s'] ?>-<?= (int)$z['u'] ?>-<?= (int)$z['n'] ?></td>
-                    <td class="zahl"><?= $z['diff'] > 0 ? '+' : '' ?><?= (int)$z['diff'] ?></td>
+                    <td class="zahl breit"><?= (int)$z['s'] ?>-<?= $quelle['unentschieden'] ? (int)$z['u'] . '-' : '' ?><?= (int)$z['n'] ?></td>
+                    <?php // Sätze bzw. Spiele als „6:0“, sonst Differenz ?>
+                    <td class="zahl"><?= is_string($z['diff']) ? Html::encode($z['diff']) : ($z['diff'] > 0 ? '+' : '') . (int)$z['diff'] ?></td>
                     <td class="zahl"><strong><?= (int)$z['punkte'] ?></strong></td>
                 </tr>
             <?php endforeach ?>
@@ -216,6 +224,11 @@ JS); ?>
 <?php endif ?>
 
 <p class="text-muted" style="font-size:.85em;padding:0 4px">
-    <?= Yii::t('VereineModule.base', 'Quelle: Bayerischer Fußball-Verband ({link}). Wir gleichen Spielplan und Ergebnisse täglich ab; während eines Spiels holen wir den Liveticker jede Minute. Angaben ohne Gewähr.', ['link' => Html::a('bfv.de', Bfv::WEB . 'vereine/-/' . rawurlencode($verein->bfv_id), ['target' => '_blank', 'rel' => 'noopener'])]) ?>
+    <?php $link = Html::a(Html::encode(preg_replace('#^https?://(www\.)?([^/]+).*$#', '$2', $quelleUrl)), $quelleUrl, ['target' => '_blank', 'rel' => 'noopener']) ?>
+    <?php if ($verein->spiele_quelle === 'bfv'): ?>
+        <?= Yii::t('VereineModule.base', 'Quelle: Bayerischer Fußball-Verband ({link}). Wir gleichen Spielplan und Ergebnisse täglich ab; während eines Spiels holen wir den Liveticker jede Minute. Angaben ohne Gewähr.', ['link' => $link]) ?>
+    <?php else: ?>
+        <?= Yii::t('VereineModule.base', 'Quelle: {verband} ({link}). Wir gleichen Spielplan, Ergebnisse und Tabellen täglich ab. Angaben ohne Gewähr.', ['verband' => Html::encode(Yii::t('VereineModule.base', $quelle['verband'])), 'link' => $link]) ?>
+    <?php endif ?>
     <?php if ($stand): ?><?= Yii::t('VereineModule.base', 'Stand: {zeit}', ['zeit' => Html::encode(Bfv::format(strtotime($stand), 'dMMMMHm'))]) ?><?php endif ?>
 </p>

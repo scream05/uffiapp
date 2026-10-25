@@ -1,4 +1,31 @@
 {
+    "sbu-spiele": {
+        "en": {
+            "titel": "Basketball, Volleyball and Badminton of the SBU",
+            "text": "Besides football, you can now also find the games, results and tables of SB Uffenheim in the section \"Vereine & Ehrenamt\": basketball, volleyball (including the sets) and badminton, each with the hall. On match days, the box \"Sport heute\" on the start page shows all games of the day, and Uffi knows them too.",
+            "quelle": "8866aeb8146ef6c844f92939c75947dab6f0e6b4"
+        },
+        "uk": {
+            "titel": "Баскетбол, волейбол і бадмінтон у SBU",
+            "text": "Окрім футболу, у розділі «Клуби та волонтерство» тепер також є матчі, результати й турнірні таблиці SB Uffenheim: баскетбол, волейбол (із сетами) і бадмінтон, кожен із вказанням залу. У дні ігор блок «Спорт сьогодні» на головній сторінці показує всі матчі дня, і Uffi їх теж знає.",
+            "quelle": "8866aeb8146ef6c844f92939c75947dab6f0e6b4"
+        },
+        "ar": {
+            "titel": "كرة السلة والكرة الطائرة والريشة للنادي الرياضي أوفenهايم",
+            "text": "إلى جانب كرة القدم، تجد الآن في قسم „الجمعيات والعمل التطوعي“ أيضًا مباريات ونتائج وجداول نادي SB Uffenheim: كرة السلة، والكرة الطائرة (مع المجموعات)، وكرة الريشة، ولكل منها القاعة. في أيام المباريات يعرض مربع „الرياضة اليوم“ في الصفحة الرئيسية جميع مباريات اليوم، وأوفي يعرفها أيضًا.",
+            "quelle": "8866aeb8146ef6c844f92939c75947dab6f0e6b4"
+        },
+        "tr": {
+            "titel": "SBU'nun Basketbol, Voleybol ve Badminton maçları",
+            "text": "Futbolun yanında „Kulüpler & Gönüllülük“ bölümünde artık SB Uffenheim'ın maçlarını, sonuçlarını ve puan durumlarını da bulabilirsin: Basketbol, Voleybol (setlerle birlikte) ve Badminton, her biri salon bilgisiyle. Maç günlerinde ana sayfadaki „Bugün Spor“ kutusu o günkü tüm maçları gösterir, Uffi de onları biliyor.",
+            "quelle": "8866aeb8146ef6c844f92939c75947dab6f0e6b4"
+        },
+        "ru": {
+            "titel": "Basketball, Volleyball und Badminton der SBU",
+            "text": "Neben dem Fußball findest du im Bereich „Vereine & Ehrenamt“ jetzt auch die Spiele, Ergebnisse und Tabellen der SB Uffenheim: Basketball, Volleyball (mit den Sätzen) und Badminton, jeweils mit Halle. An Spieltagen zeigt der Kasten „Sport heute“ auf der Startseite alle Spiele des Tages, und Uffi kennt sie auch.",
+            "quelle": "8866aeb8146ef6c844f92939c75947dab6f0e6b4"
+        }
+    },
     "miniaturbilder-stream": {
         "en": {
             "titel": "Pictures next to the text",

@@ -10,6 +10,10 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'sbu-spiele', 'datum' => '2026-10-25', 'art' => 'neu', 'popup' => true,
+        'link' => ['vereine-and-ehrenamt', '/vereine/spiele/index'],
+        'titel' => 'Basketball, Volleyball und Badminton der SBU',
+        'text' => 'Neben dem Fußball findest du im Bereich „Vereine & Ehrenamt“ jetzt auch die Spiele, Ergebnisse und Tabellen der SB Uffenheim: Basketball, Volleyball (mit den Sätzen) und Badminton, jeweils mit Halle. An Spieltagen zeigt der Kasten „Sport heute“ auf der Startseite alle Spiele des Tages, und Uffi kennt sie auch.'],
     ['id' => 'miniaturbilder-stream', 'datum' => '2026-10-25', 'art' => 'besser', 'popup' => false,
         'titel' => 'Bilder neben dem Text',
         'text' => 'In der Übersicht und in den Bereichen steht das Bild eines Beitrags oder Termins jetzt als kleines Vorschaubild links neben dem Text – so bleibt die Liste übersichtlicher. Tippst du darauf, siehst du es groß; hat ein Beitrag mehrere Bilder, zeigt „+2“ und Co., wie viele noch kommen.'],

@@ -121,8 +121,8 @@ class Context
         }
 
         if (Yii::$app->hasModule('vereine') && Yii::$app->db->getTableSchema('verein_spiel') !== null
-            && ($fussball = \humhub\modules\vereine\components\Bfv::forAssistant()) !== null) {
-            $parts[] = $fussball;
+            && ($sport = \humhub\modules\vereine\components\Bfv::forAssistant()) !== null) {
+            $parts[] = $sport; // alle Sportarten mit Spielquelle
         }
 
         if (Yii::$app->hasModule('gewerbe') && Yii::$app->getModule('gewerbe') !== null
