@@ -18,7 +18,8 @@ use humhub\modules\user\models\User;
  * stehen in „eingeblendet“.
  *
  * Reihenfolge der Kästen in der Seitenleiste der Übersicht (am Handy im Fach): je Person unter „Meine Übersicht“
- * (Benutzereinstellung „kaesten“, Schlüssel aus KAESTEN); Events::onDashboardSidebarRun setzt die sortOrder.
+ * (Benutzereinstellung „kaesten“, Schlüssel aus KAESTEN), ausgeblendete in „kaesten_aus“; Events::onDashboardSidebarRun
+ * setzt die sortOrder und entfernt ausgeblendete Kästen.
  */
 class Module extends \humhub\components\Module
 {
@@ -54,6 +55,19 @@ class Module extends \humhub\components\Module
         // Unverändert = keine Einstellung (dann gelten künftige Standardänderungen auch für diese Person)
         $gueltig === $standard ? $this->settings->user($user)->delete('kaesten')
             : $this->settings->user($user)->set('kaesten', json_encode($gueltig));
+    }
+
+    /** @return string[] Schlüssel der Kästen, die die Person ausgeblendet hat */
+    public function getKaestenAus(User $user): array
+    {
+        $aus = json_decode((string)$this->settings->user($user)->get('kaesten_aus', '[]'), true) ?: [];
+        return array_values(array_intersect($aus, array_keys(self::KAESTEN)));
+    }
+
+    public function setKaestenAus(User $user, array $schluessel): void
+    {
+        $aus = array_values(array_unique(array_intersect($schluessel, array_keys(self::KAESTEN))));
+        $aus ? $this->settings->user($user)->set('kaesten_aus', json_encode($aus)) : $this->settings->user($user)->delete('kaesten_aus');
     }
 
     /** @return Space[] Bereiche, die die Person sehen und für die Übersicht wählen kann */

@@ -16,7 +16,6 @@ return [
     'Mehr …' => 'Ещё …',
     'Weniger' => 'Свернуть',
     'Kästen rechts' => 'Блоки справа',
-    'Lege fest, in welcher Reihenfolge die Kästen neben deiner Übersicht stehen (am Handy im Fach am rechten Rand). Manche erscheinen nur, wenn es etwas zu zeigen gibt.' => 'Выбери порядок блоков рядом с твоим обзором (на телефоне — в выдвижной панели у правого края). Некоторые появляются, только когда есть что показать.',
     '{kasten} nach oben' => '{kasten} вверх',
     '{kasten} nach unten' => '{kasten} вниз',
     'Notdienste' => 'Дежурные службы',
@@ -25,4 +24,6 @@ return [
     'Spritpreise' => 'Цены на топливо',
     'Letzte Aktivitäten' => 'Последние действия',
     'Anstehende Veranstaltungen' => 'Ближайшие события',
+    'Lege fest, welche Kästen neben deiner Übersicht stehen und in welcher Reihenfolge (am Handy im Fach am rechten Rand). Manche erscheinen nur, wenn es etwas zu zeigen gibt.' => 'Выбери, какие блоки показывать рядом с твоим обзором и в каком порядке (на телефоне — в выдвижной панели у правого края). Некоторые появляются, только когда есть что показать.',
+    '{kasten} anzeigen' => 'Показывать {kasten}',
 ];

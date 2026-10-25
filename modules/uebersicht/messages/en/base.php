@@ -16,7 +16,6 @@ return [
     'Mehr …' => 'More …',
     'Weniger' => 'Less',
     'Kästen rechts' => 'Boxes on the right',
-    'Lege fest, in welcher Reihenfolge die Kästen neben deiner Übersicht stehen (am Handy im Fach am rechten Rand). Manche erscheinen nur, wenn es etwas zu zeigen gibt.' => 'Choose the order of the boxes next to your overview (on your phone in the drawer on the right edge). Some only appear when there is something to show.',
     '{kasten} nach oben' => '{kasten} up',
     '{kasten} nach unten' => '{kasten} down',
     'Notdienste' => 'Emergency services',
@@ -25,4 +24,6 @@ return [
     'Spritpreise' => 'Fuel prices',
     'Letzte Aktivitäten' => 'Latest activities',
     'Anstehende Veranstaltungen' => 'Upcoming events',
+    'Lege fest, welche Kästen neben deiner Übersicht stehen und in welcher Reihenfolge (am Handy im Fach am rechten Rand). Manche erscheinen nur, wenn es etwas zu zeigen gibt.' => 'Choose which boxes appear next to your overview and in which order (on your phone in the drawer on the right edge). Some only appear when there is something to show.',
+    '{kasten} anzeigen' => 'Show {kasten}',
 ];

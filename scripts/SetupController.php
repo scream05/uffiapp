@@ -1752,8 +1752,8 @@ class SetupController extends Controller
      * einer Transaktion, Übersicht eines normalen Kontos (Standard, eingeschaltet, wieder aus) und eines Gasts. Rollback.
      */
     /**
-     * Reihenfolge der Kästen rechts in der Übersicht („Meine Übersicht“, Module::KAESTEN): Standard, eigene Reihenfolge,
-     * ungültige Schlüssel, zurück zum Standard, Wirkung auf die sortOrder (angemeldet/Gast). Mit Rollback.
+     * Reihenfolge und Ausblenden der Kästen rechts in der Übersicht („Meine Übersicht“, Module::KAESTEN): Standard, eigene
+     * Reihenfolge, ungültige Schlüssel, zurück zum Standard, ausgeblendete Kästen, Wirkung auf die Seitenleiste (angemeldet/Gast). Mit Rollback.
      *   scripts/run-setup.sh uebersicht-kaesten-test
      */
     public function actionUebersichtKaestenTest()
@@ -1801,6 +1801,18 @@ class SetupController extends Controller
             $ue->setKaesten($nutzer, $standard);
             Yii::$app->cache->flush();
             $gleich('zurück zum Standard: keine Einstellung gespeichert', $ue->settings->user($nutzer)->get('kaesten'), null);
+            // Ausblenden
+            $ue->setKaestenAus($nutzer, ['sprit', 'gibtsnicht']);
+            Yii::$app->cache->flush();
+            $gleich('ausgeblendet gespeichert (nur gültige)', $ue->getKaestenAus($nutzer), ['sprit']);
+            Yii::$app->user->switchIdentity($nutzer);
+            $reihe = $sidebar();
+            $gleich('Seitenleiste: Spritpreise fehlen, Notdienste da', [in_array($klasse('sprit'), $reihe, true), in_array($klasse('notdienste'), $reihe, true)], [false, true]);
+            Yii::$app->user->switchIdentity(null);
+            $gleich('Gast: Spritpreise trotzdem da', in_array($klasse('sprit'), $sidebar(), true), true);
+            $ue->setKaestenAus($nutzer, []);
+            Yii::$app->cache->flush();
+            $gleich('alle wieder an: keine Einstellung gespeichert', $ue->settings->user($nutzer)->get('kaesten_aus'), null);
         } finally {
             $tx->rollBack();
             Yii::$app->cache->flush();

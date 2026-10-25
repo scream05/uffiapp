@@ -16,7 +16,6 @@ return [
     'Mehr …' => 'Daha fazla …',
     'Weniger' => 'Daha az',
     'Kästen rechts' => 'Sağdaki kutular',
-    'Lege fest, in welcher Reihenfolge die Kästen neben deiner Übersicht stehen (am Handy im Fach am rechten Rand). Manche erscheinen nur, wenn es etwas zu zeigen gibt.' => 'Genel bakışının yanındaki kutuların sırasını belirle (telefonda sağ kenardaki çekmecede). Bazıları yalnızca gösterecek bir şey olduğunda görünür.',
     '{kasten} nach oben' => '{kasten} yukarı',
     '{kasten} nach unten' => '{kasten} aşağı',
     'Notdienste' => 'Nöbetçi hizmetler',
@@ -25,4 +24,6 @@ return [
     'Spritpreise' => 'Yakıt fiyatları',
     'Letzte Aktivitäten' => 'Son etkinlikler',
     'Anstehende Veranstaltungen' => 'Yaklaşan etkinlikler',
+    'Lege fest, welche Kästen neben deiner Übersicht stehen und in welcher Reihenfolge (am Handy im Fach am rechten Rand). Manche erscheinen nur, wenn es etwas zu zeigen gibt.' => 'Genel bakışının yanında hangi kutuların hangi sırayla görüneceğini belirle (telefonda sağ kenardaki çekmecede). Bazıları yalnızca gösterecek bir şey olduğunda görünür.',
+    '{kasten} anzeigen' => '{kasten} göster',
 ];

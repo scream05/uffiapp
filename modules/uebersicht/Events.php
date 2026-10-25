@@ -76,7 +76,7 @@ class Events
         }
     }
 
-    /** Seitenleiste der Übersicht: Kästen in der Reihenfolge der Person (Module::KAESTEN); andere Kästen bleiben, wo sie sind */
+    /** Seitenleiste der Übersicht: Kästen in der Reihenfolge der Person (Module::KAESTEN), ausgeblendete entfernt; andere Kästen bleiben */
     public static function onDashboardSidebarRun($event)
     {
         try {
@@ -85,12 +85,16 @@ class Events
             }
             /** @var Module $module */
             $module = Yii::$app->getModule('uebersicht');
-            $pos = array_flip($module->getKaesten(Yii::$app->user->getIdentity()));
+            $user = Yii::$app->user->getIdentity();
+            $pos = array_flip($module->getKaesten($user));
+            $aus = $module->getKaestenAus($user);
             $klasse = array_map(fn($k) => $k[0], Module::KAESTEN);
             $sidebar = $event->sender;
             foreach ($sidebar->widgets as $i => $widget) {
                 $schluessel = array_search($widget[0] ?? null, $klasse, true);
-                if ($schluessel !== false && isset($pos[$schluessel])) {
+                if ($schluessel !== false && in_array($schluessel, $aus, true)) {
+                    unset($sidebar->widgets[$i]);
+                } elseif ($schluessel !== false && isset($pos[$schluessel])) {
                     $sidebar->widgets[$i][2]['sortOrder'] = 50 + $pos[$schluessel] * 10; // zwischen Hinweisen (0–1) und „Neue Spaces“ (400)
                 }
             }

@@ -16,7 +16,6 @@ return [
     'Mehr …' => 'المزيد …',
     'Weniger' => 'أقل',
     'Kästen rechts' => 'المربعات على اليمين',
-    'Lege fest, in welcher Reihenfolge die Kästen neben deiner Übersicht stehen (am Handy im Fach am rechten Rand). Manche erscheinen nur, wenn es etwas zu zeigen gibt.' => 'حدّد ترتيب المربعات بجانب صفحتك العامة (على الهاتف في الدرج عند الحافة اليمنى). بعضها لا يظهر إلا عند وجود ما يُعرض.',
     '{kasten} nach oben' => '{kasten} إلى الأعلى',
     '{kasten} nach unten' => '{kasten} إلى الأسفل',
     'Notdienste' => 'الخدمات المناوبة',
@@ -25,4 +24,6 @@ return [
     'Spritpreise' => 'أسعار الوقود',
     'Letzte Aktivitäten' => 'آخر النشاطات',
     'Anstehende Veranstaltungen' => 'الفعاليات القادمة',
+    'Lege fest, welche Kästen neben deiner Übersicht stehen und in welcher Reihenfolge (am Handy im Fach am rechten Rand). Manche erscheinen nur, wenn es etwas zu zeigen gibt.' => 'حدّد المربعات التي تظهر بجانب صفحتك العامة وترتيبها (على الهاتف في الدرج عند الحافة اليمنى). بعضها لا يظهر إلا عند وجود ما يُعرض.',
+    '{kasten} anzeigen' => 'عرض {kasten}',
 ];

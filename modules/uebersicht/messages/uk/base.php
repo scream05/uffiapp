@@ -16,7 +16,6 @@ return [
     'Mehr …' => 'Більше …',
     'Weniger' => 'Менше',
     'Kästen rechts' => 'Блоки праворуч',
-    'Lege fest, in welcher Reihenfolge die Kästen neben deiner Übersicht stehen (am Handy im Fach am rechten Rand). Manche erscheinen nur, wenn es etwas zu zeigen gibt.' => 'Вибери порядок блоків поруч із твоїм оглядом (на телефоні — у шухляді біля правого краю). Деякі з’являються, лише коли є що показати.',
     '{kasten} nach oben' => '{kasten} вгору',
     '{kasten} nach unten' => '{kasten} вниз',
     'Notdienste' => 'Чергові служби',
@@ -25,4 +24,6 @@ return [
     'Spritpreise' => 'Ціни на пальне',
     'Letzte Aktivitäten' => 'Останні дії',
     'Anstehende Veranstaltungen' => 'Найближчі події',
+    'Lege fest, welche Kästen neben deiner Übersicht stehen und in welcher Reihenfolge (am Handy im Fach am rechten Rand). Manche erscheinen nur, wenn es etwas zu zeigen gibt.' => 'Вибери, які блоки показувати поруч із твоїм оглядом і в якому порядку (на телефоні — у шухляді біля правого краю). Деякі з’являються, лише коли є що показати.',
+    '{kasten} anzeigen' => 'Показувати {kasten}',
 ];

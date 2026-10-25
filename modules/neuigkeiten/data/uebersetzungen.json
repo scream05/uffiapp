@@ -1,29 +1,29 @@
 {
     "kaesten-sortieren": {
         "en": {
-            "titel": "Boxes on the right can now be arranged by you",
-            "text": "Under \"Meine Übersicht\" you can now decide the order of the boxes next to your overview – on your phone in the drawer on the right edge. And \"Sport heute\" first shows only three games; tap \"+ weitere Spiele heute\" to expand the rest.",
-            "quelle": "86af2f4abdb0b79155c5cbace2a429a9b505ec6f"
+            "titel": "Boxes on the right can now be arranged yourself",
+            "text": "Under \"My Overview\" you can now decide which boxes appear next to your overview and in what order – on your phone, in the panel on the right edge. And \"Sport today\" first shows only three games; tap \"+ more games today\" to expand the rest.",
+            "quelle": "7622b8bad1d29497d39bfbbc30335f6e99f7e9b5"
         },
         "uk": {
-            "titel": "Блоки справа тепер можна розставити самостійно",
-            "text": "У розділі «Моя огляд» ти тепер можеш визначити, у якому порядку стоять блоки поруч із твоїм оглядом – на телефоні у панелі з правого краю. А «Спорт сьогодні» спочатку показує лише три матчі; натисни «+ ще матчі сьогодні», щоб розгорнути решту.",
-            "quelle": "86af2f4abdb0b79155c5cbace2a429a9b505ec6f"
+            "titel": "Kästen rechts selbst anordnen",
+            "text": "Unter „Meine Übersicht“ legst du jetzt fest, welche Kästen neben deiner Übersicht stehen und in welcher Reihenfolge – am Handy im Fach am rechten Rand. Und „Sport heute“ zeigt erst drei Spiele; mit „+ weitere Spiele heute“ klappst du den Rest auf.",
+            "quelle": "7622b8bad1d29497d39bfbbc30335f6e99f7e9b5"
         },
         "ar": {
             "titel": "ترتيب المربعات على اليمين بنفسك",
-            "text": "ضمن „Meine Übersicht“ يمكنك الآن تحديد ترتيب المربعات الموجودة بجانب نظرتك العامة، أي على الهاتف في الشريط الموجود على الحافة اليمنى. أما „Sport heute“ فيعرض في البداية ثلاث مباريات فقط، واضغط على „+ weitere Spiele heute“ لتفتح باقي المباريات.",
-            "quelle": "86af2f4abdb0b79155c5cbace2a429a9b505ec6f"
+            "text": "تحت „نظرتي العامة“ يمكنك الآن تحديد المربعات التي تظهر بجانب نظرتك العامة وترتيبها بالشكل الذي تريده، وذلك على الهاتف في الشريط الموجود على الحافة اليمنى. أيضاً تعرض „رياضة اليوم“ ثلاث مباريات فقط في البداية، وبالضغط على „+ مباريات أخرى اليوم“ تفتح بقية المباريات.",
+            "quelle": "7622b8bad1d29497d39bfbbc30335f6e99f7e9b5"
         },
         "tr": {
-            "titel": "Sağdaki kutuları kendin sırala",
-            "text": "\"Benim Görünümüm\" altında artık, kutuların görünümünün yanında hangi sırayla duracağını kendin belirleyebilirsin – telefonda sağ kenardaki bölmede. Ayrıca \"Bugün Spor\" önce üç maç gösterir; \"+ bugünkü diğer maçlar\" ile kalanları açabilirsin.",
-            "quelle": "86af2f4abdb0b79155c5cbace2a429a9b505ec6f"
+            "titel": "Kutuları sağdan kendin sırala",
+            "text": "\"Benim Genel Bakışım\" altında artık hangi kutuların genel bakışının yanında duracağını ve hangi sırayla duracağını kendin belirleyebilirsin – telefonda sağ kenardaki bölmede. Ayrıca \"Bugün Spor\" önce üç maçı gösterir; \"+ bugünkü diğer maçlar\" ile kalanını açabilirsin.",
+            "quelle": "7622b8bad1d29497d39bfbbc30335f6e99f7e9b5"
         },
         "ru": {
-            "titel": "Блоки справа теперь можно расставить самому",
-            "text": "В разделе «Моя сводка» ты теперь сам задаёшь порядок блоков, которые находятся рядом с твоей сводкой. На телефоне они показаны в панели у правого края. А в блоке «Спорт сегодня» сначала видны только три матча. Чтобы открыть остальные, нажми «+ остальные игры сегодня».",
-            "quelle": "86af2f4abdb0b79155c5cbace2a429a9b505ec6f"
+            "titel": "Блоки справа можно расставить самому",
+            "text": "В разделе «Моя сводка» теперь выбираешь, какие блоки будут стоять рядом с твоей сводкой и в каком порядке – на телефоне в панели у правого края. А «Спорт сегодня» сначала показывает только три матча; нажми «+ другие игры сегодня», чтобы раскрыть остальные.",
+            "quelle": "7622b8bad1d29497d39bfbbc30335f6e99f7e9b5"
         }
     },
     "sport-seite": {

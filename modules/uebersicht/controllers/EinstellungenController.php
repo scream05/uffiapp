@@ -31,10 +31,13 @@ class EinstellungenController extends Controller
             $module->setAusgeblendet($user, $aus);
             if (($kaesten = Yii::$app->request->post('kaesten')) !== null) {
                 $module->setKaesten($user, array_map('strval', (array)$kaesten));
+                $an = array_map('strval', (array)Yii::$app->request->post('kaesten_an', []));
+                $module->setKaestenAus($user, array_values(array_diff(array_map('strval', (array)$kaesten), $an)));
             }
             $this->view->saved();
             return $this->redirect(['/dashboard/dashboard']);
         }
-        return $this->render('index', ['bereiche' => $bereiche, 'aus' => $module->getAusgeblendet($user), 'kaesten' => $module->getKaesten($user)]);
+        return $this->render('index', ['bereiche' => $bereiche, 'aus' => $module->getAusgeblendet($user), 'kaesten' => $module->getKaesten($user),
+            'kaestenAus' => $module->getKaestenAus($user)]);
     }
 }
