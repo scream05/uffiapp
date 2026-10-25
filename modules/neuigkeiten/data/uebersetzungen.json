@@ -1,4 +1,31 @@
 {
+    "sport-seite": {
+        "en": {
+            "titel": "All things sport on one page",
+            "text": "In the \"Clubs & Volunteering\" section there is now a new menu item \"Sport\": there you'll find all clubs with match schedules – the 1. FV Uffenheim and the SB Uffenheim with basketball, volleyball and badminton – each with the next game and, on matchdays, all of the day's games.",
+            "quelle": "c66aab2b84a08149a394de2ad48027e2bfc8cb24"
+        },
+        "uk": {
+            "titel": "Усе про спорт на одній сторінці",
+            "text": "У розділі «Клуби та волонтерство» з'явився новий пункт меню «Спорт»: там ти знайдеш усі клуби з розкладом матчів – 1. FV Uffenheim та SB Uffenheim з баскетболом, волейболом і бадмінтоном – кожен із найближчою грою, а в ігрові дні також усі матчі дня.",
+            "quelle": "c66aab2b84a08149a394de2ad48027e2bfc8cb24"
+        },
+        "ar": {
+            "titel": "كل ما يخص الرياضة في صفحة واحدة",
+            "text": "في قسم „Vereine & Ehrenamt“ توجد الآن قائمة جديدة باسم „Sport“. هناك تجد كل الجمعيات التي لديها جدول مباريات، مثل 1. FV Uffenheim وSB Uffenheim مع كرة السلة والكرة الطائرة وتنس الريشة. يعرض لك كل نادٍ المباراة القادمة، وفي أيام المباريات تجد أيضاً جميع مباريات اليوم.",
+            "quelle": "c66aab2b84a08149a394de2ad48027e2bfc8cb24"
+        },
+        "tr": {
+            "titel": "Sport komplett auf einer Seite",
+            "text": "Im Bereich „Vereine & Ehrenamt“ gibt es jetzt den Menüpunkt „Sport“: Dort findest du alle Vereine mit Spielplan – den 1. FV Uffenheim und die SB Uffenheim mit Basketball, Volleyball und Badminton – jeweils mit dem nächsten Spiel, an Spieltagen auch alle Spiele des Tages.",
+            "quelle": "c66aab2b84a08149a394de2ad48027e2bfc8cb24"
+        },
+        "ru": {
+            "titel": "Всё о спорте на одной странице",
+            "text": "В разделе «Клубы и волонтёрство» появился новый пункт меню «Спорт»: там ты найдёшь все клубы с расписанием матчей — 1. FV Uffenheim и SB Uffenheim с баскетболом, волейболом и бадминтоном — с указанием ближайшей игры, а в игровые дни также все матчи этого дня.",
+            "quelle": "c66aab2b84a08149a394de2ad48027e2bfc8cb24"
+        }
+    },
     "sbu-spiele": {
         "en": {
             "titel": "Basketball, Volleyball and Badminton of the SBU",

@@ -308,4 +308,6 @@ return [
     'mix' => 'смешанная',
     'Ergebnisse und Tabellen der Mannschaften veröffentlicht der Verband auf seiner eigenen Seite.' => 'Результаты и таблицы команд федерация публикует на своём сайте.',
     'Ergebnisse & Tabellen {wo}' => 'Результаты и таблицы {wo}',
+    'Spiele, Ergebnisse und Tabellen der Uffenheimer Vereine – täglich von den Verbänden abgeglichen.' => 'Игры, результаты и таблицы клубов Уффенхайма – ежедневно по данным федераций.',
+    'Noch keine Vereine mit Spielplan.' => 'Пока нет клубов с расписанием.',
 ];

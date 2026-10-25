@@ -23,6 +23,10 @@ class SpieleController extends ContentContainerController
 
     public function actionIndex($verein = null, $mannschaft = null, $teil = null)
     {
+        // Ohne Verein: Übersicht „Sport“ (Menüpunkt) mit allen Vereinen und Sportarten
+        if ($verein === null && $teil === null) {
+            return $this->render('uebersicht', ['gruppen' => self::gruppen()]);
+        }
         $query = Verein::find()->where(['not', ['bfv_id' => null]]);
         $verein = $verein !== null ? $query->andWhere(['id' => (int)$verein])->one() : $query->orderBy(\humhub\modules\vereine\components\Spielquellen::reihenfolge())->one();
         if ($verein === null) {
@@ -87,6 +91,7 @@ class SpieleController extends ContentContainerController
         usort($letzte, fn($a, $b) => $b->getZeitpunkt() <=> $a->getZeitpunkt());
 
         return $this->render('index', [
+            'zurueck' => $this->contentContainer->createUrl('/vereine/spiele/index'),
             'verein' => $verein,
             'mannschaften' => $mannschaften,
             'label' => $label,
@@ -97,5 +102,24 @@ class SpieleController extends ContentContainerController
             'fruehere' => $auswahl ? $fruehere : [],
             'stand' => Bfv::stand($verein),
         ]);
+    }
+
+    /**
+     * Vereine mit Spielquelle oder Ergebnis-Link, gruppiert nach Vereinsname bei der Quelle (die SBU-Abteilungen
+     * Basketball, Volleyball, Badminton gehören zu „SB Uffenheim“); Reihenfolge wie Spielquellen::reihenfolge()
+     * @return array[] [['name' => string, 'logo' => Verein, 'vereine' => Verein[]]]
+     */
+    public static function gruppen(): array
+    {
+        $gruppen = [];
+        $vereine = array_merge(
+            Verein::find()->where(['not', ['bfv_id' => null]])->orderBy(\humhub\modules\vereine\components\Spielquellen::reihenfolge())->all(),
+            Verein::find()->where(['bfv_id' => null])->andWhere(['not', ['ergebnisse_url' => null]])->orderBy(['name' => SORT_ASC])->all());
+        foreach ($vereine as $v) {
+            $name = $v->bfv_name ?: $v->name;
+            $gruppen[$name] ??= ['name' => $name, 'logo' => $v, 'vereine' => []];
+            $gruppen[$name]['vereine'][] = $v;
+        }
+        return array_values($gruppen);
     }
 }

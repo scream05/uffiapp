@@ -10,6 +10,10 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'sport-seite', 'datum' => '2026-10-25', 'art' => 'besser', 'popup' => false,
+        'link' => ['vereine-and-ehrenamt', '/vereine/spiele/index'],
+        'titel' => 'Alles zum Sport auf einer Seite',
+        'text' => 'Im Bereich „Vereine & Ehrenamt“ gibt es jetzt den Menüpunkt „Sport“: Dort findest du alle Vereine mit Spielplan – den 1. FV Uffenheim und die SB Uffenheim mit Basketball, Volleyball und Badminton – jeweils mit dem nächsten Spiel, an Spieltagen auch alle Spiele des Tages.'],
     ['id' => 'sbu-spiele', 'datum' => '2026-10-25', 'art' => 'neu', 'popup' => true,
         'link' => ['vereine-and-ehrenamt', '/vereine/spiele/index'],
         'titel' => 'Basketball, Volleyball und Badminton der SBU',

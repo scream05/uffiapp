@@ -86,15 +86,14 @@ class Events
                 'isActive' => $active && Yii::$app->controller->id !== 'spiele' && !in_array(Yii::$app->controller->action->id, ['anfragen', 'pruefen'], true),
                 'sortOrder' => 90,
             ]);
-            // Je Verein mit Spielquelle (BFV, DBB, BVV, BBV) eine Seite „Spiele & Ergebnisse“
-            foreach (Verein::find()->where(['not', ['bfv_id' => null]])->orderBy(\humhub\modules\vereine\components\Spielquellen::reihenfolge())->all() as $verein) {
+            // Ein Menüpunkt „Sport“ (Übersicht aller Vereine mit Spielplan bzw. Ergebnis-Link), darunter die Seiten je Verein
+            if (Verein::find()->where(['or', ['not', ['bfv_id' => null]], ['not', ['ergebnisse_url' => null]]])->exists()) {
                 $event->sender->addItem([
-                    'label' => Yii::t('VereineModule.base', '{sport}: {verein}', ['sport' => \humhub\modules\vereine\components\Spielquellen::sport($verein),
-                        'verein' => $verein->bfv_name ?: $verein->name]),
+                    'label' => Yii::t('VereineModule.base', 'Sport'),
                     'group' => 'modules',
-                    'url' => $verein->getSpieleUrl(),
-                    'icon' => '<i class="fa ' . \humhub\modules\vereine\components\Spielquellen::quelle($verein)['icon'] . '"></i>',
-                    'isActive' => $active && Yii::$app->controller->id === 'spiele' && (int)Yii::$app->request->get('verein') === $verein->id,
+                    'url' => $space->createUrl('/vereine/spiele/index'),
+                    'icon' => '<i class="fa fa-trophy"></i>',
+                    'isActive' => $active && Yii::$app->controller->id === 'spiele',
                     'sortOrder' => 89,
                 ]);
             }

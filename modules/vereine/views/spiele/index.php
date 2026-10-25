@@ -9,6 +9,7 @@
  * @var \humhub\modules\vereine\models\VereinSpiel[] $letzte letztes Spiel je Mannschaft, neueste zuerst
  * @var \humhub\modules\vereine\models\VereinSpiel[] $fruehere frühere Spiele der gewählten Mannschaft
  * @var string|null $stand
+ * @var string $zurueck Übersicht „Sport“
  */
 
 use humhub\helpers\Html;
@@ -43,6 +44,7 @@ $liste = function (array $spiele) use ($label, $tagUeberschrift) {
 $tabelle = $auswahl ? $auswahl->getTabelleList() : [];
 ?>
 <?= $this->render('_stil') ?>
+<p style="margin:0 4px 8px"><?= Html::a('<i class="fa fa-arrow-left"></i> ' . Yii::t('VereineModule.base', 'Sport'), $zurueck) ?></p>
 
 <div class="panel panel-default">
     <div class="panel-body">
