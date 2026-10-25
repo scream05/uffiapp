@@ -41,6 +41,16 @@ class Events
         }
     }
 
+    /** Startseite: an Spieltagen Kasten mit den heutigen Spielen und dem Live-Stand (am Handy im Fach rechts) */
+    public static function onDashboardSidebarInit($event)
+    {
+        try {
+            $event->sender->addWidget(\humhub\modules\vereine\widgets\SpieltagKasten::class, [], ['sortOrder' => 52]);
+        } catch (\Throwable $e) {
+            Yii::error($e);
+        }
+    }
+
     public static function onMetaSearchInit($event)
     {
         if (!Yii::$app->user->isGuest && Yii::$app->getModule('vereine')->getDirectorySpace() !== null) {

@@ -219,7 +219,6 @@ return [
     'Alle Mannschaften' => 'Tüm takımlar',
     'Nächste Spiele' => 'Sıradaki maçlar',
     'In dieser Saison stehen keine weiteren Spiele an.' => 'Bu sezon başka maç yok.',
-    'In den nächsten {n} Tagen stehen keine Spiele an.' => 'Önümüzdeki {n} gün içinde maç yok.',
     'Tabelle' => 'Puan durumu',
     'Mannschaft' => 'Takım',
     'Spiele' => 'Maçlar',
@@ -279,4 +278,8 @@ return [
     '{tore, plural, =0{keine Tore} =1{1 Tor} other{# Tore}}, {karten, plural, =0{keine Karten} =1{1 Karte} other{# Karten}}' => '{tore, plural, =0{gol yok} =1{1 gol} other{# gol}}, {karten, plural, =0{kart yok} =1{1 kart} other{# kart}}',
     'Aus dem Liveticker beim BFV.' => 'BFV canlı anlatımından.',
     'Zum Spiel' => 'Maça git',
+    'Fußball heute' => 'Bugün futbol',
+    'Fußball live' => 'Canlı futbol',
+    'gegen {gegner}' => '{gegner} karşısında',
+    'bei {gegner}' => 'deplasmanda: {gegner}',
 ];

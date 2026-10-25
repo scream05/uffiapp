@@ -219,7 +219,6 @@ return [
     'Alle Mannschaften' => 'كل الفرق',
     'Nächste Spiele' => 'المباريات القادمة',
     'In dieser Saison stehen keine weiteren Spiele an.' => 'لا توجد مباريات أخرى هذا الموسم.',
-    'In den nächsten {n} Tagen stehen keine Spiele an.' => 'لا توجد مباريات في الأيام الـ{n} القادمة.',
     'Tabelle' => 'الجدول',
     'Mannschaft' => 'الفريق',
     'Spiele' => 'المباريات',
@@ -279,4 +278,8 @@ return [
     '{tore, plural, =0{keine Tore} =1{1 Tor} other{# Tore}}, {karten, plural, =0{keine Karten} =1{1 Karte} other{# Karten}}' => '{tore, plural, =0{بلا أهداف} =1{هدف واحد} other{# أهداف}}، {karten, plural, =0{بلا بطاقات} =1{بطاقة واحدة} other{# بطاقات}}',
     'Aus dem Liveticker beim BFV.' => 'من التغطية المباشرة على موقع BFV.',
     'Zum Spiel' => 'إلى المباراة',
+    'Fußball heute' => 'كرة القدم اليوم',
+    'Fußball live' => 'كرة القدم مباشر',
+    'gegen {gegner}' => 'ضد {gegner}',
+    'bei {gegner}' => 'خارج الأرض ضد {gegner}',
 ];

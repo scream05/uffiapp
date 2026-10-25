@@ -2807,6 +2807,19 @@ class SetupController extends Controller
             $S::updateAll(['ticker_status' => 'live', 'ergebnis' => null], ['spiel_id' => $s6]);
             $Bfv::live($anstoss + 200 * 60);
             $gleich('Live: Ticker ohne Abpfiff nach 3 Stunden beendet', $sp6()->ticker_status, 'beendet');
+            // Startseite: Kasten nur an Spieltagen, mit Live-Stand
+            $S::updateAll(['datum' => date('Y-m-d', strtotime('+3 days'))], ['and', ['mannschaft_id' => $h1], ['datum' => date('Y-m-d')]]);
+            if (!Yii::$app->has('session')) { // Html::nonce() braucht eine Sitzung
+                Yii::$app->set('session', ['class' => \yii\web\Session::class]);
+            }
+            $kasten = fn() => \humhub\modules\vereine\widgets\SpieltagKasten::widget();
+            $gleich('Startseite: Kasten nur an Spieltagen', str_contains($kasten(), 'Test-Herren-Gegner'), false);
+            $S::updateAll(['datum' => date('Y-m-d'), 'uhrzeit' => date('H:i', strtotime('-40 minutes')), 'ticker_status' => 'live', 'ticker_stand' => '2:1',
+                'ticker_minute' => 41, 'ergebnis' => null, 'gast' => 'Test-Herren-Gegner'], ['spiel_id' => $s6]);
+            $html = $kasten();
+            $gleich('Startseite: laufendes Spiel mit Stand und Minute', [str_contains($html, 'Test-Herren-Gegner'), str_contains($html, '2:1'), str_contains($html, '41.')], [true, true, true]);
+            $S::updateAll(['ergebnis' => 'Abse.', 'ticker_status' => null], ['spiel_id' => $s6]);
+            $gleich('Startseite: abgesetztes Spiel nicht im Kasten', str_contains($kasten(), 'Test-Herren-Gegner'), false);
             // Täglicher Abgleich: Ticker älterer Spiele werden geleert
             $S::updateAll(['ticker' => '[]', 'ticker_status' => 'beendet'], ['spiel_id' => str_repeat('2', 32)]);
             $Bfv::abrufen($verein);

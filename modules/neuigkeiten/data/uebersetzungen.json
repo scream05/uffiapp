@@ -1,4 +1,31 @@
 {
+    "fussball-startseite": {
+        "en": {
+            "titel": "Football today on the homepage",
+            "text": "If 1. FV Uffenheim is playing, the match appears on the homepage on the same day – before kick-off with the time, and afterwards with the current score, on mobile in the panel on the right edge. On the matches page you now only see the next game per team, and the sections can be collapsed.",
+            "quelle": "144ab35d26e76a4221f954b12573236bcd9cc1ce"
+        },
+        "uk": {
+            "titel": "Футбол сьогодні на головній сторінці",
+            "text": "Якщо грає 1. FV Uffenheim, матч з'являється на головній сторінці того ж дня – до початку гри з часом, а після неї з актуальним рахунком. На телефоні це відображається у віконці з правого краю. На сторінці ігор тепер видно лише наступний матч для кожної команди, а розділи можна згортати.",
+            "quelle": "144ab35d26e76a4221f954b12573236bcd9cc1ce"
+        },
+        "ar": {
+            "titel": "كرة القدم اليوم في الصفحة الرئيسية",
+            "text": "إذا لعب فريق 1. FV Uffenheim، يظهر المباراة في الصفحة الرئيسية في نفس اليوم، قبل البداية مع الوقت، وبعدها مع النتيجة الحالية، وعلى الهاتف في الخانة اليمنى. وفي صفحة المباريات تشاهد الآن فقط المباراة القادمة لكل فريق، ويمكن طي الأقسام وإخفاؤها.",
+            "quelle": "144ab35d26e76a4221f954b12573236bcd9cc1ce"
+        },
+        "tr": {
+            "titel": "Fußball heute auf der Startseite",
+            "text": "Spielt der 1. FV Uffenheim, steht das Spiel am selben Tag auf der Startseite – vor dem Anpfiff mit Uhrzeit, danach mit dem aktuellen Spielstand, am Handy im Fach am rechten Rand. Auf der Spieleseite siehst du jetzt nur noch das nächste Spiel je Mannschaft, und die Bereiche lassen sich einklappen.",
+            "quelle": "144ab35d26e76a4221f954b12573236bcd9cc1ce"
+        },
+        "ru": {
+            "titel": "Футбол сегодня на главной странице",
+            "text": "Если играет 1. FV Uffenheim, матч появляется на главной странице в тот же день — до начала с указанием времени, после него с текущим счётом; на телефоне это блок в правой части экрана. На странице с матчами теперь видно только следующую игру каждой команды, а разделы можно сворачивать.",
+            "quelle": "144ab35d26e76a4221f954b12573236bcd9cc1ce"
+        }
+    },
     "fvu-spiele": {
         "en": {
             "titel": "Games & Results of 1. FV Uffenheim",

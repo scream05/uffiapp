@@ -13,7 +13,6 @@
 
 use humhub\helpers\Html;
 use humhub\modules\vereine\components\Bfv;
-use humhub\modules\vereine\controllers\SpieleController;
 
 $space = $this->context->contentContainer;
 $name = $verein->bfv_name ?: $verein->name;
@@ -112,18 +111,26 @@ $liveUrl = $space->createUrl('/vereine/spiele/index', array_filter(['verein' => 
 JS);
 } ?>
 
-<div class="panel panel-default">
-    <div class="panel-heading"><strong><?= Yii::t('VereineModule.base', 'Nächste Spiele') ?></strong></div>
+<?php // Auf-/Zugeklappt merkt sich der Browser; ein Sprung per #anker öffnet den Bereich
+$this->registerJs(<<<JS
+document.querySelectorAll('details.fvs-klapp').forEach(function (d) {
+    var key = 'fvs-zu-' + d.id;
+    try { if (localStorage.getItem(key) === '1' && location.hash !== '#' + d.id) { d.open = false; } } catch (e) {}
+    d.addEventListener('toggle', function () { try { d.open ? localStorage.removeItem(key) : localStorage.setItem(key, '1'); } catch (e) {} });
+});
+JS); ?>
+<details class="panel panel-default fvs-klapp" id="fvs-naechste" open>
+    <summary class="panel-heading"><strong><?= $auswahl ? Yii::t('VereineModule.base', 'Nächstes Spiel') : Yii::t('VereineModule.base', 'Nächste Spiele') ?></strong>
+        <?php if (!$auswahl): ?><span class="text-muted"><?= Yii::t('VereineModule.base', 'je Mannschaft') ?></span><?php endif ?>
+        <i class="fa fa-chevron-down fvs-pfeil" aria-hidden="true"></i></summary>
     <div class="panel-body">
         <?php if ($kommend): ?>
             <?php $liste($kommend) ?>
         <?php else: ?>
-            <p class="text-muted" style="margin:0"><?= $auswahl
-                ? Yii::t('VereineModule.base', 'In dieser Saison stehen keine weiteren Spiele an.')
-                : Yii::t('VereineModule.base', 'In den nächsten {n} Tagen stehen keine Spiele an.', ['n' => SpieleController::TAGE_VORAUS]) ?></p>
+            <p class="text-muted" style="margin:0"><?= Yii::t('VereineModule.base', 'In dieser Saison stehen keine weiteren Spiele an.') ?></p>
         <?php endif ?>
     </div>
-</div>
+</details>
 
 <?php if ($tabelle): ?>
 <div class="panel panel-default">
@@ -154,10 +161,10 @@ JS);
 </div>
 <?php endif ?>
 
-<div class="panel panel-default">
-    <div class="panel-heading"><strong><?= $auswahl ? Yii::t('VereineModule.base', 'Letztes Spiel') : Yii::t('VereineModule.base', 'Letzte Spiele') ?></strong>
+<details class="panel panel-default fvs-klapp" id="fvs-letzte" open>
+    <summary class="panel-heading"><strong><?= $auswahl ? Yii::t('VereineModule.base', 'Letztes Spiel') : Yii::t('VereineModule.base', 'Letzte Spiele') ?></strong>
         <?php if (!$auswahl): ?><span class="text-muted"><?= Yii::t('VereineModule.base', 'je Mannschaft') ?></span><?php endif ?>
-    </div>
+        <i class="fa fa-chevron-down fvs-pfeil" aria-hidden="true"></i></summary>
     <div class="panel-body">
         <?php if ($letzte): ?>
             <?php foreach ($letzte as $s): ?>
@@ -174,17 +181,18 @@ JS);
             <p class="text-muted" style="margin:0"><?= Yii::t('VereineModule.base', 'Noch keine Ergebnisse.') ?></p>
         <?php endif ?>
     </div>
-</div>
+</details>
 
 <?php if ($fruehere): ?>
-<div class="panel panel-default" id="fvs-frueher">
-    <div class="panel-heading"><strong><?= Yii::t('VereineModule.base', 'Frühere Spiele') ?></strong></div>
+<details class="panel panel-default fvs-klapp" id="fvs-frueher" open>
+    <summary class="panel-heading"><strong><?= Yii::t('VereineModule.base', 'Frühere Spiele') ?></strong>
+        <i class="fa fa-chevron-down fvs-pfeil" aria-hidden="true"></i></summary>
     <div class="panel-body">
         <?php foreach ($fruehere as $s): ?>
             <?= $this->render('_spiel', ['spiel' => $s, 'label' => $label[$s->mannschaft_id] ?? '', 'mitDatum' => true]) ?>
         <?php endforeach ?>
     </div>
-</div>
+</details>
 <?php endif ?>
 
 <?php if (!$auswahl): ?>

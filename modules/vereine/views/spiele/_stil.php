@@ -55,5 +55,11 @@ use humhub\helpers\Html;
     .fvs-karte-gelb { background: #f9c80e; }
     .fvs-karte-rot { background: #d32f2f; }
     .fvs-karte-gelbrot { background: linear-gradient(135deg, #f9c80e 50%, #d32f2f 50%); }
+    .fvs-klapp > summary { list-style: none; cursor: pointer; display: flex; align-items: baseline; gap: 6px; }
+    .fvs-klapp > summary::-webkit-details-marker { display: none; }
+    .fvs-klapp > summary:focus-visible { outline: 2px solid var(--bs-primary, #446e88); outline-offset: -2px; }
+    .fvs-pfeil { margin-left: auto; color: var(--bs-secondary-color, #777); transition: transform .2s; }
+    .fvs-klapp:not([open]) .fvs-pfeil { transform: rotate(-90deg); }
+    @media (prefers-reduced-motion: reduce) { .fvs-pfeil { transition: none; } }
     @media (max-width: 575.98px) { .fvs-bericht, .fvs-mehr, .fvs-hinweis { margin-left: 0; } }
 </style>

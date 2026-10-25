@@ -219,7 +219,6 @@ return [
     'Alle Mannschaften' => 'Все команды',
     'Nächste Spiele' => 'Ближайшие матчи',
     'In dieser Saison stehen keine weiteren Spiele an.' => 'В этом сезоне больше нет матчей.',
-    'In den nächsten {n} Tagen stehen keine Spiele an.' => 'В ближайшие {n} дней матчей нет.',
     'Tabelle' => 'Таблица',
     'Mannschaft' => 'Команда',
     'Spiele' => 'Матчи',
@@ -279,4 +278,8 @@ return [
     '{tore, plural, =0{keine Tore} =1{1 Tor} other{# Tore}}, {karten, plural, =0{keine Karten} =1{1 Karte} other{# Karten}}' => '{tore, plural, =0{без голов} one{# гол} few{# гола} many{# голов} other{# гола}}, {karten, plural, =0{без карточек} one{# карточка} few{# карточки} many{# карточек} other{# карточки}}',
     'Aus dem Liveticker beim BFV.' => 'Из онлайн-трансляции BFV.',
     'Zum Spiel' => 'К матчу',
+    'Fußball heute' => 'Футбол сегодня',
+    'Fußball live' => 'Футбол в прямом эфире',
+    'gegen {gegner}' => 'против {gegner}',
+    'bei {gegner}' => 'в гостях у {gegner}',
 ];

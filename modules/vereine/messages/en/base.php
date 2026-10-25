@@ -219,7 +219,6 @@ return [
     'Alle Mannschaften' => 'All teams',
     'Nächste Spiele' => 'Upcoming matches',
     'In dieser Saison stehen keine weiteren Spiele an.' => 'No more matches this season.',
-    'In den nächsten {n} Tagen stehen keine Spiele an.' => 'No matches in the next {n} days.',
     'Tabelle' => 'Table',
     'Mannschaft' => 'Team',
     'Spiele' => 'Matches',
@@ -279,4 +278,8 @@ return [
     '{tore, plural, =0{keine Tore} =1{1 Tor} other{# Tore}}, {karten, plural, =0{keine Karten} =1{1 Karte} other{# Karten}}' => '{tore, plural, =0{no goals} =1{1 goal} other{# goals}}, {karten, plural, =0{no cards} =1{1 card} other{# cards}}',
     'Aus dem Liveticker beim BFV.' => 'From the BFV live ticker.',
     'Zum Spiel' => 'To the match',
+    'Fußball heute' => 'Football today',
+    'Fußball live' => 'Football live',
+    'gegen {gegner}' => 'vs {gegner}',
+    'bei {gegner}' => 'at {gegner}',
 ];

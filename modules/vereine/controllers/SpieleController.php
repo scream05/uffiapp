@@ -7,17 +7,16 @@ use humhub\modules\vereine\components\Bfv;
 use humhub\modules\vereine\models\Verein;
 use humhub\modules\vereine\models\VereinMannschaft;
 use humhub\modules\vereine\models\VereinSpiel;
+use humhub\modules\vereine\widgets\SpieltagKasten;
 use Yii;
 use yii\web\NotFoundHttpException;
 
 /**
  * Spiele & Ergebnisse eines Fußballvereins (Daten vom BFV, siehe components/Bfv.php), auch für Gäste.
- * Laufende Spiele lädt die Seite jede Minute neu (?teil=live).
+ * Laufende Spiele lädt die Seite jede Minute neu (?teil=live), den Kasten auf der Startseite ebenso (?teil=heute).
  */
 class SpieleController extends ContentContainerController
 {
-    /** Ohne Mannschaftsfilter: Spiele so viele Tage voraus */
-    public const TAGE_VORAUS = 35;
     /** Mit Mannschaftsfilter: so viele frühere Spiele unter dem letzten */
     public const FRUEHERE = 30;
 
@@ -48,13 +47,22 @@ class SpieleController extends ContentContainerController
         if ($teil === 'live') {
             return $this->renderPartial('_live', ['live' => $live, 'label' => $label, 'verein' => $verein, 'auswahl' => $auswahl]);
         }
-
-        $kommend = VereinSpiel::find()->where(['mannschaft_id' => $ids])->andWhere(['>=', 'datum', date('Y-m-d', strtotime('-1 day'))])
-            ->orderBy(['datum' => SORT_ASC, 'uhrzeit' => SORT_ASC]);
-        if ($auswahl === null) {
-            $kommend->andWhere(['<=', 'datum', date('Y-m-d', strtotime('+' . self::TAGE_VORAUS . ' days'))]);
+        if ($teil === 'heute') {
+            return SpieltagKasten::widget(); // Kasten auf der Startseite
         }
-        $kommend = array_values(array_filter($kommend->all(), fn(VereinSpiel $s) => !$s->istVorbei() && !$s->laeuft()));
+
+        // Nur das nächste Spiel je Mannschaft (abgesetzte übersprungen)
+        $kommend = [];
+        foreach ($auswahl ? [$auswahl] : $mannschaften as $m) {
+            foreach (VereinSpiel::find()->where(['mannschaft_id' => $m->id])->andWhere(['>=', 'datum', date('Y-m-d', strtotime('-1 day'))])
+                         ->orderBy(['datum' => SORT_ASC, 'uhrzeit' => SORT_ASC])->limit(20)->all() as $s) {
+                if (!$s->istVorbei() && !$s->laeuft() && $s->getZustand() === null) {
+                    $kommend[] = $s;
+                    break;
+                }
+            }
+        }
+        usort($kommend, fn($a, $b) => $a->getZeitpunkt() <=> $b->getZeitpunkt());
 
         // Letztes Spiel je Mannschaft (mit Spielbericht), bei gewählter Mannschaft darunter die früheren
         $letzte = [];
