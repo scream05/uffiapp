@@ -1,4 +1,31 @@
 {
+    "kaesten-sortieren": {
+        "en": {
+            "titel": "Boxes on the right can now be arranged by you",
+            "text": "Under \"Meine Übersicht\" you can now decide the order of the boxes next to your overview – on your phone in the drawer on the right edge. And \"Sport heute\" first shows only three games; tap \"+ weitere Spiele heute\" to expand the rest.",
+            "quelle": "86af2f4abdb0b79155c5cbace2a429a9b505ec6f"
+        },
+        "uk": {
+            "titel": "Блоки справа тепер можна розставити самостійно",
+            "text": "У розділі «Моя огляд» ти тепер можеш визначити, у якому порядку стоять блоки поруч із твоїм оглядом – на телефоні у панелі з правого краю. А «Спорт сьогодні» спочатку показує лише три матчі; натисни «+ ще матчі сьогодні», щоб розгорнути решту.",
+            "quelle": "86af2f4abdb0b79155c5cbace2a429a9b505ec6f"
+        },
+        "ar": {
+            "titel": "ترتيب المربعات على اليمين بنفسك",
+            "text": "ضمن „Meine Übersicht“ يمكنك الآن تحديد ترتيب المربعات الموجودة بجانب نظرتك العامة، أي على الهاتف في الشريط الموجود على الحافة اليمنى. أما „Sport heute“ فيعرض في البداية ثلاث مباريات فقط، واضغط على „+ weitere Spiele heute“ لتفتح باقي المباريات.",
+            "quelle": "86af2f4abdb0b79155c5cbace2a429a9b505ec6f"
+        },
+        "tr": {
+            "titel": "Sağdaki kutuları kendin sırala",
+            "text": "\"Benim Görünümüm\" altında artık, kutuların görünümünün yanında hangi sırayla duracağını kendin belirleyebilirsin – telefonda sağ kenardaki bölmede. Ayrıca \"Bugün Spor\" önce üç maç gösterir; \"+ bugünkü diğer maçlar\" ile kalanları açabilirsin.",
+            "quelle": "86af2f4abdb0b79155c5cbace2a429a9b505ec6f"
+        },
+        "ru": {
+            "titel": "Блоки справа теперь можно расставить самому",
+            "text": "В разделе «Моя сводка» ты теперь сам задаёшь порядок блоков, которые находятся рядом с твоей сводкой. На телефоне они показаны в панели у правого края. А в блоке «Спорт сегодня» сначала видны только три матча. Чтобы открыть остальные, нажми «+ остальные игры сегодня».",
+            "quelle": "86af2f4abdb0b79155c5cbace2a429a9b505ec6f"
+        }
+    },
     "sport-seite": {
         "en": {
             "titel": "All things sport on one page",

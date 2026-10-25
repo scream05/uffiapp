@@ -10,6 +10,10 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'kaesten-sortieren', 'datum' => '2026-10-25', 'art' => 'neu', 'popup' => true,
+        'link' => [null, '/uebersicht/einstellungen/index'],
+        'titel' => 'Kästen rechts selbst anordnen',
+        'text' => 'Unter „Meine Übersicht“ legst du jetzt fest, in welcher Reihenfolge die Kästen neben deiner Übersicht stehen – am Handy im Fach am rechten Rand. Und „Sport heute“ zeigt erst drei Spiele; mit „+ weitere Spiele heute“ klappst du den Rest auf.'],
     ['id' => 'sport-seite', 'datum' => '2026-10-25', 'art' => 'besser', 'popup' => false,
         'link' => ['vereine-and-ehrenamt', '/vereine/spiele/index'],
         'titel' => 'Alles zum Sport auf einer Seite',
