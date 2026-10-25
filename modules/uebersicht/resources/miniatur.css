@@ -1,0 +1,32 @@
+/* Miniaturbild links im Beitrag, Text läuft herum (resources/miniatur.js) */
+.wall-entry-content.miniatur-mit-bild { display: flow-root; }
+.miniatur-mit-bild > .miniatur {
+    float: left; float: inline-start;
+    margin: 4px 14px 8px 0; margin-inline: 0 14px;
+    width: 120px;
+}
+.miniatur-mit-bild > .miniatur a { display: block; position: relative; }
+.miniatur-mit-bild > .miniatur img {
+    display: block; width: 100%; height: auto; max-height: 160px; min-height: 72px;
+    object-fit: cover; border-radius: 8px; background: rgba(0, 0, 0, .04);
+}
+html.design-neu .miniatur-mit-bild > .miniatur img { border-radius: var(--dn-r-s, 12px); }
+.miniatur-mehr {
+    position: absolute; right: 6px; bottom: 6px; inset-inline-end: 6px; inset-inline-start: auto;
+    padding: 1px 8px; border-radius: 999px;
+    background: rgba(0, 0, 0, .62); color: #fff; font-size: 12px; font-weight: 700; line-height: 18px;
+}
+/* „Mehr anzeigen“ schneidet mit overflow:hidden ab – das würde den Text neben dem Bild als Spalte führen;
+   clip schneidet gleich, lässt den Text aber herumlaufen */
+.miniatur-mit-bild [data-ui-show-more] { overflow: clip; }
+/* dasselbe für den Text selbst (Kern: overflow-x auto für breite Tabellen) */
+.miniatur-mit-bild [data-ui-richtext] { overflow-x: clip; overflow-y: visible; }
+/* Termine: Abschnitte (Datum, Ort …) sollen nicht unter das Bild springen */
+.miniatur-mit-bild .event-info-section.clearfix::after { clear: none; }
+.miniatur-mit-bild .calendar-wall-entry { margin-top: 0 !important; }
+.miniatur-versteckt { display: none !important; }
+
+@media (max-width: 575.98px) {
+    .miniatur-mit-bild > .miniatur { width: 88px; margin-inline-end: 12px; }
+    .miniatur-mit-bild > .miniatur img { max-height: 120px; min-height: 56px; }
+}

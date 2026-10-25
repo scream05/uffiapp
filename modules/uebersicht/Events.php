@@ -2,6 +2,7 @@
 
 namespace humhub\modules\uebersicht;
 
+use humhub\modules\uebersicht\assets\MiniaturAsset;
 use humhub\modules\uebersicht\assets\UebersichtAsset;
 use humhub\modules\uebersicht\filters\AngepinntFilter;
 use humhub\modules\uebersicht\widgets\PinLink;
@@ -159,12 +160,15 @@ class Events
         }
     }
 
-    /** Markierung „Angepinnt“ in der Übersicht (IDs für das Skript) */
+    /** Miniaturbilder in allen Streams; Markierung „Angepinnt“ in der Übersicht (IDs für das Skript) */
     public static function onLayoutAddons($event)
     {
         try {
-            if (Yii::$app->request->isConsoleRequest || !Yii::$app->controller
-                || Yii::$app->controller->module->id !== 'dashboard') {
+            if (Yii::$app->request->isConsoleRequest || !Yii::$app->controller) {
+                return;
+            }
+            MiniaturAsset::register(Yii::$app->view);
+            if (Yii::$app->controller->module->id !== 'dashboard') {
                 return;
             }
             /** @var Module $module */

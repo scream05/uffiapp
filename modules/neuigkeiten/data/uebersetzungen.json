@@ -1,4 +1,31 @@
 {
+    "miniaturbilder-stream": {
+        "en": {
+            "titel": "Pictures next to the text",
+            "text": "In the overview and in the sections, the picture of a post or event now appears as a small thumbnail on the left next to the text – so the list stays clearer. If you tap on it, you see it large; if a post has several pictures, \"+2\" and the like show how many more are coming.",
+            "quelle": "2dae5fdd21488a2aa7e101ba1790dafcd7f64f99"
+        },
+        "uk": {
+            "titel": "Бідо поруч із текстом",
+            "text": "В огляді та в розділах зображення допису або події тепер показується як маленьке прев’ю ліворуч від тексту – так список стає зрозуміліше. Торкнися його, і побачиш велике зображення; якщо в дописі кілька фото, „+2“ і подібні позначки показують, скільки ще є.",
+            "quelle": "2dae5fdd21488a2aa7e101ba1790dafcd7f64f99"
+        },
+        "ar": {
+            "titel": "صور بجانب النص",
+            "text": "في النظرة العامة وفي الأقسام، تظهر صورة المنشور أو الموعد الآن كصورة مصغّرة صغيرة على يسار النص، وبذلك تبقى القائمة أوضح. عندما تضغط عليها، تراها بحجم كبير؛ وإذا كان للمنشور عدة صور، يُظهر „+2“ وما شابهها عدد الصور المتبقية.",
+            "quelle": "2dae5fdd21488a2aa7e101ba1790dafcd7f64f99"
+        },
+        "tr": {
+            "titel": "Resimler metnin yanında",
+            "text": "Genel görünümde ve bölümlerde bir gönderinin ya da etkinliğin resmi artık metnin soluna küçük bir önizleme resmi olarak görünüyor – böylece liste daha düzenli kalıyor. Üzerine dokunursan resmi büyük görürsün; bir gönderinin birden fazla resmi varsa, „+2“ ve benzeri, daha kaç tane geleceğini gösterir.",
+            "quelle": "2dae5fdd21488a2aa7e101ba1790dafcd7f64f99"
+        },
+        "ru": {
+            "titel": "Bilder neben dem Text",
+            "text": "In der Übersicht und in den Bereichen steht das Bild eines Beitrags oder Termins jetzt als kleines Vorschaubild links neben dem Text – so bleibt die Liste übersichtlicher. Tippst du darauf, siehst du es groß; hat ein Beitrag mehrere Bilder, zeigt „+2“ und Co., wie viele noch kommen.",
+            "quelle": "2dae5fdd21488a2aa7e101ba1790dafcd7f64f99"
+        }
+    },
     "fussball-startseite": {
         "en": {
             "titel": "Football today on the homepage",
