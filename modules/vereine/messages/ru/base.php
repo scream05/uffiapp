@@ -310,4 +310,5 @@ return [
     'Ergebnisse & Tabellen {wo}' => 'Результаты и таблицы {wo}',
     'Spiele, Ergebnisse und Tabellen der Uffenheimer Vereine – täglich von den Verbänden abgeglichen.' => 'Игры, результаты и таблицы клубов Уффенхайма – ежедневно по данным федераций.',
     'Noch keine Vereine mit Spielplan.' => 'Пока нет клубов с расписанием.',
+    'Weniger anzeigen' => 'Показать меньше',
 ];

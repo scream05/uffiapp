@@ -10,6 +10,9 @@ use humhub\modules\vereine\models\VereinSpiel;
 /** Kasten auf der Startseite an Spieltagen: heutige Spiele aller Sportarten mit Anstoß, Live-Stand (Fußball) bzw. Ergebnis */
 class SpieltagKasten extends Widget
 {
+    /** So viele Zeilen sichtbar, der Rest per „+ n weitere“ aufklappbar; 0 = alle (Seite „Sport“) */
+    public int $zeilen = 3;
+
     public function run()
     {
         $vereine = Verein::find()->where(['not', ['bfv_id' => null]])->orderBy(\humhub\modules\vereine\components\Spielquellen::reihenfolge())->all();
@@ -27,6 +30,6 @@ class SpieltagKasten extends Widget
         if (!$spiele || $vereine[0]->getSpieleUrl() === null) {
             return '';
         }
-        return $this->render('spieltag', ['spiele' => $spiele, 'label' => $label, 'verein' => $vereine[0], 'vereinVon' => $verein]);
+        return $this->render('spieltag', ['spiele' => $spiele, 'label' => $label, 'verein' => $vereine[0], 'vereinVon' => $verein, 'zeilen' => $this->zeilen]);
     }
 }

@@ -16,6 +16,9 @@ use humhub\modules\user\models\User;
  * von der Mitgliedschaft. Standard: alles an außer $standardAus. Gespeichert wird nur, was ausgeschaltet ist (Benutzereinstellung
  * „ausgeblendet“, Space-GUIDs), damit neue Spaces automatisch an sind; eingeschaltete Bereiche aus $standardAus
  * stehen in „eingeblendet“.
+ *
+ * Reihenfolge der Kästen in der Seitenleiste der Übersicht (am Handy im Fach): je Person unter „Meine Übersicht“
+ * (Benutzereinstellung „kaesten“, Schlüssel aus KAESTEN); Events::onDashboardSidebarRun setzt die sortOrder.
  */
 class Module extends \humhub\components\Module
 {
@@ -24,6 +27,34 @@ class Module extends \humhub\components\Module
 
     /** Bereiche, die in der Übersicht standardmäßig aus sind (auch für Gäste); jede Person kann sie einschalten */
     public array $standardAus = ['vorschlaege'];
+
+    /** Sortierbare Kästen der Seitenleiste: Schlüssel => [Widget-Klasse, Bezeichnung], in der Standardreihenfolge */
+    public const KAESTEN = [
+        'notdienste' => ['humhub\modules\notdienst\widgets\NotdienstSidebar', 'Notdienste'],
+        'sport' => ['humhub\modules\vereine\widgets\SpieltagKasten', 'Sport heute (nur an Spieltagen)'],
+        'oeffnungszeiten' => ['humhub\modules\oeffnungszeiten\widgets\Kasten', 'Öffnungszeiten'],
+        'sprit' => ['humhub\modules\tanken\widgets\SpritKasten', 'Spritpreise'],
+        'aktivitaeten' => ['humhub\modules\activity\widgets\ActivityStreamViewer', 'Letzte Aktivitäten'],
+        'veranstaltungen' => ['humhub\modules\calendar\widgets\UpcomingEvents', 'Anstehende Veranstaltungen'],
+    ];
+
+    /** @return string[] Schlüssel der vorhandenen Kästen in der Reihenfolge der Person (neue Kästen hinten an) */
+    public function getKaesten(User $user): array
+    {
+        $vorhanden = array_keys(array_filter(self::KAESTEN, fn($k) => class_exists($k[0])));
+        $eigen = json_decode((string)$this->settings->user($user)->get('kaesten', '[]'), true) ?: [];
+        $eigen = array_values(array_intersect($eigen, $vorhanden));
+        return array_merge($eigen, array_values(array_diff($vorhanden, $eigen)));
+    }
+
+    public function setKaesten(User $user, array $schluessel): void
+    {
+        $gueltig = array_values(array_unique(array_intersect($schluessel, array_keys(self::KAESTEN))));
+        $standard = array_values(array_intersect(array_keys(self::KAESTEN), $gueltig));
+        // Unverändert = keine Einstellung (dann gelten künftige Standardänderungen auch für diese Person)
+        $gueltig === $standard ? $this->settings->user($user)->delete('kaesten')
+            : $this->settings->user($user)->set('kaesten', json_encode($gueltig));
+    }
 
     /** @return Space[] Bereiche, die die Person sehen und für die Übersicht wählen kann */
     public function getBereiche(User $user): array

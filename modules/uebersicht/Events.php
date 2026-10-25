@@ -76,6 +76,29 @@ class Events
         }
     }
 
+    /** Seitenleiste der Übersicht: Kästen in der Reihenfolge der Person (Module::KAESTEN); andere Kästen bleiben, wo sie sind */
+    public static function onDashboardSidebarRun($event)
+    {
+        try {
+            if (Yii::$app->user->isGuest) {
+                return;
+            }
+            /** @var Module $module */
+            $module = Yii::$app->getModule('uebersicht');
+            $pos = array_flip($module->getKaesten(Yii::$app->user->getIdentity()));
+            $klasse = array_map(fn($k) => $k[0], Module::KAESTEN);
+            $sidebar = $event->sender;
+            foreach ($sidebar->widgets as $i => $widget) {
+                $schluessel = array_search($widget[0] ?? null, $klasse, true);
+                if ($schluessel !== false && isset($pos[$schluessel])) {
+                    $sidebar->widgets[$i][2]['sortOrder'] = 50 + $pos[$schluessel] * 10; // zwischen Hinweisen (0–1) und „Neue Spaces“ (400)
+                }
+            }
+        } catch (\Throwable $e) {
+            Yii::error($e);
+        }
+    }
+
     /** Übersicht angemeldeter Nutzer nach „Meine Übersicht“ (filters/MeineUebersicht) */
     public static function onBeforeRequest($event)
     {

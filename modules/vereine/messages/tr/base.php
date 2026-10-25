@@ -310,4 +310,5 @@ return [
     'Ergebnisse & Tabellen {wo}' => 'Sonuçlar ve puan tabloları {wo}',
     'Spiele, Ergebnisse und Tabellen der Uffenheimer Vereine – täglich von den Verbänden abgeglichen.' => 'Uffenheim kulüplerinin maçları, sonuçları ve puan tabloları – federasyonlardan her gün güncellenir.',
     'Noch keine Vereine mit Spielplan.' => 'Henüz fikstürü olan kulüp yok.',
+    'Weniger anzeigen' => 'Daha az göster',
 ];

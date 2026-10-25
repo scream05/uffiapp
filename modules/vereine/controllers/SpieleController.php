@@ -53,7 +53,7 @@ class SpieleController extends ContentContainerController
             return $this->renderPartial('_live', ['live' => $live, 'label' => $label, 'verein' => $verein, 'auswahl' => $auswahl]);
         }
         if ($teil === 'heute') {
-            return SpieltagKasten::widget(); // Kasten auf der Startseite
+            return SpieltagKasten::widget(['zeilen' => Yii::$app->request->get('alle') ? 0 : 3]); // Kasten auf der Startseite bzw. Seite „Sport“
         }
 
         // Nur das nächste Spiel je Mannschaft; abgesetzte davor bleiben stehen, damit niemand umsonst hinfährt

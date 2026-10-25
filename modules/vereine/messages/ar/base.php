@@ -310,4 +310,5 @@ return [
     'Ergebnisse & Tabellen {wo}' => 'النتائج والترتيب {wo}',
     'Spiele, Ergebnisse und Tabellen der Uffenheimer Vereine – täglich von den Verbänden abgeglichen.' => 'مباريات أندية أوفنهايم ونتائجها وجداول ترتيبها – تُحدَّث يوميًا من الاتحادات.',
     'Noch keine Vereine mit Spielplan.' => 'لا توجد أندية بجدول مباريات بعد.',
+    'Weniger anzeigen' => 'عرض أقل',
 ];

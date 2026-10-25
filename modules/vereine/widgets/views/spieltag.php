@@ -5,6 +5,7 @@
  * @var string[] $label
  * @var \humhub\modules\vereine\models\Verein $verein erster Verein (Adresse zum Neuladen)
  * @var \humhub\modules\vereine\models\Verein[] $vereinVon Mannschaft-ID => Verein
+ * @var int $zeilen so viele sichtbar, der Rest aufklappbar (0 = alle)
  */
 
 use humhub\helpers\Html;
@@ -25,19 +26,15 @@ foreach ($vereinVon as $mid => $v) {
         $seiten[$v->id] = $v;
     }
 }
-// Höchstens so viele Zeilen: laufende und kommende zuerst, dann die jüngsten Ergebnisse; angezeigt nach Uhrzeit
-$max = 8;
-$weitere = max(0, count($spiele) - $max);
-if ($weitere) {
-    $offenZuerst = $spiele;
-    usort($offenZuerst, fn($a, $b) => [(int)$a->istVorbei(), $a->istVorbei() ? -$a->getZeitpunkt() : $a->getZeitpunkt()]
-        <=> [(int)$b->istVorbei(), $b->istVorbei() ? -$b->getZeitpunkt() : $b->getZeitpunkt()]);
-    $behalten = array_slice($offenZuerst, 0, $max);
-    $spiele = array_values(array_filter($spiele, fn($s) => in_array($s, $behalten, true)));
-}
+// Laufende und kommende zuerst (nach Uhrzeit), dann die jüngsten Ergebnisse; nur die ersten $zeilen sichtbar
+usort($spiele, fn($a, $b) => [(int)$a->istVorbei(), $a->istVorbei() ? -$a->getZeitpunkt() : $a->getZeitpunkt()]
+    <=> [(int)$b->istVorbei(), $b->istVorbei() ? -$b->getZeitpunkt() : $b->getZeitpunkt()]);
+$weitere = $zeilen > 0 ? max(0, count($spiele) - $zeilen) : 0;
+$seite = $seite . (str_contains($seite, '?') ? '&' : '?') . 'teil=heute' . ($zeilen > 0 ? '' : '&alle=1');
+$seiteLink = $verein->getSpieleUrl();
 $wertungText = ['s' => Yii::t('VereineModule.base', 'gewonnen'), 'u' => Yii::t('VereineModule.base', 'unentschieden'), 'n' => Yii::t('VereineModule.base', 'verloren')];
 ?>
-<div class="panel panel-default" id="fvs-heute" data-url="<?= Html::encode($seite . (str_contains($seite, '?') ? '&' : '?') . 'teil=heute') ?>" data-aktiv="<?= $offen ? 1 : 0 ?>">
+<div class="panel panel-default" id="fvs-heute" data-url="<?= Html::encode($seite) ?>" data-aktiv="<?= $offen ? 1 : 0 ?>">
     <style <?= Html::nonce() ?>>
         #fvs-heute .fvh-zeile { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-top: 1px solid var(--bs-border-color, #e5e5e5); color: inherit; text-decoration: none; }
         #fvs-heute .fvh-zeile:first-child { border-top: 0; padding-top: 0; }
@@ -57,7 +54,10 @@ $wertungText = ['s' => Yii::t('VereineModule.base', 'gewonnen'), 'u' => Yii::t('
         #fvs-heute .fvh-abgesetzt { color: var(--bs-danger-text-emphasis, #58151c); }
         #fvs-heute .fvh-weg .fvh-team, #fvs-heute .fvh-weg .fvh-gegner { text-decoration: line-through; opacity: .7; }
         #fvs-heute .fvh-alle { display: flex; flex-wrap: wrap; gap: 2px 12px; margin-top: 8px; }
-        #fvs-heute .fvh-weitere { font-size: .85em; color: var(--bs-secondary-color, #6b6b6b); padding-top: 6px; border-top: 1px solid var(--bs-border-color, #e5e5e5); }
+        #fvs-heute .fvh-weitere { display: block; width: 100%; text-align: start; font-size: .85em; font-weight: 600; padding: 6px 0 0; border: 0;
+            border-top: 1px solid var(--bs-border-color, #e5e5e5); background: none; color: var(--bs-link-color, #446e88); cursor: pointer; }
+        #fvs-heute .fvh-mehr { display: none; }
+        #fvs-heute.fvh-offen .fvh-mehr { display: flex; }
         #fvs-heute .fvh-sport { flex: 0 0 auto; width: 16px; text-align: center; color: var(--bs-secondary-color, #6b6b6b); }
     </style>
     <div class="panel-heading">
@@ -66,14 +66,14 @@ $wertungText = ['s' => Yii::t('VereineModule.base', 'gewonnen'), 'u' => Yii::t('
                 : ($live ? Yii::t('VereineModule.base', 'Sport live') : Yii::t('VereineModule.base', 'Sport heute')) ?></strong>
     </div>
     <div class="panel-body">
-        <?php foreach ($spiele as $s): ?>
+        <?php foreach ($spiele as $i => $s): ?>
             <?php $stand = $s->getAnzeigeStand(); $wertung = $s->getWertung();
             $v = $vereinVon[$s->mannschaft_id] ?? $verein; $q = Spielquellen::quelle($v);
             // Ohne Heimrecht (Volleyball) steht „gegen …“: dann das eigene Ergebnis zuerst
             if ($stand !== null && $s->getHeimspiel() === null && !$s->heim_eigen) {
                 $stand = implode(':', array_reverse(explode(':', $stand)));
             } ?>
-            <a class="fvh-zeile<?= $gestrichen($s) ? ' fvh-weg' : '' ?>" href="<?= Html::encode($v->getSpieleUrl() ?: $seite) ?>">
+            <a class="fvh-zeile<?= $gestrichen($s) ? ' fvh-weg' : '' ?><?= $zeilen > 0 && $i >= $zeilen ? ' fvh-mehr' : '' ?>" href="<?= Html::encode($v->getSpieleUrl() ?: $seiteLink) ?>">
                 <?php if ($mehrereSportarten): ?>
                     <i class="fa <?= $q['icon'] ?> fvh-sport" title="<?= Html::encode(Spielquellen::sport($v)) ?>"></i><span class="visually-hidden"><?= Html::encode(Spielquellen::sport($v)) ?>:</span>
                 <?php endif ?>
@@ -97,7 +97,8 @@ $wertungText = ['s' => Yii::t('VereineModule.base', 'gewonnen'), 'u' => Yii::t('
             </a>
         <?php endforeach ?>
         <?php if ($weitere): ?>
-            <div class="fvh-weitere"><?= Yii::t('VereineModule.base', '+ {n} weitere Spiele heute', ['n' => $weitere]) ?></div>
+            <button type="button" class="fvh-weitere" aria-expanded="false" data-mehr="<?= Html::encode(Yii::t('VereineModule.base', '+ {n} weitere Spiele heute', ['n' => $weitere])) ?>"
+                    data-weniger="<?= Html::encode(Yii::t('VereineModule.base', 'Weniger anzeigen')) ?>"><?= Yii::t('VereineModule.base', '+ {n} weitere Spiele heute', ['n' => $weitere]) ?></button>
         <?php endif ?>
         <div class="fvh-alle">
             <?php if (count($seiten) > 1): ?>
@@ -105,7 +106,7 @@ $wertungText = ['s' => Yii::t('VereineModule.base', 'gewonnen'), 'u' => Yii::t('
                     <?= Html::a(Html::encode(Spielquellen::sport($v) . ': ' . ($v->bfv_name ?: $v->name)) . ' <i class="fa fa-angle-right"></i>', $v->getSpieleUrl()) ?>
                 <?php endforeach ?>
             <?php else: ?>
-                <?= Html::a(Yii::t('VereineModule.base', 'Spiele & Ergebnisse') . ' <i class="fa fa-angle-right"></i>', $seite) ?>
+                <?= Html::a(Yii::t('VereineModule.base', 'Spiele & Ergebnisse') . ' <i class="fa fa-angle-right"></i>', $seiteLink) ?>
             <?php endif ?>
         </div>
     </div>
@@ -123,11 +124,30 @@ $wertungText = ['s' => Yii::t('VereineModule.base', 'gewonnen'), 'u' => Yii::t('
             .then(function (html) {
                 if (html === null || !document.body.contains(box)) { return; }
                 if (html.trim() === '') { box.remove(); return; }
+                var offen = box.classList.contains('fvh-offen');
                 box.outerHTML = html;
+                var neu = document.getElementById('fvs-heute');
+                if (offen && neu) { neu.classList.add('fvh-offen'); var k = neu.querySelector('.fvh-weitere'); if (k) { k.textContent = k.dataset.weniger; k.setAttribute('aria-expanded', 'true'); } }
             }).catch(function () {});
     }
     window.fvsHeuteTimer = setInterval(laden, 60000);
     document.addEventListener('visibilitychange', function () { if (!document.hidden && window.fvsHeuteTimer) { laden(); } });
 })();
+JS);
+} ?>
+<?php if (Yii::$app->request instanceof \yii\web\Request && !Yii::$app->request->isAjax) {
+    // „+ n weitere“ auf- und zuklappen (auch nach dem Neuladen des Kastens)
+    $this->registerJs(<<<JS
+if (!window.fvsHeuteKlick) {
+    window.fvsHeuteKlick = true;
+    document.addEventListener('click', function (e) {
+        var k = e.target.closest && e.target.closest('#fvs-heute .fvh-weitere');
+        if (!k) { return; }
+        var box = document.getElementById('fvs-heute');
+        var offen = box.classList.toggle('fvh-offen');
+        k.textContent = offen ? k.dataset.weniger : k.dataset.mehr;
+        k.setAttribute('aria-expanded', offen ? 'true' : 'false');
+    });
+}
 JS);
 } ?>

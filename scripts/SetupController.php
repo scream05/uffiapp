@@ -1751,6 +1751,64 @@ class SetupController extends Controller
      * „Meine Übersicht“ mit standardmäßig ausgeschalteten Bereichen (setup/uebersicht-standard-test): Testvorschlag in
      * einer Transaktion, Übersicht eines normalen Kontos (Standard, eingeschaltet, wieder aus) und eines Gasts. Rollback.
      */
+    /**
+     * Reihenfolge der Kästen rechts in der Übersicht („Meine Übersicht“, Module::KAESTEN): Standard, eigene Reihenfolge,
+     * ungültige Schlüssel, zurück zum Standard, Wirkung auf die sortOrder (angemeldet/Gast). Mit Rollback.
+     *   scripts/run-setup.sh uebersicht-kaesten-test
+     */
+    public function actionUebersichtKaestenTest()
+    {
+        $ue = Yii::$app->getModule('uebersicht');
+        $M = \humhub\modules\uebersicht\Module::class;
+        $ok = 0;
+        $fehler = 0;
+        $gleich = function (string $was, $ist, $soll) use (&$ok, &$fehler) {
+            $bedingung = $ist === $soll;
+            $bedingung ? $ok++ : $fehler++;
+            $this->stdout(($bedingung ? 'ok   ' : 'FEHL ') . "$was\n" . (!$bedingung ? '     ist: ' . var_export($ist, true) . ', soll: ' . var_export($soll, true) . "\n" : ''));
+        };
+        $nutzer = User::find()->active()->one();
+        $standard = array_keys(array_filter($M::KAESTEN, fn($k) => class_exists($k[0])));
+        $sidebar = function () use ($M) {
+            $sb = new class { public $widgets = []; };
+            foreach ($M::KAESTEN as $k) {
+                $sb->widgets[] = [$k[0], [], ['sortOrder' => 77]];
+            }
+            $sb->widgets[] = ['humhub\modules\space\widgets\NewSpaces', [], ['sortOrder' => 400]];
+            \humhub\modules\uebersicht\Events::onDashboardSidebarRun((object)['sender' => $sb]);
+            $reihe = $sb->widgets;
+            usort($reihe, fn($a, $b) => $a[2]['sortOrder'] <=> $b[2]['sortOrder']);
+            return array_map(fn($w) => $w[0], $reihe);
+        };
+        $klasse = fn(string $k) => $M::KAESTEN[$k][0];
+        $tx = Yii::$app->db->beginTransaction();
+        try {
+            $ue->setKaesten($nutzer, $standard);
+            Yii::$app->cache->flush();
+            $gleich('Standardreihenfolge', $ue->getKaesten($nutzer), $standard);
+            $ue->setKaesten($nutzer, ['sprit', 'gibtsnicht', 'notdienste', 'sprit']);
+            Yii::$app->cache->flush();
+            $soll = array_merge(['sprit', 'notdienste'], array_values(array_diff($standard, ['sprit', 'notdienste'])));
+            $gleich('eigene Reihenfolge, Ungültiges und Doppeltes entfernt, Rest hinten an', $ue->getKaesten($nutzer), $soll);
+            Yii::$app->user->switchIdentity($nutzer);
+            $reihe = $sidebar();
+            $gleich('Seitenleiste: Spritpreise vor Notdiensten, „Neue Spaces“ bleibt hinten',
+                [array_search($klasse('sprit'), $reihe, true) < array_search($klasse('notdienste'), $reihe, true), end($reihe)],
+                [true, 'humhub\modules\space\widgets\NewSpaces']);
+            Yii::$app->user->switchIdentity(null);
+            $gleich('Gast: Reihenfolge unverändert (sortOrder der Module bleibt)', $sidebar(),
+                array_merge(array_values(array_map(fn($k) => $k[0], $M::KAESTEN)), ['humhub\modules\space\widgets\NewSpaces']));
+            $ue->setKaesten($nutzer, $standard);
+            Yii::$app->cache->flush();
+            $gleich('zurück zum Standard: keine Einstellung gespeichert', $ue->settings->user($nutzer)->get('kaesten'), null);
+        } finally {
+            $tx->rollBack();
+            Yii::$app->cache->flush();
+        }
+        $this->stdout("\n$ok ok, $fehler Fehler\n");
+        return $fehler ? ExitCode::UNSPECIFIED_ERROR : ExitCode::OK;
+    }
+
     public function actionUebersichtStandardTest()
     {
         $modul = Yii::$app->getModule('vorschlaege');

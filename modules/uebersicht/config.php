@@ -24,6 +24,8 @@ return [
         ['class' => 'humhub\modules\space\widgets\Sidebar', 'event' => 'afterRun', 'callback' => [Events::class, 'onSpaceSidebarAfterRun']],
         // „Neue Spaces“ in der Seitenleiste der Übersicht nur für Admins
         ['class' => 'humhub\modules\dashboard\widgets\Sidebar', 'event' => 'init', 'callback' => [Events::class, 'onDashboardSidebarInit']],
+        // Reihenfolge der Kästen nach „Meine Übersicht“ (nach allen init-Ereignissen, vor dem Sortieren)
+        ['class' => 'humhub\modules\dashboard\widgets\Sidebar', 'event' => 'run', 'callback' => [Events::class, 'onDashboardSidebarRun']],
         ['class' => LayoutAddons::class, 'event' => LayoutAddons::EVENT_BEFORE_RUN, 'callback' => [Events::class, 'onLayoutAddons']],
     ],
 ];

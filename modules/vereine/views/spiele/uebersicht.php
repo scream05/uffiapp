@@ -10,7 +10,7 @@ use humhub\modules\vereine\components\Bfv;
 use humhub\modules\vereine\components\Spielquellen;
 use humhub\modules\vereine\widgets\SpieltagKasten;
 
-$heute = SpieltagKasten::widget();
+$heute = SpieltagKasten::widget(['zeilen' => 0]);
 ?>
 <?= $this->render('_stil') ?>
 <style <?= Html::nonce() ?>>
