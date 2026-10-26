@@ -1148,6 +1148,23 @@ html.design-neu .dn-mehr .dn-ziel {
     box-shadow: none;
 }
 
+/* Namen nie mitten im Wort umbrechen („Mitteilungsbla-tt“ am iPhone, Kachel dort nur ~97 px breit):
+   einzeilig, Schrift wächst mit der Breite bis 13 px, notfalls Auslassungspunkte */
+html.design-neu .dn-mehr .dn-ziel {
+    min-width: 0;
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+html.design-neu .dn-mehr .dn-ziel-text {
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: clamp(11px, 3.05vw, 13px);
+    letter-spacing: -.01em;
+}
+
 html.design-neu .dn-mehr .dn-ziel:hover {
     box-shadow: var(--dn-schatten);
 }

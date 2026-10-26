@@ -1,4 +1,31 @@
 {
+    "mehr-namen-einzeilig": {
+        "en": {
+            "titel": "Names under \"More\" are back on one line",
+            "text": "On mobile, long names in the \"More\" tab such as \"Öffnungszeiten\" or \"Mitteilungsblatt\" were broken in the middle of a word. Now all names display neatly on one line.",
+            "quelle": "8e385e67e13d84c9f66e0226ddc163eb7f46eebb"
+        },
+        "uk": {
+            "titel": "Назви в розділі «Більше» знову в один рядок",
+            "text": "На телефоні довгі назви в розділі «Більше», наприклад «Години роботи» або «Міський вісник», раніше переносилися посеред слова. Тепер усі назви відображаються акуратно в один рядок.",
+            "quelle": "8e385e67e13d84c9f66e0226ddc163eb7f46eebb"
+        },
+        "ar": {
+            "titel": "أسماء قائمة „المزيد“ في سطر واحد مرة أخرى",
+            "text": "على الهاتف المحمول كانت الأسماء الطويلة في قسم „المزيد“، مثل „أوقات الفتح“ أو „نشرة البلدة“، تُكسر في منتصف الكلمة. الآن تظهر جميع الأسماء بشكل مرتب في سطر واحد.",
+            "quelle": "8e385e67e13d84c9f66e0226ddc163eb7f46eebb"
+        },
+        "tr": {
+            "titel": "„Mehr“'deki isimler yeniden tek satırda",
+            "text": "Telefonda „Mehr“ bölümündeki uzun isimler, örneğin „Öffnungszeiten“ veya „Mitteilungsblatt“, kelimenin ortasından bölünüyordu. Artık tüm isimler düzgün bir şekilde tek satırda görünüyor.",
+            "quelle": "8e385e67e13d84c9f66e0226ddc163eb7f46eebb"
+        },
+        "ru": {
+            "titel": "Названия в разделе «Ещё» снова в одну строку",
+            "text": "На телефоне длинные названия в разделе «Ещё», например «Часы работы» или «Информационный бюллетень», раньше переносились посреди слова. Теперь все названия аккуратно умещаются в одной строке.",
+            "quelle": "8e385e67e13d84c9f66e0226ddc163eb7f46eebb"
+        }
+    },
     "humhub-1-19": {
         "en": {
             "titel": "New version of the platform",

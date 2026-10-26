@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'mehr-namen-einzeilig', 'datum' => '2026-10-26', 'art' => 'behoben', 'popup' => false,
+        'titel' => 'Namen unter „Mehr“ wieder in einer Zeile',
+        'text' => 'Am Handy wurden lange Namen im Fach „Mehr“ wie „Öffnungszeiten“ oder „Mitteilungsblatt“ mitten im Wort umgebrochen. Jetzt stehen alle Namen sauber in einer Zeile.'],
     ['id' => 'humhub-1-19', 'datum' => '2026-10-26', 'art' => 'besser', 'popup' => false,
         'titel' => 'Neue Version der Plattform',
         'text' => 'Rund um Uffni läuft jetzt auf der neuen HumHub-Version 1.19. Für dich ändert sich fast nichts, alles bleibt an seinem Platz. Im Hintergrund ist die Plattform damit auf dem aktuellen Stand und bekommt weiter Sicherheits-Updates. Falls dir etwas komisch vorkommt, schreib es gern unter „Ideen & Vorschläge“.'],
