@@ -158,13 +158,44 @@ window.kiChat = function (root, opts) {
         if (opts.onAsk) opts.onAsk();
         add('user', esc(q));
         history.push({role: 'user', text: q});
-        var pending = add('model', '<em>…</em>');
+        var pending = add('model', '<div class="ki-status"><em>' + esc(t('Uffi überlegt …')) + '</em></div>');
         var data = new FormData();
         data.append('history', JSON.stringify(history));
+        data.append('stream', '1');
         data.append(yii.getCsrfParam(), yii.getCsrfToken());
+        // Antwort kommt als NDJSON stückweise ({text}, {status}), zuletzt die fertige Antwort ({answer, cards, …} oder {error})
+        var text = '', status = '', res = null, frame = null;
+        function zeigen() {
+            frame = null;
+            pending.innerHTML = (text ? render(text) : '') + (status || !text ? '<div class="ki-status"><em>' + esc(status || t('Uffi überlegt …')) + '</em></div>' : '');
+            if (!newestFirst && !(opts.pageScroll && opts.pageScroll())) box.scrollTop = box.scrollHeight;
+        }
+        function zeile(line) {
+            if (!line.trim()) return;
+            var ev = JSON.parse(line);
+            if (ev.text !== undefined) { text += ev.text; status = ''; }
+            else if (ev.status !== undefined) { status = ev.status; }
+            else { res = ev; return; }
+            if (!frame) frame = setTimeout(zeigen, 40); // nicht requestAnimationFrame: läuft in Hintergrund-Tabs nicht
+        }
         fetch(opts.askUrl, {method: 'POST', body: data, credentials: 'same-origin'})
-            .then(function (r) { return r.json(); })
-            .then(function (res) {
+            .then(function (r) {
+                if (!r.ok) throw new Error(r.status);
+                if (!r.body || !window.TextDecoder) return r.text().then(function (all) { all.split('\n').forEach(zeile); });
+                var reader = r.body.getReader(), decoder = new TextDecoder(), rest = '';
+                return (function lesen() {
+                    return reader.read().then(function (chunk) {
+                        rest += decoder.decode(chunk.value || new Uint8Array(), {stream: !chunk.done});
+                        var lines = rest.split('\n');
+                        rest = chunk.done ? '' : lines.pop();
+                        lines.forEach(zeile);
+                        return chunk.done ? null : lesen();
+                    });
+                })();
+            })
+            .then(function () {
+                if (frame) { clearTimeout(frame); frame = null; }
+                if (!res) throw new Error('unvollständig');
                 if (res.error) {
                     history.pop();
                     pending.innerHTML = '<span class="text-danger">' + esc(res.error) + '</span>';
@@ -179,6 +210,7 @@ window.kiChat = function (root, opts) {
                 if (res.usage && opts.onUsage) opts.onUsage(res.usage);
             })
             .catch(function () {
+                if (frame) { clearTimeout(frame); frame = null; }
                 history.pop();
                 pending.innerHTML = '<span class="text-danger">' + esc(t('Verbindungsfehler')) + '</span>';
             })

@@ -5,6 +5,9 @@ namespace humhub\modules\kiAssistent\components;
 use Anthropic\Client;
 use Anthropic\Core\Exceptions\APIConnectionException;
 use Anthropic\Core\Exceptions\APIStatusException;
+use Anthropic\Lib\Streaming\MessageAccumulator;
+use Anthropic\Messages\RawContentBlockDeltaEvent;
+use Anthropic\Messages\TextDelta;
 use Anthropic\Messages\Message;
 use Anthropic\Messages\ToolUseBlock;
 
@@ -24,10 +27,11 @@ class Claude
     }
 
     /**
+     * @param string|array $systemPrompt Text oder Teile (siehe generate)
      * @param array $history [['role' => 'user'|'model', 'text' => '…'], …], letzte Nachricht = Frage
      * @return array [Antworttext, Eingabe-Tokens, Ausgabe-Tokens]
      */
-    public function ask(string $systemPrompt, array $history): array
+    public function ask(string|array $systemPrompt, array $history): array
     {
         [$message, $in, $out] = $this->generate($systemPrompt, self::messages($history));
         $text = self::text($message);
@@ -39,23 +43,38 @@ class Claude
 
     /**
      * Ein Schritt mit Werkzeugen (Tool Use).
+     * @param string|array $systemPrompt Text oder Teile [fest, …, veränderlich]: alle Teile außer dem letzten liest Claude
+     *   aus dem Prompt-Cache (1 Stunde), solange sie sich nicht ändern – das spart Zeit und Kosten
      * @param array $messages Claude-„messages“ (frühere Antworten des Modells unverändert, inkl. Denk-Blöcken)
      * @param array $tools Werkzeuge (name, description, inputSchema)
+     * @param callable|null $onText fn(string $stueck): Antwort wird gestreamt, sichtbarer Text stückweise übergeben
      * @return array [Message, Eingabe-Tokens, Ausgabe-Tokens]
      */
-    public function generate(string $systemPrompt, array $messages, array $tools = []): array
+    public function generate(string|array $systemPrompt, array $messages, array $tools = [], ?callable $onText = null): array
     {
+        $params = [
+            'model' => $this->model,
+            'maxTokens' => 8000,
+            'system' => self::system($systemPrompt),
+            'messages' => $messages,
+            'tools' => $tools ?: null,
+            // Zusätzlich innerhalb einer Werkzeug-Runde: Stadtwissen und bisheriges Gespräch aus dem Cache (5 Minuten)
+            'cacheControl' => ['type' => 'ephemeral'],
+            'outputConfig' => ['effort' => 'medium'],
+        ];
         try {
-            $message = $this->client->messages->create(
-                model: $this->model,
-                maxTokens: 8000,
-                system: $systemPrompt,
-                messages: $messages,
-                tools: $tools ?: null,
-                // Stadtwissen und Werkzeuge bleiben innerhalb einer Werkzeug-Runde gleich: Wiederholungen aus dem Cache
-                cacheControl: ['type' => 'ephemeral'],
-                outputConfig: ['effort' => 'medium'],
-            );
+            if ($onText === null) {
+                $message = $this->client->messages->create(...$params);
+            } else {
+                $acc = MessageAccumulator::forMessages();
+                foreach ($this->client->messages->createStream(...$params) as $event) {
+                    $acc->accumulate($event);
+                    if ($event instanceof RawContentBlockDeltaEvent && $event->delta instanceof TextDelta) {
+                        $onText($event->delta->text);
+                    }
+                }
+                $message = $acc->message();
+            }
         } catch (APIConnectionException $e) {
             throw new \RuntimeException('Claude nicht erreichbar: ' . $e->getMessage(), 0, $e);
         } catch (APIStatusException $e) {
@@ -65,10 +84,24 @@ class Claude
             throw new \RuntimeException('Claude hat die Anfrage abgelehnt (' . ($message->stopDetails?->category ?? '?') . ')');
         }
         $u = $message->usage;
-        // Eingabe nach Preis gewichtet (Cache schreiben 1,25-fach, Cache lesen 0,1-fach), damit die Kostenbremse
-        // die tatsächlichen Kosten abbildet und nicht jede Werkzeug-Runde voll zählt
-        $in = $u->inputTokens + (int)round(1.25 * (int)$u->cacheCreationInputTokens + 0.1 * (int)$u->cacheReadInputTokens);
+        // Eingabe nach Preis gewichtet (Cache schreiben 1,25-fach, für 1 Stunde 2-fach, Cache lesen 0,1-fach), damit die
+        // Kostenbremse die tatsächlichen Kosten abbildet und nicht jede Werkzeug-Runde voll zählt
+        $stunde = (int)($u->cacheCreation?->ephemeral1hInputTokens ?? 0);
+        $in = $u->inputTokens + (int)round(1.25 * ((int)$u->cacheCreationInputTokens - $stunde) + 2 * $stunde
+                + 0.1 * (int)$u->cacheReadInputTokens);
         return [$message, $in, $u->outputTokens];
+    }
+
+    /** System-Prompt als Text-Blöcke, Cache-Marke (1 Stunde) hinter dem letzten festen Teil */
+    private static function system(string|array $prompt): string|array
+    {
+        if (is_string($prompt)) {
+            return $prompt;
+        }
+        $prompt = array_values(array_filter($prompt, fn($t) => $t !== ''));
+        return array_map(fn($t, $i) => ['type' => 'text', 'text' => $t]
+            + ($i === count($prompt) - 2 ? ['cacheControl' => ['type' => 'ephemeral', 'ttl' => '1h']] : []),
+            $prompt, array_keys($prompt));
     }
 
     /** Verlauf aus dem Browser (role user/model) als Claude-„messages“ */

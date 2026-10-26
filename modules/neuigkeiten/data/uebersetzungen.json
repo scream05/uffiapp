@@ -1,4 +1,31 @@
 {
+    "uffi-streaming": {
+        "en": {
+            "titel": "Uffi answers more smoothly",
+            "text": "Uffi now shows his answer piece by piece as he writes it, instead of making you wait until the end. While he is thinking or searching the directory, you can see what he is currently doing.",
+            "quelle": "3f4e17dae43e5aee68ebd3b2b6ac3819df229a39"
+        },
+        "uk": {
+            "titel": "Uffi відповідає швидше",
+            "text": "Uffi тепер показує свою відповідь уже під час написання, шматок за шматком, а не змушує тебе чекати до кінця. Поки він думає або шукає в каталозі, ти бачиш, що саме він зараз робить.",
+            "quelle": "3f4e17dae43e5aee68ebd3b2b6ac3819df229a39"
+        },
+        "ar": {
+            "titel": "أصبح أوفي يرد بسلاسة أكبر",
+            "text": "يعرض أوفي إجابته الآن أثناء كتابتها خطوة بخطوة، بدلاً من أن يجعلك تنتظر حتى النهاية. وأثناء تفكيره أو بحثه في الدليل، ترى ما يفعله في تلك اللحظة.",
+            "quelle": "3f4e17dae43e5aee68ebd3b2b6ac3819df229a39"
+        },
+        "tr": {
+            "titel": "Uffi daha akıcı yanıt veriyor",
+            "text": "Uffi artık yanıtını yazarken parça parça gösteriyor; sonuna kadar beklemen gerekmiyor. Düşünürken veya rehberde ararken ne yaptığını hemen görebilirsin.",
+            "quelle": "3f4e17dae43e5aee68ebd3b2b6ac3819df229a39"
+        },
+        "ru": {
+            "titel": "Uffi отвечает быстрее",
+            "text": "Uffi теперь показывает свой ответ по мере написания, по частям, и тебе не нужно ждать до самого конца. Пока он думает или ищет в справочнике, ты видишь, что он сейчас делает.",
+            "quelle": "3f4e17dae43e5aee68ebd3b2b6ac3819df229a39"
+        }
+    },
     "kaesten-sortieren": {
         "en": {
             "titel": "Boxes on the right can now be arranged yourself",

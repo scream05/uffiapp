@@ -47,6 +47,7 @@ class FloatingChat extends Widget
             'Was war falsch oder hat gefehlt? (optional)' => Yii::t('KiAssistentModule.base', 'Was war falsch oder hat gefehlt? (optional)'),
             'Senden' => Yii::t('KiAssistentModule.base', 'Senden'),
             'Verbindungsfehler' => Yii::t('KiAssistentModule.base', 'Verbindungsfehler'),
+            'Uffi überlegt …' => Yii::t('KiAssistentModule.base', 'Uffi überlegt …'),
         ];
         $view->registerJs('window.kiChatText = ' . json_encode($texte, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) . ';',
             \yii\web\View::POS_HEAD, 'ki-chat-texte');

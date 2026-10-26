@@ -35,7 +35,7 @@ class VereineController extends Controller
             $fehler = $fehler || (bool)preg_grep('/^!/', $log);
             $this->stdout(date('Y-m-d H:i:s') . " {$verein->name}: " . implode('; ', $log) . "\n");
         }
-        Yii::$app->cache->delete('ki-assistent-context');
+        Yii::$app->cache->delete('ki-assistent-context-aktuell'); // Spielstände stehen im veränderlichen Teil
         return $fehler ? ExitCode::UNSPECIFIED_ERROR : ExitCode::OK;
     }
 
@@ -131,7 +131,7 @@ class VereineController extends Controller
             $log = ['! ' . $e->getMessage()];
         }
         $this->stdout(implode("\n", $log) . "\n");
-        Yii::$app->cache->delete('ki-assistent-context');
+        Yii::$app->cache->delete('ki-assistent-context-aktuell'); // Spielstände stehen im veränderlichen Teil
         return preg_grep('/^!/', $log) ? ExitCode::UNSPECIFIED_ERROR : ExitCode::OK;
     }
 }

@@ -11,7 +11,8 @@ use yii\helpers\Url;
 
 /**
  * Wissen für den Assistenten: nur öffentliche Inhalte der Stadt-Spaces, keine Nutzerdaten.
- * Wird 10 Minuten zwischengespeichert, die Quellen ändern sich höchstens stündlich.
+ * Wird 10 Minuten zwischengespeichert, die Quellen ändern sich höchstens stündlich. Aufgeteilt in einen stabilen und
+ * einen laufend veränderlichen Teil (Prompt-Cache von Claude, siehe ChatController::systemPrompt).
  */
 class Context
 {
@@ -20,17 +21,49 @@ class Context
     /** Veranstaltungen so viele Tage vollständig im Prompt; spätere (und Betriebe/Vereine im Detail) holt Uffi über verzeichnis_suchen */
     public const TAGE_IM_PROMPT = 14;
 
+    /** Daten für den Assistenten in Prompt-Reihenfolge (zum Anzeigen und Testen) */
     public static function get(): string
     {
-        // Gemeinsamer Teil zwischengespeichert; Mängelmeldungen je Nutzer (nur was er im Mängelmelder lesen darf)
-        $base = Yii::$app->cache->getOrSet('ki-assistent-context', fn() => self::build(), 600);
-        $maengel = self::maengel();
-        // Datum und Uhrzeit außerhalb des Zwischenspeichers (Notdienst wechselt morgens)
-        return "Heute ist " . self::DAYS[date('w')] . ', ' . date('d.m.Y') . ', jetzt ist es ' . date('G:i') . " Uhr.\n\n"
-            . $base . ($maengel !== null ? "\n\n" . $maengel : '')
-            // Spritpreise ändern sich laufend: nicht im 10-Minuten-Speicher, eigener Zwischenspeicher im Modul
-            . (Yii::$app->hasModule('tanken') && Yii::$app->getModule('tanken')->aktiv()
-                ? "\n\n" . \humhub\modules\tanken\components\Spritpreise::forAssistant() : '');
+        return self::stabil() . "\n\n" . self::aktuell();
+    }
+
+    /**
+     * Teil, der sich höchstens täglich ändert (Abfuhr, Termine, Nachrichten, Verzeichnisse …): steht im Prompt vor
+     * allem Veränderlichen, damit Claude ihn aus dem Prompt-Cache liest, solange sich der Text nicht ändert.
+     */
+    public static function stabil(): string
+    {
+        return Yii::$app->cache->getOrSet('ki-assistent-context', fn() => self::build(), 600);
+    }
+
+    /** Teil, der sich laufend ändert: Uhrzeit, Warnungen, Sport, Mängel (je Nutzer), Spritpreise */
+    public static function aktuell(): string
+    {
+        $parts = [
+            // Datum und Uhrzeit außerhalb des Zwischenspeichers (Notdienst wechselt morgens)
+            "Heute ist " . self::DAYS[date('w')] . ', ' . date('d.m.Y') . ', jetzt ist es ' . date('G:i') . " Uhr.",
+            // Warnungen (Abruf beim Bund) und Spielstände 10 Minuten zwischengespeichert, Stand-Uhrzeit ändert sich damit
+            Yii::$app->cache->getOrSet('ki-assistent-context-aktuell', fn() => self::buildAktuell(), 600),
+        ];
+        // Mängelmeldungen je Nutzer (nur was er im Mängelmelder lesen darf)
+        if (($maengel = self::maengel()) !== null) {
+            $parts[] = $maengel;
+        }
+        // Spritpreise ändern sich laufend: eigener Zwischenspeicher im Modul
+        if (Yii::$app->hasModule('tanken') && Yii::$app->getModule('tanken')->aktiv()) {
+            $parts[] = \humhub\modules\tanken\components\Spritpreise::forAssistant();
+        }
+        return implode("\n\n", $parts);
+    }
+
+    private static function buildAktuell(): string
+    {
+        $parts = [Warnungen::forAssistant()];
+        if (Yii::$app->hasModule('vereine') && Yii::$app->db->getTableSchema('verein_spiel') !== null
+            && ($sport = \humhub\modules\vereine\components\Bfv::forAssistant()) !== null) {
+            $parts[] = $sport; // alle Sportarten mit Spielquelle
+        }
+        return implode("\n\n", $parts);
     }
 
     /**
@@ -79,8 +112,6 @@ class Context
             $parts[] = \humhub\modules\oeffnungszeiten\components\Zeiten::forAssistant();
         }
 
-        $parts[] = Warnungen::forAssistant();
-
         if (Yii::$app->hasModule('vorschlaege') && ($v = \humhub\modules\vorschlaege\components\Uffi::forAssistant()) !== null) {
             $parts[] = $v;
         }
@@ -118,11 +149,6 @@ class Context
                 $parts[] = "## Vereinsverzeichnis der Community (nur Namen, Ortsteil in Klammern außer Kernstadt; Link und Details mit verzeichnis_suchen, "
                     . "Bereich vereine, Details zu passenden Vereinen ggf. auch weiter unten bei den Informationen)\n" . self::namensliste($vereine);
             }
-        }
-
-        if (Yii::$app->hasModule('vereine') && Yii::$app->db->getTableSchema('verein_spiel') !== null
-            && ($sport = \humhub\modules\vereine\components\Bfv::forAssistant()) !== null) {
-            $parts[] = $sport; // alle Sportarten mit Spielquelle
         }
 
         if (Yii::$app->hasModule('gewerbe') && Yii::$app->getModule('gewerbe') !== null

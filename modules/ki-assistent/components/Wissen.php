@@ -114,8 +114,9 @@ class Wissen
     /**
      * Wissensteil des Prompts für die Frage (bei Rückfragen auch die vorherige Frage berücksichtigen).
      * Mit $embed (Frage → [Modell, Vektor]) Suche nach Bedeutung, sonst/ersatzweise Stichwortsuche.
+     * @param bool $immer Seiten mit „immer: ja“ mitschicken (false, wenn sie über immer() schon im Prompt stehen)
      */
-    public static function forQuestion(string $question, ?callable $embed = null): string
+    public static function forQuestion(string $question, ?callable $embed = null, bool $immer = true): string
     {
         $chunks = self::visible(self::chunks());
         if ($chunks === []) {
@@ -134,7 +135,25 @@ class Wissen
             }
         }
         [$selected, $related] = $ranked ?? self::rankByKeywords($chunks, $question);
-        return self::build($chunks, $selected, $related);
+        return self::build($chunks, $selected, $related, $immer);
+    }
+
+    /** Nur die Seiten mit „immer: ja“ (ändern sich höchstens mit dem nächtlichen Abgleich: fester Teil des Prompts) */
+    public static function immer(): string
+    {
+        $chunks = self::visible(self::chunks());
+        $byPage = [];
+        foreach ($chunks as $i => $c) {
+            if ($c['immer']) {
+                $byPage[$c['rel']][] = $i;
+            }
+        }
+        if ($byPage === []) {
+            return '';
+        }
+        return "## Grundinformationen von der Website der Stadt Uffenheim (www.uffenheim.de)\n"
+            . "Bei Antworten daraus immer die Quelle der jeweiligen Seite verlinken.\n\n"
+            . implode("\n\n", array_map(fn($ids) => self::render($chunks, $ids, true), $byPage));
     }
 
     /**
@@ -236,7 +255,7 @@ class Wissen
         return [array_keys(array_filter($scored, fn($score) => $score >= 0.4 * $best)), array_keys($scored)];
     }
 
-    private static function build(array $chunks, array $selected, array $related): string
+    private static function build(array $chunks, array $selected, array $related, bool $immer = true): string
     {
         $byPage = [];
         foreach ($chunks as $i => $c) {
@@ -263,7 +282,7 @@ class Wissen
 
         $out = [];
         foreach ($byPage as $rel => $ids) {
-            if ($chunks[$ids[0]]['immer']) {
+            if ($immer && $chunks[$ids[0]]['immer']) {
                 $out[] = self::render($chunks, $ids, true);
             }
         }

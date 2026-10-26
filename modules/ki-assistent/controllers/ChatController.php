@@ -53,6 +53,7 @@ class ChatController extends Controller
     /**
      * Erwartet POST history = JSON [{role, text}, …] (letzter Eintrag = Frage des Nutzers).
      * Der Verlauf liegt nur im Browser, auf dem Server wird nichts davon gespeichert.
+     * Mit POST stream=1 kommt die Antwort als NDJSON stückweise, sobald Claude schreibt (siehe streamen()).
      */
     public function actionAsk()
     {
@@ -88,25 +89,57 @@ class ChatController extends Controller
             return $this->asJson(['error' => $grund]);
         }
 
-        try {
-            [$answer, $cards, $memo, $in, $out] = self::converse(new Claude($key, $this->module->getModel()),
-                self::systemPrompt(self::searchText($history)), $history);
-        } catch (\Throwable $e) {
-            // Nur die Fehlermeldung protokollieren, nie den Inhalt der Frage
-            Yii::error('KI-Assistent: ' . $e->getMessage(), 'ki-assistent');
-            return $this->asJson(['error' => Yii::t('KiAssistentModule.base', 'Uffi ist gerade nicht erreichbar. Bitte versuch es später noch einmal.')]);
+        $antworten = function (?callable $senden) use ($key, $history) {
+            try {
+                [$answer, $cards, $memo, $in, $out] = self::converse(new Claude($key, $this->module->getModel()),
+                    self::systemPrompt(self::searchText($history)), $history, $senden);
+            } catch (\Throwable $e) {
+                // Nur die Fehlermeldung protokollieren, nie den Inhalt der Frage
+                Yii::error('KI-Assistent: ' . $e->getMessage(), 'ki-assistent');
+                return ['error' => Yii::t('KiAssistentModule.base', 'Uffi ist gerade nicht erreichbar. Bitte versuch es später noch einmal.')];
+            }
+            $this->module->addUsage($in, $out);
+            // „memo“ hängt der Browser an den Verlauf an, damit die KI später weiß, welche Aktionen schon liefen
+            return ['answer' => $answer, 'cards' => $cards, 'memo' => $memo,
+                'usage' => Yii::$app->user->isAdmin() ? $this->module->getUsage() : null]; // Zähler nur für Admins
+        };
+        if (Yii::$app->request->post('stream') === '1') {
+            return $this->streamen($antworten);
         }
-        $this->module->addUsage($in, $out);
-        // „memo“ hängt der Browser an den Verlauf an, damit die KI später weiß, welche Aktionen schon liefen
-        return $this->asJson(['answer' => $answer, 'cards' => $cards, 'memo' => $memo,
-            'usage' => Yii::$app->user->isAdmin() ? $this->module->getUsage() : null]); // Zähler nur für Admins
+        return $this->asJson($antworten(null));
+    }
+
+    /**
+     * Antwort als NDJSON (eine JSON-Zeile je Ereignis), am Yii-Response vorbei direkt an den Browser:
+     * {"text": "…"} Textstück, {"status": "…"} Uffi führt gerade eine Aktion aus, zuletzt die vollständige Antwort
+     * wie bei actionAsk ohne Streaming ({"answer", "cards", "memo", "usage"} bzw. {"error"}).
+     */
+    private function streamen(callable $antworten)
+    {
+        // Sitzung freigeben, sonst warten andere Seitenaufrufe desselben Nutzers auf das Ende der Antwort
+        Yii::$app->session->close();
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+        header('Content-Type: application/x-ndjson; charset=UTF-8');
+        header('Cache-Control: no-store');
+        header('X-Accel-Buffering: no');
+        header('X-Content-Type-Options: nosniff');
+        $senden = function (array $daten) {
+            echo json_encode($daten, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
+            flush();
+        };
+        $senden($antworten($senden));
+        Yii::$app->response->isSent = true; // Yii schickt danach nichts mehr hinterher
+        return null;
     }
 
     /**
      * Gespräch mit Werkzeugen: die KI darf mehrmals Aktionen aufrufen, bis sie eine Textantwort gibt.
+     * @param callable|null $senden fn(array): gestreamt – Textstücke als ['text' => …], Aktionen als ['status' => …]
      * @return array [Antwort, Karten, Memo für den Verlauf, Eingabe-Tokens, Ausgabe-Tokens]
      */
-    public static function converse(Claude $claude, string $systemPrompt, array $history): array
+    public static function converse(Claude $claude, string|array $systemPrompt, array $history, ?callable $senden = null): array
     {
         $messages = Claude::messages($history);
         $tools = Aktionen::declarations();
@@ -116,8 +149,18 @@ class ChatController extends Controller
         // Text, den Claude zusammen mit einem Aktionsaufruf schreibt, gehört zur Antwort (sonst bliebe oft nur
         // „Unter dieser Antwort erscheint der Knopf …“ aus der letzten Runde übrig)
         $teile = [];
+        $geschrieben = false; // schon Text gestreamt: vor dem Text der nächsten Runde eine Leerzeile wie in der Antwort
         for ($round = 0; $round < 5; $round++) {
-            [$message, $i, $o] = $claude->generate($systemPrompt, $messages, $round < 4 ? $tools : []);
+            $neueRunde = true;
+            $onText = $senden === null ? null : function (string $stueck) use ($senden, &$geschrieben, &$neueRunde) {
+                if ($neueRunde && $geschrieben) {
+                    $stueck = "\n\n" . ltrim($stueck);
+                }
+                $neueRunde = false;
+                $geschrieben = true;
+                $senden(['text' => $stueck]);
+            };
+            [$message, $i, $o] = $claude->generate($systemPrompt, $messages, $round < 4 ? $tools : [], $onText);
             $in += $i;
             $out += $o;
             $calls = Claude::toolCalls($message);
@@ -130,6 +173,11 @@ class ChatController extends Controller
             $messages[] = ['role' => 'assistant', 'content' => $message->content]; // unverändert, inkl. Denk-Blöcken
             $results = [];
             foreach ($calls as [$id, $name, $args]) {
+                if ($senden !== null) {
+                    $senden(['status' => $name === 'verzeichnis_suchen'
+                        ? Yii::t('KiAssistentModule.base', 'Uffi sucht im Verzeichnis …')
+                        : Yii::t('KiAssistentModule.base', 'Uffi bereitet die Aktion vor …')]);
+                }
                 [$result, $card] = Aktionen::run($name, $args);
                 if ($card !== null) {
                     $cards[] = $card;
@@ -213,7 +261,11 @@ class ChatController extends Controller
         return implode(' ', array_slice($questions, -2));
     }
 
-    public static function systemPrompt(string $question = ''): string
+    /**
+     * @return array [fester Teil: Regeln, Daten und Stadtwissen, die sich höchstens täglich ändern (Prompt-Cache),
+     *   veränderlicher Teil: Uhrzeit, Warnungen, Sport, Mängel, Spritpreise und das Stadtwissen zur Frage]
+     */
+    public static function systemPrompt(string $question = ''): array
     {
         $embed = fn($q) => Embeddings::query($q);
         $name = Yii::$app->name;
@@ -268,6 +320,7 @@ TXT;
         $prompt = str_replace('{GAST}', $gast, $prompt);
         $sprachen = ['de' => 'Deutsch', 'en' => 'Englisch', 'uk' => 'Ukrainisch', 'ar' => 'Arabisch', 'tr' => 'Türkisch', 'ru' => 'Russisch'];
         $prompt = str_replace('{SPRACHE}', $sprachen[substr(Yii::$app->language, 0, 2)] ?? 'Deutsch', $prompt);
-        return str_replace('{FORMULARE}', Formulare::catalog(), $prompt) . "\n" . Context::get() . "\n\n" . Wissen::forQuestion($question, $embed);
+        return [str_replace('{FORMULARE}', Formulare::catalog(), $prompt) . "\n" . Context::stabil() . "\n\n" . Wissen::immer(),
+            Context::aktuell() . "\n\n" . Wissen::forQuestion($question, $embed, false)];
     }
 }

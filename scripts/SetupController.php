@@ -985,7 +985,8 @@ class SetupController extends Controller
     public function actionKi($question = null, $dryRun = 0)
     {
         $module = Yii::$app->getModule('ki-assistent');
-        $prompt = \humhub\modules\kiAssistent\controllers\ChatController::systemPrompt((string)$question);
+        $teile = \humhub\modules\kiAssistent\controllers\ChatController::systemPrompt((string)$question);
+        $prompt = implode("\n\n", $teile);
         if ($question === null) {
             $this->stdout($prompt . "\n\n" . mb_strlen($prompt) . " Zeichen, Modell " . $module->getModel() . "\n");
             return ExitCode::OK;
@@ -1001,7 +1002,7 @@ class SetupController extends Controller
         }
         $t = microtime(true);
         [$answer, $in, $out] = (new \humhub\modules\kiAssistent\components\Claude($module->getApiKey(), $module->getModel()))
-            ->ask($prompt, [['role' => 'user', 'text' => $question]]);
+            ->ask($teile, [['role' => 'user', 'text' => $question]]);
         $module->addTestUsage($in, $out);
         $this->stdout($answer . "\n\n(" . round(microtime(true) - $t, 1) . " s, $in Eingabe- / $out Ausgabe-Tokens)\n");
         return ExitCode::OK;
