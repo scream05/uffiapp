@@ -12,6 +12,7 @@
  */
 
 use humhub\helpers\Html;
+use yii\helpers\Url;
 use humhub\modules\vorschlaege\assets\VorschlagAsset;
 use humhub\modules\vorschlaege\models\Vorschlag;
 use humhub\modules\vorschlaege\widgets\VorschlagAddon;
@@ -38,7 +39,7 @@ foreach (array_keys(Vorschlag::STATUSES) as $key) {
         <p class="help-block"><?= Yii::t('VorschlaegeModule.base', 'Was fehlt dir auf der Plattform, was könnte besser laufen? Reich deine Idee ein, stimm bei anderen dafür oder dagegen und diskutier in den Kommentaren mit. Das Team setzt den Stand, damit alle sehen, was daraus wird.') ?></p>
         <?php if (Yii::$app->user->isGuest): ?>
             <p class="help-block"><?= Yii::t('VorschlaegeModule.base', 'Zum Einreichen, Abstimmen und Kommentieren bitte {anmelden}.',
-                ['anmelden' => Html::a(Yii::t('VorschlaegeModule.base', 'anmelden'), ['/user/auth/login'])]) ?></p>
+                ['anmelden' => Html::a(Yii::t('VorschlaegeModule.base', 'anmelden'), ['/user/auth/login'], ['data-pjax-prevent' => 1, 'data-action-click' => 'ui.modal.load', 'data-action-url' => Url::to(['/user/auth/login'])])]) ?></p>
         <?php endif ?>
 
         <nav class="vs-filter" aria-label="<?= Yii::t('VorschlaegeModule.base', 'Nach Stand filtern') ?>">

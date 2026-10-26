@@ -8,6 +8,7 @@
  */
 
 use humhub\helpers\Html;
+use yii\helpers\Url;
 use humhub\modules\content\widgets\richtext\RichText;
 use humhub\modules\gewerbe\components\Logo;
 use humhub\modules\gewerbe\components\Oeffnungszeiten;
@@ -210,7 +211,7 @@ $stand = $betrieb->getStand(true);
 <div class="panel panel-default">
     <div class="panel-body">
         <?php if (Yii::$app->user->isGuest): ?>
-            <p class="text-muted"><?= Yii::t('GewerbeModule.base', 'Das ist dein Betrieb? {link}, um die Seite selbst zu pflegen.', ['link' => Html::a(Yii::t('GewerbeModule.base', 'Melde dich an'), ['/user/auth/login'])]) ?></p>
+            <p class="text-muted"><?= Yii::t('GewerbeModule.base', 'Das ist dein Betrieb? {link}, um die Seite selbst zu pflegen.', ['link' => Html::a(Yii::t('GewerbeModule.base', 'Melde dich an'), ['/user/auth/login'], ['data-pjax-prevent' => 1, 'data-action-click' => 'ui.modal.load', 'data-action-url' => Url::to(['/user/auth/login'])])]) ?></p>
         <?php elseif ($own && $own->status === BetriebVerwalter::STATUS_ANGEFRAGT): ?>
             <p class="text-muted"><i class="fa fa-hourglass-half" aria-hidden="true"></i> <?= Yii::t('GewerbeModule.base', 'Deine Anfrage, diesen Betrieb zu verwalten, wartet auf Bestätigung.') ?></p>
         <?php else: ?>

@@ -1,4 +1,31 @@
 {
+    "login-fenster-schliessen": {
+        "en": {
+            "titel": "Login window can be closed again",
+            "text": "If you tap \"Sign in for details\" on the defect map without an account, the sign-in window now opens properly above the page and can be closed again with the X. This also applies to the sign-in links for suggestions and businesses.",
+            "quelle": "7e35baf0c08cf7ee56b481660319d0169a385a7d"
+        },
+        "uk": {
+            "titel": "Вікно входу тепер можна знову закрити",
+            "text": "Якщо ти без облікового запису натискаєш на мапі дефектів «Увійти, щоб побачити деталі», вікно входу тепер відкривається як слід поверх сторінки і його можна закрити хрестиком. Так само працює і посилання для входу у пропозиціях та на сторінках підприємств.",
+            "quelle": "7e35baf0c08cf7ee56b481660319d0169a385a7d"
+        },
+        "ar": {
+            "titel": "يمكن الآن إغلاق نافذة تسجيل الدخول مرة أخرى",
+            "text": "إذا نقرت، دون حساب، على „Anmelden für Details“ في خريطة العيوب، تفتح نافذة تسجيل الدخول الآن فوق الصفحة بشكل صحيح، ويمكنك إغلاقها مرة أخرى بزر الإغلاق (×). ينطبق ذلك أيضاً على روابط تسجيل الدخول في الاقتراحات والمؤسسات.",
+            "quelle": "7e35baf0c08cf7ee56b481660319d0169a385a7d"
+        },
+        "tr": {
+            "titel": "Giriş penceresi tekrar kapatılabiliyor",
+            "text": "Hesabın yokken Sorun haritasında „Ayrıntılar için giriş yap“ düğmesine dokunursan, giriş penceresi artık sayfanın üzerinde düzgün açılıyor ve çarpı işaretiyle tekrar kapatılabiliyor. Bu durum öneriler ve işletmelerdeki giriş bağlantıları için de geçerli.",
+            "quelle": "7e35baf0c08cf7ee56b481660319d0169a385a7d"
+        },
+        "ru": {
+            "titel": "Окно входа теперь можно закрыть",
+            "text": "Если ты без аккаунта нажимаешь на карте проблем «Войти для подробностей», окно входа теперь открывается поверх страницы как следует и его можно закрыть крестиком. Это касается и ссылок на вход в предложениях и у заведений.",
+            "quelle": "7e35baf0c08cf7ee56b481660319d0169a385a7d"
+        }
+    },
     "uffi-links": {
         "en": {
             "titel": "Links at Uffi easier to spot",

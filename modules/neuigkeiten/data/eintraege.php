@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'login-fenster-schliessen', 'datum' => '2026-10-26', 'art' => 'behoben', 'popup' => false,
+        'titel' => 'Anmeldefenster lässt sich wieder schließen',
+        'text' => 'Wenn du ohne Konto auf der Mängelkarte „Anmelden für Details“ antippst, öffnet sich das Anmeldefenster jetzt richtig über der Seite und lässt sich mit dem Kreuz wieder schließen. Das gilt auch für die Anmelde-Links bei den Vorschlägen und den Betrieben.'],
     ['id' => 'uffi-links', 'datum' => '2026-10-26', 'art' => 'besser', 'popup' => false,
         'link' => [null, '/ki-assistent/chat'],
         'titel' => 'Links bei Uffi besser sichtbar',

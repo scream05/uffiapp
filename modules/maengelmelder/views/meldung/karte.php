@@ -81,7 +81,7 @@ maengelReady(function () {
         var mk = L.circleMarker([m.lat, m.lng], {radius: 9, color: '#fff', weight: 2, fillColor: m.farbe, fillOpacity: 0.9})
             .bindPopup('<strong>' + esc(m.titel) + '</strong><br><span class="mm-status mm-status-' + esc(m.status) + '">' + esc(m.statusLabel) + '</span> · ' + esc(fmt(t.gemeldet, {datum: m.datum}))
                 + (m.auch ? '<br>' + esc(m.auch === 1 ? t.einePerson : fmt(t.personen, {n: m.auch})) : '')
-                + (m.url ? '<br><a href="' + esc(m.url) + '">' + esc(t.zurMeldung) + '</a>' : '<br><a href="' + esc(loginUrl) + '">' + esc(t.anmelden) + '</a>'));
+                + (m.url ? '<br><a href="' + esc(m.url) + '">' + esc(t.zurMeldung) + '</a>' : '<br><a href="' + esc(loginUrl) + '" data-pjax-prevent data-action-click="ui.modal.load" data-action-url="' + esc(loginUrl) + '">' + esc(t.anmelden) + '</a>'));
         var isClosed = m.status === 'erledigt' || m.status === 'abgelehnt';
         if (!isClosed || isFocus) mk.addTo(map);
         if (isClosed && !isFocus) closed.push(mk);
