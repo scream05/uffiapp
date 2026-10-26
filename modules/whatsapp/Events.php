@@ -3,6 +3,7 @@
 namespace humhub\modules\whatsapp;
 
 use humhub\modules\whatsapp\models\Entwurf;
+use humhub\modules\ui\menu\MenuLink;
 use Yii;
 
 class Events
@@ -16,14 +17,13 @@ class Events
                 return;
             }
             $open = Entwurf::find()->where(['status' => Entwurf::STATUS_OFFEN])->count();
-            $event->sender->addItem([
+            $event->sender->addEntry(new MenuLink([
                 'label' => 'WhatsApp-Eingang' . ($open ? " ($open)" : ''),
-                'group' => 'modules',
                 'url' => $space->createUrl('/whatsapp/eingang/index'),
-                'icon' => '<i class="fa fa-whatsapp"></i>',
+                'icon' => 'whatsapp',
                 'isActive' => Yii::$app->controller->module && Yii::$app->controller->module->id === 'whatsapp',
                 'sortOrder' => 95,
-            ]);
+            ]));
         } catch (\Throwable $e) {
             Yii::error($e);
         }

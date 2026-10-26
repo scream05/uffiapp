@@ -13,13 +13,13 @@ class Events
     public static function onAccountMenuInit($event)
     {
         try {
-            $event->sender->addItem([
+            $event->sender->addEntry(new MenuLink([
                 'label' => Yii::t('AbfuhrModule.base', 'Abfuhr-Erinnerung'),
                 'url' => Url::to(['/abfuhr/einstellungen']),
                 'icon' => 'trash',
                 'sortOrder' => 450,
                 'isActive' => Yii::$app->controller->module && Yii::$app->controller->module->id === 'abfuhr',
-            ]);
+            ]));
         } catch (\Throwable $e) {
             Yii::error($e);
         }
@@ -33,14 +33,13 @@ class Events
             if (!self::imAbfallSpace($space)) {
                 return;
             }
-            $event->sender->addItem([
+            $event->sender->addEntry(new MenuLink([
                 'label' => Yii::t('AbfuhrModule.base', 'Erinnerung einrichten'),
-                'group' => 'modules',
                 'url' => Url::to(['/abfuhr/einstellungen']),
-                'icon' => '<i class="fa fa-bell"></i>',
+                'icon' => 'bell',
                 'sortOrder' => 50,
                 'isActive' => false,
-            ]);
+            ]));
         } catch (\Throwable $e) {
             Yii::error($e);
         }

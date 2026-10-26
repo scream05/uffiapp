@@ -26,12 +26,18 @@ if [ "${1:-}" = pdfjs ]; then
   echo "pdf.js $V in modules/mitteilungsblatt/pdfjs"
   exit 0
 fi
-# App-/Browser-Icon (design/icon: rund mit transparenten Ecken für Browser/Android, eckig für Apple) nach uploads/icon;
-# HumHub nimmt je Größe zuerst uploads/icon/<n>x<n>.png, sonst verkleinert es icon.png nach assets/siteicons
+# App-/Browser-Icon (design/icon: rund mit transparenten Ecken für Browser/Android, eckig für Apple) nach uploads/icon.
+# HumHub (ab 1.19) legt jede Größe als icon_<xxh32 der Optionen>.png neben icon.png ab und rechnet sie nur aus, wenn die
+# Datei fehlt – unsere fertigen PNGs kommen deshalb unter genau diesen Namen dorthin (152/167/180 eckig, Rest rund)
 if [ "${1:-}" = icon ]; then
-  docker compose exec -T -u www-data humhub sh -c 'rm -rf /data/uploads/icon /data/assets/siteicons; mkdir -p /data/uploads/icon'
-  docker compose cp design/icon/. humhub:/data/uploads/icon/ >/dev/null
-  docker compose exec -T humhub sh -c 'rm -f /data/uploads/icon/*.svg; chown -R www-data:www-data /data/uploads/icon'
+  docker compose exec -T -u www-data humhub sh -c 'rm -rf /data/uploads/icon; mkdir -p /data/uploads/icon'
+  docker compose cp design/icon/icon.png humhub:/data/uploads/icon/icon.png >/dev/null
+  for n in 32 96 152 167 180 192; do
+    name=$(docker compose exec -T humhub php -r "echo 'icon_' . hash('xxh32', json_encode(['square' => $n])) . '.png';")
+    docker compose cp "design/icon/${n}x${n}.png" "humhub:/data/uploads/icon/$name" >/dev/null
+  done
+  docker compose exec -T humhub chown -R www-data:www-data /data/uploads/icon
+  docker compose exec -T -u www-data humhub /app/yii cache/flush-all >/dev/null
   echo "Icon gesetzt: $(docker compose exec -T humhub ls /data/uploads/icon | tr '\n' ' ')"
   exit 0
 fi

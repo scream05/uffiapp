@@ -147,8 +147,7 @@ class Vorschlag extends ActiveRecord
 
         $comment = new Comment();
         $comment->message = '**Stand: ' . $this->getLabel() . '**' . ($hinweis !== null ? " – $hinweis" : '');
-        $comment->object_model = Post::class;
-        $comment->object_id = $this->content->object_id;
+        $comment->content_id = $this->content->id;
         $comment->save();
         return true;
     }

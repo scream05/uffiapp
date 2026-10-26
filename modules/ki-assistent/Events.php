@@ -3,6 +3,7 @@
 namespace humhub\modules\kiAssistent;
 
 use Yii;
+use humhub\modules\ui\menu\MenuLink;
 use yii\helpers\Url;
 
 class Events
@@ -21,13 +22,13 @@ class Events
     public static function onTopMenuInit($event)
     {
         try {
-            $event->sender->addItem([
+            $event->sender->addEntry(new MenuLink([
                 'label' => 'Uffi',
                 'url' => Url::to(['/ki-assistent/chat']),
-                'icon' => '<i class="fa fa-comments"></i>',
+                'icon' => 'comments',
                 'isActive' => Yii::$app->controller->module && Yii::$app->controller->module->id === 'ki-assistent',
                 'sortOrder' => 900,
-            ]);
+            ]));
         } catch (\Throwable $e) {
             Yii::error($e);
         }

@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'humhub-1-19', 'datum' => '2026-10-26', 'art' => 'besser', 'popup' => false,
+        'titel' => 'Neue Version der Plattform',
+        'text' => 'Rund um Uffni läuft jetzt auf der neuen HumHub-Version 1.19. Für dich ändert sich fast nichts, alles bleibt an seinem Platz. Im Hintergrund ist die Plattform damit auf dem aktuellen Stand und bekommt weiter Sicherheits-Updates. Falls dir etwas komisch vorkommt, schreib es gern unter „Ideen & Vorschläge“.'],
     ['id' => 'login-fenster-schliessen', 'datum' => '2026-10-26', 'art' => 'behoben', 'popup' => false,
         'titel' => 'Anmeldefenster lässt sich wieder schließen',
         'text' => 'Wenn du ohne Konto auf der Mängelkarte „Anmelden für Details“ antippst, öffnet sich das Anmeldefenster jetzt richtig über der Seite und lässt sich mit dem Kreuz wieder schließen. Das gilt auch für die Anmelde-Links bei den Vorschlägen und den Betrieben.'],

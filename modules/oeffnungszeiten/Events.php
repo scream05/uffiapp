@@ -3,6 +3,7 @@
 namespace humhub\modules\oeffnungszeiten;
 
 use humhub\modules\oeffnungszeiten\widgets\Kasten;
+use humhub\modules\ui\menu\MenuLink;
 use Yii;
 
 class Events
@@ -24,14 +25,13 @@ class Events
             if ($event->sender->space->url !== Yii::$app->getModule('oeffnungszeiten')->spaceUrl) {
                 return;
             }
-            $event->sender->addItem([
+            $event->sender->addEntry(new MenuLink([
                 'label' => Yii::t('OeffnungszeitenModule.base', 'Öffnungszeiten'),
-                'group' => 'modules',
                 'url' => $event->sender->space->createUrl('/oeffnungszeiten/index'),
-                'icon' => '<i class="fa fa-clock-o"></i>',
+                'icon' => 'clock-o',
                 'sortOrder' => 55,
                 'isActive' => Yii::$app->controller?->module?->id === 'oeffnungszeiten',
-            ]);
+            ]));
         } catch (\Throwable $e) {
             Yii::error($e);
         }

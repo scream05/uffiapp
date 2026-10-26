@@ -3,6 +3,7 @@
 namespace humhub\modules\mitteilungsblatt;
 
 use Yii;
+use humhub\modules\ui\menu\MenuLink;
 
 class Events
 {
@@ -15,23 +16,21 @@ class Events
             if ($event->sender->space->url !== $module->space || !$module->darfLesen()) {
                 return;
             }
-            $event->sender->addItem([
+            $event->sender->addEntry(new MenuLink([
                 'label' => Yii::t('MitteilungsblattModule.base', 'Mitteilungsblatt'),
-                'group' => 'modules',
                 'url' => $event->sender->space->createUrl('/mitteilungsblatt/index'),
-                'icon' => '<i class="fa fa-newspaper-o"></i>',
+                'icon' => 'newspaper-o',
                 'sortOrder' => 55,
                 'isActive' => Yii::$app->controller?->module?->id === 'mitteilungsblatt' && Yii::$app->controller->action?->id !== 'bekanntmachungen',
-            ]);
+            ]));
             if ($module->darfBekanntmachungenSehen()) {
-                $event->sender->addItem([
+                $event->sender->addEntry(new MenuLink([
                     'label' => Yii::t('MitteilungsblattModule.base', 'Bekanntmachungen'),
-                    'group' => 'modules',
                     'url' => $event->sender->space->createUrl('/mitteilungsblatt/index/bekanntmachungen'),
-                    'icon' => '<i class="fa fa-gavel"></i>',
+                    'icon' => 'gavel',
                     'sortOrder' => 56,
                     'isActive' => Yii::$app->controller?->module?->id === 'mitteilungsblatt' && Yii::$app->controller->action?->id === 'bekanntmachungen',
-                ]);
+                ]));
             }
         } catch (\Throwable $e) {
             Yii::error($e);

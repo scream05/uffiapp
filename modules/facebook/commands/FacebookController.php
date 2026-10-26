@@ -6,7 +6,7 @@ use humhub\modules\activity\models\Activity;
 use humhub\modules\facebook\components\Api;
 use humhub\modules\facebook\components\Import;
 use humhub\modules\facebook\Module;
-use humhub\modules\space\activities\MemberAdded;
+use humhub\modules\space\activities\MemberAddedActivity;
 use humhub\modules\space\models\Membership;
 use humhub\modules\space\models\Space;
 use humhub\modules\user\models\User;
@@ -80,9 +80,8 @@ class FacebookController extends Controller
             $ms->delete();
             $this->stdout("- Mitglied in {$ms->space->name}\n");
         }
-        foreach (Activity::find()->joinWith('content')->where(['content.created_by' => $user->id])
-                     ->andWhere(['activity.class' => MemberAdded::class])->all() as $activity) {
-            $activity->hardDelete();
+        foreach (Activity::find()->where(['created_by' => $user->id, 'class' => MemberAddedActivity::class])->all() as $activity) {
+            $activity->delete();
         }
         return ExitCode::OK;
     }

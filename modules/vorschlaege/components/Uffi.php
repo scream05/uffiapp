@@ -28,10 +28,9 @@ class Uffi
             ->orderBy(['v.created_at' => SORT_DESC])->limit(80)->all();
         $ids = array_map(fn($v) => (int)$v->content_id, $vorschlaege);
         $summen = Stimme::summen($ids);
-        $kommentare = $ids ? (new \yii\db\Query())->select(['n' => 'COUNT(*)', 'object_id'])->from('comment')
-            ->where(['object_model' => \humhub\modules\post\models\Post::class,
-                'object_id' => array_map(fn($v) => $v->content->object_id, $vorschlaege)])
-            ->groupBy('object_id')->indexBy('object_id')->column() : [];
+        $kommentare = $ids ? (new \yii\db\Query())->select(['n' => 'COUNT(*)', 'content_id'])->from('comment')
+            ->where(['content_id' => $ids, 'parent_comment_id' => null])
+            ->groupBy('content_id')->indexBy('content_id')->column() : [];
         // Meiste Zustimmung zuerst, damit beliebte Ideen auch bei langer Liste oben stehen
         usort($vorschlaege, fn($a, $b) => (($summen[$b->content_id]['dafuer'] ?? 0) - ($summen[$b->content_id]['dagegen'] ?? 0))
             <=> (($summen[$a->content_id]['dafuer'] ?? 0) - ($summen[$a->content_id]['dagegen'] ?? 0)));
@@ -43,7 +42,7 @@ class Uffi
             $lines[] = "- {$v->titel} ({$v->kategorie}) – Stand: {$v->getLabel()}"
                 . ($v->updated_at ? ' (seit ' . date('d.m.Y', strtotime($v->updated_at)) . ')' : '')
                 . ($v->note ? " – Hinweis des Teams: {$v->note}" : '')
-                . " – {$s['dafuer']} dafür, {$s['dagegen']} dagegen, " . (int)($kommentare[$v->content->object_id] ?? 0) . ' Kommentare'
+                . " – {$s['dafuer']} dafür, {$s['dagegen']} dagegen, " . (int)($kommentare[$v->content_id] ?? 0) . ' Kommentare'
                 . ' – eingereicht ' . date('d.m.Y', strtotime($v->created_at)) . ' – ' . Url::to($v->content->getUrl(), true)
                 . ($text !== '' ? "\n  " . (mb_strlen($text) > 250 ? mb_substr($text, 0, 250) . '…' : $text) : '');
         }

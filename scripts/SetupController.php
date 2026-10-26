@@ -259,7 +259,7 @@ class SetupController extends Controller
         }
         $s->set('themeCustomScss', $scss);
         if ($logo !== null) {
-            \humhub\libs\LogoImage::set(new \yii\web\UploadedFile(['tempName' => $logo]));
+            \Yii::$app->img->logo->setByFile($logo);
             $this->stdout("Logo gesetzt\n");
         }
         $result = \humhub\helpers\ThemeHelper::buildCss();
@@ -449,10 +449,9 @@ class SetupController extends Controller
         $n = \humhub\modules\content\models\Content::updateAll(['stream_channel' => null],
             ['object_model' => [$entryClass, $calClass, $postClass], 'stream_channel' => 'default', 'contentcontainer_id' => $space->contentcontainer_id]);
         $a = 0;
-        foreach (\humhub\modules\activity\models\Activity::find()->where(['object_model' => [$entryClass, $calClass]])
-            ->orWhere(['object_model' => $postClass, 'object_id' => \humhub\modules\content\models\Content::find()->select('object_id')
-                ->where(['object_model' => $postClass, 'contentcontainer_id' => $space->contentcontainer_id])])->all() as $activity) {
-            $activity->hardDelete();
+        foreach (\humhub\modules\activity\models\Activity::find()->where(['content_id' => \humhub\modules\content\models\Content::find()->select('id')
+                ->where(['object_model' => [$entryClass, $calClass, $postClass], 'contentcontainer_id' => $space->contentcontainer_id])])->all() as $activity) {
+            $activity->delete();
             $a++;
         }
         if ($n || $a) {
@@ -656,10 +655,9 @@ class SetupController extends Controller
             $membership->delete();
             $this->stdout("- Mitglied in {$membership->space->name}\n");
         }
-        foreach (\humhub\modules\activity\models\Activity::find()->joinWith('content')
-                     ->where(['content.created_by' => $user->id])
-                     ->andWhere(['activity.class' => \humhub\modules\space\activities\MemberAdded::class])->all() as $activity) {
-            $activity->hardDelete();
+        foreach (\humhub\modules\activity\models\Activity::find()->where(['created_by' => $user->id,
+                     'class' => \humhub\modules\space\activities\MemberAddedActivity::class])->all() as $activity) {
+            $activity->delete();
         }
 
         $posts = \humhub\modules\post\models\Post::find()->contentContainer($space)
@@ -1288,7 +1286,7 @@ class SetupController extends Controller
         // wie die Übersicht im Browser: Beitrags-Stream (nicht der Aktivitäten-Kanal), aus Sicht der jeweiligen Person
         $ids = function (?User $user) {
             Yii::$app->user->switchIdentity($user);
-            $q = new \humhub\modules\dashboard\stream\DashboardStreamQuery(['user' => $user, 'limit' => 5, 'activity' => false]);
+            $q = new \humhub\modules\dashboard\stream\DashboardStreamQuery(['user' => $user, 'limit' => 5]);
             return array_map(fn($c) => $c->id, $q->all());
         };
         $this->stdout("Übersicht {$leser->username}: " . (in_array($b->content_id, $ids($leser)) ? 'sichtbar' : 'NICHT sichtbar') . "\n");
@@ -1752,12 +1750,12 @@ class SetupController extends Controller
             $pruefe('Andere sehen Knöpfe, Dafür markiert', substr_count($html, '<form') === 2 && str_contains($html, 'vs-knopf-dafuer vs-an'));
 
             $pruefe('Admin darf Stand setzen', \humhub\modules\vorschlaege\models\Vorschlag::canManage());
-            $kommentare = \humhub\modules\comment\models\Comment::find()->where(['object_model' => \humhub\modules\post\models\Post::class, 'object_id' => $post->id])->count();
+            $kommentare = \humhub\modules\comment\models\Comment::find()->where(['content_id' => $post->content->id])->count();
             $pruefe('Stand „Geplant“ gesetzt', $v->statusSetzen('geplant', 'kommt im November'));
-            $c = \humhub\modules\comment\models\Comment::find()->where(['object_model' => \humhub\modules\post\models\Post::class, 'object_id' => $post->id])
+            $c = \humhub\modules\comment\models\Comment::find()->where(['content_id' => $post->content->id])
                 ->orderBy(['id' => SORT_DESC])->one();
             $pruefe('Kommentar zum Stand', $c !== null && (int)$kommentare + 1 === (int)\humhub\modules\comment\models\Comment::find()
-                ->where(['object_model' => \humhub\modules\post\models\Post::class, 'object_id' => $post->id])->count()
+                ->where(['content_id' => $post->content->id])->count()
                 && $c->message === '**Stand: Geplant** – kommt im November');
             $pruefe('Gleicher Stand ohne Hinweis = keine Änderung', !$v->statusSetzen('geplant', ''));
             $v->statusSetzen('umgesetzt', null);
@@ -1779,7 +1777,7 @@ class SetupController extends Controller
                 ->where(['c.contentcontainer_id' => $space->contentcontainer_id])->all();
             $seite = Yii::$app->view->renderFile('@vorschlaege/views/vorschlag/index.php', ['module' => $modul, 'space' => $space,
                 'vorschlaege' => $liste, 'summen' => $S::summen([$v->content_id]), 'meine' => $S::meine([$v->content_id]),
-                'kommentare' => [$post->id => 2], 'anzahl' => ['neu' => 1], 'stand' => 'offen', 'sortierung' => 'stimmen']);
+                'kommentare' => [$v->content_id => 2], 'anzahl' => ['neu' => 1], 'stand' => 'offen', 'sortierung' => 'stimmen']);
             $pruefe('Übersicht gerendert', str_contains($seite, 'TEST Abfuhrtermine') && str_contains($seite, '2 Kommentare')
                 && str_contains($seite, 'Bitte die Abfuhrtermine'));
             $leer = Yii::$app->view->renderFile('@vorschlaege/views/vorschlag/index.php', ['module' => $modul, 'space' => $space,
@@ -1963,7 +1961,7 @@ class SetupController extends Controller
         };
         $imStream = function (?User $user, int $contentId): bool {
             Yii::$app->user->switchIdentity($user);
-            $q = new \humhub\modules\dashboard\stream\DashboardStreamQuery(['user' => $user, 'limit' => 50, 'activity' => false]);
+            $q = new \humhub\modules\dashboard\stream\DashboardStreamQuery(['user' => $user, 'limit' => 50]);
             return in_array($contentId, array_map(fn($c) => (int)$c->id, $q->all()), true);
         };
         $tx = Yii::$app->db->beginTransaction();
@@ -2739,6 +2737,8 @@ class SetupController extends Controller
     {
         $D = \humhub\modules\gewerbe\components\GutscheinDienst::class;
         $D::$stumm = true;
+        // Die Texte werden auf Deutsch verglichen; die Konsole läuft sonst auf en-US (seit der Mehrsprachigkeit)
+        \Yii::$app->language = 'de';
         $this->actionGutscheinTestAufraeumen(true);
         $ok = 0; $fehl = 0;
         $pruefe = function (string $was, bool $bed) use (&$ok, &$fehl) {

@@ -1,4 +1,31 @@
 {
+    "humhub-1-19": {
+        "en": {
+            "titel": "New version of the platform",
+            "text": "Rund um Uffni is now running on the new HumHub version 1.19. Little changes for you, everything stays where it is. Behind the scenes, the platform is now up to date and continues to receive security updates. If something seems strange to you, feel free to write about it under \"Ideen & Vorschläge\".",
+            "quelle": "8cdc4df5b8f67fcf61c4059c3228df7631976deb"
+        },
+        "uk": {
+            "titel": "Нова версія платформи",
+            "text": "Rund um Uffni тепер працює на новій версії HumHub 1.19. Для тебе майже нічого не змінюється, усе залишається на своєму місці. У фоновому режимі платформа тепер на актуальному рівні та й надалі отримує оновлення безпеки. Якщо щось здається тобі дивним, пиши про це з радістю в розділі „Ідеї та пропозиції“.",
+            "quelle": "8cdc4df5b8f67fcf61c4059c3228df7631976deb"
+        },
+        "ar": {
+            "titel": "نسخة جديدة من المنصة",
+            "text": "يعمل موقع «Rund um Uffni» الآن على النسخة الجديدة من HumHub 1.19. بالنسبة لك لن يتغيّر تقريبًا أي شيء، فكل شيء سيبقى في مكانه. وفي الخلفية أصبحت المنصة الآن على أحدث إصدار، وستستمر في الحصول على تحديثات الأمان. وإذا لاحظت شيئًا غريبًا، فاكتب لنا ذلك بكل سهولة تحت «Ideen & Vorschläge».",
+            "quelle": "8cdc4df5b8f67fcf61c4059c3228df7631976deb"
+        },
+        "tr": {
+            "titel": "Yeni platform sürümü",
+            "text": "Rund um Uffni artık yeni HumHub sürümü 1.19 üzerinde çalışıyor. Senin için neredeyse hiçbir şey değişmiyor, her şey yerinde duruyor. Arka planda platform artık güncel durumda ve güvenlik güncellemeleri almaya devam ediyor. Bir şey tuhaf gelirse, „Ideen & Vorschläge“ altında bize yazmaktan çekinme.",
+            "quelle": "8cdc4df5b8f67fcf61c4059c3228df7631976deb"
+        },
+        "ru": {
+            "titel": "Новая версия платформы",
+            "text": "Rund um Uffni теперь работает на новой версии HumHub 1.19. Для тебя почти ничего не меняется, всё остаётся на своих местах. Зато в фоне платформа теперь на актуальном уровне и продолжает получать обновления безопасности. Если что-то покажется тебе странным, напиши об этом, пожалуйста, в разделе „Ideen & Vorschläge“.",
+            "quelle": "8cdc4df5b8f67fcf61c4059c3228df7631976deb"
+        }
+    },
     "login-fenster-schliessen": {
         "en": {
             "titel": "Login window can be closed again",

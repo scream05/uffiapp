@@ -306,8 +306,7 @@ class Bauhof
         try {
             $comment = new Comment();
             $comment->message = '**Status: ' . $status->getLabel() . '**' . ($hinweis !== null ? " – $hinweis" : '');
-            $comment->object_model = Post::class;
-            $comment->object_id = $content->object_id;
+            $comment->content_id = $content->id;
             $comment->save();
         } finally {
             if ($wechsel) {
@@ -640,7 +639,7 @@ class Bauhof
             if (!$nummer || $file === null || !$n->wamid) {
                 continue;
             }
-            $data = file_get_contents($file->store->get());
+            $data = $file->store->getContent();
             if ($data === false || !Verarbeitung::uebernehmen($nummer, $n->buerger ? null : $n->mitarbeiter->name, $n->wamid,
                     $n->typ, $n->text, $data, (string)$file->mime_type, $n->created_at)) {
                 continue;

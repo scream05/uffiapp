@@ -3,6 +3,7 @@
 namespace humhub\modules\gewerbe;
 
 use humhub\modules\gewerbe\models\BetriebBeitrag;
+use humhub\modules\ui\menu\MenuLink;
 use humhub\modules\gewerbe\models\BetriebVerwalter;
 use humhub\modules\gewerbe\models\Einloesung;
 use humhub\modules\gewerbe\models\Gutschein;
@@ -99,44 +100,40 @@ class Events
                 return;
             }
             $active = Yii::$app->controller->module && Yii::$app->controller->module->id === 'gewerbe';
-            $event->sender->addItem([
+            $event->sender->addEntry(new MenuLink([
                 'label' => Yii::t('GewerbeModule.base', 'Gewerbeverzeichnis'),
-                'group' => 'modules',
                 'url' => $space->createUrl('/gewerbe/betrieb/index'),
-                'icon' => '<i class="fa fa-shopping-bag"></i>',
+                'icon' => 'shopping-bag',
                 'isActive' => $active && Yii::$app->controller->id !== 'gutschein'
                     && !in_array(Yii::$app->controller->action->id, ['anfragen', 'pruefen'], true),
                 'sortOrder' => 90,
-            ]);
-            $event->sender->addItem([
+            ]));
+            $event->sender->addEntry(new MenuLink([
                 'label' => Yii::t('GewerbeModule.base', 'Gutscheine'),
-                'group' => 'modules',
                 'url' => $space->createUrl('/gewerbe/gutschein/index'),
-                'icon' => '<i class="fa fa-ticket"></i>',
+                'icon' => 'ticket',
                 'isActive' => $active && Yii::$app->controller->id === 'gutschein',
                 'sortOrder' => 91,
-            ]);
+            ]));
             if (Module::canManageAll()) {
                 $open = BetriebVerwalter::find()->where(['status' => BetriebVerwalter::STATUS_ANGEFRAGT])->count();
-                $event->sender->addItem([
+                $event->sender->addEntry(new MenuLink([
                     'label' => $open ? Yii::t('GewerbeModule.base', 'Gewerbe-Anfragen ({anzahl})', ['anzahl' => $open])
                         : Yii::t('GewerbeModule.base', 'Gewerbe-Anfragen'),
-                    'group' => 'modules',
                     'url' => $space->createUrl('/gewerbe/betrieb/anfragen'),
-                    'icon' => '<i class="fa fa-inbox"></i>',
+                    'icon' => 'inbox',
                     'isActive' => $active && Yii::$app->controller->action->id === 'anfragen',
                     'sortOrder' => 92,
-                ]);
+                ]));
                 $offen = BetriebBeitrag::find()->where(['status' => BetriebBeitrag::STATUS_EINGEREICHT])->count();
-                $event->sender->addItem([
+                $event->sender->addEntry(new MenuLink([
                     'label' => $offen ? Yii::t('GewerbeModule.base', 'Gewerbe-Beiträge ({anzahl})', ['anzahl' => $offen])
                         : Yii::t('GewerbeModule.base', 'Gewerbe-Beiträge'),
-                    'group' => 'modules',
                     'url' => $space->createUrl('/gewerbe/beitrag/pruefen'),
-                    'icon' => '<i class="fa fa-check-square-o"></i>',
+                    'icon' => 'check-square-o',
                     'isActive' => $active && Yii::$app->controller->action->id === 'pruefen',
                     'sortOrder' => 93,
-                ]);
+                ]));
             }
         } catch (\Throwable $e) {
             Yii::error($e);

@@ -4,7 +4,7 @@ namespace humhub\modules\uebersicht\widgets;
 
 use humhub\components\Widget;
 use humhub\modules\content\components\ContentActiveRecord;
-use humhub\widgets\bootstrap\Button;
+use humhub\widgets\bootstrap\Link;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use Yii;
@@ -18,7 +18,7 @@ class PinLink extends Widget
     {
         $id = $this->record->content->id;
         $an = Yii::$app->getModule('uebersicht')->istAngepinnt($id);
-        $link = Button::asLink($an ? Yii::t('UebersichtModule.base', 'Aus Übersicht lösen') : Yii::t('UebersichtModule.base', 'In Übersicht anpinnen'))
+        $link = Link::to($an ? Yii::t('UebersichtModule.base', 'Aus Übersicht lösen') : Yii::t('UebersichtModule.base', 'In Übersicht anpinnen'))
             ->action('uebersicht.umschalten', Url::to(['/uebersicht/pin/umschalten', 'id' => $id]))
             ->cssClass('dropdown-item')
             ->icon('thumb-tack');

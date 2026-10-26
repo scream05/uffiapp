@@ -3,6 +3,7 @@
 namespace humhub\modules\tanken;
 
 use humhub\modules\tanken\jobs\Abruf;
+use humhub\modules\ui\menu\MenuLink;
 use humhub\modules\tanken\widgets\SpritKasten;
 use Yii;
 
@@ -28,14 +29,13 @@ class Events
             if (!$modul->aktiv() || $event->sender->space->url !== $modul->spaceUrl) {
                 return;
             }
-            $event->sender->addItem([
+            $event->sender->addEntry(new MenuLink([
                 'label' => Yii::t('TankenModule.base', 'Spritpreise'),
-                'group' => 'modules',
                 'url' => $event->sender->space->createUrl('/tanken/index'),
-                'icon' => '<i class="fa fa-car"></i>',
+                'icon' => 'car',
                 'sortOrder' => 70,
                 'isActive' => Yii::$app->controller?->module?->id === 'tanken',
-            ]);
+            ]));
         } catch (\Throwable $e) {
             Yii::error($e, 'tanken');
         }

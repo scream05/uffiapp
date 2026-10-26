@@ -3,6 +3,7 @@
 namespace humhub\modules\notdienst;
 
 use humhub\modules\notdienst\widgets\NotdienstSidebar;
+use humhub\modules\ui\menu\MenuLink;
 use Yii;
 
 class Events
@@ -24,14 +25,13 @@ class Events
             if ($event->sender->space->url !== Yii::$app->getModule('notdienst')->spaceUrl) {
                 return;
             }
-            $event->sender->addItem([
+            $event->sender->addEntry(new MenuLink([
                 'label' => Yii::t('NotdienstModule.base', 'Notdienste'),
-                'group' => 'modules',
                 'url' => $event->sender->space->createUrl('/notdienst/index'),
-                'icon' => '<i class="fa fa-medkit"></i>',
+                'icon' => 'medkit',
                 'sortOrder' => 60,
                 'isActive' => Yii::$app->controller?->module?->id === 'notdienst',
-            ]);
+            ]));
         } catch (\Throwable $e) {
             Yii::error($e);
         }

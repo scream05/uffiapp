@@ -103,7 +103,7 @@ class GewerbeController extends Controller
         $this->stdout("Beitrag {$b->id} für „{$betrieb->name}“: Status {$b->status}, Content {$b->content_id}\n");
         $ids = function ($user) {
             Yii::$app->user->switchIdentity($user);
-            $q = new \humhub\modules\dashboard\stream\DashboardStreamQuery(['user' => $user, 'limit' => 5, 'activity' => false]);
+            $q = new \humhub\modules\dashboard\stream\DashboardStreamQuery(['user' => $user, 'limit' => 5]);
             return array_map(fn($c) => $c->id, $q->all());
         };
         $this->stdout("Übersicht {$l->username}: " . (in_array($b->content_id, $ids($l)) ? 'sichtbar' : 'NICHT sichtbar') . "\n");

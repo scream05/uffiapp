@@ -3,6 +3,7 @@
 namespace humhub\modules\vereine;
 
 use humhub\modules\calendar\models\CalendarEntry;
+use humhub\modules\ui\menu\MenuLink;
 use humhub\modules\post\models\Post;
 use humhub\modules\vereine\models\Verein;
 use humhub\modules\vereine\models\VereinBeitrag;
@@ -78,44 +79,40 @@ class Events
                 return;
             }
             $active = Yii::$app->controller->module && Yii::$app->controller->module->id === 'vereine';
-            $event->sender->addItem([
+            $event->sender->addEntry(new MenuLink([
                 'label' => Yii::t('VereineModule.base', 'Vereinsverzeichnis'),
-                'group' => 'modules',
                 'url' => $space->createUrl('/vereine/verein/index'),
-                'icon' => '<i class="fa fa-users"></i>',
+                'icon' => 'users',
                 'isActive' => $active && Yii::$app->controller->id !== 'spiele' && !in_array(Yii::$app->controller->action->id, ['anfragen', 'pruefen'], true),
                 'sortOrder' => 90,
-            ]);
+            ]));
             // Ein Menüpunkt „Sport“ (Übersicht aller Vereine mit Spielplan bzw. Ergebnis-Link), darunter die Seiten je Verein
             if (Verein::find()->where(['or', ['not', ['bfv_id' => null]], ['not', ['ergebnisse_url' => null]]])->exists()) {
-                $event->sender->addItem([
+                $event->sender->addEntry(new MenuLink([
                     'label' => Yii::t('VereineModule.base', 'Sport'),
-                    'group' => 'modules',
                     'url' => $space->createUrl('/vereine/spiele/index'),
-                    'icon' => '<i class="fa fa-trophy"></i>',
+                    'icon' => 'trophy',
                     'isActive' => $active && Yii::$app->controller->id === 'spiele',
                     'sortOrder' => 89,
-                ]);
+                ]));
             }
             if (Module::canManageAll()) {
                 $open = VereinVerwalter::find()->where(['status' => VereinVerwalter::STATUS_ANGEFRAGT])->count();
-                $event->sender->addItem([
+                $event->sender->addEntry(new MenuLink([
                     'label' => 'Vereins-Anfragen' . ($open ? " ($open)" : ''),
-                    'group' => 'modules',
                     'url' => $space->createUrl('/vereine/verein/anfragen'),
-                    'icon' => '<i class="fa fa-inbox"></i>',
+                    'icon' => 'inbox',
                     'isActive' => $active && Yii::$app->controller->action->id === 'anfragen',
                     'sortOrder' => 91,
-                ]);
+                ]));
                 $offen = VereinBeitrag::find()->where(['status' => VereinBeitrag::STATUS_EINGEREICHT])->count();
-                $event->sender->addItem([
+                $event->sender->addEntry(new MenuLink([
                     'label' => 'Vereins-Beiträge' . ($offen ? " ($offen)" : ''),
-                    'group' => 'modules',
                     'url' => $space->createUrl('/vereine/beitrag/pruefen'),
-                    'icon' => '<i class="fa fa-check-square-o"></i>',
+                    'icon' => 'check-square-o',
                     'isActive' => $active && Yii::$app->controller->action->id === 'pruefen',
                     'sortOrder' => 92,
-                ]);
+                ]));
             }
         } catch (\Throwable $e) {
             Yii::error($e);

@@ -67,7 +67,7 @@ class UebersichtController extends Controller
         \Yii::$app->getModule('dashboard')->memberFilterClass = \humhub\modules\uebersicht\filters\MeineUebersicht::class;
         $this->stdout('Ausgeblendet: ' . implode(', ', array_map(fn($g) => \humhub\modules\space\models\Space::findOne(['guid' => $g])?->name ?? $g,
                 $module->getAusgeblendet($user))) . "\n");
-        $q = new \humhub\modules\dashboard\stream\DashboardStreamQuery(['user' => $user, 'limit' => 40, 'activity' => false]);
+        $q = new \humhub\modules\dashboard\stream\DashboardStreamQuery(['user' => $user, 'limit' => 40]);
         $zaehler = [];
         foreach ($q->all() as $c) {
             $name = $c->container ? $c->container->getDisplayName() : '(global)';

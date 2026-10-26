@@ -5,7 +5,7 @@
  * @var \humhub\modules\vorschlaege\models\Vorschlag[] $vorschlaege
  * @var array $summen
  * @var array $meine
- * @var array $kommentare object_id => Anzahl
+ * @var array $kommentare content_id => Anzahl
  * @var array $anzahl status => Anzahl
  * @var string $stand
  * @var string $sortierung
@@ -63,7 +63,7 @@ foreach (array_keys(Vorschlag::STATUSES) as $key) {
                     $autor = $v->content->createdBy;
                     $text = trim(preg_replace('/\s+/u', ' ', strip_tags(\humhub\libs\Helpers::truncateText(
                         Vorschlag::beschreibung($v->content->getPolymorphicRelation()->message ?? ''), 220))));
-                    $n = $kommentare[$v->content->object_id] ?? 0;
+                    $n = $kommentare[$v->content_id] ?? 0;
                     ?>
                     <li class="vs-eintrag">
                         <h2><?= Html::a(Html::encode($v->titel), $v->content->getUrl()) ?></h2>

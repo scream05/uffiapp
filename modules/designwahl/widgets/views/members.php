@@ -1,6 +1,6 @@
 <?php
 
-// Kopie von humhub/modules/space/widgets/views/members.php (HumHub, AGPL-3.0), ohne Mitgliederzahl in der Überschrift
+// Kopie von humhub/modules/space/widgets/views/members.php (HumHub 1.19, AGPL-3.0), ohne Mitgliederzahl in der Überschrift
 
 use humhub\helpers\Html;
 use humhub\modules\space\models\Space;
@@ -19,10 +19,14 @@ use humhub\widgets\PanelMenu;
 ?>
 <div class="panel panel-default members" id="space-members-panel">
     <?= PanelMenu::widget([
-        'extraMenus' => Html::tag('li', Link::asLink(Yii::t('SpaceModule.base', 'Show as List'))->icon('list')->options($showListOptions)),
+        'extraMenus' => Html::tag('li', Link::to(Yii::t('SpaceModule.base', 'Show as List'))->icon('list')->options($showListOptions)),
     ]) ?>
-    <div class="panel-heading"<?= Html::renderTagAttributes($showListOptions + ['style' => 'cursor:pointer']) ?>>
-        <?= Yii::t('SpaceModule.base', '<strong>Space</strong> members'); ?>
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            <button class="btn-panel-title-action" <?= Html::renderTagAttributes($showListOptions) ?>>
+                <?= Yii::t('SpaceModule.base', '<strong>Space</strong> members') ?>
+            </button>
+        </h3>
     </div>
     <div class="panel-body">
         <div class="d-flex gap-2 flex-wrap">

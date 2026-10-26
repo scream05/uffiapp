@@ -3,6 +3,7 @@
 namespace humhub\modules\maengelmelder;
 
 use humhub\modules\maengelmelder\widgets\StatusAddon;
+use humhub\modules\ui\menu\MenuLink;
 use humhub\modules\post\models\Post;
 use humhub\modules\space\models\Space;
 use Yii;
@@ -91,22 +92,20 @@ class Events
                 return;
             }
             $active = Yii::$app->controller->module && Yii::$app->controller->module->id === 'maengelmelder';
-            $event->sender->addItem([
+            $event->sender->addEntry(new MenuLink([
                 'label' => Yii::t('MaengelmelderModule.base', 'Mangel melden'),
-                'group' => 'modules',
                 'url' => $space->createUrl('/maengelmelder/meldung/create'),
-                'icon' => '<i class="fa fa-map-marker"></i>',
+                'icon' => 'map-marker',
                 'isActive' => $active && Yii::$app->controller->action->id === 'create',
                 'sortOrder' => 150,
-            ]);
-            $event->sender->addItem([
+            ]));
+            $event->sender->addEntry(new MenuLink([
                 'label' => Yii::t('MaengelmelderModule.base', 'Karte'),
-                'group' => 'modules',
                 'url' => $space->createUrl('/maengelmelder/meldung/karte'),
-                'icon' => '<i class="fa fa-map"></i>',
+                'icon' => 'map',
                 'isActive' => $active && Yii::$app->controller->action->id === 'karte',
                 'sortOrder' => 151,
-            ]);
+            ]));
             if (models\MaengelStatus::canManage() && $space->url === Yii::$app->getModule('maengelmelder')->bauhofSpace) {
                 // Ungelesene WhatsApp-Nachrichten und Gastmeldungen, die auf Freigabe warten
                 $neu = models\BauhofNachricht::ungelesen() + (int)\humhub\modules\content\models\Content::find()

@@ -4,7 +4,6 @@ namespace humhub\modules\vorschlaege\controllers;
 
 use humhub\modules\content\components\ContentContainerController;
 use humhub\modules\content\models\Content;
-use humhub\modules\post\models\Post;
 use humhub\modules\vorschlaege\models\Stimme;
 use humhub\modules\vorschlaege\models\Vorschlag;
 use humhub\modules\vorschlaege\models\VorschlagForm;
@@ -68,9 +67,9 @@ class VorschlagController extends ContentContainerController
             'vorschlaege' => $vorschlaege,
             'summen' => Stimme::summen($ids),
             'meine' => Stimme::meine($ids),
-            'kommentare' => $ids ? array_map('intval', (new \yii\db\Query())->select(['n' => 'COUNT(*)', 'object_id'])->from('comment')
-                ->where(['object_model' => Post::class, 'object_id' => array_map(fn($v) => $v->content->object_id, $vorschlaege)])
-                ->groupBy('object_id')->indexBy('object_id')->column()) : [],
+            'kommentare' => $ids ? array_map('intval', (new \yii\db\Query())->select(['n' => 'COUNT(*)', 'content_id'])->from('comment')
+                ->where(['content_id' => $ids, 'parent_comment_id' => null])
+                ->groupBy('content_id')->indexBy('content_id')->column()) : [],
             'anzahl' => array_map('intval', $anzahl),
             'stand' => $stand,
             'sortierung' => $sortierung,

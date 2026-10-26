@@ -314,10 +314,9 @@ class BauhofController extends Controller
                          ->andWhere(['not', ['space_id' => $space?->id]])->all() as $membership) {
                 $membership->delete();
             }
-            foreach (\humhub\modules\activity\models\Activity::find()->joinWith('content')
-                         ->where(['content.created_by' => $user->id])
-                         ->andWhere(['activity.class' => \humhub\modules\space\activities\MemberAdded::class])->all() as $activity) {
-                $activity->hardDelete();
+            foreach (\humhub\modules\activity\models\Activity::find()->where(['created_by' => $user->id,
+                         'class' => \humhub\modules\space\activities\MemberAddedActivity::class])->all() as $activity) {
+                $activity->delete();
             }
             $mod->settings->set('gastMeldungen', 1);
         } elseif ($schalter === 'aus') {
