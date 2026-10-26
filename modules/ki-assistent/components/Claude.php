@@ -60,7 +60,8 @@ class Claude
             'tools' => $tools ?: null,
             // Zusätzlich innerhalb einer Werkzeug-Runde: Stadtwissen und bisheriges Gespräch aus dem Cache (5 Minuten)
             'cacheControl' => ['type' => 'ephemeral'],
-            'outputConfig' => ['effort' => 'medium'],
+            // low statt medium (26.10.2026): ki-test gleich gut, etwas weniger Denken
+            'outputConfig' => ['effort' => 'low'],
         ];
         try {
             if ($onText === null) {
