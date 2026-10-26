@@ -12,8 +12,8 @@
 return [
     ['id' => 'uffi-streaming', 'datum' => '2026-10-26', 'art' => 'besser', 'popup' => false,
         'link' => [null, '/ki-assistent/chat'],
-        'titel' => 'Uffi antwortet flüssiger',
-        'text' => 'Uffi zeigt seine Antwort jetzt schon beim Schreiben Stück für Stück an, statt dich bis zum Ende warten zu lassen. Solange er nachdenkt oder im Verzeichnis sucht, siehst du, was er gerade tut.'],
+        'titel' => 'Uffi antwortet schneller',
+        'text' => 'Uffi findet die passenden Infos jetzt schneller und zeigt seine Antwort schon beim Schreiben Stück für Stück an, statt dich bis zum Ende warten zu lassen. Solange er nachdenkt oder im Verzeichnis sucht, siehst du, was er gerade tut.'],
     ['id' => 'kaesten-sortieren', 'datum' => '2026-10-25', 'art' => 'neu', 'popup' => true,
         'link' => [null, '/uebersicht/einstellungen/index'],
         'titel' => 'Kästen rechts selbst anordnen',

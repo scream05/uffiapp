@@ -267,7 +267,7 @@ class ChatController extends Controller
      */
     public static function systemPrompt(string $question = ''): array
     {
-        $embed = fn($q) => Embeddings::query($q);
+        $embed = fn($q) => Embeddings::suche($q);
         $name = Yii::$app->name;
         $prompt = <<<TXT
 Du bist Uffi, der KI-Assistent von „{$name}“, dem Bürger- und Vereinsnetzwerk für Uffenheim (Mittelfranken) unter https://community.rundumuffni.de.

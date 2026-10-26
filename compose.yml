@@ -93,6 +93,8 @@ services:
       - "127.0.0.1:8095:8000"
     volumes:
       - ./embeddings/cache:/cache
+      # Index des Stadtwissens für POST /suche (Vektoren einmal im Speicher statt bei jeder Frage in PHP)
+      - ./wissen:/srv/wissen:ro
     environment:
       - EMBED_MODEL=jinaai/jina-embeddings-v2-base-de
       - EMBED_THREADS=2

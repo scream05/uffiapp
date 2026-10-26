@@ -1,29 +1,29 @@
 {
     "uffi-streaming": {
         "en": {
-            "titel": "Uffi answers more smoothly",
-            "text": "Uffi now shows his answer piece by piece as he writes it, instead of making you wait until the end. While he is thinking or searching the directory, you can see what he is currently doing.",
-            "quelle": "3f4e17dae43e5aee68ebd3b2b6ac3819df229a39"
+            "titel": "Uffi answers faster",
+            "text": "Uffi now finds the right info more quickly and shows his answer piece by piece as he writes it, instead of making you wait until the end. While he's thinking or searching the directory, you can see what he's currently doing.",
+            "quelle": "c4065bfb6f0bda610d3c4ca26fd8051d0fd75920"
         },
         "uk": {
             "titel": "Uffi відповідає швидше",
-            "text": "Uffi тепер показує свою відповідь уже під час написання, шматок за шматком, а не змушує тебе чекати до кінця. Поки він думає або шукає в каталозі, ти бачиш, що саме він зараз робить.",
-            "quelle": "3f4e17dae43e5aee68ebd3b2b6ac3819df229a39"
+            "text": "Uffi тепер швидше знаходить потрібну інформацію і показує свою відповідь уже під час написання, поступово, замість того щоб змушувати тебе чекати до кінця. Поки він думає або шукає в каталозі, ти бачиш, що він саме робить.",
+            "quelle": "c4065bfb6f0bda610d3c4ca26fd8051d0fd75920"
         },
         "ar": {
-            "titel": "أصبح أوفي يرد بسلاسة أكبر",
-            "text": "يعرض أوفي إجابته الآن أثناء كتابتها خطوة بخطوة، بدلاً من أن يجعلك تنتظر حتى النهاية. وأثناء تفكيره أو بحثه في الدليل، ترى ما يفعله في تلك اللحظة.",
-            "quelle": "3f4e17dae43e5aee68ebd3b2b6ac3819df229a39"
+            "titel": "Uffi antwortet schneller",
+            "text": "يجد Uffi المعلومات المناسبة الآن بسرعة أكبر، ويعرض إجابته أثناء الكتابة شيئاً فشيئاً، بدلاً من أن يجعلك تنتظر حتى النهاية. وفيما يفكر أو يبحث في الدليل، يمكنك أن ترى ما يقوم به في تلك اللحظة.",
+            "quelle": "c4065bfb6f0bda610d3c4ca26fd8051d0fd75920"
         },
         "tr": {
-            "titel": "Uffi daha akıcı yanıt veriyor",
-            "text": "Uffi artık yanıtını yazarken parça parça gösteriyor; sonuna kadar beklemen gerekmiyor. Düşünürken veya rehberde ararken ne yaptığını hemen görebilirsin.",
-            "quelle": "3f4e17dae43e5aee68ebd3b2b6ac3819df229a39"
+            "titel": "Uffi yanıtlıyor artık daha hızlı",
+            "text": "Uffi artık ihtiyacın olan bilgileri daha hızlı buluyor ve yanıtını sen daha yazarken parça parça gösteriyor; sonunu beklemek zorunda kalmıyorsun. Düşünürken ya da rehberde ararken ne yaptığını da hemen görebiliyorsun.",
+            "quelle": "c4065bfb6f0bda610d3c4ca26fd8051d0fd75920"
         },
         "ru": {
             "titel": "Uffi отвечает быстрее",
-            "text": "Uffi теперь показывает свой ответ по мере написания, по частям, и тебе не нужно ждать до самого конца. Пока он думает или ищет в справочнике, ты видишь, что он сейчас делает.",
-            "quelle": "3f4e17dae43e5aee68ebd3b2b6ac3819df229a39"
+            "text": "Uffi теперь быстрее находит нужную информацию и показывает свой ответ по мере написания, по частям, чтобы тебе не приходилось ждать до самого конца. Пока он думает или ищет в справочнике, ты видишь, что он делает в данный момент.",
+            "quelle": "c4065bfb6f0bda610d3c4ca26fd8051d0fd75920"
         }
     },
     "kaesten-sortieren": {

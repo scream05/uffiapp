@@ -27,36 +27,32 @@ class Wissen
         'seit', 'hallo', 'danke', 'gerne', 'sagen', 'wissen', 'erzähl', 'erzähle', 'mehr', 'dazu', 'du', 'dich'];
 
     /**
-     * Alle Abschnitte, je ['rel', 'titel', 'quelle', 'immer', 'nr', 'abschnitt', 'text', 'vec' (base64 float32) | null].
-     * Fehlt der Index (Abgleich noch nicht gelaufen), gilt jede Seite als ein Abschnitt ohne Vektor.
+     * Alle Abschnitte, je ['rel', 'titel', 'quelle', 'immer', 'nr', 'abschnitt', 'text'], Schlüssel = Position im Index
+     * (so liefert sie auch die Suche nach Bedeutung im Embedding-Dienst). Die Vektoren braucht PHP nicht: ohne sie je
+     * Stand des Index zwischengespeichert statt bei jeder Frage 19 MB JSON zu lesen.
+     * Fehlt der Index (Abgleich noch nicht gelaufen), gilt jede Seite als ein Abschnitt.
      */
     public static function chunks(): array
     {
-        $index = self::index();
-        if (is_array($index['abschnitte'] ?? null) && $index['abschnitte'] !== []) {
-            return $index['abschnitte'];
+        static $memo = [null, null];
+        $stand = self::stand();
+        if ($stand === false || $memo[0] !== $stand) {
+            $abschnitte = $stand === false ? null : \Yii::$app->cache->getOrSet(['ki-assistent-abschnitte', $stand], function () {
+                $index = @json_decode((string)@file_get_contents(self::DIR . '/.abschnitte.json'), true);
+                return is_array($index['abschnitte'] ?? null) && $index['abschnitte'] !== []
+                    ? array_map(fn($c) => array_diff_key($c, ['vec' => 0, 'hash' => 0]), $index['abschnitte']) : null;
+            }, 2 * 86400);
+            $memo = [$stand, $abschnitte ?? array_map(fn($p) => $p + ['nr' => 0, 'abschnitt' => ''], self::pages())];
         }
-        return array_map(fn($p) => $p + ['nr' => 0, 'abschnitt' => '', 'vec' => null], self::pages());
+        return $memo[1];
     }
 
-    private static function index(): ?array
+    /** Änderungszeit von .abschnitte.json (= Stand des Index, ändert sich mit dem nächtlichen Abgleich) oder false */
+    private static function stand(): int|false
     {
-        // je Anfrage einmal lesen; bei geändertem Index (nächtlicher Abgleich) neu
-        static $cache = [null, null];
         $file = self::DIR . '/.abschnitte.json';
         clearstatcache(true, $file);
-        $mtime = @filemtime($file);
-        if ($cache[0] !== $mtime) {
-            $index = @json_decode((string)@file_get_contents($file), true);
-            $cache = [$mtime, is_array($index) ? $index : null];
-        }
-        return $cache[1];
-    }
-
-    /** Embedding-Modell, mit dem die Abschnitt-Vektoren berechnet wurden */
-    private static function indexModel(): ?string
-    {
-        return self::index()['modell'] ?? null;
+        return @filemtime($file);
     }
 
     /**
@@ -66,7 +62,8 @@ class Wissen
     private static function visible(array $chunks): array
     {
         $member = null;
-        return array_values(array_filter($chunks, function ($c) use (&$member) {
+        // Schlüssel bleiben erhalten (Position im Index), passend zum Stichwort-Index
+        return array_filter($chunks, function ($c) use (&$member) {
             if (empty($c['space']) || !empty($c['oeffentlich'])) {
                 return true;
             }
@@ -78,7 +75,7 @@ class Wissen
                 }
             }
             return isset($member[(int)$c['space']]);
-        }));
+        });
     }
 
     /** @return array[] je Seite ['rel', 'titel', 'quelle', 'immer', 'text'] direkt aus den Markdown-Dateien */
@@ -113,23 +110,24 @@ class Wissen
 
     /**
      * Wissensteil des Prompts für die Frage (bei Rückfragen auch die vorherige Frage berücksichtigen).
-     * Mit $embed (Frage → [Modell, Vektor]) Suche nach Bedeutung, sonst/ersatzweise Stichwortsuche.
+     * Mit $suche (Frage → [Stand des Index, Abschnitt-Positionen nach Ähnlichkeit], Embeddings::suche) Suche nach
+     * Bedeutung und Stichwortsuche zusammen, sonst/ersatzweise nur Stichwortsuche.
      * @param bool $immer Seiten mit „immer: ja“ mitschicken (false, wenn sie über immer() schon im Prompt stehen)
      */
-    public static function forQuestion(string $question, ?callable $embed = null, bool $immer = true): string
+    public static function forQuestion(string $question, ?callable $suche = null, bool $immer = true): string
     {
         $chunks = self::visible(self::chunks());
         if ($chunks === []) {
             return '';
         }
         $ranked = null;
-        if ($embed !== null && trim($question) !== '') {
+        if ($suche !== null && trim($question) !== '') {
             try {
-                [$model, $vector] = $embed($question);
-                if ($model !== self::indexModel()) {
-                    throw new \RuntimeException("Index mit anderem Modell berechnet (" . self::indexModel() . "), Dienst: $model");
+                [$stand, $rang] = $suche($question);
+                if ($stand !== self::stand()) {
+                    throw new \RuntimeException("Embedding-Dienst hat einen anderen Stand des Index ($stand)");
                 }
-                $ranked = self::rankHybrid($chunks, $question, $vector);
+                $ranked = self::rankHybrid($chunks, $question, $rang);
             } catch (\Throwable $e) {
                 \Yii::warning('KI-Assistent: Suche nach Bedeutung nicht möglich, Stichwortsuche: ' . $e->getMessage(), 'ki-assistent');
             }
@@ -159,12 +157,14 @@ class Wissen
     /**
      * Suche nach Bedeutung und Stichwortsuche zusammen (Reciprocal Rank Fusion): das lokale Embedding-Modell findet
      * umformulierte Fragen, BM25 genaue Begriffe („Biotonne abmelden“), die das Modell allein schlechter trifft.
+     * @param array $rang Abschnitt-Positionen nach Ähnlichkeit zur Frage (Embedding-Dienst), beste zuerst
      * @return array|null [ausgewählte Abschnitt-Indizes, weitere Treffer]
      */
-    private static function rankHybrid(array $chunks, string $question, array $query): ?array
+    private static function rankHybrid(array $chunks, string $question, array $rang): ?array
     {
-        $meaning = self::rankByMeaning($chunks, $query);
-        if ($meaning === null) {
+        // nur Abschnitte, die der Nutzer sehen darf
+        $meaning = array_values(array_filter(array_map('intval', $rang), fn($i) => isset($chunks[$i])));
+        if ($meaning === []) {
             return null;
         }
         [, $keywords] = self::rankByKeywords($chunks, $question);
@@ -179,73 +179,98 @@ class Wissen
         return [array_slice($ids, 0, self::MAX_CHUNKS), $ids];
     }
 
-    /** @return array|null Abschnitt-Indizes (ohne „immer“-Seiten) nach Kosinus-Ähnlichkeit, beste zuerst */
-    private static function rankByMeaning(array $chunks, array $query): ?array
+    /**
+     * Stichwort-Index aller Abschnitte: Wort → [Abschnitt → Anzahl], Länge und Titelwörter je Abschnitt. Einmal je
+     * Stand von .abschnitte.json berechnet und zwischengespeichert – sonst zerlegt jede Frage alle Abschnitte neu (~1,4 s).
+     */
+    private static function stichwortIndex(): array
     {
-        $query = array_values($query);
-        $dim = count($query);
-        $scored = [];
-        foreach ($chunks as $i => $c) {
-            if (empty($c['vec']) || $c['immer']) {
-                continue;
-            }
-            $v = unpack('g*', base64_decode($c['vec']));
-            if (count($v) !== $dim) {
-                continue;
-            }
-            $dot = 0.0;
-            for ($k = 0; $k < $dim; $k++) {
-                $dot += $v[$k + 1] * $query[$k];
-            }
-            $scored[$i] = $dot;
+        static $memo = [null, null];
+        $stand = self::stand();
+        if ($stand !== false && $memo[0] === $stand) {
+            return $memo[1];
         }
-        if ($scored === []) {
-            return null;
+        $bauen = function () {
+            $woerter = $len = $titel = [];
+            foreach (self::chunks() as $i => $c) {
+                $counts = array_count_values(self::terms($c['titel'] . ' ' . $c['abschnitt'] . ' ' . $c['text']));
+                foreach ($counts as $w => $n) {
+                    $woerter[(string)$w][$i] = $n;
+                }
+                $len[$i] = array_sum($counts);
+                $titel[$i] = array_values(array_unique(self::terms($c['titel'] . ' ' . $c['abschnitt'])));
+            }
+            $sortiert = array_map('strval', array_keys($woerter));
+            sort($sortiert, SORT_STRING);
+            return ['woerter' => $woerter, 'sortiert' => $sortiert, 'len' => $len, 'titel' => $titel];
+        };
+        // Ohne Index (Abgleich noch nicht gelaufen) jedes Mal neu, das kommt nur ausnahmsweise vor
+        $daten = $stand === false ? $bauen() : \Yii::$app->cache->getOrSet(['ki-assistent-stichworte', 2, $stand], $bauen, 2 * 86400);
+        $memo = [$stand, $daten];
+        return $daten;
+    }
+
+    /**
+     * Wörter des Index, die zum Begriff passen (wie $matches in rankByKeywords: das Wort beginnt mit dem Begriff, oder der
+     * Begriff beginnt mit einem Wort ab 5 Zeichen) – per binärer Suche in der sortierten Liste statt über alle Wörter.
+     */
+    private static function passendeWoerter(array $index, string $t): array
+    {
+        $liste = $index['sortiert'];
+        [$lo, $hi] = [0, count($liste)];
+        while ($lo < $hi) {
+            $mid = ($lo + $hi) >> 1;
+            strcmp($liste[$mid], $t) < 0 ? $lo = $mid + 1 : $hi = $mid;
         }
-        arsort($scored);
-        return array_keys($scored);
+        $out = [];
+        for ($k = $lo; $k < count($liste) && str_starts_with($liste[$k], $t); $k++) {
+            $out[] = $liste[$k];
+        }
+        for ($l = 5; $l < strlen($t); $l++) {
+            if (isset($index['woerter'][$p = substr($t, 0, $l)])) {
+                $out[] = $p;
+            }
+        }
+        return $out;
     }
 
     /** @return array [ausgewählte Abschnitt-Indizes, weitere Treffer] nach BM25 */
     private static function rankByKeywords(array $chunks, string $question): array
     {
         $terms = array_unique(self::terms($question));
-        $docs = [];
-        foreach ($chunks as $i => $c) {
-            $counts = array_count_values(self::terms($c['titel'] . ' ' . $c['abschnitt'] . ' ' . $c['text']));
-            $docs[$i] = ['counts' => $counts, 'len' => array_sum($counts),
-                'titleStems' => array_unique(self::terms($c['titel'] . ' ' . $c['abschnitt']))];
-        }
+        $index = self::stichwortIndex();
         // Begriff passt auf ein Wort, wenn eins mit dem anderen beginnt („gewerbe“ ↔ „gewerbeanmeld“)
         $matches = fn(string $t, string $w) => str_starts_with($w, $t) || (strlen($w) >= 5 && str_starts_with($t, $w));
         $tf = [];
         $df = array_fill_keys($terms, 0);
-        foreach ($docs as $i => $d) {
-            foreach ($terms as $t) {
-                $n = 0;
-                foreach ($d['counts'] as $w => $c) {
-                    if ($matches($t, (string)$w)) {
-                        $n += $c;
+        foreach ($terms as $t) {
+            $treffer = [];
+            foreach (self::passendeWoerter($index, $t) as $w) {
+                foreach ($index['woerter'][$w] as $i => $n) {
+                    if (isset($chunks[$i])) { // nur Abschnitte, die der Nutzer sehen darf
+                        $treffer[$i] = ($treffer[$i] ?? 0) + $n;
                     }
                 }
-                if ($n) {
-                    $tf[$i][$t] = $n;
-                    $df[$t]++;
-                }
             }
+            foreach ($treffer as $i => $n) {
+                $tf[$i][$t] = $n;
+            }
+            $df[$t] = count($treffer);
         }
+        ksort($tf); // Reihenfolge wie die Abschnitte (bei gleicher Punktzahl entscheidet die Position)
+        $docs = array_intersect_key($index['len'], $chunks);
         // BM25: seltene Begriffe zählen mehr, lange Abschnitte werden nicht bevorzugt; Treffer in Titel/Überschrift extra
-        $avgLen = array_sum(array_column($docs, 'len')) / count($docs);
+        $avgLen = array_sum($docs) / max(1, count($docs));
         $scored = [];
-        foreach ($docs as $i => $d) {
-            if ($chunks[$i]['immer'] || empty($tf[$i])) {
+        foreach ($tf as $i => $terme) {
+            if ($chunks[$i]['immer']) {
                 continue;
             }
             $score = 0;
-            foreach ($tf[$i] as $t => $n) {
+            foreach ($terme as $t => $n) {
                 $idf = log(1 + (count($docs) - $df[$t] + 0.5) / ($df[$t] + 0.5));
-                $inTitle = array_filter($d['titleStems'], fn($w) => $matches($t, $w)) !== [];
-                $score += $idf * ($n * 2.2 / ($n + 1.2 * (0.25 + 0.75 * $d['len'] / $avgLen)) + ($inTitle ? 2 : 0));
+                $inTitle = array_filter($index['titel'][$i], fn($w) => $matches($t, (string)$w)) !== [];
+                $score += $idf * ($n * 2.2 / ($n + 1.2 * (0.25 + 0.75 * $docs[$i] / $avgLen)) + ($inTitle ? 2 : 0));
             }
             $scored[$i] = $score;
         }

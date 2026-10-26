@@ -1009,6 +1009,32 @@ class SetupController extends Controller
     }
 
     /**
+     * Zeitbedarf beim Aufbau des KI-Prompts je Schritt (ohne Anfrage an Claude): setup/ki-zeit "Frage"
+     */
+    public function actionKiZeit($question = 'Wo kann ich in Uffenheim Döner essen?')
+    {
+        $w = \humhub\modules\kiAssistent\components\Wissen::class;
+        $ctx = \humhub\modules\kiAssistent\components\Context::class;
+        $call = fn($name, ...$args) => (new \ReflectionMethod($w, $name))->invoke(null, ...$args);
+        $mess = function ($was, callable $f) {
+            $t = microtime(true);
+            $r = $f();
+            $this->stdout(sprintf("%7.0f ms  %s\n", 1000 * (microtime(true) - $t), $was));
+            return $r;
+        };
+        $chunks = $mess('Abschnitte laden (ohne Vektoren, zwischengespeichert)', fn() => $w::chunks());
+        $chunks = $mess('Sichtbarkeit filtern', fn() => $call('visible', $chunks));
+        [, $rang] = $mess('Suche nach Bedeutung (Embedding-Dienst)', fn() => \humhub\modules\kiAssistent\components\Embeddings::suche($question));
+        $mess('Stichwortsuche BM25', fn() => $call('rankByKeywords', $chunks, $question));
+        $mess('Wissen::forQuestion gesamt', fn() => $w::forQuestion($question, fn($q) => \humhub\modules\kiAssistent\components\Embeddings::suche($q), false));
+        $mess('Wissen::immer', fn() => $w::immer());
+        $mess('Context::stabil (Zwischenspeicher)', fn() => $ctx::stabil());
+        $mess('Context::aktuell', fn() => $ctx::aktuell());
+        $mess('systemPrompt gesamt', fn() => \humhub\modules\kiAssistent\controllers\ChatController::systemPrompt($question));
+        return ExitCode::OK;
+    }
+
+    /**
      * Altersbestätigung des KI-Assistenten anzeigen/setzen/zurücksetzen:
      * setup/ki-alter <benutzername> [zeigen|setzen|zuruecksetzen]
      */
