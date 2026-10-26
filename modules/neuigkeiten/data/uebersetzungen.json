@@ -1,4 +1,31 @@
 {
+    "uffi-links": {
+        "en": {
+            "titel": "Links at Uffi easier to spot",
+            "text": "Links in Uffi's answers are now bold and clearly underlined, so you can find them right away. A small arrow ↗ shows you when a link opens another page in a new tab.",
+            "quelle": "cdd27350dbaf69d2e9f616c15f556dfc0291b559"
+        },
+        "uk": {
+            "titel": "Посилання в Uffi стали помітнішими",
+            "text": "Посилання у відповідях Uffi тепер жирні та яскраво підкреслені, щоб ти одразу їх знаходив. Маленька стрілка ↗ показує, якщо посилання відкриває іншу сторінку в новій вкладці.",
+            "quelle": "cdd27350dbaf69d2e9f616c15f556dfc0291b559"
+        },
+        "ar": {
+            "titel": "روابط أوضح في Uffi",
+            "text": "أصبحت الروابط في ردود Uffi الآن عريضة ومسطّرة بخط واضح، حتى تجدها فورًا. ويُظهر لك سهم صغير ↗ أن الرابط سيفتح صفحة أخرى في تبويب جديد.",
+            "quelle": "cdd27350dbaf69d2e9f616c15f556dfc0291b559"
+        },
+        "tr": {
+            "titel": "Uffi'deki bağlantılar artık daha görünür",
+            "text": "Uffi'nin yanıtlarındaki bağlantılar artık kalın yazılmış ve belirgin şekilde altı çizili, böylece onları hemen bulabilirsin. Bir bağlantı başka bir sayfayı yeni bir sekmede açtığında, küçük bir ok ↗ bunu sana gösterir.",
+            "quelle": "cdd27350dbaf69d2e9f616c15f556dfc0291b559"
+        },
+        "ru": {
+            "titel": "Ссылки у Uffi стали заметнее",
+            "text": "Ссылки в ответах Uffi теперь жирные и крепко подчёркнутые, чтобы ты сразу их находил. Маленькая стрелка ↗ покажет, если ссылка открывает другую страницу в новой вкладке.",
+            "quelle": "cdd27350dbaf69d2e9f616c15f556dfc0291b559"
+        }
+    },
     "uffi-streaming": {
         "en": {
             "titel": "Uffi answers faster",

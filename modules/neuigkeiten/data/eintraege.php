@@ -10,6 +10,10 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'uffi-links', 'datum' => '2026-10-26', 'art' => 'besser', 'popup' => false,
+        'link' => [null, '/ki-assistent/chat'],
+        'titel' => 'Links bei Uffi besser sichtbar',
+        'text' => 'Links in Uffis Antworten sind jetzt fett und kräftig unterstrichen, damit du sie sofort findest. Ein kleiner Pfeil ↗ zeigt dir, wenn ein Link eine andere Seite in einem neuen Tab öffnet.'],
     ['id' => 'uffi-streaming', 'datum' => '2026-10-26', 'art' => 'besser', 'popup' => false,
         'link' => [null, '/ki-assistent/chat'],
         'titel' => 'Uffi antwortet schneller',

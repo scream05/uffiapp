@@ -108,3 +108,20 @@ body:has(.ki-page) .ki-panel { display: none !important; }
 /* Statuszeile während Uffi schreibt oder eine Aktion ausführt (Streaming) */
 .ki-status { color: var(--hh-text-color-soft, #777); font-size: .9em; }
 .ki-msg-model > .ki-status:not(:first-child) { margin-top: .3em; }
+
+/* Links in Uffis Antworten deutlich hervorheben: fett, unterstrichen, Pfeil bei fremden Seiten */
+.ki-msg-model a[href]:not(.btn):not([data-r]) {
+    color: var(--bs-primary, #446e88);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+    border-radius: 3px;
+}
+.ki-msg-model a[href]:not(.btn):not([data-r]):hover,
+.ki-msg-model a[href]:not(.btn):not([data-r]):focus-visible {
+    background: var(--hh-background-color-highlight, rgba(68, 110, 136, .12));
+    text-decoration-thickness: 3px;
+}
+.ki-msg-model a[target="_blank"]:not(.btn):not([data-r])::after { content: " ↗"; font-weight: 400; text-decoration: none; display: inline-block; }
+[data-bs-theme="dark"] .ki-msg-model a[href]:not(.btn):not([data-r]) { color: #9cc3dc; }
