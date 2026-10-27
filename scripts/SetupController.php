@@ -325,6 +325,28 @@ class SetupController extends Controller
     }
 
     /**
+     * Alte Push-Geräte aufräumen (Crontab täglich): Die HumHub-App legt bei fast jedem Start einen neuen Token an, die alten
+     * bleiben in fcmpush_user liegen. Je Konto und Push-Weg bleibt der neueste Eintrag immer stehen; ältere Einträge fallen
+     * weg, wenn sie seit <tage> Tagen nicht erneuert wurden. Ein Gerät, das so lange nicht geöffnet wurde, meldet sich beim
+     * nächsten App-Start neu an. setup/push-geraete-aufraeumen [tage=30] [probe=0]
+     */
+    public function actionPushGeraeteAufraeumen($tage = 30, $probe = 0)
+    {
+        $bedingung = 'FROM fcmpush_user f JOIN (SELECT user_id, sender_id, MAX(id) AS neueste FROM fcmpush_user GROUP BY user_id, sender_id) k'
+            . ' ON k.user_id = f.user_id AND k.sender_id = f.sender_id'
+            . ' WHERE f.id < k.neueste AND COALESCE(f.updated_at, f.created_at) < NOW() - INTERVAL :tage DAY';
+        $db = Yii::$app->db;
+        $anzahl = (int)$db->createCommand("SELECT COUNT(*) $bedingung", [':tage' => (int)$tage])->queryScalar();
+        if (!$probe && $anzahl) {
+            $anzahl = $db->createCommand("DELETE f $bedingung", [':tage' => (int)$tage])->execute();
+        }
+        $rest = (int)$db->createCommand('SELECT COUNT(*) FROM fcmpush_user')->queryScalar();
+        $this->stdout(date('Y-m-d H:i:s') . ($probe ? ' Probe: würde ' : ' ') . "$anzahl alte Push-Geräte "
+            . ($probe ? 'löschen' : 'gelöscht') . " (älter als $tage Tage), $rest Einträge übrig\n");
+        return ExitCode::OK;
+    }
+
+    /**
      * Vorschau der Mails an Bürger in einer Sprache, ohne Versand: setup/mailvorschau <sprache> (de, en-US, uk, ar, tr, ru).
      * Nimmt die neueste Mängelmeldung und den neuesten Vereins-/Gewerbebeitrag als Beispiel.
      */
