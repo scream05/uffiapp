@@ -289,9 +289,10 @@ class SetupController extends Controller
 
     /**
      * Test-Push an alle Geräte eines Kontos (App und Browser), mit der Zahl ungelesener Glockenmeldungen als Kennzeichen:
-     * setup/pushtest <benutzername> ["Text"]. Fehler stehen im HumHub-Log (Kategorie fcm-push).
+     * setup/pushtest <benutzername> ["Text"] [still=0]. Fehler stehen im HumHub-Log (Kategorie fcm-push).
+     * still=1 schickt nur die stille Nachricht mit der Zahl (wie fcm-push nach dem Lesen), ohne sichtbaren Text.
      */
-    public function actionPushtest($username, $text = 'Test-Push von Rund um Uffni')
+    public function actionPushtest($username, $text = 'Test-Push von Rund um Uffni', $still = 0)
     {
         $user = User::findOne(['username' => $username]);
         if ($user === null) {
@@ -309,12 +310,14 @@ class SetupController extends Controller
             $tokens = (new \humhub\modules\fcmPush\services\TokenService())->getTokensForUser($user, $driver);
             $name = (new \ReflectionClass($driver))->getShortName();
             $this->stdout("$name (Sender {$driver->getSenderId()}): " . count($tokens) . " Gerät(e)\n");
-            if (!$tokens) {
-                continue;
+            if (!$tokens || ($still && !$driver instanceof \humhub\modules\fcmPush\drivers\Proxy)) {
+                continue; // stille Nachrichten verschickt fcm-push nur über den Proxy (HumHub-App)
             }
             if ($driver instanceof \humhub\modules\fcmPush\drivers\Proxy) {
-                $response = $driver->post('/push', ['tokens' => $tokens, 'title' => Yii::$app->name, 'body' => $text,
-                    'iconUrl' => null, 'url' => $url, 'notificationCount' => $count])->send();
+                $daten = $still ? ['tokens' => $tokens, 'notificationCount' => $count, 'silent' => true]
+                    : ['tokens' => $tokens, 'title' => Yii::$app->name, 'body' => $text, 'iconUrl' => null, 'url' => $url,
+                        'notificationCount' => $count];
+                $response = $driver->post('/push', $daten)->send();
                 $this->stdout("  HTTP {$response->statusCode}: " . json_encode($response->data, JSON_UNESCAPED_UNICODE) . "\n");
             } else {
                 $report = $driver->processCloudMessage($tokens, Yii::$app->name, $text, $url, null, $count);
