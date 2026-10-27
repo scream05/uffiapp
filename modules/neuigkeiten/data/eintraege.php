@@ -12,7 +12,7 @@
 return [
     ['id' => 'app-zahl-schneller', 'datum' => '2026-10-27', 'art' => 'besser', 'popup' => false,
         'titel' => 'Zahl am App-Symbol aktualisiert sich schneller',
-        'text' => 'Wenn du in der App deine Benachrichtigungen liest, passt sich die Zahl am App-Symbol jetzt nach etwa einer Minute an, statt erst nach zehn Minuten. Bei neuen Benachrichtigungen erscheint sie wie bisher sofort.'],
+        'text' => 'Wenn du in der App deine Benachrichtigungen liest, passt sich die Zahl am App-Symbol jetzt nach wenigen Sekunden an, statt erst nach zehn Minuten. Bei neuen Benachrichtigungen erscheint sie wie bisher sofort.'],
     ['id' => 'mehr-namen-einzeilig', 'datum' => '2026-10-26', 'art' => 'behoben', 'popup' => false,
         'titel' => 'Namen unter „Mehr“ wieder in einer Zeile',
         'text' => 'Am Handy wurden lange Namen im Fach „Mehr“ wie „Öffnungszeiten“ oder „Mitteilungsblatt“ mitten im Wort umgebrochen. Jetzt stehen alle Namen sauber in einer Zeile.'],

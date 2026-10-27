@@ -2,28 +2,28 @@
     "app-zahl-schneller": {
         "en": {
             "titel": "Number on the app icon updates faster",
-            "text": "When you read your notifications in the app, the number on the app icon now adjusts after about a minute instead of only after ten minutes. For new notifications, it still appears immediately, as before.",
-            "quelle": "a2ab86a42d24e2aba73c3de560bb15e483ca970f"
+            "text": "When you read your notifications in the app, the number on the app icon now adjusts after a few seconds instead of only after ten minutes. When there are new notifications, it still appears immediately as before.",
+            "quelle": "57c469afb04c9e44f4bd3b8610d6c5b56d213949"
         },
         "uk": {
-            "titel": "Цифра на значку застосунку тепер оновлюється швидше",
-            "text": "Коли ти читаєш сповіщення в застосунку, цифра на значку застосунку тепер змінюється приблизно через одну хвилину, а не через десять. Нові сповіщення, як і раніше, з'являються одразу.",
-            "quelle": "a2ab86a42d24e2aba73c3de560bb15e483ca970f"
+            "titel": "Цифра на іконці застосунку оновлюється швидше",
+            "text": "Коли ти читаєш сповіщення в застосунку, цифра на іконці застосунку тепер змінюється за кілька секунд, а не через десять хвилин. Для нових сповіщень вона, як і раніше, з'являється одразу.",
+            "quelle": "57c469afb04c9e44f4bd3b8610d6c5b56d213949"
         },
         "ar": {
-            "titel": "الرقم على أيقونة التطبيق يتحدّث أسرع",
-            "text": "عندما تقرأ إشعاراتك في التطبيق، يتعدّل الرقم على أيقونة التطبيق الآن بعد حوالي دقيقة واحدة، بدلاً من عشر دقائق كما كان من قبل. أما عند وصول إشعارات جديدة، فيظهر الرقم فوراً كما كان يحدث سابقاً.",
-            "quelle": "a2ab86a42d24e2aba73c3de560bb15e483ca970f"
+            "titel": "تتحدّث الرقم على أيقونة التطبيق بشكل أسرع",
+            "text": "عندما تقرأ إشعاراتك في التطبيق، يتم الآن تعديل الرقم على أيقونة التطبيق بعد بضع ثوانٍ فقط، بدلاً من عشر دقائق. وعند وصول إشعارات جديدة، يظهر الرقم فوراً كما كان من قبل.",
+            "quelle": "57c469afb04c9e44f4bd3b8610d6c5b56d213949"
         },
         "tr": {
-            "titel": "App simgesindeki sayı artık daha hızlı güncelleniyor",
-            "text": "Uygulamada bildirimlerini okuduğunda, uygulama simgesindeki sayı artık yaklaşık bir dakika sonra güncelleniyor; eskiden on dakika sürüyordu. Yeni bildirimler ise her zamanki gibi hemen görünüyor.",
-            "quelle": "a2ab86a42d24e2aba73c3de560bb15e483ca970f"
+            "titel": "App-Symbolda gösterilen sayı daha hızlı güncelleniyor",
+            "text": "Uygulamada bildirimlerini okuduğunda, uygulama simgesindeki sayı artık zaman aşımı beklemeden birkaç saniye içinde güncelleniyor. Önceden olduğu gibi yeni bildirimler de hemen görünür.",
+            "quelle": "57c469afb04c9e44f4bd3b8610d6c5b56d213949"
         },
         "ru": {
-            "titel": "Число на значке приложения обновляется быстрее",
-            "text": "Когда ты читаешь уведомления в приложении, число на значке приложения теперь обновляется примерно через минуту, а не через десять минут. При новых уведомлениях оно появляется, как и раньше, сразу.",
-            "quelle": "a2ab86a42d24e2aba73c3de560bb15e483ca970f"
+            "titel": "Zahl am App-Symbol aktualisiert sich schneller",
+            "text": "Wenn du in der App deine Benachrichtigungen liest, passt sich die Zahl am App-Symbol jetzt nach wenigen Sekunden an, statt erst nach zehn Minuten. Bei neuen Benachrichtigungen erscheint sie wie bisher sofort.",
+            "quelle": "57c469afb04c9e44f4bd3b8610d6c5b56d213949"
         }
     },
     "mehr-namen-einzeilig": {
