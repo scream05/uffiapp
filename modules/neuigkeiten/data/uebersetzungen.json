@@ -1,4 +1,31 @@
 {
+    "app-zahl-schneller": {
+        "en": {
+            "titel": "Number on the app icon updates faster",
+            "text": "When you read your notifications in the app, the number on the app icon now adjusts after about a minute instead of only after ten minutes. For new notifications, it still appears immediately, as before.",
+            "quelle": "a2ab86a42d24e2aba73c3de560bb15e483ca970f"
+        },
+        "uk": {
+            "titel": "Цифра на значку застосунку тепер оновлюється швидше",
+            "text": "Коли ти читаєш сповіщення в застосунку, цифра на значку застосунку тепер змінюється приблизно через одну хвилину, а не через десять. Нові сповіщення, як і раніше, з'являються одразу.",
+            "quelle": "a2ab86a42d24e2aba73c3de560bb15e483ca970f"
+        },
+        "ar": {
+            "titel": "الرقم على أيقونة التطبيق يتحدّث أسرع",
+            "text": "عندما تقرأ إشعاراتك في التطبيق، يتعدّل الرقم على أيقونة التطبيق الآن بعد حوالي دقيقة واحدة، بدلاً من عشر دقائق كما كان من قبل. أما عند وصول إشعارات جديدة، فيظهر الرقم فوراً كما كان يحدث سابقاً.",
+            "quelle": "a2ab86a42d24e2aba73c3de560bb15e483ca970f"
+        },
+        "tr": {
+            "titel": "App simgesindeki sayı artık daha hızlı güncelleniyor",
+            "text": "Uygulamada bildirimlerini okuduğunda, uygulama simgesindeki sayı artık yaklaşık bir dakika sonra güncelleniyor; eskiden on dakika sürüyordu. Yeni bildirimler ise her zamanki gibi hemen görünüyor.",
+            "quelle": "a2ab86a42d24e2aba73c3de560bb15e483ca970f"
+        },
+        "ru": {
+            "titel": "Число на значке приложения обновляется быстрее",
+            "text": "Когда ты читаешь уведомления в приложении, число на значке приложения теперь обновляется примерно через минуту, а не через десять минут. При новых уведомлениях оно появляется, как и раньше, сразу.",
+            "quelle": "a2ab86a42d24e2aba73c3de560bb15e483ca970f"
+        }
+    },
     "mehr-namen-einzeilig": {
         "en": {
             "titel": "Names under \"More\" are back on one line",
