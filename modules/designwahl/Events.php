@@ -264,6 +264,9 @@ class Events
             }
             assets\KalenderAsset::register(Yii::$app->view);
             assets\AufwachenAsset::register(Yii::$app->view);
+            if (!Yii::$app->user->isGuest) {
+                assets\KennzeichenAsset::register(Yii::$app->view);
+            }
             Yii::$app->view->registerJs('window.dnSitzungSek = ' . (int) Yii::$app->user->authTimeout . ';', \yii\web\View::POS_HEAD, 'dn-sitzung');
             if (Yii::$app->user->isGuest) {
                 self::abbrechenKnopf();
@@ -524,5 +527,28 @@ JS, ['DN_ABBRECHEN' => json_encode(Yii::t('DesignwahlModule.base', 'Abbrechen'),
         } catch (\Throwable $e) {
             Yii::error($e, 'designwahl');
         }
+    }
+
+    /**
+     * Zahl am Symbol der Web-App, auch wenn sie geschlossen ist: Jeder Push an die Web-App (fcm-push, Treiber Fcm)
+     * trägt die Zahl in data.notification_count; der Service Worker setzt sie damit. Stille Nachrichten nimmt Safari
+     * bei Web-Apps nicht an, daher sinkt die Zahl erst beim Öffnen (resources/kennzeichen/kennzeichen.js).
+     */
+    public static function onServiceWorkerInit($event)
+    {
+        $event->sender->additionalJs .= <<<'JS'
+
+self.addEventListener('push', function (event) {
+    var anzahl = NaN;
+    try {
+        var inhalt = event.data && event.data.json();
+        anzahl = parseInt(inhalt && inhalt.data && inhalt.data.notification_count, 10);
+    } catch (e) {
+    }
+    if (!isNaN(anzahl) && self.navigator.setAppBadge) {
+        event.waitUntil((anzahl > 0 ? self.navigator.setAppBadge(anzahl) : self.navigator.clearAppBadge()).catch(function () {}));
+    }
+});
+JS;
     }
 }

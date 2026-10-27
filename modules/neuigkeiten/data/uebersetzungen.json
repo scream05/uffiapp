@@ -1,4 +1,31 @@
 {
+    "webapp-zahl": {
+        "en": {
+            "titel": "Number on the icon now also in the web app",
+            "text": "If you use Rund um Uffni as an icon on your home screen instead of the \"HumHub\" app, the icon now shows the number of your new notifications and messages. It updates with every push notification and adjusts as soon as you open the page.",
+            "quelle": "2307df8517f8b315f4a1423cc15e3bf0e3bc7643"
+        },
+        "uk": {
+            "titel": "Число на іконці також у веб-застосунку",
+            "text": "Якщо ти використовуєш «Rund um Uffni» як іконку на головному екрані замість застосунку «HumHub», іконка тепер показує кількість твоїх нових сповіщень і повідомлень. Число з'являється разом із кожним push-повідомленням і оновлюється, щойно ти відкриваєш сторінку.",
+            "quelle": "2307df8517f8b315f4a1423cc15e3bf0e3bc7643"
+        },
+        "ar": {
+            "titel": "الرقم على الأيقونة في تطبيق الويب أيضًا",
+            "text": "إذا كنت تستخدم «رund um Uffni» كأيقونة على شاشتك الرئيسية بدلاً من تطبيق „HumHub“، فإن الأيقونة تعرض الآن عدد إشعاراتك ورسائلك الجديدة. يظهر هذا الرقم مع كل إشعار فوري، ويتحدّث تلقائيًا بمجرد أن تفتح الصفحة.",
+            "quelle": "2307df8517f8b315f4a1423cc15e3bf0e3bc7643"
+        },
+        "tr": {
+            "titel": "Zahl am Symbol auch in der Web-App",
+            "text": "Nutzt du Rund um Uffni als Symbol auf dem Startbildschirm statt der App „HumHub“, zeigt das Symbol jetzt die Zahl deiner neuen Benachrichtigungen und Nachrichten. Sie kommt mit jeder Push-Mitteilung und passt sich an, sobald du die Seite öffnest.",
+            "quelle": "2307df8517f8b315f4a1423cc15e3bf0e3bc7643"
+        },
+        "ru": {
+            "titel": "Zahl am Symbol auch in der Web-App",
+            "text": "Nutzt du Rund um Uffni als Symbol auf dem Startbildschirm statt der App „HumHub“, zeigt das Symbol jetzt die Zahl deiner neuen Benachrichtigungen und Nachrichten. Sie kommt mit jeder Push-Mitteilung und passt sich an, sobald du die Seite öffnest.",
+            "quelle": "2307df8517f8b315f4a1423cc15e3bf0e3bc7643"
+        }
+    },
     "app-zahl-schneller": {
         "en": {
             "titel": "Number on the app icon updates faster",

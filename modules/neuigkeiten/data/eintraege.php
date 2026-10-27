@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'webapp-zahl', 'datum' => '2026-10-27', 'art' => 'neu', 'popup' => false,
+        'titel' => 'Zahl am Symbol auch in der Web-App',
+        'text' => 'Nutzt du Rund um Uffni als Symbol auf dem Startbildschirm statt der App „HumHub“, zeigt das Symbol jetzt die Zahl deiner neuen Benachrichtigungen und Nachrichten. Sie kommt mit jeder Push-Mitteilung und passt sich an, sobald du die Seite öffnest.'],
     ['id' => 'app-zahl-schneller', 'datum' => '2026-10-27', 'art' => 'besser', 'popup' => false,
         'titel' => 'Zahl am App-Symbol aktualisiert sich schneller',
         'text' => 'Wenn du in der App deine Benachrichtigungen liest, passt sich die Zahl am App-Symbol jetzt nach wenigen Sekunden an, statt erst nach zehn Minuten. Auch bei neuen Benachrichtigungen und Nachrichten kommt die Zahl jetzt zuverlässig ein paar Sekunden nach dem Push.'],
