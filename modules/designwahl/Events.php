@@ -495,4 +495,34 @@ JS, ['DN_ABBRECHEN' => json_encode(Yii::t('DesignwahlModule.base', 'Abbrechen'),
             Yii::error($e, 'designwahl');
         }
     }
+
+    /**
+     * Zahl am App-Symbol: Der sichtbare Push der HumHub-App setzt die Zahl am iPhone nicht, nur die stille Nachricht von
+     * fcm-push (kommt sonst nur beim Lesen). Deshalb lösen auch neue Glockenmeldungen und neue private Nachrichten das
+     * Ereignis aus; fcm-push schickt dann nach silentUnreadNotificationCountPushDelay die aktuelle Zahl (je Konto ein Auftrag).
+     */
+    public static function onNotificationInsert($event)
+    {
+        try {
+            if ($event->sender->send_web_notifications && $event->sender->user) {
+                \humhub\modules\notification\events\UnreadCountChangedEvent::triggerChanged($event->sender->user);
+            }
+        } catch (\Throwable $e) {
+            Yii::error($e, 'designwahl');
+        }
+    }
+
+    public static function onMessageEntryInsert($event)
+    {
+        try {
+            $message = $event->sender->message;
+            foreach ($message ? $message->users : [] as $user) {
+                if ($user->id != $event->sender->user_id) {
+                    \humhub\modules\notification\events\UnreadCountChangedEvent::triggerChanged($user);
+                }
+            }
+        } catch (\Throwable $e) {
+            Yii::error($e, 'designwahl');
+        }
+    }
 }

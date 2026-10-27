@@ -28,5 +28,8 @@ return [
         ['class' => 'humhub\modules\content\widgets\WallEntryControls', 'event' => 'run', 'callback' => [Events::class, 'onWallEntryControlsRun']],
         ['class' => 'yii\web\Response', 'event' => 'beforeSend', 'callback' => [Events::class, 'onResponseBeforeSend']],
         ['class' => LayoutAddons::class, 'event' => LayoutAddons::EVENT_BEFORE_RUN, 'callback' => [Events::class, 'onLayoutAddons']],
+        // Zahl am App-Symbol auch bei neuen Meldungen/Nachrichten per stiller Nachricht nachziehen (siehe Events::kennzeichenNachziehen)
+        ['class' => 'humhub\modules\notification\models\Notification', 'event' => 'afterInsert', 'callback' => [Events::class, 'onNotificationInsert']],
+        ['class' => 'humhub\modules\mail\models\MessageEntry', 'event' => 'afterInsert', 'callback' => [Events::class, 'onMessageEntryInsert']],
     ],
 ];
