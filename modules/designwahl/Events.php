@@ -39,6 +39,7 @@ class Events
     public static function onBeforeRequest($event)
     {
         self::uebersetzungenRegistrieren();
+        self::pushVerzoegerung();
         Yii::$container->set(\humhub\modules\space\widgets\HeaderCounterSet::class, widgets\SpaceZaehler::class);
         Yii::$container->set(\humhub\modules\space\widgets\Members::class, widgets\SpaceMitglieder::class);
         Yii::$container->set(\humhub\modules\space\widgets\SpaceDirectoryIcons::class, widgets\SpaceVerzeichnisSymbole::class);
@@ -59,6 +60,24 @@ class Events
      * bleiben deutsche Nutzer beim Original, alle anderen bekommen messages/<sprache>/base.php (en-US → en).
      * Auch für die Konsole (Warteschlange: Benachrichtigungen und Mails in der Sprache des Empfängers).
      */
+    /**
+     * Zahl am App-Symbol: fcm-push schickt die neue Zahl als stille Nachricht – Standard erst nach 10 Minuten, hier nach
+     * 10 Sekunden (mehrere Änderungen darin = eine Nachricht). Bewusst nicht in config/common.php: ein Moduleintrag dort
+     * bricht `module/update fcm-push` (der Befehl lädt keine Module, der Eintrag ist dann ohne Klasse).
+     */
+    public static function pushVerzoegerung(): void
+    {
+        if (Yii::$app->hasModule('fcm-push')) {
+            Yii::$app->getModule('fcm-push')->silentUnreadNotificationCountPushDelay = 10;
+        }
+    }
+
+    public static function konsoleVorAnfrage(): void
+    {
+        self::uebersetzungenRegistrieren();
+        self::pushVerzoegerung();
+    }
+
     public static function uebersetzungenRegistrieren(): void
     {
         foreach (Module::DEUTSCHE_MODULE as $id) {
