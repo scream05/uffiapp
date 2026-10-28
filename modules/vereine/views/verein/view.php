@@ -152,6 +152,12 @@ $module = Yii::$app->getModule('vereine');
                         <?= Html::a('<i class="fa fa-comment-o"></i> ' . Yii::t('VereineModule.base', 'Kommentieren'), $b->content->getUrl()) ?>
                     <?php endif ?>
                     <?php if (Module::canManageAll()): ?>
+                        <?= $b->content_id
+                            ? Html::a('<i class="fa fa-eye-slash" aria-hidden="true"></i> ' . Yii::t('VereineModule.base', 'Aus der Übersicht nehmen'), $space->createUrl('/vereine/beitrag/aus-uebersicht', ['id' => $b->id]), [
+                                'style' => 'margin-left:12px', 'data-method' => 'post', 'data-params' => ['zurueck' => 'verein'],
+                                'data-confirm' => Yii::t('VereineModule.base', 'Aus der Übersicht nehmen? Kommentare dort werden gelöscht; auf der Vereinsseite bleibt der Beitrag.')])
+                            : Html::a('<i class="fa fa-share" aria-hidden="true"></i> ' . Yii::t('VereineModule.base', 'Auch in der Übersicht zeigen'), $space->createUrl('/vereine/beitrag/uebersicht', ['id' => $b->id]), [
+                                'style' => 'margin-left:12px', 'data-method' => 'post', 'data-params' => ['zurueck' => 'verein']]) ?>
                         <?= Html::a('<i class="fa fa-trash"></i> ' . Yii::t('VereineModule.base', 'Entfernen'), $space->createUrl('/vereine/beitrag/entfernen', ['id' => $b->id]), [
                             'class' => 'text-danger', 'style' => 'margin-left:12px', 'data-method' => 'post', 'data-params' => ['zurueck' => 'verein'],
                             'data-confirm' => Yii::t('VereineModule.base', 'Diesen Beitrag ganz entfernen (auch aus der Übersicht)?')]) ?>

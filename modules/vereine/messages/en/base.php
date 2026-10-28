@@ -324,4 +324,7 @@ return [
     'Veröffentlicht auf der Vereinsseite und in der Übersicht.' => 'Published on the club page and in the overview.',
     'Veröffentlicht auf der Vereinsseite.' => 'Published on the club page.',
     'Der Beitrag steht nicht mehr in der Übersicht, nur noch auf der Vereinsseite.' => 'The post is no longer in the overview, only on the club page.',
+    'Aus der Übersicht nehmen' => 'Remove from overview',
+    'Auch in der Übersicht zeigen' => 'Also show in overview',
+    'Aus der Übersicht nehmen? Kommentare dort werden gelöscht; auf der Vereinsseite bleibt der Beitrag.' => 'Remove from overview? Comments there will be deleted; the post stays on the club page.',
 ];

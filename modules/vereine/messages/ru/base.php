@@ -324,4 +324,7 @@ return [
     'Veröffentlicht auf der Vereinsseite und in der Übersicht.' => 'Опубликовано на странице клуба и в обзоре.',
     'Veröffentlicht auf der Vereinsseite.' => 'Опубликовано на странице клуба.',
     'Der Beitrag steht nicht mehr in der Übersicht, nur noch auf der Vereinsseite.' => 'Публикации больше нет в обзоре, только на странице клуба.',
+    'Aus der Übersicht nehmen' => 'Убрать из обзора',
+    'Auch in der Übersicht zeigen' => 'Показать также в обзоре',
+    'Aus der Übersicht nehmen? Kommentare dort werden gelöscht; auf der Vereinsseite bleibt der Beitrag.' => 'Убрать из обзора? Комментарии там будут удалены; на странице клуба публикация останется.',
 ];

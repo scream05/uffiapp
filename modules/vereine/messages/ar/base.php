@@ -324,4 +324,7 @@ return [
     'Veröffentlicht auf der Vereinsseite und in der Übersicht.' => 'تم النشر في صفحة النادي وفي النظرة العامة.',
     'Veröffentlicht auf der Vereinsseite.' => 'تم النشر في صفحة النادي.',
     'Der Beitrag steht nicht mehr in der Übersicht, nur noch auf der Vereinsseite.' => 'لم يعد المنشور في النظرة العامة، بل في صفحة النادي فقط.',
+    'Aus der Übersicht nehmen' => 'إزالة من النظرة العامة',
+    'Auch in der Übersicht zeigen' => 'إظهار في النظرة العامة أيضًا',
+    'Aus der Übersicht nehmen? Kommentare dort werden gelöscht; auf der Vereinsseite bleibt der Beitrag.' => 'إزالة من النظرة العامة؟ ستُحذف التعليقات هناك؛ ويبقى المنشور في صفحة النادي.',
 ];

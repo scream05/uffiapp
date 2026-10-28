@@ -67,7 +67,11 @@ $space = $this->context->contentContainer;
                                 abgelehnt: <?= Html::encode(mb_strimwidth((string)$b->begruendung, 0, 80, '…')) ?>
                             <?php else: ?>
                                 veröffentlicht <?= implode(' und ', array_filter([$b->auf_vereinsseite ? 'auf der Vereinsseite' : '', $b->uebersicht ? 'in der Übersicht' : ''])) ?>
-                                <?= $b->content ? ' · ' . Html::a('Beitrag ansehen', $b->content->getUrl()) : '' ?>
+                                <?= $b->content ? ' · ' . Html::a('Beitrag ansehen', $b->content->getUrl()) . ' · ' . Html::a('Aus der Übersicht nehmen',
+                                        $space->createUrl('/vereine/beitrag/aus-uebersicht', ['id' => $b->id]), ['data-method' => 'post',
+                                        'data-confirm' => 'Aus der Übersicht nehmen? Kommentare dort werden gelöscht; auf der Vereinsseite bleibt der Beitrag.'])
+                                    : ($b->status === VereinBeitrag::STATUS_VEROEFFENTLICHT ? ' · ' . Html::a('Auch in der Übersicht zeigen',
+                                        $space->createUrl('/vereine/beitrag/uebersicht', ['id' => $b->id]), ['data-method' => 'post']) : '') ?>
                             <?php endif ?>
                             · <?= $b->geprueft_am ? Yii::$app->formatter->asDatetime($b->geprueft_am, 'short') : '' ?>
                         </small>

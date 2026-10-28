@@ -324,4 +324,7 @@ return [
     'Veröffentlicht auf der Vereinsseite und in der Übersicht.' => 'Kulüp sayfasında ve genel bakışta yayınlandı.',
     'Veröffentlicht auf der Vereinsseite.' => 'Kulüp sayfasında yayınlandı.',
     'Der Beitrag steht nicht mehr in der Übersicht, nur noch auf der Vereinsseite.' => 'Gönderi artık genel bakışta değil, yalnızca kulüp sayfasında.',
+    'Aus der Übersicht nehmen' => 'Genel bakıştan kaldır',
+    'Auch in der Übersicht zeigen' => 'Genel bakışta da göster',
+    'Aus der Übersicht nehmen? Kommentare dort werden gelöscht; auf der Vereinsseite bleibt der Beitrag.' => 'Genel bakıştan kaldırılsın mı? Oradaki yorumlar silinir; gönderi kulüp sayfasında kalır.',
 ];
