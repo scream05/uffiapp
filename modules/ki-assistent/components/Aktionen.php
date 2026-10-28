@@ -198,7 +198,7 @@ class Aktionen
                             'description' => 'Alle bisher bekannten Angaben, je Feld ein Eintrag',
                             'items' => [
                                 'type' => 'object',
-                                'properties' => ['feld' => ['type' => 'string'], 'wert' => ['type' => 'string']],
+                                'properties' => ['feld' => ['type' => 'string', 'description' => 'Feldname („name“ aus formular_info)'], 'wert' => ['type' => 'string']],
                                 'required' => ['feld', 'wert'],
                             ],
                         ],
@@ -526,17 +526,22 @@ class Aktionen
         if ($def === null) {
             return [['fehler' => 'Unbekanntes Formular'], null];
         }
+        // Feld per Name, ersatzweise per Beschriftung (die KI nimmt ohne formular_info gern die Frage als Feldnamen)
+        $labels = array_column($def['felder'], 'label', 'name');
+        $norm = fn(string $t) => preg_replace('/[^\p{L}\p{N}]+/u', '', mb_strtolower($t));
+        $perLabel = array_combine(array_map($norm, $labels), array_keys($labels));
         $input = [];
         foreach ((array)($args['werte'] ?? []) as $w) {
             if (isset($w['feld'])) {
-                $input[(string)$w['feld']] = (string)($w['wert'] ?? '');
+                $feld = (string)$w['feld'];
+                $input[isset($labels[$feld]) ? $feld : ($perLabel[$norm($feld)] ?? $feld)] = (string)($w['wert'] ?? '');
             }
         }
         [$values, $missing, $errors] = Formulare::validate($def, $input);
         if ($missing || $errors) {
-            $labels = array_column($def['felder'], 'label', 'name');
-            return [['ok' => false, 'fehlende_angaben' => array_map(fn($n) => $labels[$n] ?? $n, $missing), 'ungueltig' => $errors,
-                'hinweis' => 'Bitte den Nutzer nach diesen Angaben fragen und danach erneut aufrufen.'], null];
+            return [['ok' => false,
+                'fehlende_angaben' => array_map(fn($n) => ['feld' => $n, 'frage' => $labels[$n] ?? $n], $missing), 'ungueltig' => $errors,
+                'hinweis' => 'Bitte den Nutzer nach diesen Angaben fragen und danach erneut aufrufen, mit „feld“ = genau dem Feldnamen von oben.'], null];
         }
         $token = Formulare::render($def, $values);
         $karte = [

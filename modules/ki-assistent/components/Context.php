@@ -290,13 +290,13 @@ class Context
             if ($closed && $status->updated_at < date('Y-m-d', strtotime('-30 days'))) {
                 continue;
             }
-            preg_match('/^\*\*Mängelmeldung: (.+?)\*\*\s*(.*?)\s*📍 \*\*Ort:\*\* (.*?)(?: – )?\[/su', $p->message, $m);
-            $lines[] = '- ' . ($m[1] ?? 'Meldung') . ' – Ort: ' . (trim($m[3] ?? '') ?: 'siehe Karte')
+            $mangel = new \humhub\modules\maengelmelder\models\Mangel($p);
+            $lines[] = '- ' . $mangel->kategorie . ' – Ort: ' . ($mangel->adresse ?: 'siehe Karte')
                 . ' – gemeldet ' . self::date($p->content->created_at, false) . ' – Status: ' . $status->getLabel()
                 . ($closed || !$status->isNewRecord ? ' (seit ' . self::date($status->updated_at, false) . ')' : '')
                 . (!empty($auch[$id]) ? " – {$auch[$id]} weitere betroffen" : '')
                 . ' – ' . Url::to($p->content->getUrl(), true)
-                . (($d = self::plain($m[2] ?? '', 200)) !== '' ? "\n  $d" : '');
+                . (($d = self::plain($mangel->beschreibung, 200)) !== '' ? "\n  $d" : '');
         }
         return "## Mängelmelder: aktuelle Meldungen (offen und in den letzten 30 Tagen erledigt)\n"
             . 'Neue Meldung: ' . $space->createUrl('/maengelmelder/meldung/create', [], true) . ' · Karte: '

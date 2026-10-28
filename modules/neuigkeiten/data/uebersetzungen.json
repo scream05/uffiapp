@@ -1,4 +1,31 @@
 {
+    "uffi-formular-pdf": {
+        "en": {
+            "titel": "Uffi fills out forms reliably again",
+            "text": "When Uffi was supposed to fill out a form for you, such as the power of attorney for an ID card, sometimes no PDF came through even though all the details were there – without an account, it was mostly the case. Now you get the finished PDF to download.",
+            "quelle": "acd3c557a5a7f864b708dce590dbd3ddedf1f0e0"
+        },
+        "uk": {
+            "titel": "Uffi füllt Formulare wieder zuverlässig aus",
+            "text": "Wenn Uffi dir ein Formular wie die Vollmacht für den Ausweis ausfüllen sollte, kam manchmal kein PDF, obwohl alle Angaben da waren – ohne Konto sogar meistens. Jetzt bekommst du das fertige PDF zum Herunterladen.",
+            "quelle": "acd3c557a5a7f864b708dce590dbd3ddedf1f0e0"
+        },
+        "ar": {
+            "titel": "Uffi füllt Formulare wieder zuverlässig aus",
+            "text": "عندما كان من المفترض أن يملأ Uffi لك نموذجاً، مثل التوكيل الخاص بالبطاقة الشخصية، لم يكن يصلك أحياناً ملف PDF رغم توفر جميع البيانات – وبدون حساب كان ذلك يحدث غالباً. أما الآن فستحصل على ملف PDF الجاهز للتنزيل.",
+            "quelle": "acd3c557a5a7f864b708dce590dbd3ddedf1f0e0"
+        },
+        "tr": {
+            "titel": "Uffi füllt Formulare jetzt zuverlässig aus",
+            "text": "Wenn Uffi dir ein Formular wie die Vollmacht für den Ausweis ausfüllen sollte, kam manchmal kein PDF, obwohl alle Angaben da waren – ohne Konto sogar meistens. Jetzt bekommst du das fertige PDF zum Herunterladen.",
+            "quelle": "acd3c557a5a7f864b708dce590dbd3ddedf1f0e0"
+        },
+        "ru": {
+            "titel": "Uffi füllt Formulare wieder zuverlässig aus",
+            "text": "Wenn Uffi dir ein Formular wie die Vollmacht für den Ausweis ausfüllen sollte, kam manchmal kein PDF, obwohl alle Angaben da waren – ohne Konto sogar meistens. Jetzt bekommst du das fertige PDF zum Herunterladen.",
+            "quelle": "acd3c557a5a7f864b708dce590dbd3ddedf1f0e0"
+        }
+    },
     "webapp-leiste-unten": {
         "en": {
             "titel": "Bottom bar in the web app stays put",

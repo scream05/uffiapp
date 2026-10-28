@@ -25,16 +25,18 @@ class Mangel
     {
         $this->post = $post;
         $msg = (string)$post->message;
-        if (preg_match('/karte\?lat=(-?[\d.]+)&(?:amp;)?lng=(-?[\d.]+)/', $msg, $m)) {
-            $this->lat = (float)$m[1];
-            $this->lng = (float)$m[2];
+        // Jeweils der LETZTE Treffer: message() setzt den echten Ort ans Ende, die Beschreibung davor ist frei
+        // eingegeben (ein Karten-Link oder „📍“ darin darf den Ort nicht ersetzen)
+        if (preg_match_all('/karte\?lat=(-?[\d.]+)&(?:amp;)?lng=(-?[\d.]+)/', $msg, $m, PREG_SET_ORDER)) {
+            $this->lat = (float)end($m)[1];
+            $this->lng = (float)end($m)[2];
         }
-        if (preg_match('/^\*\*Mängelmeldung: (.+?)\*\*\s*(.*?)\s*📍/su', $msg, $k)) {
+        if (preg_match('/^\*\*Mängelmeldung: (.+?)\*\*\s*(.*)📍 \*\*Ort:\*\*/su', $msg, $k)) {
             $this->kategorie = $k[1];
-            $this->beschreibung = $k[2];
+            $this->beschreibung = trim($k[2]);
         }
-        if (preg_match('/📍 \*\*Ort:\*\* (.+?) – \[auf der Karte/u', $msg, $a)) {
-            $this->adresse = $a[1];
+        if (preg_match_all('/📍 \*\*Ort:\*\* (.+?) – \[auf der Karte/u', $msg, $a)) {
+            $this->adresse = end($a[1]);
         }
     }
 

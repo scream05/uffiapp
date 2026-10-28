@@ -416,19 +416,18 @@ class MeldungController extends ContentContainerController
         foreach ($posts as $post) {
             $id = $post->content->id;
             $status = $statuses[$id] ?? new MaengelStatus(['status' => 'gemeldet']);
-            if (!preg_match('/karte\?lat=(-?[\d.]+)&(?:amp;)?lng=(-?[\d.]+)/', $post->message, $m)) {
+            $mangel = new Mangel($post);
+            if ($mangel->lat === null) {
                 continue;
             }
-            preg_match('/^\*\*Mängelmeldung: (.+?)\*\*\s*(.*?)\s*📍/su', $post->message, $k);
-            preg_match('/📍 \*\*Ort:\*\* (.+?) – \[auf der Karte/u', $post->message, $o);
             $markers[] = [
                 'id' => $id,
-                'lat' => (float)$m[1],
-                'lng' => (float)$m[2],
+                'lat' => $mangel->lat,
+                'lng' => $mangel->lng,
                 // Kategorie aus dem (deutschen) Beitragstext, angezeigt übersetzt
-                'titel' => isset($k[1]) ? $this->module->kategorieLabel($k[1]) : Yii::t('MaengelmelderModule.base', 'Meldung'),
-                'adresse' => $o[1] ?? '',
-                'auszug' => $gast ? '' : mb_strimwidth(preg_replace('/\s+/u', ' ', $k[2] ?? ''), 0, 140, '…'),
+                'titel' => $this->module->kategorieLabel($mangel->kategorie),
+                'adresse' => $mangel->adresse,
+                'auszug' => $gast ? '' : $mangel->getAuszug(140),
                 'datum' => Yii::$app->formatter->asDate($post->content->created_at, 'short'),
                 'url' => $gast ? '' : $post->content->getUrl(),
                 'status' => $status->status,

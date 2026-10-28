@@ -218,8 +218,13 @@ class Formulare
         if (!Yii::$app->user->isGuest) {
             return Yii::$app->user->id;
         }
-        Yii::$app->session->open();
-        return 'gast-' . hash('sha256', Yii::$app->session->id);
+        $session = Yii::$app->session;
+        // Im Stream ist die Sitzung schon geschlossen (ChatController::streamen), die ID bleibt aber lesbar; neu öffnen
+        // ginge dort nicht mehr (Header gesendet)
+        if (!$session->getIsActive() && (string)$session->getId() === '') {
+            $session->open();
+        }
+        return 'gast-' . hash('sha256', $session->getId());
     }
 
     /** Abgelaufene PDFs löschen */

@@ -197,7 +197,12 @@ class GutscheinDienst
         if ($e->storniert_am !== null || $e->alter() > 60 * $module->stornoMinuten) {
             return false;
         }
-        $e->updateAttributes(['storniert_am' => date('Y-m-d H:i:s')]);
+        // Nur wer die Zeile wirklich umstellt, zählt zurück – zweimal schnell getippt (oder zwei Geräte) zählt sonst doppelt
+        $jetzt = date('Y-m-d H:i:s');
+        if (Einloesung::updateAll(['storniert_am' => $jetzt], ['id' => $e->id, 'storniert_am' => null]) !== 1) {
+            return false;
+        }
+        $e->storniert_am = $jetzt;
         Gutschein::updateAllCounters(['eingeloest' => -1], ['and', ['id' => $e->gutschein_id], ['>', 'eingeloest', 0]]);
         return true;
     }

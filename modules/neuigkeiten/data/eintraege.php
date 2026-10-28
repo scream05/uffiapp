@@ -10,6 +10,10 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'uffi-formular-pdf', 'datum' => '2026-10-28', 'art' => 'behoben', 'popup' => false,
+        'link' => [null, '/ki-assistent/chat'],
+        'titel' => 'Uffi füllt Formulare wieder zuverlässig aus',
+        'text' => 'Wenn Uffi dir ein Formular wie die Vollmacht für den Ausweis ausfüllen sollte, kam manchmal kein PDF, obwohl alle Angaben da waren – ohne Konto sogar meistens. Jetzt bekommst du das fertige PDF zum Herunterladen.'],
     ['id' => 'webapp-leiste-unten', 'datum' => '2026-10-28', 'art' => 'behoben', 'popup' => false,
         'titel' => 'Leiste in der Web-App bleibt unten',
         'text' => 'In der Web-App am iPhone rutschte die Leiste mit Übersicht, Terminen und Co. manchmal in die Bildmitte, meist nachdem die Tastatur offen war. Jetzt rücken Leiste und Uffi-Knopf wieder an den unteren Rand.'],

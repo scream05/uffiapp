@@ -116,7 +116,10 @@ class ChatController extends Controller
      */
     private function streamen(callable $antworten)
     {
-        // Sitzung freigeben, sonst warten andere Seitenaufrufe desselben Nutzers auf das Ende der Antwort
+        // Sitzung freigeben, sonst warten andere Seitenaufrufe desselben Nutzers auf das Ende der Antwort. Vorher sicher
+        // öffnen: Gäste brauchen die Sitzungs-ID für ausgefüllte Formulare (Formulare::besitzer), und der Cookie dafür
+        // geht nur jetzt, solange noch keine Ausgabe gesendet ist
+        Yii::$app->session->open();
         Yii::$app->session->close();
         while (ob_get_level() > 0) {
             ob_end_clean();
