@@ -34,7 +34,7 @@ return [
     'Schlagloch, kaputte Laterne oder wilder Müll? Mach ein Foto, setz den Ort auf der Karte – und verfolge, wie die Meldung bearbeitet wird.' => 'Çukur, bozuk sokak lambası ya da kaçak çöp mü? Fotoğraf çek, yeri haritada işaretle – ve bildiriminin nasıl işlendiğini takip et.',
     'Mangel melden' => 'Sorun bildir',
     'Immer dabei' => 'Hep yanında',
-    'Am Handy geht es am bequemsten mit der kostenlosen App „HumHub“ – dort einfach community.rundumuffni.de eingeben. Erlaube Mitteilungen, dann verpasst du keine Antworten und Erinnerungen. Ganz unten auf jeder Seite findest du „Hilfe & Regeln“ und „Ideen & Vorschläge“.' => 'Telefonda en rahatı ücretsiz “HumHub” uygulamasıdır – orada community.rundumuffni.de adresini girmen yeterli. Bildirimlere izin ver, böylece hiçbir yanıtı ve hatırlatmayı kaçırmazsın. Her sayfanın en altında “Yardım ve kurallar” ile “Fikirler ve öneriler” bölümlerini bulursun.',
+    'Am Handy legst du Rund um Uffni am besten als Web-App auf den Startbildschirm – wie das geht, zeigt die Anleitung. Erlaube Mitteilungen, dann verpasst du keine Antworten und Erinnerungen. Ganz unten auf jeder Seite findest du „Hilfe & Regeln“ und „Ideen & Vorschläge“.' => 'Telefonda Rund um Uffni\'yi en iyi web uygulaması olarak ana ekranına eklersin – nasıl yapılacağını kılavuz gösteriyor. Bildirimlere izin ver, böylece hiçbir yanıtı ve hatırlatmayı kaçırmazsın. Her sayfanın en altında “Yardım ve kurallar” ile “Fikirler ve öneriler” bölümlerini bulursun.',
     'Hilfe' => 'Yardım',
     'Hilfe & Regeln' => 'Yardım ve kurallar',
     'App-Anleitung' => 'Uygulama kılavuzu',

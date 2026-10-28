@@ -1,4 +1,31 @@
 {
+    "webapp-empfehlung": {
+        "en": {
+            "titel": "Now as a web app on your phone",
+            "text": "We now recommend using Rund um Uffni on your phone as a web app on your home screen, instead of the app \"HumHub\", which doesn't run reliably for us yet. The guide shows you how to create the icon – push notifications and the number on the icon are available there too.",
+            "quelle": "149316363a7a3f922e3dedc74f4e5e7b8ea52d8e"
+        },
+        "uk": {
+            "titel": "Auf dem Handy jetzt als Web-App",
+            "text": "Wir empfehlen dir, Rund um Uffni auf dem Handy jetzt als Web-App auf dem Startbildschirm zu nutzen, statt der App „HumHub“, die bei uns noch nicht zuverlässig läuft. Die Anleitung zeigt dir, wie du das Symbol anlegst – Push-Nachrichten und die Zahl am Symbol gibt es dort auch.",
+            "quelle": "149316363a7a3f922e3dedc74f4e5e7b8ea52d8e"
+        },
+        "ar": {
+            "titel": "على الهاتف الآن كتطبيق ويب",
+            "text": "ننصحك باستخدام «رُوند أُم أُفني» على الهاتف الآن كتطبيق ويب على شاشة البداية، بدلاً من تطبيق «HumHub» الذي لا يعمل لدينا بشكل موثوق بعد. يوضح الدليل كيفية إنشاء الأيقونة – وستحصل هناك أيضاً على إشعارات الدفع والرقم الظاهر على الأيقونة.",
+            "quelle": "149316363a7a3f922e3dedc74f4e5e7b8ea52d8e"
+        },
+        "tr": {
+            "titel": "Am Handy jetzt als Web-App",
+            "text": "Wir empfehlen dir, Rund um Uffni am Handy jetzt als Web-App auf dem Startbildschirm zu nutzen, statt der App „HumHub“, die bei uns noch nicht zuverlässig läuft. Die Anleitung zeigt dir, wie du das Symbol anlegst – Push-Nachrichten und die Zahl am Symbol gibt es dort auch.",
+            "quelle": "149316363a7a3f922e3dedc74f4e5e7b8ea52d8e"
+        },
+        "ru": {
+            "titel": "На телефоне теперь как веб-приложение",
+            "text": "Мы рекомендуем использовать Rund um Uffni на телефоне теперь как веб-приложение на главном экране вместо приложения „HumHub“, которое у нас пока работает не всегда стабильно. В инструкции показано, как создать значок – push-уведомления и число на значке тоже там есть.",
+            "quelle": "149316363a7a3f922e3dedc74f4e5e7b8ea52d8e"
+        }
+    },
     "webapp-zahl": {
         "en": {
             "titel": "Number on the icon now also in the web app",

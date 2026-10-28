@@ -34,7 +34,7 @@ return [
     'Schlagloch, kaputte Laterne oder wilder Müll? Mach ein Foto, setz den Ort auf der Karte – und verfolge, wie die Meldung bearbeitet wird.' => 'حفرة في الطريق، أو مصباح شارع معطّل، أو نفايات مرمية؟ التقط صورة، وحدد المكان على الخريطة – وتابع كيف تتم معالجة بلاغك.',
     'Mangel melden' => 'الإبلاغ عن مشكلة',
     'Immer dabei' => 'معك دائماً',
-    'Am Handy geht es am bequemsten mit der kostenlosen App „HumHub“ – dort einfach community.rundumuffni.de eingeben. Erlaube Mitteilungen, dann verpasst du keine Antworten und Erinnerungen. Ganz unten auf jeder Seite findest du „Hilfe & Regeln“ und „Ideen & Vorschläge“.' => 'على الهاتف، أسهل طريقة هي تطبيق «HumHub» المجاني – أدخل فيه فقط community.rundumuffni.de. اسمح بالإشعارات حتى لا تفوتك الردود والتذكيرات. في أسفل كل صفحة ستجد «المساعدة والقواعد» و«أفكار واقتراحات».',
+    'Am Handy legst du Rund um Uffni am besten als Web-App auf den Startbildschirm – wie das geht, zeigt die Anleitung. Erlaube Mitteilungen, dann verpasst du keine Antworten und Erinnerungen. Ganz unten auf jeder Seite findest du „Hilfe & Regeln“ und „Ideen & Vorschläge“.' => 'على الهاتف، الأفضل أن تضيف Rund um Uffni كتطبيق ويب إلى الشاشة الرئيسية – الدليل يشرح لك الطريقة. اسمح بالإشعارات حتى لا تفوتك الردود والتذكيرات. في أسفل كل صفحة ستجد «المساعدة والقواعد» و«أفكار واقتراحات».',
     'Hilfe' => 'المساعدة',
     'Hilfe & Regeln' => 'المساعدة والقواعد',
     'App-Anleitung' => 'دليل التطبيق',

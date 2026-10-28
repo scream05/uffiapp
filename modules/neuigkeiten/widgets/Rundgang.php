@@ -46,7 +46,7 @@ class Rundgang extends Widget
                 $t('Schlagloch, kaputte Laterne oder wilder Müll? Mach ein Foto, setz den Ort auf der Karte – und verfolge, wie die Meldung bearbeitet wird.'),
                 $t('Mangel melden'), $space('mangelmelder', '/maengelmelder/meldung/create'), false],
             ['mobile', $t('Immer dabei'),
-                $t('Am Handy geht es am bequemsten mit der kostenlosen App „HumHub“ – dort einfach community.rundumuffni.de eingeben. Erlaube Mitteilungen, dann verpasst du keine Antworten und Erinnerungen. Ganz unten auf jeder Seite findest du „Hilfe & Regeln“ und „Ideen & Vorschläge“.'),
+                $t('Am Handy legst du Rund um Uffni am besten als Web-App auf den Startbildschirm – wie das geht, zeigt die Anleitung. Erlaube Mitteilungen, dann verpasst du keine Antworten und Erinnerungen. Ganz unten auf jeder Seite findest du „Hilfe & Regeln“ und „Ideen & Vorschläge“.'),
                 $t('Zur Anleitung'), Url::to(['/neuigkeiten/hilfe/seite', 'seite' => 'app']), false],
         ];
         return array_values(array_filter($schritte, fn($s) => $s[3] === null || $s[4] !== null));

@@ -10,6 +10,10 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'webapp-empfehlung', 'datum' => '2026-10-28', 'art' => 'besser', 'popup' => false,
+        'link' => [null, '/hilfe/app'],
+        'titel' => 'Am Handy jetzt als Web-App',
+        'text' => 'Wir empfehlen Rund um Uffni am Handy jetzt als Web-App auf dem Startbildschirm statt der App „HumHub“, die bei uns noch nicht zuverlässig läuft. Die Anleitung zeigt, wie du das Symbol anlegst – Push-Nachrichten und die Zahl am Symbol gibt es dort auch.'],
     ['id' => 'webapp-zahl', 'datum' => '2026-10-27', 'art' => 'neu', 'popup' => false,
         'titel' => 'Zahl am Symbol auch in der Web-App',
         'text' => 'Nutzt du Rund um Uffni als Symbol auf dem Startbildschirm statt der App „HumHub“, zeigt das Symbol jetzt die Zahl deiner neuen Benachrichtigungen und Nachrichten. Sie kommt mit jeder Push-Mitteilung und passt sich an, sobald du die Seite öffnest.'],

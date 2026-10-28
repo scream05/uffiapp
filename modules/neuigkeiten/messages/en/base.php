@@ -34,7 +34,7 @@ return [
     'Schlagloch, kaputte Laterne oder wilder Müll? Mach ein Foto, setz den Ort auf der Karte – und verfolge, wie die Meldung bearbeitet wird.' => 'Pothole, broken street light or illegal dumping? Take a photo, mark the spot on the map – and follow how your report is handled.',
     'Mangel melden' => 'Report a problem',
     'Immer dabei' => 'Always with you',
-    'Am Handy geht es am bequemsten mit der kostenlosen App „HumHub“ – dort einfach community.rundumuffni.de eingeben. Erlaube Mitteilungen, dann verpasst du keine Antworten und Erinnerungen. Ganz unten auf jeder Seite findest du „Hilfe & Regeln“ und „Ideen & Vorschläge“.' => 'On your phone, the free “HumHub” app is the most convenient way – just enter community.rundumuffni.de there. Allow notifications so you never miss replies and reminders. At the very bottom of every page you will find “Help & rules” and “Ideas & suggestions”.',
+    'Am Handy legst du Rund um Uffni am besten als Web-App auf den Startbildschirm – wie das geht, zeigt die Anleitung. Erlaube Mitteilungen, dann verpasst du keine Antworten und Erinnerungen. Ganz unten auf jeder Seite findest du „Hilfe & Regeln“ und „Ideen & Vorschläge“.' => 'On your phone, it works best as a web app on your home screen – the guide shows you how. Allow notifications so you never miss replies and reminders. At the very bottom of every page you will find “Help & rules” and “Ideas & suggestions”.',
     'Hilfe' => 'Help',
     'Hilfe & Regeln' => 'Help & rules',
     'App-Anleitung' => 'App guide',
