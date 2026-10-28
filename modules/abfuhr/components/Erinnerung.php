@@ -118,23 +118,29 @@ class Erinnerung
             ->innerJoin('contentcontainer c', 'c.id = s.contentcontainer_id AND c.class = :cls', [':cls' => User::class])
             ->where(['s.module_id' => 'abfuhr', 's.name' => 'aktiv', 's.value' => '1'])->column();
         foreach (User::find()->where(['id' => $userIds, 'status' => User::STATUS_ENABLED])->all() as $user) {
-            [$aktiv, $gebiet, $tonnen, $zeit] = self::settings($user);
-            [, $stunde, $offset] = self::module()->zeiten[$zeit];
-            if (!$aktiv || !$tonnen || $hour < $stunde || $hour >= $stunde + 3) {
-                continue;
+            // Fehler bei einer Person (Versand, Einstellung) darf die übrigen nicht aufhalten
+            try {
+                [$aktiv, $gebiet, $tonnen, $zeit] = self::settings($user);
+                [, $stunde, $offset] = self::module()->zeiten[$zeit];
+                if (!$aktiv || !$tonnen || $hour < $stunde || $hour >= $stunde + 3) {
+                    continue;
+                }
+                $tag = date('Y-m-d', strtotime("+$offset day", $now));
+                $keys = array_values(array_intersect(self::termine($tag, $tag, $gebiet)[$tag] ?? [], $tonnen));
+                $s = self::module()->settings->user($user);
+                if (!$keys || $s->get('gesendet') === $tag) {
+                    continue;
+                }
+                if (!$dryRun) {
+                    // Erst merken, dann senden: bricht der Versand mittendrin ab, keine Wiederholung alle 15 Minuten
+                    $s->set('gesendet', $tag);
+                    AbfuhrMorgen::instance()->payload(['tag' => $tag, 'tonnen' => $keys, 'heute' => $offset === 0])->send($user);
+                }
+                Yii::info("Abfuhr-Erinnerung an Nutzer {$user->id}: $tag " . implode(',', $keys), 'abfuhr');
+                $sent++;
+            } catch (\Throwable $e) {
+                Yii::error("Abfuhr-Erinnerung an Nutzer {$user->id} fehlgeschlagen: $e", 'abfuhr');
             }
-            $tag = date('Y-m-d', strtotime("+$offset day", $now));
-            $keys = array_values(array_intersect(self::termine($tag, $tag, $gebiet)[$tag] ?? [], $tonnen));
-            $s = self::module()->settings->user($user);
-            if (!$keys || $s->get('gesendet') === $tag) {
-                continue;
-            }
-            if (!$dryRun) {
-                AbfuhrMorgen::instance()->payload(['tag' => $tag, 'tonnen' => $keys, 'heute' => $offset === 0])->send($user);
-                $s->set('gesendet', $tag);
-            }
-            Yii::info("Abfuhr-Erinnerung an Nutzer {$user->id}: $tag " . implode(',', $keys), 'abfuhr');
-            $sent++;
         }
         return $sent;
     }

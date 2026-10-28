@@ -57,19 +57,24 @@ class Wissen
 
     /**
      * Inhalte aus Spaces der Community (Feld „space“, gesetzt von scripts/stadtwissen.py) nur, wenn der Nutzer sie lesen darf:
-     * öffentlich sichtbare Inhalte für alle Angemeldeten, sonst nur für Mitglieder des Space.
+     * öffentlich sichtbare Inhalte für alle Angemeldeten, für Gäste nur, wenn auch der Space für Gäste sichtbar ist
+     * („gaeste“; ältere Indexe ohne das Feld zeigen Gästen nichts), sonst nur für Mitglieder des Space.
      */
     private static function visible(array $chunks): array
     {
         $member = null;
+        $gast = !\Yii::$app->has('user') || \Yii::$app->user->isGuest;
         // Schlüssel bleiben erhalten (Position im Index), passend zum Stichwort-Index
-        return array_filter($chunks, function ($c) use (&$member) {
-            if (empty($c['space']) || !empty($c['oeffentlich'])) {
+        return array_filter($chunks, function ($c) use (&$member, $gast) {
+            if (empty($c['space'])) {
                 return true;
+            }
+            if (!empty($c['oeffentlich'])) {
+                return !$gast || !empty($c['gaeste']);
             }
             if ($member === null) {
                 $member = [];
-                if (\Yii::$app->has('user') && !\Yii::$app->user->isGuest) {
+                if (!$gast) {
                     $member = array_flip(array_map('intval', \humhub\modules\space\models\Membership::find()
                         ->select('space_id')->where(['user_id' => \Yii::$app->user->id, 'status' => 3])->column()));
                 }
@@ -102,7 +107,8 @@ class Wissen
             $pages[] = ['rel' => substr($file->getPathname(), strlen(self::DIR) + 1),
                 'titel' => $meta['titel'] ?? $file->getFilename(), 'quelle' => $meta['quelle'] ?? '',
                 'immer' => ($meta['immer'] ?? '') === 'ja', 'text' => preg_replace('/^# .*\n+/', '', trim($m[2])),
-                'space' => isset($meta['space']) ? (int)$meta['space'] : null, 'oeffentlich' => ($meta['oeffentlich'] ?? '') === 'ja'];
+                'space' => isset($meta['space']) ? (int)$meta['space'] : null, 'oeffentlich' => ($meta['oeffentlich'] ?? '') === 'ja',
+                'gaeste' => ($meta['gaeste'] ?? '') === 'ja'];
         }
         usort($pages, fn($a, $b) => strnatcmp($a['quelle'], $b['quelle']));
         return $pages;

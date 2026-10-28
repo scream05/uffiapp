@@ -861,9 +861,11 @@ def update_index(rels):
             entry = {'rel': rel, 'titel': meta['titel'], 'quelle': meta.get('quelle', ''), 'immer': meta.get('immer') == 'ja',
                      'nr': nr, 'abschnitt': label, 'text': text, 'hash': digest, 'vec': old.get(digest)}
             if meta.get('space'):
-                # Community-Inhalt: KI-Assistent zeigt ihn nur Mitgliedern des Space (oder allen, wenn öffentlich)
+                # Community-Inhalt: KI-Assistent zeigt ihn nur Mitgliedern des Space (oder allen Angemeldeten, wenn
+                # öffentlich; Gästen nur, wenn auch der Space für Gäste sichtbar ist)
                 entry['space'] = int(meta['space'])
                 entry['oeffentlich'] = meta.get('oeffentlich') == 'ja'
+                entry['gaeste'] = meta.get('gaeste') == 'ja'
             entries.append(entry)
             if not entry['vec'] and model:
                 todo.append((entry, embed_text))
@@ -903,11 +905,13 @@ def plain_markdown(text):
 def community_inhalte():
     """Wiki-Seiten, Fragen mit Antworten und Beiträge aus den Spaces (ohne Autorennamen) als
     [(rel, titel, url, text, extra)]. Ausgenommen: Mängelmelder (eigener Teil im KI-Kontext), Abfall, automatisch
-    übernommene Stadt-Nachrichten. „space“ und „oeffentlich“ steuern, wem der KI-Assistent den Inhalt zeigt."""
+    übernommene Stadt-Nachrichten. „space“, „oeffentlich“ (alle Angemeldeten) und „gaeste“ (Space auch für Gäste sichtbar)
+    steuern, wem der KI-Assistent den Inhalt zeigt."""
     base = 'https://community.rundumuffni.de/s/'
     common = ("FROM content c JOIN space s ON s.contentcontainer_id = c.contentcontainer_id "
               "WHERE c.state = 1 AND s.status = 1 AND s.url NOT IN ('mangelmelder', 'abfall-and-termine') ")
-    vis = "'space', s.id, 'surl', s.url, 'sname', s.name, 'offen', (c.visibility = 1 AND s.visibility >= 1), 'cid', c.id"
+    vis = ("'space', s.id, 'surl', s.url, 'sname', s.name, 'offen', (c.visibility = 1 AND s.visibility >= 1), "
+           "'gaeste', (c.visibility = 1 AND s.visibility = 2), 'cid', c.id")
     found = []
     # Wiki ist abgeschaltet (Modul deaktiviert, Tabellen entfernt) – nur abfragen, wenn es wieder da ist
     wiki_da = db_json("SELECT JSON_OBJECT('n', COUNT(*)) FROM information_schema.tables "
@@ -1118,7 +1122,8 @@ def main():
 
 def community_written():
     try:
-        written = [write(rel, title, url, text, extra={'space': r['space'], 'oeffentlich': 'ja' if r['offen'] else 'nein'})
+        written = [write(rel, title, url, text, extra={'space': r['space'], 'oeffentlich': 'ja' if r['offen'] else 'nein',
+                                                             'gaeste': 'ja' if r['gaeste'] else 'nein'})
                    for rel, title, url, text, r in community_inhalte()]
     except Exception as e:
         print(f'! Community-Inhalte nicht gelesen: {e}', file=sys.stderr)

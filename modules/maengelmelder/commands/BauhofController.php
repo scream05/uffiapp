@@ -112,6 +112,10 @@ class BauhofController extends Controller
      */
     public function actionMailAbrufen($probelauf = 0)
     {
+        // Läuft der vorige Abruf noch (Postfach langsam), diesen auslassen
+        if (!Yii::$app->mutex->acquire('bauhof-mail-abrufen', 0)) {
+            return ExitCode::OK;
+        }
         try {
             foreach (\humhub\modules\maengelmelder\components\MailEingang::abrufen((bool)$probelauf) as $zeile) {
                 $this->stdout(date('Y-m-d H:i') . " Mail-Eingang $zeile\n");
@@ -119,6 +123,8 @@ class BauhofController extends Controller
         } catch (\Throwable $e) {
             $this->stderr(date('Y-m-d H:i') . ' Mail-Eingang: ' . $e->getMessage() . "\n");
             return ExitCode::UNSPECIFIED_ERROR;
+        } finally {
+            Yii::$app->mutex->release('bauhof-mail-abrufen');
         }
         return ExitCode::OK;
     }

@@ -41,7 +41,15 @@ class VereineController extends Controller
 
     public function actionLive()
     {
-        $log = Bfv::live();
+        // Minütlich: läuft der vorige Lauf noch (BFV langsam), diesen auslassen statt Prozesse zu stapeln
+        if (!Yii::$app->mutex->acquire('vereine-live', 0)) {
+            return ExitCode::OK;
+        }
+        try {
+            $log = Bfv::live();
+        } finally {
+            Yii::$app->mutex->release('vereine-live');
+        }
         if ($log) {
             $this->stdout(date('Y-m-d H:i:s') . ' ' . implode('; ', $log) . "\n");
         }

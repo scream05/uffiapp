@@ -58,17 +58,23 @@ class GutscheinDienst
         return $space->createUrl('/gewerbe/gutschein/theke', ['t' => self::theke($betrieb)->theke_token], $scheme);
     }
 
-    /** Nummer vom Aufsteller prüfen (für Handys ohne Kamera); höchstens 8 Fehlversuche je Person und Stunde */
+    /**
+     * Nummer vom Aufsteller prüfen (für Handys ohne Kamera); höchstens 8 Fehlversuche je Person und 20 je Betrieb
+     * (alle Konten zusammen, gegen Durchprobieren mit Zweitkonten) und Stunde – der QR-Code geht dann weiter
+     */
     public static function nummerPruefen(Betrieb $betrieb, string $nummer, int $userId): ?string
     {
         $key = "gewerbe-nummer-fehler-$userId";
+        $keyBetrieb = "gewerbe-nummer-fehler-betrieb-{$betrieb->id}";
         $fehler = (int)Yii::$app->cache->get($key);
-        if ($fehler >= 8) {
+        $fehlerBetrieb = (int)Yii::$app->cache->get($keyBetrieb);
+        if ($fehler >= 8 || $fehlerBetrieb >= 20) {
             return Yii::t('GewerbeModule.base', 'Zu viele falsche Nummern. Bitte scanne den QR-Code an der Kasse oder versuch es in einer Stunde noch einmal.');
         }
         $betrieb = self::theke($betrieb);
         if (!hash_equals((string)$betrieb->theke_nummer, preg_replace('/\D/', '', $nummer))) {
             Yii::$app->cache->set($key, $fehler + 1, 3600);
+            Yii::$app->cache->set($keyBetrieb, $fehlerBetrieb + 1, 3600);
             return Yii::t('GewerbeModule.base', 'Die Nummer passt nicht. Sie steht auf dem Aufsteller an der Kasse unter dem QR-Code.');
         }
         return null;

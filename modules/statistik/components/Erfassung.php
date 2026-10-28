@@ -10,7 +10,7 @@ use yii\web\Response;
  * Cookielose Reichweitenmessung nach dem Vorbild von Plausible/Matomo („cookieless“):
  * - nichts wird im Browser gespeichert oder ausgelesen (§ 25 TDDDG greift nicht, keine Einwilligung nötig),
  * - IP-Adresse und Browserkennung gehen nur in einen Hash mit Tages-Salz ein und werden nicht gespeichert,
- * - das Salz wird jeden Tag neu gewürfelt und das alte überschrieben → Besucher sind nur innerhalb
+ * - das Salz wird jeden Tag neu gewürfelt und das alte gelöscht (nur auf dem Server, nicht in Datenbank/Sicherung) → Besucher sind nur innerhalb
  *   eines Tages wiedererkennbar, danach ist der Hash keiner Person mehr zuzuordnen,
  * - Bots, Admins (einstellbar) und Browser mit DNT/GPC werden nicht gezählt.
  */
@@ -79,15 +79,39 @@ class Erfassung
         ])->execute();
     }
 
-    /** Tages-Salz: zufällig, nur in der Datenbank, wird am nächsten Tag überschrieben */
+    /**
+     * Tages-Salz: zufällig, je Tag eine Datei in @runtime des laufenden Containers – nicht in der Datenbank und damit
+     * nicht in den Sicherungen (sonst ließen sich Konto-ID bzw. IP-Adresse mit dem Salz des Tages zurückrechnen) und
+     * nicht im Cache (cache/flush-all läuft stündlich). Dateien früherer Tage werden gelöscht.
+     */
     private static function salz(string $tag): string
     {
-        $s = Yii::$app->getModule('statistik')->settings;
-        if ($s->get('salzTag') !== $tag || !$s->get('salz')) {
-            $s->set('salz', bin2hex(random_bytes(32)));
-            $s->set('salzTag', $tag);
+        $dir = Yii::getAlias('@runtime/statistik');
+        $datei = "$dir/salz-$tag";
+        if (!is_file($datei)) {
+            if (!is_dir($dir)) {
+                @mkdir($dir, 0700, true);
+            }
+            // „x“: nur eine Anfrage legt die Datei an, gleichzeitige lesen danach dieselbe
+            if (($f = @fopen($datei, 'x')) !== false) {
+                fwrite($f, bin2hex(random_bytes(32)));
+                fclose($f);
+                chmod($datei, 0600);
+                foreach (glob("$dir/salz-*") ?: [] as $alt) {
+                    if ($alt !== $datei) {
+                        @unlink($alt);
+                    }
+                }
+            }
         }
-        return $s->get('salz');
+        // Gerade angelegt, aber noch leer (gleichzeitige Anfrage): kurz warten
+        for ($i = 0; ($salz = (string)@file_get_contents($datei)) === '' && $i < 10; $i++) {
+            usleep(10000);
+        }
+        if ($salz === '') {
+            throw new \RuntimeException('Statistik: Tages-Salz nicht lesbar');
+        }
+        return $salz;
     }
 
     /** Pfad ohne Abfrage, nur „id“ bleibt (Beiträge, Termine); Profile werden zusammengefasst */
