@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'uffi-knopf-cookie', 'datum' => '2026-10-28', 'art' => 'behoben', 'popup' => false,
+        'titel' => 'Uffi-Knopf lässt sich immer antippen',
+        'text' => 'Am Handy lag der Cookie-Hinweis manchmal über dem Uffi-Knopf. Dann ließ sich Uffi weder öffnen noch verschieben. Solange der Hinweis zu sehen ist, rückt der Knopf jetzt darüber.'],
     ['id' => 'uffi-formular-pdf', 'datum' => '2026-10-28', 'art' => 'behoben', 'popup' => false,
         'link' => [null, '/ki-assistent/chat'],
         'titel' => 'Uffi füllt Formulare wieder zuverlässig aus',

@@ -73,8 +73,33 @@ use yii\web\View;
             if (!mobile() && !touch()) chat.focus(); else panel.querySelector('.ki-title').focus();
         } else {
             fab.focus();
+            ueberHinweis();
         }
     }
+
+    // Der Cookie-Hinweis (unten, über allem) verdeckt am Handy den Knopf, bis er bestätigt ist – Antippen und Ziehen
+    // kommen dann nicht an. iOS löscht die Bestätigung (per Skript gesetztes Cookie) nach 7 Tagen, der Hinweis kommt
+    // also immer wieder. So lange hebt --ki-heben den Knopf über den Hinweis (ki-chat.css, neu.css).
+    var hinweisBeobachter = null;
+    function ueberHinweis() {
+        var cc = document.querySelector('.cc-window'), heben = 0;
+        if (cc && !hinweisBeobachter) {
+            hinweisBeobachter = new MutationObserver(ueberHinweis);
+            hinweisBeobachter.observe(cc, {attributes: true, attributeFilter: ['class', 'style']});
+        }
+        var root = document.documentElement.style, alt = root.getPropertyValue('--ki-heben');
+        if (cc && !cc.classList.contains('cc-invisible') && getComputedStyle(cc).display !== 'none') {
+            root.setProperty('--ki-heben', '0px'); // Grundlage des Knopfs messen
+            var c = cc.getBoundingClientRect(), f = fab.getBoundingClientRect();
+            if (c.width && f.width && c.left < f.right && c.right > f.left && c.top > window.innerHeight / 2) {
+                heben = Math.max(0, Math.ceil(f.bottom - c.top + 12));
+            }
+        }
+        if (heben + 'px' !== alt) root.setProperty('--ki-heben', heben + 'px');
+    }
+    new MutationObserver(ueberHinweis).observe(body, {childList: true});
+    window.addEventListener('resize', ueberHinweis);
+    ueberHinweis();
 
     // Handy: Bei offener Tastatur schrumpft nur der sichtbare Bereich (visualViewport), nicht 100dvh –
     // sonst schiebt sich das Eingabefeld über die Nachrichten. Fenster daher genau auf den sichtbaren Bereich legen.

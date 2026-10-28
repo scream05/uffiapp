@@ -1,4 +1,31 @@
 {
+    "uffi-knopf-cookie": {
+        "en": {
+            "titel": "Uffi button can always be tapped",
+            "text": "On mobile, the cookie notice sometimes covered the Uffi button. Then you couldn't open or move Uffi. As long as the notice is visible, the button now moves up above it.",
+            "quelle": "19ad71a3384a99ce303591c571e8819d683b727b"
+        },
+        "uk": {
+            "titel": "Кнопка Uffi завжди доступна для натискання",
+            "text": "На телефоні підказка про cookie іноді накладалася на кнопку Uffi. Тоді Uffi не можна було ні відкрити, ні перемістити. Тепер, поки підказка видна, кнопка піднімається над нею.",
+            "quelle": "19ad71a3384a99ce303591c571e8819d683b727b"
+        },
+        "ar": {
+            "titel": "زر Uffi أصبح قابلاً للنقر دائماً",
+            "text": "على الهاتف كان إشعار ملفات تعريف الارتباط (الكوكيز) يغطي زر Uffi أحياناً. عندها لم يعد بالإمكان فتح Uffi ولا تحريكه. طالما أن الإشعار ظاهر، ينتقل الزر الآن إلى الأعلى فوقه.",
+            "quelle": "19ad71a3384a99ce303591c571e8819d683b727b"
+        },
+        "tr": {
+            "titel": "Uffi-Knopf lässt sich immer antippen",
+            "text": "Telefonunda çerez uyarısı bazen Uffi-Knopf'un üstüne geliyordu. Bu durumda Uffi ne açılabiliyor ne de taşınabiliyordu. Çerez uyarısı göründüğü sürece düğme artık onun üstüne kayıyor.",
+            "quelle": "19ad71a3384a99ce303591c571e8819d683b727b"
+        },
+        "ru": {
+            "titel": "Кнопка Uffi теперь всегда доступна для нажатия",
+            "text": "На телефоне подсказка про cookie иногда перекрывала кнопку Uffi. Тогда Uffi нельзя было ни открыть, ни передвинуть. Пока подсказка видна, кнопка теперь сдвигается над ней.",
+            "quelle": "19ad71a3384a99ce303591c571e8819d683b727b"
+        }
+    },
     "uffi-formular-pdf": {
         "en": {
             "titel": "Uffi fills out forms reliably again",

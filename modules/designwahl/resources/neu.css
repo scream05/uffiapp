@@ -308,7 +308,7 @@ html.design-neu #topbar .user-title strong {
 
     /* Uffi-Knopf über der Leiste */
     html.design-neu .ki-fab {
-        bottom: calc(var(--hh-ct-top-bar-height) + 12px + var(--hh-mobile-app-safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)) - var(--dn-luecke, 0px)) !important;
+        bottom: calc(var(--hh-ct-top-bar-height) + 12px + var(--hh-mobile-app-safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)) - var(--dn-luecke, 0px) + var(--ki-heben, 0px)) !important; /* --ki-heben: über dem Cookie-Hinweis (ki-assistent floatingChat) */
     }
 }
 
