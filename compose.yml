@@ -41,6 +41,7 @@ services:
       - ./modules/statistik:/data/modules/statistik:ro
       - ./modules/tanken:/data/modules/tanken:ro
       - ./modules/gewerbe:/data/modules/gewerbe:ro
+      - ./modules/verzeichnis:/data/modules/verzeichnis:ro
       - ./modules/vorschlaege:/data/modules/vorschlaege:ro
       - ./modules/neuigkeiten:/data/modules/neuigkeiten:ro
       - ./modules/oeffnungszeiten:/data/modules/oeffnungszeiten:ro

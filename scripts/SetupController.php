@@ -589,7 +589,7 @@ class SetupController extends Controller
                     $file->setStoredFileContent(file_get_contents($pfad));
                     $b->fileManager->attach($file);
                 }
-                \humhub\modules\vereine\components\BeitragDienst::freigeben($b, true, true, true);
+                \humhub\modules\vereine\components\BeitragDienst::freigeben($b, true, true, still: true);
                 $b->refresh();
                 $b->updateAttributes(['created_at' => $e['datum'], 'geprueft_am' => $e['datum'], 'geprueft_von' => $admin?->id ?? $konto->id]);
                 if ($b->content) {

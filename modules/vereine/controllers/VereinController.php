@@ -3,13 +3,15 @@
 namespace humhub\modules\vereine\controllers;
 
 use humhub\modules\content\components\ContentContainerController;
-use humhub\modules\user\models\User;
+use humhub\modules\file\models\File;
 use humhub\modules\vereine\models\Verein;
 use humhub\modules\vereine\models\VereinBeitrag;
 use humhub\modules\vereine\models\VereinVerwalter;
 use humhub\modules\vereine\Module;
 use humhub\modules\vereine\notifications\VerwaltungAngefragt;
 use humhub\modules\vereine\notifications\VerwaltungBestaetigt;
+use humhub\modules\vereine\permissions\ManageVereine;
+use humhub\modules\verzeichnis\controllers\VerwaltungTrait;
 use Yii;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -21,6 +23,8 @@ use yii\web\NotFoundHttpException;
  */
 class VereinController extends ContentContainerController
 {
+    use VerwaltungTrait;
+
     protected function getAccessRules()
     {
         return [['login' => ['create', 'edit', 'delete', 'anfrage', 'verwalter', 'anfragen']]]; // Verzeichnis + Vereinsseiten auch für Gäste
@@ -104,7 +108,7 @@ class VereinController extends ContentContainerController
             if ($verein->save()) {
                 $this->saveImages($verein);
                 if (!Module::canManageAll()) {
-                    $this->request($verein, $nachricht);
+                    $this->verwaltungAnfragen($verein, $nachricht);
                     $this->view->success(Yii::t('VereineModule.base', 'Danke! Dein Vorschlag wird geprüft. Sobald er freigegeben ist, kannst du die Seite pflegen.'));
                 }
                 return $this->redirect($verein->getUrl());
@@ -148,126 +152,69 @@ class VereinController extends ContentContainerController
         return $this->redirect($this->contentContainer->createUrl('/vereine/verein/index'));
     }
 
-    /** Verwaltung anfragen (Vorstandsmitglied o. Ä.) */
-    public function actionAnfrage($id)
+    // Verwaltung anfragen/bestätigen, offene Anfragen, Logo und Bilder: VerwaltungTrait (modules/verzeichnis)
+
+    protected function eintragName(): string
     {
-        $this->forcePostRequest();
-        $verein = $this->findVerein($id);
-        if (VereinVerwalter::findOne(['verein_id' => $verein->id, 'user_id' => Yii::$app->user->id])) {
-            return $this->redirect($verein->getUrl());
-        }
-        $this->request($verein, trim((string)Yii::$app->request->post('nachricht', '')));
-        $this->view->success(Yii::t('VereineModule.base', 'Deine Anfrage wurde verschickt. Du bekommst eine Benachrichtigung, sobald sie bestätigt ist.'));
-        return $this->redirect($verein->getUrl());
+        return 'verein';
     }
 
-    /** Verwalter eines Vereins: Anfragen bestätigen/ablehnen, Verwalter entfernen */
-    public function actionVerwalter($id)
+    protected function eintragKlasse(): string
     {
-        $verein = $this->findVerein($id);
-        if (!$verein->canManage()) {
-            throw new ForbiddenHttpException(Yii::t('VereineModule.base', 'Nur Verwalter dieses Vereins können das sehen.'));
-        }
-        if (Yii::$app->request->isPost) {
-            $userId = (int)Yii::$app->request->post('user_id');
-            $row = VereinVerwalter::findOne(['verein_id' => $verein->id, 'user_id' => $userId]);
-            $action = Yii::$app->request->post('aktion');
-            if ($row && $action === 'bestaetigen' && $row->status === VereinVerwalter::STATUS_ANGEFRAGT) {
-                $row->updateAttributes(['status' => VereinVerwalter::STATUS_BESTAETIGT]);
-                if ($verein->status === Verein::STATUS_VORGESCHLAGEN && Module::canManageAll()) {
-                    $verein->updateAttributes(['status' => Verein::STATUS_AKTIV]);
-                }
-                VerwaltungBestaetigt::instance()->from(Yii::$app->user->getIdentity())->about($verein)->send($row->user);
-                $this->view->success(Yii::t('VereineModule.base', '{name} kann den Verein jetzt verwalten.', ['name' => $row->user->displayName]));
-            } elseif ($row && in_array($action, ['ablehnen', 'entfernen'], true)) {
-                $row->delete();
-                $this->view->success($action === 'ablehnen' ? Yii::t('VereineModule.base', 'Anfrage abgelehnt.') : Yii::t('VereineModule.base', 'Verwalter entfernt.'));
-                if ($row->user_id === Yii::$app->user->id && !$verein->canManage()) {
-                    return $this->redirect($verein->getUrl());
-                }
-            }
-            return $this->redirect($this->contentContainer->createUrl('/vereine/verein/verwalter', ['id' => $verein->id]));
-        }
-        return $this->render('verwalter', [
-            'verein' => $verein,
-            'rows' => $verein->getVerwalter()->with('user')->orderBy(['status' => SORT_ASC, 'created_at' => SORT_ASC])->all(),
-        ]);
+        return Verein::class;
     }
 
-    /** Alle offenen Anfragen (Admins / Recht „Vereine verwalten“) */
-    public function actionAnfragen()
+    protected function verwalterKlasse(): string
     {
-        if (!Module::canManageAll()) {
-            throw new ForbiddenHttpException();
-        }
-        return $this->render('anfragen', [
-            'rows' => VereinVerwalter::find()->with(['user', 'verein'])
-                ->where(['status' => VereinVerwalter::STATUS_ANGEFRAGT])->orderBy(['created_at' => SORT_ASC])->all(),
-        ]);
+        return VereinVerwalter::class;
     }
 
-    private function request(Verein $verein, string $nachricht): void
+    protected function verwaltenRecht(): string
     {
-        $row = new VereinVerwalter([
-            'verein_id' => $verein->id,
-            'user_id' => Yii::$app->user->id,
-            'status' => VereinVerwalter::STATUS_ANGEFRAGT,
-            'nachricht' => mb_substr($nachricht, 0, 1000),
-        ]);
-        $row->save(false);
-        // Bisherige Verwalter des Vereins und alle mit „Vereine verwalten“ bzw. Admins
-        $recipients = $verein->getConfirmedUsers();
-        foreach (User::find()->active()->all() as $user) {
-            if ($user->isSystemAdmin() || (new \humhub\modules\user\components\PermissionManager(['subject' => $user]))
-                    ->can(\humhub\modules\vereine\permissions\ManageVereine::class)) {
-                $recipients[] = $user;
-            }
-        }
-        $byId = [];
-        foreach ($recipients as $user) {
-            if ($user->id !== Yii::$app->user->id) {
-                $byId[$user->id] = $user;
-            }
-        }
-        VerwaltungAngefragt::instance()->from(Yii::$app->user->getIdentity())->about($verein)->sendBulk(array_values($byId));
+        return ManageVereine::class;
     }
 
-    /**
-     * Logo: neu hochgeladenes Bild ersetzt das bisherige, „Logo entfernen“ löscht es.
-     * Galerie: weitere Bilder hinzufügen (höchstens Verein::MAX_BILDER), angehakte entfernen.
-     */
-    private function saveImages(Verein $verein): void
+    protected function angefragtBenachrichtigung(): string
     {
-        $request = Yii::$app->request;
-        $logo = $verein->getLogo();
-        $newLogo = array_values(array_filter((array)$request->post('fileList', [])));
-        if ($logo && ($newLogo !== [] || $request->post('logoEntfernen'))) {
-            $this->deleteImage($verein, $logo);
-            $verein->updateAttributes(['logo_guid' => null, 'logo_quelle' => null]);
-        }
-        if ($newLogo !== []) {
-            $verein->fileManager->attach([$newLogo[0]]);
-            $verein->updateAttributes(['logo_guid' => $newLogo[0], 'logo_quelle' => null]);
-        }
-        $remove = (array)$request->post('bildEntfernen', []);
-        foreach ($verein->getGallery() as $file) {
-            if (in_array($file->guid, $remove, true)) {
-                $this->deleteImage($verein, $file);
-            }
-        }
-        $free = Verein::MAX_BILDER - count($verein->getGallery());
-        $new = array_slice(array_values(array_filter((array)$request->post('galerieList', []))), 0, max(0, $free));
-        if ($new !== []) {
-            $verein->fileManager->attach($new);
-        }
+        return VerwaltungAngefragt::class;
     }
 
-    private function deleteImage(Verein $verein, \humhub\modules\file\models\File $file): void
+    protected function bestaetigtBenachrichtigung(): string
+    {
+        return VerwaltungBestaetigt::class;
+    }
+
+    protected function kategorie(): string
+    {
+        return 'VereineModule.base';
+    }
+
+    protected function verwaltungTexte(string $name = ''): array
+    {
+        return [
+            'nurVerwalterSehen' => Yii::t('VereineModule.base', 'Nur Verwalter dieses Vereins können das sehen.'),
+            'kannVerwalten' => Yii::t('VereineModule.base', '{name} kann den Verein jetzt verwalten.', ['name' => $name]),
+        ];
+    }
+
+    protected function findEintrag($id)
+    {
+        return $this->findVerein($id);
+    }
+
+    /** Mit dem Bild auch seinen Bildnachweis entfernen */
+    protected function bildLoeschen($verein, File $file): void
     {
         $credits = $verein->getBildnachweise();
         unset($credits[$file->guid]);
         $verein->updateAttributes(['bildnachweise' => $credits ? json_encode($credits, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : null]);
         $file->delete();
+    }
+
+    /** Eigenes Logo: Quellenangabe (aus der Recherche übernommenes Logo) entfällt */
+    protected function logoZusatz(): array
+    {
+        return ['logo_quelle' => null];
     }
 
     private function findVerein($id): Verein

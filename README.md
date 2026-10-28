@@ -25,6 +25,7 @@ nach § 13 der AGPL-3.0 veröffentlicht.
 | `modules/statistik` | Cookielose Besucherstatistik für Admins (Tages-Salz, keine IP gespeichert) |
 | `modules/tanken` | Spritpreise rund um Uffenheim (Daten MTS-K über Tankerkönig, CC BY 4.0; eigener API-Schlüssel nötig) |
 | `modules/vereine` | Vereinsverzeichnis mit Vorstellungsseiten und Terminen |
+| `modules/verzeichnis` | Gemeinsame Basisklassen für Gewerbe- und Vereinsverzeichnis (Beiträge, Verwalter, Bilder); muss eingebunden, aber nicht aktiviert sein |
 | `modules/vorschlaege` | Ideen & Vorschläge: Verbesserungsvorschläge einreichen, kommentieren, dafür/dagegen stimmen; Stand durch Admins |
 | `modules/whatsapp` | Veranstaltungen aus weitergeleiteten WhatsApp-Plakaten |
 | `scripts/` | Einrichtung (`run-setup.sh` + `SetupController.php`), Importe, Sicherung |

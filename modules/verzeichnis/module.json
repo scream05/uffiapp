@@ -1,0 +1,10 @@
+{
+  "id": "verzeichnis",
+  "name": "Verzeichnis (Basis)",
+  "description": "Gemeinsame Basisklassen für Gewerbe- und Vereinsverzeichnis (Beiträge, Verwalter, Bilder). Muss nicht aktiviert werden.",
+  "keywords": ["verzeichnis"],
+  "version": "0.1.0",
+  "humhub": {
+    "minVersion": "1.19"
+  }
+}

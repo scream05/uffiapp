@@ -2,19 +2,13 @@
 
 namespace humhub\modules\vereine\models;
 
-use humhub\components\ActiveRecord;
-use humhub\interfaces\ViewableInterface;
 use humhub\modules\content\models\Content;
-use humhub\modules\file\models\File;
-use humhub\modules\user\helpers\AuthHelper;
 use humhub\modules\user\models\User;
 use humhub\modules\vereine\Module;
-use Yii;
+use humhub\modules\verzeichnis\models\BeitragBasis;
 
 /**
- * Beitrag eines Vereinsverwalters. Wird eingereicht, ein Admin gibt ihn frei (Vereinsseite und/oder Übersicht)
- * oder lehnt ihn mit Begründung ab. Bei „Übersicht“ entsteht ein normaler HumHub-Beitrag im Space des
- * Verzeichnisses (content_id), die Bilder wandern dorthin.
+ * Beitrag eines Vereinsverwalters (Vereinsseite und/oder Übersicht); Logik in modules/verzeichnis (BeitragBasis).
  *
  * @property int $id
  * @property int $verein_id
@@ -32,91 +26,35 @@ use Yii;
  * @property-read User $user
  * @property-read Content|null $content
  */
-class VereinBeitrag extends ActiveRecord implements ViewableInterface
+class VereinBeitrag extends BeitragBasis
 {
-    public const STATUS_EINGEREICHT = 'eingereicht';
-    public const STATUS_VEROEFFENTLICHT = 'veroeffentlicht';
-    public const STATUS_ABGELEHNT = 'abgelehnt';
-
-    public const MAX_BILDER = 4;
-
     public static function tableName()
     {
         return 'verein_beitrag';
     }
 
-    public function rules()
+    public static function kategorie(): string
     {
-        return [
-            ['text', 'trim'],
-            ['text', 'required', 'message' => Yii::t('VereineModule.base', 'Bitte einen Text schreiben.')],
-            ['text', 'string', 'min' => 10, 'max' => 5000],
-        ];
+        return 'VereineModule.base';
     }
 
-    public function attributeLabels()
+    public static function eintragRelation(): string
     {
-        return ['text' => Yii::t('VereineModule.base', 'Text')];
+        return 'verein';
     }
 
-    public function beforeSave($insert)
+    public static function seiteSpalte(): string
     {
-        if ($insert) {
-            $this->created_at = date('Y-m-d H:i:s');
-        }
-        return parent::beforeSave($insert);
+        return 'auf_vereinsseite';
     }
 
-    public function afterDelete()
+    public static function darfAllesVerwalten(): bool
     {
-        foreach ($this->fileManager->findAll() as $file) {
-            $file->delete();
-        }
-        parent::afterDelete();
+        return Module::canManageAll();
     }
 
     public function getVerein()
     {
         return $this->hasOne(Verein::class, ['id' => 'verein_id']);
-    }
-
-    public function getUser()
-    {
-        return $this->hasOne(User::class, ['id' => 'user_id']);
-    }
-
-    public function getContent()
-    {
-        return $this->hasOne(Content::class, ['id' => 'content_id']);
-    }
-
-    /** Wer Bilder des Beitrags sehen darf (file/download): veröffentlicht wie das Verzeichnis, sonst Verfasser und Admins */
-    public function canView($user = null): bool
-    {
-        if ($this->status === self::STATUS_VEROEFFENTLICHT) {
-            return !Yii::$app->user->isGuest || AuthHelper::isGuestAccessEnabled();
-        }
-        return !Yii::$app->user->isGuest && (Yii::$app->user->id === $this->user_id || Module::canManageAll());
-    }
-
-    /** @return File[] Bilder – nach Freigabe für die Übersicht hängen sie am HumHub-Beitrag */
-    public function getBilder(): array
-    {
-        $record = $this->content?->getModel() ?? $this;
-        return array_values(array_filter($record->fileManager->findAll(), fn($f) => str_starts_with((string)$f->mime_type, 'image/')));
-    }
-
-    public function getStatusLabel(): string
-    {
-        return match ($this->status) {
-            self::STATUS_EINGEREICHT => Yii::t('VereineModule.base', 'wartet auf Prüfung'),
-            self::STATUS_ABGELEHNT => Yii::t('VereineModule.base', 'abgelehnt'),
-            default => Yii::t('VereineModule.base', 'veröffentlicht'),
-        };
-    }
-
-    public static function forContent(int $contentId): ?self
-    {
-        return static::findOne(['content_id' => $contentId]);
     }
 }
