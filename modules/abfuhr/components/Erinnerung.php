@@ -114,6 +114,7 @@ class Erinnerung
         $now ??= time();
         $hour = (int)date('G', $now);
         $sent = 0;
+        $termine = []; // je Abfuhrtag und Gebiet nur einmal abfragen, nicht je Person
         $userIds = (new \yii\db\Query())->select('c.pk')->from('contentcontainer_setting s')
             ->innerJoin('contentcontainer c', 'c.id = s.contentcontainer_id AND c.class = :cls', [':cls' => User::class])
             ->where(['s.module_id' => 'abfuhr', 's.name' => 'aktiv', 's.value' => '1'])->column();
@@ -126,7 +127,8 @@ class Erinnerung
                     continue;
                 }
                 $tag = date('Y-m-d', strtotime("+$offset day", $now));
-                $keys = array_values(array_intersect(self::termine($tag, $tag, $gebiet)[$tag] ?? [], $tonnen));
+                $termine["$tag|$gebiet"] ??= self::termine($tag, $tag, $gebiet)[$tag] ?? [];
+                $keys = array_values(array_intersect($termine["$tag|$gebiet"], $tonnen));
                 $s = self::module()->settings->user($user);
                 if (!$keys || $s->get('gesendet') === $tag) {
                     continue;
