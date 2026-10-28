@@ -184,7 +184,13 @@ h1, h2, h3, h4, .panel-heading, .modal-title {
 
 // --- Handy: Tab-Leiste unten wie in iOS ---
 @media (max-width: 575.98px) {
+    // beim Scrollen ausgeblendet (Clean: bottom -50px), auch dann um die Lücke verschoben
+    body.hide-bottom-menu #topbar > .container > #top-menu-nav {
+        bottom: calc(-50px - var(--dn-luecke, 0px));
+    }
+
     body #topbar > .container > #top-menu-nav {
+        bottom: calc(0px - var(--dn-luecke, 0px)); // Web-App am iPhone, siehe designwahl resources/viewport
         background: var(--ios-glass) !important;
         -webkit-backdrop-filter: saturate(180%) blur(20px);
         backdrop-filter: saturate(180%) blur(20px);

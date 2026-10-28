@@ -264,6 +264,7 @@ class Events
             }
             assets\KalenderAsset::register(Yii::$app->view);
             assets\AufwachenAsset::register(Yii::$app->view);
+            assets\ViewportAsset::register(Yii::$app->view);
             if (!Yii::$app->user->isGuest) {
                 assets\KennzeichenAsset::register(Yii::$app->view);
             }

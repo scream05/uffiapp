@@ -1,4 +1,31 @@
 {
+    "webapp-leiste-unten": {
+        "en": {
+            "titel": "Bottom bar in the web app stays put",
+            "text": "In the web app on the iPhone, the bar with overview, events and more sometimes slid into the middle of the screen, usually after the keyboard had been open. Now the bar and the Uffi button move back to the bottom edge.",
+            "quelle": "213c6b35939ee42cfad07cd23443bd26f974ae1c"
+        },
+        "uk": {
+            "titel": "Панель у веб-застосунку залишається внизу",
+            "text": "У веб-застосунку на iPhone панель з оглядом, подіями та іншим іноді зсувалася до центру екрана, як правило, після того, як було відкрито клавіатуру. Тепер панель і кнопка Uffi знову розміщуються внизу екрана.",
+            "quelle": "213c6b35939ee42cfad07cd23443bd26f974ae1c"
+        },
+        "ar": {
+            "titel": "الشريط في تطبيق الويب يبقى في الأسفل",
+            "text": "في تطبيق الويب على الآيفون كان الشريط الذي يضم النظرة العامة والمواعيد وغيرها ينزلق أحياناً إلى منتصف الشاشة، وغالباً بعد أن تكون لوحة المفاتيح مفتوحة. الآن يعود الشريط وزر Uffi إلى الحافة السفلية.",
+            "quelle": "213c6b35939ee42cfad07cd23443bd26f974ae1c"
+        },
+        "tr": {
+            "titel": "Web-App'te alt çubuk artık altta kalıyor",
+            "text": "iPhone'daki Web-App'te genel bakış, etkinlikler ve diğer bölümlerin olduğu çubuk bazen ekranın ortasına kayıyordu, genellikle klavye açıkken. Artık çubuk ve Uffi düğmesi yeniden ekranın alt kenarına yerleşiyor.",
+            "quelle": "213c6b35939ee42cfad07cd23443bd26f974ae1c"
+        },
+        "ru": {
+            "titel": "Leiste in der Web-App bleibt unten",
+            "text": "In der Web-App auf dem iPhone rutschte die Leiste mit Übersicht, Terminen und Co. manchmal in die Bildmitte, meist nachdem die Tastatur offen war. Jetzt rücken Leiste und Uffi-Knopf wieder an den unteren Rand.",
+            "quelle": "213c6b35939ee42cfad07cd23443bd26f974ae1c"
+        }
+    },
     "webapp-empfehlung": {
         "en": {
             "titel": "Now as a web app on your phone",

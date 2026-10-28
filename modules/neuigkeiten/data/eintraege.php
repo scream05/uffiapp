@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'webapp-leiste-unten', 'datum' => '2026-10-28', 'art' => 'behoben', 'popup' => false,
+        'titel' => 'Leiste in der Web-App bleibt unten',
+        'text' => 'In der Web-App am iPhone rutschte die Leiste mit Übersicht, Terminen und Co. manchmal in die Bildmitte, meist nachdem die Tastatur offen war. Jetzt rücken Leiste und Uffi-Knopf wieder an den unteren Rand.'],
     ['id' => 'webapp-empfehlung', 'datum' => '2026-10-28', 'art' => 'besser', 'popup' => false,
         'link' => [null, '/hilfe/app'],
         'titel' => 'Am Handy jetzt als Web-App',

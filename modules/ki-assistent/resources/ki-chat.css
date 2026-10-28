@@ -80,7 +80,7 @@ body:has(.ki-page) .ki-panel { display: none !important; }
         width: 54px;
         height: 54px;
         right: 12px;
-        bottom: calc(var(--hh-ct-top-bar-height, 50px) + var(--hh-mobile-app-safe-area-inset-bottom, env(safe-area-inset-bottom)) + 12px);
+        bottom: calc(var(--hh-ct-top-bar-height, 50px) + var(--hh-mobile-app-safe-area-inset-bottom, env(safe-area-inset-bottom)) + 12px - var(--dn-luecke, 0px));
     }
     .ki-panel {
         inset: 0;
