@@ -52,3 +52,7 @@
 .mm-legende { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 10px; }
 .mm-legende label { margin: 0 0 0 6px; font-weight: normal; white-space: nowrap; }
 .leaflet-popup-content .mm-status { margin: 4px 0 2px; }
+
+/* Überschrift einer Meldung als Link (resources/status/titel.js) */
+a.mm-titel-link { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a.mm-titel-link:hover, a.mm-titel-link:focus-visible { color: var(--bs-link-hover-color, #2b4a5f); text-decoration-thickness: 2px; }

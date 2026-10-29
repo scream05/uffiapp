@@ -1,4 +1,31 @@
 {
+    "maengel-titel-link": {
+        "en": {
+            "titel": "Defect reports open with one click",
+            "text": "Clicking the heading of a defect report, for example „Mängelmeldung: Straßenbeleuchtung“, now opens that report directly. If you work for the Bauhof, you land straight in the Bauhof view of the report.",
+            "quelle": "d040166f94051cf0003329936392521255418968"
+        },
+        "uk": {
+            "titel": "Мелдування про недоліки відкривається одним кліком",
+            "text": "Натисни на заголовок мелдування про недолік, наприклад „Mängelmeldung: Straßenbeleuchtung“, і це мелдування одразу відкриється. Якщо ти працюєш у Bauhof, тебе одразу перенесе до перегляду мелдування для Bauhof.",
+            "quelle": "d040166f94051cf0003329936392521255418968"
+        },
+        "ar": {
+            "titel": "فتح بلاغات العيوب بنقرة واحدة",
+            "text": "عند النقر على عنوان بلاغ عيب، على سبيل المثال „Mängelmeldung: Straßenbeleuchtung“ (بلاغ عيب: إنارة الشوارع)، يُفتح هذا البلاغ مباشرةً الآن. ومن يعمل في دائرة الصيانة البلدية (Bauhof) يصل مباشرةً إلى عرض دائرة الصيانة للبلاغ.",
+            "quelle": "d040166f94051cf0003329936392521255418968"
+        },
+        "tr": {
+            "titel": "Mängelmeldungen per Klick öffnen",
+            "text": "Ein Klick auf die Überschrift einer Mängelmeldung, zum Beispiel „Mängelmeldung: Straßenbeleuchtung“, öffnet jetzt direkt diese Meldung. Wer für den Bauhof arbeitet, landet gleich in der Bauhof-Ansicht der Meldung.",
+            "quelle": "d040166f94051cf0003329936392521255418968"
+        },
+        "ru": {
+            "titel": "Mängelmeldungen per Klick öffnen",
+            "text": "Ein Klick auf die Überschrift einer Mängelmeldung, zum Beispiel „Mängelmeldung: Straßenbeleuchtung“, öffnet jetzt direkt diese Meldung. Wer für den Bauhof arbeitet, landet gleich in der Bauhof-Ansicht der Meldung.",
+            "quelle": "d040166f94051cf0003329936392521255418968"
+        }
+    },
     "space-bilder-gewerbe-ideen": {
         "en": {
             "titel": "Own icon for Ideas & Suggestions",

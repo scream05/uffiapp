@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'maengel-titel-link', 'datum' => '2026-10-29', 'art' => 'besser', 'popup' => false,
+        'titel' => 'Mängelmeldungen per Klick öffnen',
+        'text' => 'Ein Klick auf die Überschrift einer Mängelmeldung, zum Beispiel „Mängelmeldung: Straßenbeleuchtung“, öffnet jetzt direkt diese Meldung. Wer für den Bauhof arbeitet, landet gleich in der Bauhof-Ansicht der Meldung.'],
     ['id' => 'space-bilder-gewerbe-ideen', 'datum' => '2026-10-29', 'art' => 'besser', 'popup' => false,
         'titel' => 'Eigenes Symbol für Ideen & Vorschläge',
         'text' => '„Ideen & Vorschläge“ hat jetzt ein eigenes Symbol, eine Glühbirne. Beiträge aus „Gewerbe & Einkaufen“ und „Ideen & Vorschläge“ tragen das Symbol ihres Bereichs in der Kopfzeile, Beiträge aus dem Mitteilungsblatt das Symbol der Vereine.'],

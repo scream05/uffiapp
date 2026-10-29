@@ -9,6 +9,7 @@ use humhub\modules\maengelmelder\models\MaengelAuch;
 use humhub\modules\maengelmelder\models\MaengelStatus;
 use humhub\modules\post\models\Post;
 use Yii;
+use yii\helpers\Url;
 
 /** Status-Etikett unter einer Meldung, für Berechtigte mit Formular zum Ändern */
 class StatusAddon extends Widget
@@ -31,7 +32,7 @@ class StatusAddon extends Widget
         StatusAsset::register($this->view);
         $status = MaengelStatus::forContent($this->post->content);
         $since = $status->isNewRecord ? $this->post->content->created_at : $status->updated_at;
-        $html = '<div class="mm-statuszeile">' . $status->getEtikett()
+        $html = '<div class="mm-statuszeile" data-mm-perma="' . Html::encode($this->ziel()) . '">' . $status->getEtikett()
             . '<span class="mm-seit">' . Yii::t('MaengelmelderModule.base', 'seit {datum}', ['datum' => Yii::$app->formatter->asDate($since, 'short')]) . '</span>';
 
         $html .= $this->auch($status);
@@ -58,6 +59,15 @@ $(document).off('click.maengel').on('click.maengel', '[data-maengel-toggle]', fu
 JS);
         }
         return $html . '</div>';
+    }
+
+    /** Ziel der verlinkten Überschrift (titel.js): Bauhof direkt in die Bauhof-Ansicht der Meldung, sonst der Beitrag */
+    private function ziel(): string
+    {
+        $content = $this->post->content;
+        return MaengelStatus::canManage()
+            ? $content->container->createUrl('/maengelmelder/bauhof/mangel', ['id' => $content->id])
+            : Url::to(['/content/perma', 'id' => $content->id]);
     }
 
     /** „X weitere betroffen“ und Knopf zum Anschließen (nicht bei eigenen und abgeschlossenen Meldungen) */
