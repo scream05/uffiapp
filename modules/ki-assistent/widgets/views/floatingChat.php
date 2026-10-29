@@ -7,7 +7,6 @@
 
 use humhub\helpers\Html;
 use yii\helpers\Url;
-use yii\web\View;
 
 ?>
 <button type="button" class="ki-fab" id="ki-fab" title="<?= Yii::t('KiAssistentModule.base', 'Uffi fragen – zum Verschieben ziehen') ?>" aria-label="<?= Yii::t('KiAssistentModule.base', 'Uffi, den KI-Assistenten, öffnen') ?>"
@@ -46,20 +45,33 @@ use yii\web\View;
             <?= Html::a(Html::encode(Yii::t('KiAssistentModule.base', 'Datenschutz')), ['/legal/page/view', 'pageKey' => 'privacy']) ?></div>
     </div>
 </div>
-<?php ob_start() // nach ki-chat.js ausführen, das erst am Seitenende geladen wird ?>
+<?php
+// Eigener <script>-Block statt registerJs(POS_END): Yii fasst alle POS_END-Schnipsel einer Seite in einem Block zusammen,
+// ein Fehler in einem fremden Schnipsel davor legte dann den Uffi-Knopf still (29.10.2026, Admin am PC).
+// Start nach DOMContentLoaded, weil ki-chat.js erst am Seitenende geladen wird.
+?>
+<script <?= Html::nonce() ?>>
 (function () {
+  function kiFabStart() {
     var body = document.body;
     var fab = document.getElementById('ki-fab');
+    if (!fab || fab.dataset.kiBereit) return; // schon eingerichtet (z. B. nach PJAX)
+    fab.dataset.kiBereit = '1';
     var panel = document.getElementById('ki-panel');
     var mobile = function () { return window.matchMedia('(max-width: 575.98px)').matches; };
     // Tablet (iPad): Fenster wie am Computer, aber Bildschirmtastatur – nicht von selbst ins Feld springen
     var touch = function () { return window.matchMedia('(hover: none) and (pointer: coarse)').matches; };
-    var chat = kiChat(panel, {
-        askUrl: <?= json_encode(Url::to(['/ki-assistent/chat/ask'])) ?>,
-        feedbackUrl: <?= json_encode(Url::to(['/ki-assistent/chat/feedback'])) ?>,
-        storageKey: 'ki-assistent-chat',
-        newestFirst: mobile
-    });
+    var chat = null;
+    try {
+        chat = kiChat(panel, {
+            askUrl: <?= json_encode(Url::to(['/ki-assistent/chat/ask'])) ?>,
+            feedbackUrl: <?= json_encode(Url::to(['/ki-assistent/chat/feedback'])) ?>,
+            storageKey: 'ki-assistent-chat',
+            newestFirst: mobile
+        });
+    } catch (e) {
+        if (window.console) console.error('Uffi', e); // Knopf und Fenster sollen trotzdem gehen
+    }
 
     function toggle(open) {
         body.classList.toggle('ki-fab-open', open);
@@ -70,7 +82,7 @@ use yii\web\View;
             var box = panel.querySelector('.ki-messages');
             box.scrollTop = mobile() ? 0 : box.scrollHeight;
             // Fokus ins Fenster (Screenreader); am Handy auf den Titel, damit keine Tastatur aufspringt
-            if (!mobile() && !touch()) chat.focus(); else panel.querySelector('.ki-title').focus();
+            if (chat && !mobile() && !touch()) chat.focus(); else panel.querySelector('.ki-title').focus();
             // Eingabefeld noch gesperrt (Altersbestätigung fehlt): Fokus trotzdem ins Fenster, sonst landet er im Nichts
             if (!panel.contains(document.activeElement)) panel.querySelector('.ki-title').focus();
         } else {
@@ -101,7 +113,7 @@ use yii\web\View;
     }
     new MutationObserver(ueberHinweis).observe(body, {childList: true});
     window.addEventListener('resize', ueberHinweis);
-    ueberHinweis();
+    try { ueberHinweis(); } catch (e) { if (window.console) console.error('Uffi', e); }
 
     // Handy: Bei offener Tastatur schrumpft nur der sichtbare Bereich (visualViewport), nicht 100dvh –
     // sonst schiebt sich das Eingabefeld über die Nachrichten. Fenster daher genau auf den sichtbaren Bereich legen.
@@ -195,10 +207,12 @@ use yii\web\View;
                 .then(function (res) {
                     if (!res.ok) return;
                     age.remove();
-                    chat.enable();
-                    if (!touch()) chat.focus();
+                    if (chat) chat.enable();
+                    if (chat && !touch()) chat.focus();
                 });
         });
     }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', kiFabStart); else kiFabStart();
 })();
-<?php $this->registerJs(ob_get_clean(), View::POS_END) ?>
+</script>
