@@ -117,3 +117,45 @@ input[type="checkbox"][name="adult"] {
 .form-button-search {
     min-width: 24px;
 }
+
+/* Gefahr-Knöpfe (Abmelden, Konto löschen): Rot des Clean-Themes (#ff3b30) hat mit Weiß nur 3,5:1 – dunkleres Rot (1.4.3) */
+.btn-danger:not(.btn-outline-danger) {
+    --bs-btn-bg: #c42b1c;
+    --bs-btn-border-color: #c42b1c;
+    --bs-btn-hover-bg: #a52414;
+    --bs-btn-hover-border-color: #a52414;
+    --bs-btn-active-bg: #8f1f11;
+    background-color: var(--bs-btn-bg) !important;
+    border-color: var(--bs-btn-border-color) !important;
+    color: #fff !important;
+}
+.btn-danger:not(.btn-outline-danger):hover,
+.btn-danger:not(.btn-outline-danger):focus-visible {
+    background-color: var(--bs-btn-hover-bg) !important;
+}
+
+/* Kästchen und Optionsfelder in eigenen Formularen (Bootstrap-3-Klassen .radio/.checkbox) groß genug zum Antippen (2.5.8) */
+.radio > label > input[type="radio"],
+.checkbox > label > input[type="checkbox"],
+label > input[type="checkbox"][name="aktiv"] {
+    width: 24px;
+    height: 24px;
+    margin: 0 8px 0 0;
+    vertical-align: -6px;
+}
+
+/* Kommentare: Name des Verfassers nicht nur über die Farbe als Link erkennbar (1.4.1) */
+.comment-heading a {
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-thickness: 1px;
+}
+
+/* „Gefällt mir“-Zähler: Link mindestens 24 px breit (2.5.8) */
+a[href*="/like/like/user-list"] {
+    display: inline-block;
+    min-width: 24px;
+    min-height: 24px;
+    text-align: center;
+}

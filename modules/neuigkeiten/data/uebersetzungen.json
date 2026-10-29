@@ -1,4 +1,31 @@
 {
+    "barrierefreiheit-3": {
+        "en": {
+            "titel": "Settings and menus more accessible",
+            "text": "Even after logging in, settings, notifications, messages and menus are now easier to use with a screen reader and keyboard. Red buttons have more contrast, and checkboxes are bigger.",
+            "quelle": "4fcbc05c61ff81f891a8ad44f19fbaba2d5aeaec"
+        },
+        "uk": {
+            "titel": "Налаштування та меню стали доступнішими",
+            "text": "Тепер і після входу в акаунт налаштування, сповіщення, повідомлення та меню краще працюють зі screen reader і з клавіатурою. Червоні кнопки мають більший контраст, а поля для галочок — більші.",
+            "quelle": "4fcbc05c61ff81f891a8ad44f19fbaba2d5aeaec"
+        },
+        "ar": {
+            "titel": "إعدادات وقوائم أسهل في الاستخدام",
+            "text": "حتى بعد تسجيل الدخول، أصبحت الإعدادات والإشعارات والرسائل والقوائم أسهل في الاستخدام مع قارئ الشاشة ولوحة المفاتيح. الأزرار الحمراء صارت ذات تباين أعلى، والمربعات أكبر حجمًا.",
+            "quelle": "4fcbc05c61ff81f891a8ad44f19fbaba2d5aeaec"
+        },
+        "tr": {
+            "titel": "Ayarlar ve menüler artık daha erişilebilir",
+            "text": "Giriş yaptıktan sonra da ayarlar, bildirimler, mesajlar ve menüler artık ekran okuyucu ve klavyeyle daha iyi kullanılabiliyor. Kırmızı düğmelerin kontrastı arttı, kutucuklar da daha büyük oldu.",
+            "quelle": "4fcbc05c61ff81f891a8ad44f19fbaba2d5aeaec"
+        },
+        "ru": {
+            "titel": "Настройки и меню стали удобнее для людей с ограниченными возможностями",
+            "text": "Теперь и после входа в систему настройки, уведомления, сообщения и меню лучше работают со программами чтения с экрана и с клавиатуры. Красные кнопки стали контрастнее, а поля для отметок — крупнее.",
+            "quelle": "4fcbc05c61ff81f891a8ad44f19fbaba2d5aeaec"
+        }
+    },
     "bildbeschreibungen": {
         "en": {
             "titel": "Image descriptions",

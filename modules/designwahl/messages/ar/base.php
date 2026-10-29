@@ -139,4 +139,6 @@ return [
     'Höchstens {max} Zeichen. Leer lassen, wenn das Bild nur Schmuck ist.' => 'بحد أقصى {max} حرفًا. اتركه فارغًا إذا كانت الصورة للزينة فقط.',
     'Bisher wird der Dateiname vorgelesen: „{name}“.' => 'حاليًا يُقرأ اسم الملف: „{name}“.',
     'Speichern' => 'حفظ',
+    'Wem das gefällt' => 'من أعجبه هذا',
+    'Passwort anzeigen' => 'إظهار كلمة المرور',
 ];

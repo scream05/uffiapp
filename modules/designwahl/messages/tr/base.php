@@ -139,4 +139,6 @@ return [
     'Höchstens {max} Zeichen. Leer lassen, wenn das Bild nur Schmuck ist.' => 'En fazla {max} karakter. Görsel sadece süs amaçlıysa boş bırak.',
     'Bisher wird der Dateiname vorgelesen: „{name}“.' => 'Şu anda dosya adı okunuyor: „{name}“.',
     'Speichern' => 'Kaydet',
+    'Wem das gefällt' => 'Bunu beğenenler',
+    'Passwort anzeigen' => 'Şifreyi göster',
 ];

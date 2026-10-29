@@ -139,4 +139,6 @@ return [
     'Höchstens {max} Zeichen. Leer lassen, wenn das Bild nur Schmuck ist.' => 'At most {max} characters. Leave empty if the image is purely decorative.',
     'Bisher wird der Dateiname vorgelesen: „{name}“.' => 'Currently the file name is read aloud: “{name}”.',
     'Speichern' => 'Save',
+    'Wem das gefällt' => 'Who likes this',
+    'Passwort anzeigen' => 'Show password',
 ];

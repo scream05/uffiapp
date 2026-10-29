@@ -139,4 +139,6 @@ return [
     'Höchstens {max} Zeichen. Leer lassen, wenn das Bild nur Schmuck ist.' => 'Не більше {max} символів. Залиш порожнім, якщо зображення лише для прикраси.',
     'Bisher wird der Dateiname vorgelesen: „{name}“.' => 'Зараз зачитується назва файлу: «{name}».',
     'Speichern' => 'Зберегти',
+    'Wem das gefällt' => 'Кому це подобається',
+    'Passwort anzeigen' => 'Показати пароль',
 ];

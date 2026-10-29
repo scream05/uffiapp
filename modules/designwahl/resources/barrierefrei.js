@@ -78,8 +78,8 @@
         var symbole = {filter: 'Filter', search: 'Suchen', times: 'Schließen', close: 'Schließen', bars: 'Menü',
             'ellipsis-h': 'Weitere Aktionen', 'ellipsis-v': 'Weitere Aktionen', plus: 'Hinzufügen', pencil: 'Bearbeiten',
             trash: 'Löschen', cog: 'Einstellungen', bell: 'Benachrichtigungen', envelope: 'Nachrichten'};
-        root.querySelectorAll('button:not([aria-label]):not([aria-labelledby]), a.btn:not([aria-label])').forEach(function (b) {
-            if (b.textContent.trim()) return;
+        root.querySelectorAll('button:not([aria-label]):not([aria-labelledby]), a.btn:not([aria-label]), #icon-messages, a[data-bs-toggle="dropdown"]:not([aria-label])').forEach(function (b) {
+            if (b.textContent.trim() || b.querySelector('img[alt]:not([alt=""])')) return;
             var titel = b.title || b.getAttribute('data-bs-original-title') || b.getAttribute('data-original-title');
             var icon = !titel && b.querySelector('i.fa, i[class*="fa-"]');
             var m = icon && icon.className.match(/fa-([a-z-]+)/g);
@@ -111,6 +111,49 @@
                 el.setAttribute('aria-label', t('Tabelle, seitlich scrollbar'));
             }
         });
+        // „Gefällt mir“-Zähler: ohne Zahl unsichtbar und nicht anwählbar, mit Zahl benannt (2.4.4)
+        root.querySelectorAll('a[href*="/like/like/user-list"]').forEach(function (a) {
+            var n = a.textContent.trim();
+            a.hidden = !n;
+            if (n) a.setAttribute('aria-label', t('Wem das gefällt') + ': ' + n);
+        });
+        // Leere Überschriften (z. B. Profilkopf ohne Titel) nicht als Überschrift ansagen (1.3.1)
+        root.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(function (h) {
+            var leer = !h.textContent.trim() && !h.querySelector('img[alt]:not([alt=""])');
+            if (leer && !h.hasAttribute('aria-hidden')) {
+                h.setAttribute('aria-hidden', 'true');
+                h.setAttribute('data-bf-leer', '');
+            } else if (!leer && h.hasAttribute('data-bf-leer')) { // inzwischen gefüllt
+                h.removeAttribute('aria-hidden');
+                h.removeAttribute('data-bf-leer');
+            }
+        });
+        // Auswahlfelder mit Suche (select2, mehrfach): Eingabefeld benennen, Liste der gewählten Einträge ist keine echte Liste
+        root.querySelectorAll('.select2-container').forEach(function (c) {
+            var box = c.querySelector('[role="combobox"], .select2-selection');
+            var text = box && box.getAttribute('aria-label');
+            c.querySelectorAll('.select2-search__field:not([aria-label])').forEach(function (f) {
+                f.setAttribute('aria-label', text || f.getAttribute('placeholder') || t('Auswahl'));
+            });
+            c.querySelectorAll('ul.select2-selection__rendered').forEach(function (ul) { ul.setAttribute('role', 'none'); });
+        });
+        // Passwort anzeigen (Auge im Passwortfeld)
+        root.querySelectorAll('.humhub-pw-show[role="button"]').forEach(function (b) {
+            if (!b.getAttribute('aria-label')) b.setAttribute('aria-label', t('Passwort anzeigen'));
+        });
+        // Tabelle der Benachrichtigungs-Einstellungen: Kästchen nach Zeile und Spalte benennen (1.3.1, 4.1.2)
+        root.querySelectorAll('table input[type="checkbox"][name^="NotificationSettings"]:not([aria-label])').forEach(function (c) {
+            var zelle = c.closest('td'), zeile = c.closest('tr'), tabelle = c.closest('table');
+            if (!zelle || !zeile || !tabelle) return;
+            var kopf = tabelle.querySelectorAll('thead th, tr:first-child th')[zelle.cellIndex];
+            var name = zeile.cells[0] ? zeile.cells[0].textContent.trim() : '';
+            c.setAttribute('aria-label', name + (kopf && kopf.textContent.trim() ? ' – ' + kopf.textContent.trim() : ''));
+        });
+        // Profilbild neben dem gleichen Namen: Alt-Text doppelt vorgelesen
+        root.querySelectorAll('img.profile-user-photo[alt], img[class*="space-profile-image"][alt]').forEach(function (img) {
+            var a = img.closest('a, label, li, td, .media') || (img.parentElement && img.parentElement.parentElement);
+            if (img.alt && a && a.textContent.replace(/\s+/g, ' ').indexOf(img.alt.trim()) !== -1) img.alt = '';
+        });
         // Captcha: englischer Linkname
         root.querySelectorAll('a[href*="altcha.org"]').forEach(function (a) {
             a.setAttribute('aria-label', t('ALTCHA-Website öffnen'));
@@ -121,12 +164,26 @@
     // Überschriften im Stream (1.3.1): der Kern nimmt h4 für den Autor und h5 für Zeit/Ort, das Kalendermodul h1
     // für Datum und „Ort“. Ebene passend zur Seite setzen: unter h1+h2 (Space-Kopf) Ebene 3, sonst 2.
     function ueberschriften(root) {
-        var kopf = document.querySelector('#layout-content h2, .space-layout-container h2, .container-fluid h2');
-        var ebene = kopf && !kopf.closest('.wall-entry') ? 3 : 2;
+        var kopf = Array.prototype.filter.call(document.querySelectorAll('#layout-content h2, .space-layout-container h2, .container-fluid h2'),
+            function (h) { return !h.closest('.wall-entry') && h.textContent.trim() && h.getAttribute('aria-hidden') !== 'true'; })[0];
+        var ebene = kopf ? 3 : 2;
         root.querySelectorAll('.wall-entry-header-info > h4').forEach(function (h) { h.setAttribute('aria-level', ebene); });
         // Zeile mit Zeit und Bereich ist keine Überschrift
         root.querySelectorAll('.wall-entry-header-info > h5').forEach(function (h) { h.setAttribute('role', 'none'); });
         root.querySelectorAll('.wall-entry .event-info-section-content > h1').forEach(function (h) { h.setAttribute('aria-level', ebene + 1); });
+        root.querySelectorAll('.comment-heading').forEach(function (h) { h.setAttribute('aria-level', ebene + 1); });
+        // Seiten ohne Hauptüberschrift (Benachrichtigungen, Nachrichten, Suche): unsichtbare h1 aus dem Seitentitel (2.4.6)
+        var inhalt = document.getElementById('layout-content');
+        if (inhalt && !document.querySelector('h1, [role="heading"][aria-level="1"]')) {
+            var h1 = document.createElement('h1');
+            h1.className = 'visually-hidden bf-h1';
+            h1.textContent = document.title.replace(/\s+[-–|]\s+[^-–|]*$/, '').trim() || document.title;
+            inhalt.insertBefore(h1, inhalt.firstChild);
+        }
+        // nach PJAX-Wechsel alte Ersatz-Überschrift entfernen, wenn die Seite jetzt eine eigene h1 hat
+        document.querySelectorAll('h1.bf-h1').forEach(function (h) {
+            if (document.querySelectorAll('h1').length > 1) h.remove();
+        });
     }
 
     // Kalender: Textfarbe je nach Terminfarbe Schwarz oder Weiß, damit der Kontrast immer reicht (1.4.3)

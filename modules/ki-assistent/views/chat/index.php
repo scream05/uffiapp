@@ -21,7 +21,7 @@ $this->registerJs('window.kiChatDomains = ' . json_encode(Yii::$app->getModule('
 <div class="container ki-page">
     <div class="panel panel-default">
         <div class="panel-heading">
-            <strong>Uffi</strong> <span class="text-muted">· <?= Yii::t('KiAssistentModule.base', 'KI-Assistent') ?></span>
+            <h1 style="font-size:inherit;margin:0;font-weight:inherit"><strong>Uffi</strong> <span class="text-muted">· <?= Yii::t('KiAssistentModule.base', 'KI-Assistent') ?></span></h1>
         </div>
         <div class="panel-body">
             <style <?= Html::nonce() ?>>

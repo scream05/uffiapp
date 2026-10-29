@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'barrierefreiheit-3', 'datum' => '2026-10-29', 'art' => 'besser', 'popup' => false,
+        'titel' => 'Einstellungen und Menüs barriereärmer',
+        'text' => 'Auch nach der Anmeldung sind Einstellungen, Benachrichtigungen, Nachrichten und Menüs jetzt besser mit Screenreader und Tastatur bedienbar. Rote Knöpfe haben mehr Kontrast, Kästchen sind größer.'],
     ['id' => 'bildbeschreibungen', 'datum' => '2026-10-29', 'art' => 'neu', 'popup' => true,
         'titel' => 'Bildbeschreibungen',
         'text' => 'Du kannst zu deinen Bildern eine kurze Beschreibung ergänzen: Menü ⋯ am Beitrag → „Bildbeschreibungen“. So wissen auch Menschen, die das Bild nicht sehen, was darauf ist.'],
