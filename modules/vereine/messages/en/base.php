@@ -327,4 +327,5 @@ return [
     'Aus der Übersicht nehmen' => 'Remove from overview',
     'Auch in der Übersicht zeigen' => 'Also show in overview',
     'Aus der Übersicht nehmen? Kommentare dort werden gelöscht; auf der Vereinsseite bleibt der Beitrag.' => 'Remove from overview? Comments there will be deleted; the post stays on the club page.',
+    'Bild {nr} von {anzahl} in voller Größe öffnen' => 'Open image {nr} of {anzahl} in full size',
 ];

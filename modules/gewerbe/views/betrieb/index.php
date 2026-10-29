@@ -42,11 +42,11 @@ $url = fn(array $p = []) => $space->createUrl('/gewerbe/betrieb/index', array_fi
 
         <?= $this->render('_ansicht', ['aktiv' => 'liste', 'q' => $q, 'kategorie' => $kategorie, 'ortsteil' => $ortsteil]) ?>
 
-        <div class="gw-branchen" role="list" aria-label="<?= Html::encode(Yii::t('GewerbeModule.base', 'Branchen')) ?>">
+        <div class="gw-branchen" role="group" aria-label="<?= Html::encode(Yii::t('GewerbeModule.base', 'Branchen')) ?>">
             <?php foreach ($module->categories as $k): ?>
                 <?= Html::a(Html::encode(Module::kategorieLabel($k)) . (isset($anzahl[$k]) ? ' <span class="gw-zahl">' . (int)$anzahl[$k] . '</span>' : ''),
                     $url(['kategorie' => $kategorie === $k ? '' : $k, 'ortsteil' => $ortsteil, 'q' => $q]),
-                    ['class' => 'gw-branche' . ($kategorie === $k ? ' aktiv' : ''), 'role' => 'listitem', 'aria-current' => $kategorie === $k ? 'true' : null]) ?>
+                    ['class' => 'gw-branche' . ($kategorie === $k ? ' aktiv' : ''), 'aria-current' => $kategorie === $k ? 'true' : null]) ?>
             <?php endforeach ?>
         </div>
 

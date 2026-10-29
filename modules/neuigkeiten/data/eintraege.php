@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'barrierefreiheit-2', 'datum' => '2026-10-29', 'art' => 'besser', 'popup' => false,
+        'titel' => 'Besser nutzbar mit Screenreader und Tastatur',
+        'text' => 'Bilder in Vereins- und Betriebsbeiträgen sind für Screenreader jetzt benannt, Links sind überall unterstrichen und Überschriften sauber gegliedert. Auch die Spritpreise sind besser lesbar.'],
     ['id' => 'uffi-knopf-cookie', 'datum' => '2026-10-28', 'art' => 'behoben', 'popup' => false,
         'titel' => 'Uffi-Knopf lässt sich immer antippen',
         'text' => 'Am Handy lag der Cookie-Hinweis manchmal über dem Uffi-Knopf. Dann ließ sich Uffi weder öffnen noch verschieben. Solange der Hinweis zu sehen ist, rückt der Knopf jetzt darüber.'],

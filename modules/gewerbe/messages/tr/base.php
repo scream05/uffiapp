@@ -379,4 +379,5 @@ return [
     'Drucken ohne Skalierung („Tatsächliche Größe“).' => 'Ölçeklendirmeden yazdır (“Gerçek boyut”).',
     'Sprache der Karten:' => 'Kartların dili:',
     'Drucken' => 'Yazdır',
+    'Bild {nr} von {anzahl} in voller Größe öffnen' => '{anzahl} görselden {nr}. görseli tam boyutta aç',
 ];

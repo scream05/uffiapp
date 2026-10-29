@@ -379,4 +379,5 @@ return [
     'Drucken ohne Skalierung („Tatsächliche Größe“).' => 'Печатайте без масштабирования («Фактический размер»).',
     'Sprache der Karten:' => 'Язык табличек:',
     'Drucken' => 'Печать',
+    'Bild {nr} von {anzahl} in voller Größe öffnen' => 'Открыть изображение {nr} из {anzahl} в полном размере',
 ];

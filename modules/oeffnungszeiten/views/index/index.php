@@ -12,7 +12,7 @@ $feiertag = Zeiten::feiertag(date('Y-m-d'));
     .oez-ort { padding: 14px 0; border-top: 1px solid var(--hh-border-color, #e5e5e5); scroll-margin-top: 90px; }
     .oez-ort:first-child { border-top: 0; padding-top: 0; }
     .oez-kopf { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
-    .oez-kopf h4 { margin: 0; }
+    .oez-kopf h3 { margin: 0; }
     .oez-marke { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: .85em; background: #ececec; color: #4a4a4a; }
     .oez-marke.oez-offen { background: #dff1e3; color: #1e6b2d; font-weight: 600; }
     .oez-marke.oez-bald { background: #fbefd6; color: #7a4f00; }
@@ -38,7 +38,7 @@ $feiertag = Zeiten::feiertag(date('Y-m-d'));
                 ?>
                 <div class="oez-ort" id="oez-<?= Html::encode($id) ?>">
                     <div class="oez-kopf">
-                        <h4><i class="fa fa-<?= Html::encode($ort['icon']) ?>" aria-hidden="true"></i> <?= Html::encode($t($ort['name'])) ?></h4>
+                        <h3 class="h4"><i class="fa fa-<?= Html::encode($ort['icon']) ?>" aria-hidden="true"></i> <?= Html::encode($t($ort['name'])) ?></h3>
                         <span class="oez-marke<?= $s['offen'] ? ' oez-offen' : '' ?><?= $s['bald'] ? ' oez-bald' : '' ?>"><?= Html::encode($s['offen'] ? $t('Jetzt geöffnet') . ' · ' . $s['text'] : $s['text']) ?></span>
                     </div>
                     <div class="oez-unter">

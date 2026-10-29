@@ -327,4 +327,5 @@ return [
     'Aus der Übersicht nehmen' => 'Прибрати з огляду',
     'Auch in der Übersicht zeigen' => 'Показати також в огляді',
     'Aus der Übersicht nehmen? Kommentare dort werden gelöscht; auf der Vereinsseite bleibt der Beitrag.' => 'Прибрати з огляду? Коментарі там буде видалено; на сторінці клубу допис залишиться.',
+    'Bild {nr} von {anzahl} in voller Größe öffnen' => 'Відкрити зображення {nr} з {anzahl} у повному розмірі',
 ];

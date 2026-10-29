@@ -29,7 +29,7 @@ $tiefst = Spritpreise::tiefst($liste, $sorte);
     .tk-preis sup { font-size: 0.55em; }
     .tk-preis.tk-min { color: #2e7d32; }
     .tk-andere { font-size: 0.8em; color: var(--hh-text-color-soft, #777); white-space: nowrap; text-align: right; font-weight: normal; }
-    .tk-zu { opacity: .6; }
+    .tk-zu, .tk-zu .tk-preis { color: var(--hh-text-color-soft, #5f6368); } /* statt Deckkraft: Kontrast bleibt ≥ 4,5:1 */
     .tk-marke { display: inline-block; font-size: 0.75em; padding: 1px 6px; border-radius: 8px; margin-left: 4px; vertical-align: 1px; }
     .tk-marke-offen { background: #e6f4e7; color: #1b5e20; }
     .tk-marke-zu { background: #f1f1f1; color: #555; }
@@ -39,7 +39,7 @@ $tiefst = Spritpreise::tiefst($liste, $sorte);
     .tk-h span { position: absolute; left: 0; right: 0; border-radius: 3px; }
     .tk-h .tk-guenstig { background: #2e7d32; top: 50%; border-radius: 0 0 3px 3px; }
     .tk-h .tk-teuer { background: #b8750c; bottom: 50%; border-radius: 3px 3px 0 0; }
-    .tk-h i { position: absolute; top: 100%; left: 0; right: 0; text-align: center; font-size: 10px; font-style: normal; color: #777; margin-top: 4px; }
+    .tk-h i { position: absolute; top: 100%; left: 0; right: 0; text-align: center; font-size: 10px; font-style: normal; color: var(--hh-text-color-soft, #5f6368); margin-top: 4px; }
     @media (max-width: 600px) { .tk-h:nth-child(odd) i { visibility: hidden; } }
 </style>
 <div class="<?= $this->context->contentContainer ? '' : 'container' ?>">

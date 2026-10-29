@@ -67,7 +67,7 @@ $module = Yii::$app->getModule('vereine');
                 <?php foreach ($gallery as $file): $c = $credits[$file->guid] ?? null; ?>
                     <figure style="margin:0">
                         <a href="<?= Html::encode($file->getUrl()) ?>" target="_blank" rel="noopener">
-                            <?= Html::img($file->getUrl(), ['alt' => Html::encode($c['beschreibung'] ?? $verein->name), 'loading' => 'lazy',
+                            <?= Html::img($file->getUrl(), ['alt' => $c['beschreibung'] ?? $verein->name, // Html::img kodiert selbst 'loading' => 'lazy',
                                 'style' => 'width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;display:block']) ?>
                         </a>
                         <?php if ($c): ?>

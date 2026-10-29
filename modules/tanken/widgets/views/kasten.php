@@ -23,7 +23,7 @@ $tiefst = array_map(fn($k) => Spritpreise::tiefst($liste, $k), array_combine(arr
     <div class="panel-heading"><i class="fa fa-car"></i> <strong><?= $t('Spritpreise in Uffenheim') ?></strong></div>
     <div class="panel-body">
         <table>
-            <thead><tr><th></th><th>E5</th><th>E10</th><th>Diesel</th></tr></thead>
+            <thead><tr><th><span class="visually-hidden"><?= $t('Tankstelle') ?></span></th><th>E5</th><th>E10</th><th>Diesel</th></tr></thead>
             <tbody>
             <?php foreach ($liste as $s): ?>
                 <tr class="<?= $s['offen'] ? '' : 'tk-zu' ?>">

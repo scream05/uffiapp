@@ -45,10 +45,10 @@ $now = time();
                 </div>
             <?php endif ?>
             <?php foreach ($periods as $k => $p): ?>
-                <h4 style="margin-top:<?= $k ? '20px' : '0' ?>">
+                <h3 class="h4" style="margin-top:<?= $k ? '20px' : '0' ?>">
                     <?= Yii::t('NotdienstModule.base', $p['von'] <= $now ? 'Jetzt' : ($k === 1 ? 'Danach' : 'Anschließend')) ?>:
                     <small><?= Yii::t('NotdienstModule.base', '{von} bis {bis}', ['von' => Notdienst::zeit($p['von']), 'bis' => Notdienst::zeit($p['bis'])]) ?></small>
-                </h4>
+                </h3>
                 <div>
                     <?php foreach ($p['apotheken'] as $a): ?>
                         <div class="nd-apo">

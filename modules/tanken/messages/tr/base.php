@@ -23,4 +23,5 @@ return [
     '<strong>Wann ist Tanken günstig?</strong> {sorte} in Uffenheim' => '<strong>Ne zaman yakıt almak ucuz?</strong> Uffenheim\'da {sorte}',
     'Wir sammeln dafür gerade noch Preise. Nach ein paar Tagen steht hier, zu welcher Uhrzeit es meist am günstigsten ist.' => 'Bunun için henüz fiyat topluyoruz. Birkaç gün sonra burada yakıtın genellikle hangi saatte en ucuz olduğunu göreceksin.',
     '{zeit} Uhr' => '{zeit}',
+    'Tankstelle' => 'Benzin istasyonu',
 ];

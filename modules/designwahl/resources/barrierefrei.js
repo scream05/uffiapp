@@ -35,6 +35,19 @@
         if (skip && document.body.firstElementChild !== skip) document.body.insertBefore(skip, document.body.firstChild);
         var topbar = document.getElementById('topbar');
         if (topbar) topbar.setAttribute('role', 'banner');
+        // Fußzeile im Login-Layout (Anmeldung, Rechtstexte für Gäste) liegt außerhalb jeder Landmarke
+        var fuss = document.querySelector('body > .text.powered');
+        if (fuss && !document.querySelector('footer, [role="contentinfo"]')) fuss.setAttribute('role', 'contentinfo');
+        // Sprunglink des Kerns (seit 1.19) zielt auf #main-content, das es im Clean-Theme nicht gibt: unserer reicht
+        document.querySelectorAll('a[href="#main-content"].visually-hidden-focusable').forEach(function (a) {
+            if (!document.getElementById('main-content')) a.remove();
+        });
+        // Linke und rechte Seitenleiste heißen im Kern beide „Seitenleiste“: Menü links eigens benennen (1.3.1)
+        var nav = document.querySelector('aside.layout-nav-container');
+        var rechts = document.querySelector('aside.layout-sidebar-container');
+        if (nav && rechts && nav.getAttribute('aria-label') === rechts.getAttribute('aria-label')) {
+            nav.setAttribute('aria-label', t('Menü des Bereichs'));
+        }
     }
 
     function name(el, text) {
@@ -105,6 +118,17 @@
         });
     }
 
+    // Überschriften im Stream (1.3.1): der Kern nimmt h4 für den Autor und h5 für Zeit/Ort, das Kalendermodul h1
+    // für Datum und „Ort“. Ebene passend zur Seite setzen: unter h1+h2 (Space-Kopf) Ebene 3, sonst 2.
+    function ueberschriften(root) {
+        var kopf = document.querySelector('#layout-content h2, .space-layout-container h2, .container-fluid h2');
+        var ebene = kopf && !kopf.closest('.wall-entry') ? 3 : 2;
+        root.querySelectorAll('.wall-entry-header-info > h4').forEach(function (h) { h.setAttribute('aria-level', ebene); });
+        // Zeile mit Zeit und Bereich ist keine Überschrift
+        root.querySelectorAll('.wall-entry-header-info > h5').forEach(function (h) { h.setAttribute('role', 'none'); });
+        root.querySelectorAll('.wall-entry .event-info-section-content > h1').forEach(function (h) { h.setAttribute('aria-level', ebene + 1); });
+    }
+
     // Kalender: Textfarbe je nach Terminfarbe Schwarz oder Weiß, damit der Kontrast immer reicht (1.4.3)
     function hell(rgb) {
         var m = rgb && rgb.match(/\d+(\.\d+)?/g);
@@ -147,6 +171,7 @@
         try {
             landmarken();
             namen(root || document);
+            ueberschriften(root || document);
             kalender(root || document);
             unten();
         } catch (e) {

@@ -379,4 +379,5 @@ return [
     'Drucken ohne Skalierung („Tatsächliche Größe“).' => 'اطبع دون تغيير الحجم («الحجم الفعلي»).',
     'Sprache der Karten:' => 'لغة البطاقات:',
     'Drucken' => 'طباعة',
+    'Bild {nr} von {anzahl} in voller Größe öffnen' => 'فتح الصورة {nr} من {anzahl} بالحجم الكامل',
 ];

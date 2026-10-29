@@ -23,4 +23,5 @@ return [
     '<strong>Wann ist Tanken günstig?</strong> {sorte} in Uffenheim' => '<strong>Коли заправлятися дешевше?</strong> {sorte} в Уффенгаймі',
     'Wir sammeln dafür gerade noch Preise. Nach ein paar Tagen steht hier, zu welcher Uhrzeit es meist am günstigsten ist.' => 'Ми ще збираємо ціни. За кілька днів тут буде видно, о котрій годині зазвичай найдешевше.',
     '{zeit} Uhr' => '{zeit}',
+    'Tankstelle' => 'АЗС',
 ];

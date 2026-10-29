@@ -379,4 +379,5 @@ return [
     'Drucken ohne Skalierung („Tatsächliche Größe“).' => 'Print without scaling (“Actual size”).',
     'Sprache der Karten:' => 'Language of the cards:',
     'Drucken' => 'Print',
+    'Bild {nr} von {anzahl} in voller Größe öffnen' => 'Open image {nr} of {anzahl} in full size',
 ];

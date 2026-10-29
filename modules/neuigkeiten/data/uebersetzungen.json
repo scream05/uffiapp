@@ -1,4 +1,31 @@
 {
+    "barrierefreiheit-2": {
+        "en": {
+            "titel": "Easier to use with screen readers and keyboard",
+            "text": "Images in club and business posts now have names for screen readers, links are underlined everywhere, and headings are neatly structured. The fuel prices are also easier to read.",
+            "quelle": "554ed7e3d9aaa8d9b5f3dfa54b85e110c577057a"
+        },
+        "uk": {
+            "titel": "Besser nutzbar mit Screenreader und Tastatur",
+            "text": "Bilder in Vereins- und Betriebsbeiträgen sind für Screenreader jetzt benannt, Links sind überall unterstrichen und Überschriften sauber gegliedert. Auch die Spritpreise sind besser lesbar.",
+            "quelle": "554ed7e3d9aaa8d9b5f3dfa54b85e110c577057a"
+        },
+        "ar": {
+            "titel": "أسهل في الاستخدام مع قارئ الشاشة ولوحة المفاتيح",
+            "text": "الصور في منشورات الجمعيات والشركات أصبحت الآن مُسمّاة لقارئ الشاشة، والروابط مُسطّرة في كل مكان، والعناوين مرتبة بشكل واضح. كما أن أسعار الوقود أصبحت أسهل في القراءة.",
+            "quelle": "554ed7e3d9aaa8d9b5f3dfa54b85e110c577057a"
+        },
+        "tr": {
+            "titel": "Screenreader ve klavyeyle daha rahat kullanım",
+            "text": "Dernek ve işletme gönderilerindeki resimler artık ekran okuyucular için adlandırıldı, bağlantılar her yerde altı çizili ve başlıklar düzgün bir şekilde yapılandırıldı. Akaryakıt fiyatları da artık daha okunaklı.",
+            "quelle": "554ed7e3d9aaa8d9b5f3dfa54b85e110c577057a"
+        },
+        "ru": {
+            "titel": "Удобнее пользоваться со скринридером и клавиатурой",
+            "text": "Изображения в публикациях клубов и предприятий теперь имеют описания для скринридеров, ссылки везде подчёркнуты, а заголовки аккуратно структурированы. Также цены на топливо стали лучше читаемыми.",
+            "quelle": "554ed7e3d9aaa8d9b5f3dfa54b85e110c577057a"
+        }
+    },
     "uffi-knopf-cookie": {
         "en": {
             "titel": "Uffi button can always be tapped",

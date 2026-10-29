@@ -299,6 +299,7 @@ class Events
             'Auswahl' => Yii::t('DesignwahlModule.base', 'Auswahl'),
             'Tabelle, seitlich scrollbar' => Yii::t('DesignwahlModule.base', 'Tabelle, seitlich scrollbar'),
             'ALTCHA-Website öffnen' => Yii::t('DesignwahlModule.base', 'ALTCHA-Website öffnen'),
+            'Menü des Bereichs' => Yii::t('DesignwahlModule.base', 'Menü des Bereichs'),
         ];
     }
 

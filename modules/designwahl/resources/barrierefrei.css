@@ -71,7 +71,12 @@ html[data-bs-theme="dark"] .select2-container .select2-selection {
 .help-block a,
 .alert a:not(.btn),
 .cc-message a,
-.panel-body p a:not(.btn) {
+.panel-body p a:not(.btn),
+.panel-body :is(li, dd, dt, td, figcaption, .abfall-zeiten-name) > a:not([class]),
+.panel-body > a:not([class]),
+figcaption a:not(.btn),
+.panel-body a[href^="tel:"]:not(.btn),
+.panel-body a[href^="mailto:"]:not(.btn) {
     text-decoration: underline;
     text-underline-offset: 2px;
 }
