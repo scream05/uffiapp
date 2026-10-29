@@ -373,6 +373,7 @@ JS, ['DN_ABBRECHEN' => json_encode(Yii::t('DesignwahlModule.base', 'Abbrechen'),
         '@calendar/views/common' => '@designwahl/views/calendar/common', // nur defaultConfig.php (ohne Reiter „Erinnerung“)
         '@humhub/modules/space/widgets/views' => '@designwahl/views/space/widgets', // nur profileHeaderControls.php (Leiste nur für Admins)
         '@humhub/modules/file/widgets/views' => '@designwahl/views/file/widgets', // nur showFiles.php (Alt-Text aus der Bildbeschreibung)
+        '@humhub/modules/content/widgets/stream/views' => '@designwahl/views/content/stream', // nur wallStreamEntryHeader.php (Space-Bild im Beitragskopf)
     ];
 
     /** Teilnehmerliste eines Termins: nur wer ihn bearbeiten darf (Ersteller, Space-Admins, Admins) */

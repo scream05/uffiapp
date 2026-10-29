@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'space-bild-im-beitrag', 'datum' => '2026-10-29', 'art' => 'besser', 'popup' => false,
+        'titel' => 'Beiträge zeigen das Bild ihres Bereichs',
+        'text' => 'Termine, Beiträge aus dem Rathaus und aus dem Mitteilungsblatt tragen jetzt links das Bild ihres Bereichs statt eines Kalenderblatts oder Platzhalters. Der Name des Bereichs steht dafür nicht mehr extra in der Kopfzeile.'],
     ['id' => 'kastenfach-wischen', 'datum' => '2026-10-29', 'art' => 'behoben', 'popup' => false,
         'titel' => 'Wischen öffnet das Fach „Auf einen Blick“',
         'text' => 'Wenn du auf der Startseite am Handy nach links wischst, öffnet sich jetzt dasselbe Fach wie mit der Lasche am rechten Rand. Vorher füllte die Leiste die ganze Seite und ließ sich nur wieder wegwischen.'],

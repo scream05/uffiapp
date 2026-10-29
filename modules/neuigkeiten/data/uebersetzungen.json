@@ -1,4 +1,31 @@
 {
+    "space-bild-im-beitrag": {
+        "en": {
+            "titel": "Posts now show their area's image",
+            "text": "Events, posts from the town hall and from the Mitteilungsblatt now show the image of their area on the left instead of a calendar sheet or placeholder. The area name is no longer shown separately in the header.",
+            "quelle": "e879cb2c37e96328e83fe7233014cfa4e9106ee8"
+        },
+        "uk": {
+            "titel": "Дописи показують зображення свого розділу",
+            "text": "Події, дописи з ратуші та з інформаційного бюлетеня тепер ліворуч показують зображення свого розділу замість календарного аркуша чи заповнювача. Назва розділу більше не виводиться окремо в заголовку.",
+            "quelle": "e879cb2c37e96328e83fe7233014cfa4e9106ee8"
+        },
+        "ar": {
+            "titel": "هذه المنشورات تعرض صورة مجالها",
+            "text": "تحمل المواعيد والمنشورات من البلدية ومن نشرة المعلومات الآن على اليسار صورة المجال الخاص بها بدلاً من ورقة تقويم أو عنصر نائب. ولم يعد اسم المجال يظهر بعد ذلك بشكل منفصل في الرأس.",
+            "quelle": "e879cb2c37e96328e83fe7233014cfa4e9106ee8"
+        },
+        "tr": {
+            "titel": "Gönderiler artık kendi alanlarının resmini gösteriyor",
+            "text": "Etkinlikler, Belediye'den (Rathaus) ve Mitteilungsblatt'tan gelen gönderiler artık sol tarafta takvim yaprağı ya da yer tutucu yerine kendi alanlarının resmini gösteriyor. Alanın adı artık üst bilgide ayrıca yer almıyor.",
+            "quelle": "e879cb2c37e96328e83fe7233014cfa4e9106ee8"
+        },
+        "ru": {
+            "titel": "Beiträge zeigen das Bild ihres Bereichs",
+            "text": "Termine, Beiträge aus dem Rathaus und aus dem Mitteilungsblatt zeigen jetzt links das Bild ihres Bereichs statt eines Kalenderblatts oder Platzhalters. Der Name des Bereichs steht dafür nicht mehr extra in der Kopfzeile.",
+            "quelle": "e879cb2c37e96328e83fe7233014cfa4e9106ee8"
+        }
+    },
     "kastenfach-wischen": {
         "en": {
             "titel": "Swiping opens the \"At a Glance\" drawer",
