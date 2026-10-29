@@ -154,6 +154,10 @@
             var a = img.closest('a, label, li, td, .media') || (img.parentElement && img.parentElement.parentElement);
             if (img.alt && a && a.textContent.replace(/\s+/g, ' ').indexOf(img.alt.trim()) !== -1) img.alt = '';
         });
+        // Cookie-Hinweis: Knopf „Verstanden“ heißt für Screenreader englisch „dismiss cookie message“ (2.5.3: Name = sichtbarer Text)
+        root.querySelectorAll('.cc-btn[aria-label]').forEach(function (b) {
+            if (b.textContent.trim()) b.removeAttribute('aria-label');
+        });
         // Captcha: englischer Linkname
         root.querySelectorAll('a[href*="altcha.org"]').forEach(function (a) {
             a.setAttribute('aria-label', t('ALTCHA-Website öffnen'));
@@ -222,6 +226,10 @@
             if (rl.top > window.innerHeight / 2) h = Math.max(h, window.innerHeight - rl.top);
         }
         document.documentElement.style.scrollPaddingBottom = h ? (Math.ceil(h) + 12) + 'px' : '';
+        // Am Seitenende kann der Browser nicht weiter scrollen: Platz unter der Fußzeile, damit der Cookie-Hinweis
+        // die letzten Links nicht verdeckt
+        var ccH = cc && cc.offsetParent !== null ? Math.ceil(window.innerHeight - cc.getBoundingClientRect().top) : 0;
+        document.body.style.paddingBottom = ccH > 0 ? (ccH + 12) + 'px' : '';
     }
 
     function alles(root) {
@@ -234,6 +242,43 @@
         } catch (e) {
             if (window.console) console.warn('barrierefrei', e);
         }
+    }
+
+    // HumHub-Fenster (Modals) setzen data-bs-focus="false": Bootstrap hält den Fokus dann nicht im Fenster, und Esc
+    // greift nur, solange der Fokus darin ist. Hier: Tab bleibt im Fenster, Esc schließt es, danach Fokus zurück (2.1.2, 2.4.3)
+    var FOKUSSIERBAR = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), '
+        + 'textarea:not([disabled]), [tabindex]:not([tabindex="-1"]), [contenteditable="true"]';
+    function offenesFenster() {
+        var alle = document.querySelectorAll('.modal.show');
+        return alle.length ? alle[alle.length - 1] : null;
+    }
+    var oeffner = null;
+    document.addEventListener('focusin', function (e) {
+        if (!offenesFenster() && !e.target.closest('.modal')) oeffner = e.target;
+    });
+    document.addEventListener('keydown', function (e) {
+        var md = offenesFenster();
+        if (!md) return;
+        if (e.key === 'Escape' && md.getAttribute('data-bs-keyboard') !== 'false' && !md.contains(document.activeElement)) {
+            var zu = md.querySelector('[data-bs-dismiss="modal"], [data-modal-close], .btn-close');
+            if (zu) { e.preventDefault(); zu.click(); }
+            return;
+        }
+        if (e.key !== 'Tab') return;
+        var ziele = Array.prototype.filter.call(md.querySelectorAll(FOKUSSIERBAR), function (el) {
+            return el.offsetParent !== null && !el.closest('[hidden], .select2-hidden-accessible');
+        });
+        if (!ziele.length) return;
+        var erstes = ziele[0], letztes = ziele[ziele.length - 1], aktiv = document.activeElement;
+        if (!md.contains(aktiv)) { e.preventDefault(); (e.shiftKey ? letztes : erstes).focus(); }
+        else if (e.shiftKey && aktiv === erstes) { e.preventDefault(); letztes.focus(); }
+        else if (!e.shiftKey && aktiv === letztes) { e.preventDefault(); erstes.focus(); }
+    }, true);
+    if (window.jQuery) {
+        jQuery(document).on('hidden.bs.modal', '.modal', function () {
+            if (offenesFenster() || !oeffner || !document.contains(oeffner)) return;
+            if (document.activeElement === document.body || !document.activeElement) oeffner.focus({preventScroll: true});
+        });
     }
 
     var geplant = null;

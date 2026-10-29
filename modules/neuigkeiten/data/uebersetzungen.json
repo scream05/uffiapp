@@ -1,4 +1,31 @@
 {
+    "tastatur-zoom": {
+        "en": {
+            "titel": "With keyboard and zoom",
+            "text": "Uffi, the login window and the \"More\" drawer can now be used entirely with the keyboard and closed with Esc. When zoomed in heavily, no text gets cut off anymore.",
+            "quelle": "e98cfc5be3de6100b9f7f15de470dae06c6696fa"
+        },
+        "uk": {
+            "titel": "З клавіатурою та збільшенням",
+            "text": "Уффі, вікно входу та панель «Більше» тепер повністю керуються клавіатурою і закриваються клавішею Esc. При сильному збільшенні текст більше не обрізається.",
+            "quelle": "e98cfc5be3de6100b9f7f15de470dae06c6696fa"
+        },
+        "ar": {
+            "titel": "مع لوحة المفاتيح والتكبير",
+            "text": "يا Uffi، أصبح نافذة تسجيل الدخول وقسم „المزيد“ يمكن التحكم بهما بالكامل عبر لوحة المفاتيح، ويمكنك إغلاقهما بمفتاح Esc. وعند التكبير الكبير لم يعد يتم قطع أي نص.",
+            "quelle": "e98cfc5be3de6100b9f7f15de470dae06c6696fa"
+        },
+        "tr": {
+            "titel": "Klavye ve Yakınlaştırma ile",
+            "text": "Uffi, giriş penceresi ve „Mehr“ paneli artık tamamen klavyeyle kullanılabiliyor ve Esc tuşuyla kapatılabiliyor. Güçlü yakınlaştırmada artık hiçbir metin kesilmiyor.",
+            "quelle": "e98cfc5be3de6100b9f7f15de470dae06c6696fa"
+        },
+        "ru": {
+            "titel": "С клавиатурой и увеличением",
+            "text": "Уффи, окно входа и панель «Ещё» теперь полностью управляются с клавиатуры и закрываются клавишей Esc. При сильном увеличении текст больше не обрезается.",
+            "quelle": "e98cfc5be3de6100b9f7f15de470dae06c6696fa"
+        }
+    },
     "barrierefreiheit-3": {
         "en": {
             "titel": "Settings and menus more accessible",

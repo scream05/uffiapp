@@ -71,6 +71,8 @@ use yii\web\View;
             box.scrollTop = mobile() ? 0 : box.scrollHeight;
             // Fokus ins Fenster (Screenreader); am Handy auf den Titel, damit keine Tastatur aufspringt
             if (!mobile() && !touch()) chat.focus(); else panel.querySelector('.ki-title').focus();
+            // Eingabefeld noch gesperrt (Altersbestätigung fehlt): Fokus trotzdem ins Fenster, sonst landet er im Nichts
+            if (!panel.contains(document.activeElement)) panel.querySelector('.ki-title').focus();
         } else {
             fab.focus();
             ueberHinweis();

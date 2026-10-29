@@ -159,3 +159,44 @@ a[href*="/like/like/user-list"] {
     min-height: 24px;
     text-align: center;
 }
+
+/* Textabstand (1.4.12) und Umfluss (1.4.10): nichts abschneiden */
+/* Untertitel im Space-Kopf: umbrechen statt „…“ (am Handy fehlte sonst die halbe Beschreibung) */
+@media (max-width: 575.98px) {
+    /* Kopf wächst mit dem Text mit (fest 76 px schnitt bei größerem Zeilenabstand ab); Bannerbild füllt die Fläche */
+    .profile-banner-image-container {
+        height: auto !important;
+        min-height: 76px;
+    }
+    .profile-banner-image-container > .img-profile-header-background {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100% !important;
+        object-fit: cover;
+    }
+    .profile-banner-image-container > .img-profile-data {
+        position: relative !important;
+        height: auto !important;
+        min-height: 76px;
+    }
+}
+.img-profile-data h2.space,
+.img-profile-data h1.space {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+}
+/* Hauptmenü am Computer: feste Höhe nur als Mindesthöhe, damit größerer Zeilenabstand nicht abgeschnitten wird */
+@media (min-width: 576px) {
+    #top-menu-nav > li > a {
+        height: auto !important;
+        min-height: 42px;
+        overflow: visible !important;
+    }
+}
+/* Fach „Mehr“: Namen bleiben einzeilig, ragen bei mehr Buchstabenabstand aber lieber etwas über als „…“ */
+html.design-neu .dn-mehr .dn-ziel .dn-ziel-text {
+    overflow: visible;
+    text-overflow: clip;
+}

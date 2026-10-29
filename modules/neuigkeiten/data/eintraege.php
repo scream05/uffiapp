@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'tastatur-zoom', 'datum' => '2026-10-29', 'art' => 'besser', 'popup' => false,
+        'titel' => 'Mit Tastatur und Vergrößerung',
+        'text' => 'Uffi, das Anmeldefenster und das Fach „Mehr“ lassen sich jetzt vollständig mit der Tastatur bedienen und mit Esc schließen. Bei starker Vergrößerung wird kein Text mehr abgeschnitten.'],
     ['id' => 'barrierefreiheit-3', 'datum' => '2026-10-29', 'art' => 'besser', 'popup' => false,
         'titel' => 'Einstellungen und Menüs barriereärmer',
         'text' => 'Auch nach der Anmeldung sind Einstellungen, Benachrichtigungen, Nachrichten und Menüs jetzt besser mit Screenreader und Tastatur bedienbar. Rote Knöpfe haben mehr Kontrast, Kästchen sind größer.'],

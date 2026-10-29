@@ -321,21 +321,28 @@
 
     // --- Fach „Mehr“ (Handy: von unten, Computer: unter der Kopfleiste) ---
     function fach() { return document.getElementById('dn-mehr'); }
+    var mehrKnopf = null; // Knopf, der das Fach geöffnet hat: bekommt beim Schließen den Fokus zurück (2.4.3)
 
     function mehr(auf) {
         var f = fach();
         if (!f) return;
+        var fokusImFach = f.contains(document.activeElement);
         f.hidden = !auf;
         document.documentElement.classList.toggle('dn-mehr-offen', auf);
         document.querySelectorAll('[data-dn-mehr]').forEach(function (a) { a.setAttribute('aria-expanded', auf ? 'true' : 'false'); });
         if (auf) {
             var erstes = f.querySelector('.dn-ziel');
             if (erstes) erstes.focus({preventScroll: true});
+        } else if (fokusImFach) {
+            var knopf = mehrKnopf && mehrKnopf.offsetParent !== null ? mehrKnopf
+                : Array.prototype.filter.call(document.querySelectorAll('[data-dn-mehr]'), function (a) { return a.offsetParent !== null; })[0];
+            if (knopf) knopf.focus({preventScroll: true});
         }
     }
 
     document.addEventListener('click', function (e) {
         if (e.target.closest('[data-dn-mehr]')) {
+            mehrKnopf = e.target.closest('[data-dn-mehr]');
             e.preventDefault();
             e.stopPropagation();
             mehr(fach() && fach().hidden);
