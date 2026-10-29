@@ -41,4 +41,5 @@ return [
     'Community-Regeln' => 'Topluluk kuralları',
     'Zur Anleitung' => 'Kılavuza git',
     'Barrierefreiheit' => 'Erişilebilirlik',
+    'Leichte Sprache' => 'Kolay Almanca',
 ];

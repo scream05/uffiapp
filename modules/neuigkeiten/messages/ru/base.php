@@ -41,4 +41,5 @@ return [
     'Community-Regeln' => 'Правила сообщества',
     'Zur Anleitung' => 'К инструкции',
     'Barrierefreiheit' => 'Доступность',
+    'Leichte Sprache' => 'Простой немецкий язык',
 ];

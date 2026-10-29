@@ -41,4 +41,5 @@ return [
     'Community-Regeln' => 'قواعد المجتمع',
     'Zur Anleitung' => 'إلى الدليل',
     'Barrierefreiheit' => 'إمكانية الوصول',
+    'Leichte Sprache' => 'لغة ألمانية مبسطة',
 ];

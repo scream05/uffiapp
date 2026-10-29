@@ -120,3 +120,11 @@ html.nk-offen, html.nk-offen body { overflow: hidden; }
 .hl-regeln b, .hl-karten b, .hl-schritte b { font-weight: 800; }
 .hl-regeln b { display: block; margin-bottom: 2px; }
 [data-bs-theme="dark"] .hl-regeln li > .fa { background: rgba(255, 255, 255, .08) !important; color: #9cc0d6 !important; }
+
+/* Leichte Sprache: größere Schrift, viel Zeilenabstand, ein Satz je Zeile, Symbole vor den Abschnitten */
+.hl-leicht { font-size: 1.15em; hyphens: manual; -webkit-hyphens: manual; overflow-wrap: normal; } /* Leichte Sprache: keine Silbentrennung am Zeilenende */
+.hl-leicht p, .hl-leicht li { line-height: 1.75; }
+.hl-leicht h2 { margin-top: 28px; }
+.hl-leicht-liste { list-style: none; margin: 0; padding: 0; }
+.hl-leicht-liste li { display: flex; gap: 14px; align-items: flex-start; padding: 12px 0; border-top: 1px solid var(--hh-border-color, #e5e7eb); }
+.hl-leicht-liste li > .fa { font-size: 28px; width: 36px; text-align: center; color: var(--hh-accent-color, #446e88); margin-top: 4px; flex: none; }

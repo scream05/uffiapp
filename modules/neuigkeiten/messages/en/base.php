@@ -41,4 +41,5 @@ return [
     'Community-Regeln' => 'Community rules',
     'Zur Anleitung' => 'Open the guide',
     'Barrierefreiheit' => 'Accessibility',
+    'Leichte Sprache' => 'Easy-to-read German',
 ];

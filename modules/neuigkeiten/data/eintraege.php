@@ -10,6 +10,10 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'leichte-sprache', 'datum' => '2026-10-29', 'art' => 'neu', 'popup' => false,
+        'link' => [null, '/hilfe/leichte-sprache'],
+        'titel' => 'Rund um Uffni in Leichter Sprache',
+        'text' => 'Eine kurze Erklärung der Plattform in Leichter Sprache: was du hier machen kannst, wie du ein Konto bekommst und wo du Hilfe findest. Link in der Fußzeile.'],
     ['id' => 'tastatur-zoom', 'datum' => '2026-10-29', 'art' => 'besser', 'popup' => false,
         'titel' => 'Mit Tastatur und Vergrößerung',
         'text' => 'Uffi, das Anmeldefenster und das Fach „Mehr“ lassen sich jetzt vollständig mit der Tastatur bedienen und mit Esc schließen. Bei starker Vergrößerung wird kein Text mehr abgeschnitten.'],

@@ -2105,7 +2105,8 @@ class SetupController extends Controller
             foreach (array_keys(\humhub\modules\neuigkeiten\Module::HILFE) as $seite) {
                 $de = (string)file_get_contents($modul->getBasePath() . "/hilfe/de/$seite.html");
                 $veraltet = [];
-                foreach (array_keys(\humhub\modules\kiAssistent\components\Uebersetzer::SPRACHEN) as $l) {
+                foreach (in_array($seite, \humhub\modules\neuigkeiten\Module::NUR_DEUTSCH, true) ? []
+                    : array_keys(\humhub\modules\kiAssistent\components\Uebersetzer::SPRACHEN) as $l) {
                     $tr = @file_get_contents($modul->getBasePath() . "/hilfe/$l/$seite.html");
                     if ($tr === false || !str_starts_with($tr, '<!-- quelle: ' . sha1($de) . ' -->')) {
                         $veraltet[] = $l;
@@ -2119,6 +2120,7 @@ class SetupController extends Controller
             \humhub\modules\neuigkeiten\Events::onBeforeRequest(null); // Konsole: Regeln wie im Web
             $pruefe('Hilfe-Adressen kurz', \yii\helpers\Url::to(['/neuigkeiten/hilfe/seite', 'seite' => 'regeln']) === '/hilfe/regeln',
                 \yii\helpers\Url::to(['/neuigkeiten/hilfe/seite', 'seite' => 'regeln']));
+            $pruefe('Leichte Sprache in allen Sprachen deutsch', str_contains($modul->hilfeHtml('leichte-sprache', 'en'), 'Leichter Sprache'));
             $hEn = $modul->hilfeHtml('app');
             $pruefe('Hilfe englisch', !str_contains($hEn, 'So nutzt du') && str_contains($hEn, 'community.rundumuffni.de'));
             $rgEn = \humhub\modules\neuigkeiten\widgets\Rundgang::widget();
@@ -2574,7 +2576,7 @@ class SetupController extends Controller
         $claude = new \humhub\modules\kiAssistent\components\Claude($ki->getApiKey(), $ki->getModel());
         $basis = $modul->getBasePath() . '/hilfe';
         $fehler = 0;
-        foreach (array_keys(\humhub\modules\neuigkeiten\Module::HILFE) as $seite) {
+        foreach (array_diff(array_keys(\humhub\modules\neuigkeiten\Module::HILFE), \humhub\modules\neuigkeiten\Module::NUR_DEUTSCH) as $seite) {
             $de = (string)file_get_contents("$basis/de/$seite.html");
             $kopf = '<!-- quelle: ' . sha1($de) . ' -->';
             foreach (\humhub\modules\kiAssistent\components\Uebersetzer::SPRACHEN as $lang => $sprache) {

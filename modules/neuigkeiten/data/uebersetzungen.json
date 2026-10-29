@@ -1,4 +1,31 @@
 {
+    "leichte-sprache": {
+        "en": {
+            "titel": "Rund um Uffni in Easy Language",
+            "text": "A short explanation of the platform in Easy Language: what you can do here, how you get an account and where you can find help. Link in the footer.",
+            "quelle": "c5b914aaf487dd8eedfadba455b19c56509b31b3"
+        },
+        "uk": {
+            "titel": "Rund um Uffni у простій мові",
+            "text": "Коротке пояснення платформи простою мовою: що ти можеш тут робити, як отримати обліковий запис і де знайти допомогу. Посилання внизу сторінки.",
+            "quelle": "c5b914aaf487dd8eedfadba455b19c56509b31b3"
+        },
+        "ar": {
+            "titel": "Rund um Uffni in einfacher Sprache",
+            "text": "Eine kurze Erklärung der Plattform in einfacher Sprache: was du hier machen kannst, wie du ein Konto bekommst und wo du Hilfe findest. Link in der Fußzeile.",
+            "quelle": "c5b914aaf487dd8eedfadba455b19c56509b31b3"
+        },
+        "tr": {
+            "titel": "Rund um Uffni Leichter Sprache'de",
+            "text": "Platform hakkında Leichter Sprache'de kısa bir açıklama: burada neler yapabileceğini, nasıl bir hesap alabileceğini ve nereden yardım bulabileceğini öğreneceksin. Bağlantı altbilgide (Fußzeile).",
+            "quelle": "c5b914aaf487dd8eedfadba455b19c56509b31b3"
+        },
+        "ru": {
+            "titel": "Rund um Uffni на простом языке",
+            "text": "Краткое объяснение платформы на простом языке: что ты здесь можешь делать, как получить аккаунт и где найти помощь. Ссылка в нижнем колонтитуле.",
+            "quelle": "c5b914aaf487dd8eedfadba455b19c56509b31b3"
+        }
+    },
     "tastatur-zoom": {
         "en": {
             "titel": "With keyboard and zoom",

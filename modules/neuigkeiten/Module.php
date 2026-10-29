@@ -23,7 +23,11 @@ class Module extends \humhub\components\Module
     public const ARTEN = ['neu' => ['Neu', 'star'], 'besser' => ['Verbessert', 'magic'], 'behoben' => ['Behoben', 'wrench']];
 
     /** Hilfe-Seiten: Schlüssel => deutscher Titel (Inhalt in hilfe/<sprache>/<schlüssel>.html) */
-    public const HILFE = ['app' => 'App-Anleitung', 'regeln' => 'Community-Regeln', 'barrierefreiheit' => 'Barrierefreiheit'];
+    public const HILFE = ['app' => 'App-Anleitung', 'regeln' => 'Community-Regeln', 'barrierefreiheit' => 'Barrierefreiheit',
+        'leichte-sprache' => 'Leichte Sprache'];
+
+    /** Hilfe-Seiten nur auf Deutsch (Leichte Sprache gibt es nur auf Deutsch): nicht übersetzen, in allen Sprachen die deutsche Fassung */
+    public const NUR_DEUTSCH = ['leichte-sprache'];
 
     private ?array $eintraege = null;
 
@@ -123,7 +127,7 @@ class Module extends \humhub\components\Module
     {
         $lang ??= substr((string)Yii::$app->language, 0, 2);
         $datei = $this->getBasePath() . "/hilfe/$lang/$seite.html";
-        if (!is_file($datei)) {
+        if (!is_file($datei) || in_array($seite, self::NUR_DEUTSCH, true)) {
             $datei = $this->getBasePath() . "/hilfe/de/$seite.html";
         }
         $route = function (string $r): array {
