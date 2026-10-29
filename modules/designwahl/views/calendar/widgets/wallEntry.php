@@ -1,7 +1,8 @@
 <?php
 
 // Kopie von calendar/widgets/views/wallEntry.php (HumHub-Kalendermodul 1.8.21, AGPL-3.0): Teilnahme-Knöpfe
-// mit eigenen Klassen (cal-antwort-ja/-vielleicht/-nein) für die Gestaltung in resources/kalender.css.
+// mit eigenen Klassen (cal-antwort-ja/-vielleicht/-nein) für die Gestaltung in resources/kalender.css;
+// kein Blatt-Symbol (file-text) vor dem Datum.
 // Bei Updates des Kalendermoduls mit dem Original abgleichen.
 
 use humhub\modules\calendar\helpers\RecurrenceHelper;
@@ -25,7 +26,7 @@ $color = 'var(--text-color-secondary)';
 <div class="event calendar-wall-entry mt-3" data-action-component="calendar.CalendarEntry"
      data-calendar-entry="<?= $calendarEntry->id ?>">
     <div class="event-info-section clearfix mb-2">
-        <?= Icon::get('file-text')->color($color)->left()->size(Icon::SIZE_LG)->style('margin-top:2px;')->fixedWith() ?>
+        <?php // ohne Blatt-Symbol vor Datum/Beschreibung; Text bleibt bündig mit Ort, Link usw. ?>
 
         <div class="event-info-section-content">
             <h1>
