@@ -1,4 +1,31 @@
 {
+    "kastenfach-wischen": {
+        "en": {
+            "titel": "Swiping opens the \"At a Glance\" drawer",
+            "text": "When you swipe left on the home page on your phone, the same drawer now opens as with the tab on the right edge. Before, the bar filled the whole page and could only be swiped away again.",
+            "quelle": "ada6f61ead263bcdd274f7823bf1b34753f6a96b"
+        },
+        "uk": {
+            "titel": "Wischen öffnet das Fach „Auf einen Blick“",
+            "text": "Wenn du auf der Startseite am Handy nach links wischst, öffnet sich jetzt dasselbe Fach wie mit der Lasche am rechten Rand. Vorher füllte die Leiste die ganze Seite und ließ sich nur wieder wegwischen.",
+            "quelle": "ada6f61ead263bcdd274f7823bf1b34753f6a96b"
+        },
+        "ar": {
+            "titel": "الانتقال بالتمرير يفتح لوحة „نظرة سريعة“",
+            "text": "إذا مررت على الصفحة الرئيسية في هاتفك نحو اليسار، ستفتح الآن نفس اللوحة التي تفتحها بالسحب من الحافة اليمنى. قبل ذلك كان الشريط يملأ الصفحة كاملة ولم يكن يُغلق إلا بالتمرير مرة أخرى.",
+            "quelle": "ada6f61ead263bcdd274f7823bf1b34753f6a96b"
+        },
+        "tr": {
+            "titel": "„Auf einen Blick“-Fach mit Wischen öffnen",
+            "text": "Wenn du auf der Startseite am Handy nach links wischst, öffnet sich jetzt dasselbe Fach wie mit der Lasche am rechten Rand. Vorher hat die Leiste die ganze Seite ausgefüllt und ließ sich nur wieder wegwischen.",
+            "quelle": "ada6f61ead263bcdd274f7823bf1b34753f6a96b"
+        },
+        "ru": {
+            "titel": "Wischen öffnet das Fach „Auf einen Blick“",
+            "text": "Wenn du auf der Startseite am Handy nach links wischst, öffnet sich jetzt dasselbe Fach wie mit der Lasche am rechten Rand. Vorher füllte die Leiste die ganze Seite und ließ sich nur wieder wegwischen.",
+            "quelle": "ada6f61ead263bcdd274f7823bf1b34753f6a96b"
+        }
+    },
     "leichte-sprache": {
         "en": {
             "titel": "Rund um Uffni in Easy Language",

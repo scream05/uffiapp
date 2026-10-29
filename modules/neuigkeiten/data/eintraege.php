@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'kastenfach-wischen', 'datum' => '2026-10-29', 'art' => 'behoben', 'popup' => false,
+        'titel' => 'Wischen öffnet das Fach „Auf einen Blick“',
+        'text' => 'Wenn du auf der Startseite am Handy nach links wischst, öffnet sich jetzt dasselbe Fach wie mit der Lasche am rechten Rand. Vorher füllte die Leiste die ganze Seite und ließ sich nur wieder wegwischen.'],
     ['id' => 'leichte-sprache', 'datum' => '2026-10-29', 'art' => 'neu', 'popup' => false,
         'link' => [null, '/hilfe/leichte-sprache'],
         'titel' => 'Rund um Uffni in Leichter Sprache',

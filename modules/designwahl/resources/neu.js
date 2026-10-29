@@ -295,6 +295,25 @@
         wischX = null;
     }, {passive: true});
 
+    // Nach links wischen öffnet auf der Startseite unser Fach – wie ein Tipp auf die Lasche.
+    // Der Kern (humhub.ui.view, „swiped-left“ an document) schöbe sonst die ganze Seitenleiste bildschirmfüllend herein;
+    // das Ereignis wird darum schon an window (Capture) abgefangen.
+    var zuletztGescrollt = 0;
+    window.addEventListener('scroll', function () { zuletztGescrollt = Date.now(); }, true);
+    window.addEventListener('swiped-left', function (e) {
+        if (!kastenKnopf || kastenKnopf.offsetParent === null || !document.contains(kastenKnopf)) return; // nicht Startseite/Handy: Kern
+        e.stopPropagation();
+        var f = kastenFach();
+        if (!f || !f.hidden || document.body.classList.contains('modal-open')) return;
+        if (Date.now() - zuletztGescrollt < 400) return; // senkrechtes Scrollen, kein Wischen
+        var el = e.target && e.target.closest ? e.target : null;
+        if (el && el.closest('[data-menu-id], .dn-mehr, .leaflet-container, input, textarea')) return;
+        for (; el && el !== document.body; el = el.parentElement) { // seitlich scrollende Leisten (z. B. Stundenwetter)
+            if (el.scrollWidth > el.clientWidth + 2 && /auto|scroll/.test(getComputedStyle(el).overflowX)) return;
+        }
+        kastenFenster(true);
+    }, true);
+
     function einsetzen() {
         var vorlage = document.getElementById('dn-hero-vorlage');
         var ziel = document.querySelector('#layout-content .layout-content-container');
