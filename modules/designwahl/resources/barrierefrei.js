@@ -58,6 +58,12 @@
     function namen(root) {
         root.querySelectorAll('#search-menu').forEach(function (el) { name(el, t('Suche')); });
         root.querySelectorAll('.form-button-search').forEach(function (el) { name(el, t('Suchen')); });
+        // Space-Bilder: der Kern kodiert den Namen im Alt-Text doppelt („Vereine &amp; Ehrenamt“)
+        root.querySelectorAll('img[alt*="&amp;"], img[alt*="&quot;"], img[alt*="&#039;"]').forEach(function (img) {
+            var tx = document.createElement('textarea');
+            tx.innerHTML = img.alt;
+            img.alt = tx.value;
+        });
         // Avatar-Link neben dem Namen führt zum selben Ziel: für Tastatur und Screenreader überspringen
         root.querySelectorAll('.wall-entry-header-image a, .media-left > a, .comment .media > a').forEach(function (a) {
             if (!a.textContent.trim() && !a.getAttribute('aria-label')) {

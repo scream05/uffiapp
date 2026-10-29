@@ -608,7 +608,7 @@ class SetupController extends Controller
 
     /**
      * Space-Bilder aus design/spaces/<space-url>.png setzen (Stil wie die übrigen: Petrol-Verlauf, Symbol orange/weiß):
-     * setup/spacebilder – nur Spaces, zu denen es eine Datei gibt. Vorlage ist die SVG daneben; ImageMagick darf
+     * setup/spacebilder – nur Spaces, zu denen es eine Datei gibt; dazu Profilbilder von Import-Konten. Vorlage ist die SVG daneben; ImageMagick darf
      * hier kein SVG lesen (design/imagemagick-policy.xml), die PNG (600 px) wird darum im Browser gerendert.
      */
     public function actionSpacebilder()
@@ -622,6 +622,18 @@ class SetupController extends Controller
             copy($png, '/tmp/spacebild.png'); // Arbeitskopie, das Original bleibt
             $space->image->setByFile('/tmp/spacebild.png');
             $this->stdout("Bild gesetzt: {$space->name}\n");
+        }
+        // Import-Konten ohne eigenes Bild bekommen das Bild ihres Spaces (auch in Kommentaren, Profil, Erwähnungen)
+        foreach (['mitteilungsblatt' => 'vereine-and-ehrenamt'] as $name => $url) {
+            $user = User::findOne(['username' => $name]);
+            $space = Space::findOne(['url' => $url]);
+            if ($user === null || $space === null || !$space->image->exists()) {
+                $this->stderr("Übersprungen: $name\n");
+                continue;
+            }
+            file_put_contents('/tmp/kontobild.png', $space->image->fs->read($space->image->file));
+            $user->image->setByFile('/tmp/kontobild.png');
+            $this->stdout("Profilbild gesetzt: {$user->displayName} (wie {$space->name})\n");
         }
         Yii::$app->cache->flush();
         return ExitCode::OK;

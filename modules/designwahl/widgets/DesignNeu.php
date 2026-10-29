@@ -8,6 +8,7 @@ use humhub\modules\designwahl\assets\DesignAsset;
 use humhub\modules\designwahl\Module;
 use humhub\modules\ui\icon\widgets\Icon;
 use humhub\modules\space\models\Space;
+use humhub\modules\user\models\User;
 use Yii;
 
 /**
@@ -17,13 +18,19 @@ use Yii;
 class DesignNeu extends Widget
 {
     /** Eigene Space-Symbole (resources/spaces/*.svg) je Space-URL */
-    private const SPACE_SYMBOLE = [
+    public const SPACE_SYMBOLE = [
         'rathaus-uffenheim' => 'rathaus',
         'veranstaltungen' => 'veranstaltungen',
         'mangelmelder' => 'maengelmelder',
         'vereine-and-ehrenamt' => 'vereine',
         'abfall-and-termine' => 'abfall',
         'gewerbe' => 'gewerbe',
+        'vorschlaege' => 'vorschlaege',
+    ];
+
+    /** Import-Konten, deren Profilbild im neuen Design das Symbol ihres Spaces zeigt (Benutzername => Symbol) */
+    private const KONTO_SYMBOLE = [
+        'mitteilungsblatt' => 'vereine',
     ];
 
     public function run()
@@ -138,6 +145,12 @@ class DesignNeu extends Widget
             $css .= "html.design-neu img.space-profile-image-{$space->id}{display:inline-block!important;object-position:-9999px 0;"
                 . "background:url(\"{$svg}\") center/cover no-repeat;border-radius:50%!important}"
                 . "html.design-neu .space-profile-acronym-{$space->id}{display:none!important}";
+        }
+        $konten = User::find()->select(['contentcontainer_id', 'username'])->where(['username' => array_keys(self::KONTO_SYMBOLE)])->all();
+        foreach ($konten as $konto) {
+            $svg = $baseUrl . '/spaces/' . self::KONTO_SYMBOLE[$konto->username] . '.svg';
+            $css .= "html.design-neu img[data-contentcontainer-id=\"{$konto->contentcontainer_id}\"]:not([class*=space-profile-image]){object-position:-9999px 0;"
+                . "background:url(\"{$svg}\") center/cover no-repeat;border-radius:50%!important}";
         }
         if ($css !== '') {
             $this->view->registerCss($css, [], 'designwahl-spaces');

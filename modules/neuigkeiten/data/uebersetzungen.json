@@ -1,29 +1,29 @@
 {
     "space-bilder-gewerbe-ideen": {
         "en": {
-            "titel": "Own images for businesses and ideas",
-            "text": "The areas “Business & Shopping” and “Ideas & Suggestions” now have their own images – a shopping bag and a light bulb. Your posts show this image in the header.",
-            "quelle": "c95f400ab7161b88296cb876a013d85301e0e2a2"
+            "titel": "Own icon for Ideas & Suggestions",
+            "text": "„Ideas & Suggestions“ now has its own icon, a light bulb. Posts from „Business & Shopping“ and „Ideas & Suggestions“ show their area's icon in the header, and posts from the community newsletter show the clubs' icon.",
+            "quelle": "f42194f6cb212caa1b234c97d949d8b37952cfb7"
         },
         "uk": {
-            "titel": "Власні зображення для бізнесу та ідей",
-            "text": "Розділи «Бізнес і покупки» та «Ідеї та пропозиції» тепер мають власні зображення — торбинку для покупок і лампочку. Твої дописи відображають це зображення в заголовку.",
-            "quelle": "c95f400ab7161b88296cb876a013d85301e0e2a2"
+            "titel": "Власний символ для Ідей і пропозицій",
+            "text": "«Ідеї й пропозиції» тепер має власний символ — лампочку. Дописи з розділів «Бізнес і покупки» та «Ідеї й пропозиції» показують символ свого розділу в заголовку, а дописи з Вісника — символ клубів.",
+            "quelle": "f42194f6cb212caa1b234c97d949d8b37952cfb7"
         },
         "ar": {
-            "titel": "صور خاصة لقسم الأعمال التجارية والأفكار",
-            "text": "أصبح لقسمي „الأعمال التجارية والتسوق“ و„الأفكار والاقتراحات“ الآن صور خاصة بهما: حقيبة تسوق ومصباح كهربائي. وتظهر هذه الصورة في رأس منشوراتكم.",
-            "quelle": "c95f400ab7161b88296cb876a013d85301e0e2a2"
+            "titel": "أيقونة خاصة بالأفكار والاقتراحات",
+            "text": "لدى قسم „الأفكار والاقتراحات“ الآن أيقونة خاصة به، وهي مصباح كهربائي. المنشورات من قسمي „الأعمال والتسوق“ و„الأفكار والاقتراحات“ تحمل أيقونة قسمها في رأس المنشور، أما المنشورات من النشرة الرسمية للبلدية فتحمل أيقونة الجمعيات.",
+            "quelle": "f42194f6cb212caa1b234c97d949d8b37952cfb7"
         },
         "tr": {
-            "titel": "Gewerbe ve fikirler için kendi resimleri",
-            "text": "\"Gewerbe & Einkaufen\" ve \"Ideen & Vorschläge\" alanlarının artık kendi resimleri var – bir alışveriş çantası ve bir ampul. Gönderileriniz bu resmi başlık satırında gösterir.",
-            "quelle": "c95f400ab7161b88296cb876a013d85301e0e2a2"
+            "titel": "Ideen & Vorschläge için kendi simge",
+            "text": "„Ideen & Vorschläge“ artık kendi simgesine sahip: bir ampul. „Gewerbe & Einkaufen“ ve „Ideen & Vorschläge“ bölümlerindeki gönderiler, başlık satırında kendi bölümlerinin simgesini taşıyor; Mitteilungsblatt gönderileri ise derneklerin simgesini taşıyor.",
+            "quelle": "f42194f6cb212caa1b234c97d949d8b37952cfb7"
         },
         "ru": {
-            "titel": "Собственные картинки для бизнеса и идей",
-            "text": "Разделы «Бизнес и покупки» и «Идеи и предложения» теперь имеют собственные картинки — сумку для покупок и лампочку. Твои записи показывают это изображение в заголовке.",
-            "quelle": "c95f400ab7161b88296cb876a013d85301e0e2a2"
+            "titel": "Eigenes Symbol für Ideen & Vorschläge",
+            "text": "„Ideen & Vorschläge“ hat jetzt ein eigenes Symbol, eine Glühbirne. Beiträge aus „Gewerbe & Einkaufen“ und „Ideen & Vorschläge“ tragen das Symbol ihres Bereichs in der Kopfzeile, Beiträge aus dem Mitteilungsblatt das Symbol der Vereine.",
+            "quelle": "f42194f6cb212caa1b234c97d949d8b37952cfb7"
         }
     },
     "space-bild-im-beitrag": {

@@ -4,6 +4,7 @@ namespace humhub\modules\designwahl\components;
 
 use humhub\modules\content\components\ContentActiveRecord;
 use humhub\modules\content\widgets\stream\WallStreamModuleEntryWidget;
+use humhub\modules\designwahl\widgets\DesignNeu;
 use humhub\modules\space\models\Space;
 
 /**
@@ -23,7 +24,7 @@ class Kopfbild
     public static function space(ContentActiveRecord $model, $widget): ?Space
     {
         $space = $model->content->container;
-        if (!$space instanceof Space || !$space->image->exists()) {
+        if (!$space instanceof Space || (!$space->image->exists() && !isset(DesignNeu::SPACE_SYMBOLE[$space->url]))) {
             return null;
         }
         $autor = $model->content->createdBy;
