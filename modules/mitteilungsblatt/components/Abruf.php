@@ -374,7 +374,8 @@ class Abruf
             return;
         }
         if (is_file($a->bildPfad)) {
-            $file = new File(['file_name' => "Mitteilungsblatt-{$a->name}.jpg", 'mime_type' => 'image/jpeg', 'size' => filesize($a->bildPfad)]);
+            $file = new File(['file_name' => "Mitteilungsblatt-{$a->name}.jpg", 'mime_type' => 'image/jpeg', 'size' => filesize($a->bildPfad),
+                'title' => 'Titelseite Mitteilungsblatt ' . $a->titel]); // Bildbeschreibung (Alt-Text)
             $file->save();
             $file->setStoredFileContent(file_get_contents($a->bildPfad));
             $post->fileManager->attach($file);

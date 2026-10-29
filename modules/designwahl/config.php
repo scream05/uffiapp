@@ -26,6 +26,7 @@ return [
         ['class' => 'humhub\modules\calendar\widgets\CalendarTypeLegend', 'event' => 'afterRun', 'callback' => [Events::class, 'onCalendarTypeLegend']],
         ['class' => 'humhub\modules\calendar\widgets\CalendarFilterBar', 'event' => 'beforeRun', 'callback' => [Events::class, 'onCalendarFilterBar']],
         ['class' => 'humhub\components\Controller', 'event' => 'beforeAction', 'callback' => [Events::class, 'onControllerBeforeAction']],
+        ['class' => 'humhub\modules\content\widgets\WallEntryControls', 'event' => 'init', 'callback' => [Events::class, 'onWallEntryControlsInit']],
         ['class' => 'humhub\modules\content\widgets\WallEntryControls', 'event' => 'run', 'callback' => [Events::class, 'onWallEntryControlsRun']],
         ['class' => 'yii\web\Response', 'event' => 'beforeSend', 'callback' => [Events::class, 'onResponseBeforeSend']],
         ['class' => LayoutAddons::class, 'event' => LayoutAddons::EVENT_BEFORE_RUN, 'callback' => [Events::class, 'onLayoutAddons']],

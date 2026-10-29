@@ -1,4 +1,31 @@
 {
+    "bildbeschreibungen": {
+        "en": {
+            "titel": "Image descriptions",
+            "text": "You can add a short description to your pictures: menu ⋯ on the post → \"Image descriptions\". That way, people who can't see the picture also know what's in it.",
+            "quelle": "617d1904df792440f434f7f169abcb41e5639007"
+        },
+        "uk": {
+            "titel": "Bildbeschreibungen",
+            "text": "Du kannst zu deinen Bildern eine kurze Beschreibung ergänzen: Menü ⋯ am Beitrag → „Bildbeschreibungen“. So wissen auch Menschen, die das Bild nicht sehen, was darauf ist.",
+            "quelle": "617d1904df792440f434f7f169abcb41e5639007"
+        },
+        "ar": {
+            "titel": "وصف الصور",
+            "text": "يمكنك إضافة وصف قصير لصورك: القائمة ⋯ في المنشور ← „وصف الصور“. وبهذه الطريقة يعرف أيضاً الأشخاص الذين لا يستطيعون رؤية الصورة ما الذي تُظهره.",
+            "quelle": "617d1904df792440f434f7f169abcb41e5639007"
+        },
+        "tr": {
+            "titel": "Resim açıklamaları",
+            "text": "Resimlerinize kısa bir açıklama ekleyebilirsin: Gönderideki menü ⋯ → „Resim açıklamaları“. Böylece resmi göremeyen kişiler de üzerinde ne olduğunu bilir.",
+            "quelle": "617d1904df792440f434f7f169abcb41e5639007"
+        },
+        "ru": {
+            "titel": "Bildbeschreibungen",
+            "text": "Du kannst zu deinen Bildern eine kurze Beschreibung ergänzen: Menü ⋯ am Beitrag → „Bildbeschreibungen“. So wissen auch Menschen, die das Bild nicht sehen, was darauf ist.",
+            "quelle": "617d1904df792440f434f7f169abcb41e5639007"
+        }
+    },
     "erklaerung-barrierefreiheit": {
         "en": {
             "titel": "Accessibility Statement",

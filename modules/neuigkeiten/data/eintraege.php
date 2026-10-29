@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'bildbeschreibungen', 'datum' => '2026-10-29', 'art' => 'neu', 'popup' => true,
+        'titel' => 'Bildbeschreibungen',
+        'text' => 'Du kannst zu deinen Bildern eine kurze Beschreibung ergänzen: Menü ⋯ am Beitrag → „Bildbeschreibungen“. So wissen auch Menschen, die das Bild nicht sehen, was darauf ist.'],
     ['id' => 'erklaerung-barrierefreiheit', 'datum' => '2026-10-29', 'art' => 'neu', 'popup' => false,
         'link' => [null, '/hilfe/barrierefreiheit'],
         'titel' => 'Erklärung zur Barrierefreiheit',

@@ -770,7 +770,7 @@ class SetupController extends Controller
             }
             // Bilder herunterladen und anhängen, statt sie von der Stadt-Website nachzuladen (Datenschutz)
             foreach ($images as $url) {
-                $this->attachImage($post, $url);
+                $this->attachImage($post, $url, 'Bild zu: ' . trim(html_entity_decode((string)$entry->title, ENT_QUOTES | ENT_HTML5)));
             }
             $post->content->updateAttributes(['created_at' => $date, 'updated_at' => $date, 'stream_sort_date' => $date]);
             $this->stdout("+ $link" . ($post->silentContentCreation ? ' (still)' : '') . "\n");
@@ -913,7 +913,7 @@ class SetupController extends Controller
                     $entry->updateAttributes(['color' => $type->color]);
                 }
                 foreach ($images as $url) {
-                    $this->attachImage($entry, $url);
+                    $this->attachImage($entry, $url, 'Bild zu: ' . $entry->title);
                 }
             }
             $stats[$isNew ? 'neu' : 'geändert']++;
@@ -977,6 +977,7 @@ class SetupController extends Controller
             $src = $img->getAttribute('data-src') ?: $img->getAttribute('src');
             if ($src !== '' && !str_contains($src, '/_assets/')) {
                 $images[] = preg_match('#^https?://#', $src) ? $src : 'https://www.uffenheim.de/' . ltrim($src, '/');
+                $this->merkeBildtext(end($images), $img);
             }
         }
         $description = trim($description
@@ -1215,7 +1216,7 @@ class SetupController extends Controller
         }
         if (is_file($neueste->bildPfad)) {
             $file = new \humhub\modules\file\models\File(['file_name' => "Mitteilungsblatt-{$neueste->name}.jpg",
-                'mime_type' => 'image/jpeg', 'size' => filesize($neueste->bildPfad)]);
+                'mime_type' => 'image/jpeg', 'size' => filesize($neueste->bildPfad), 'title' => 'Titelseite Mitteilungsblatt ' . $neueste->titel]);
             $file->save();
             $file->setStoredFileContent(file_get_contents($neueste->bildPfad));
             $post->fileManager->attach($file);
@@ -2216,6 +2217,147 @@ class SetupController extends Controller
     }
 
     /**
+     * Bildbeschreibungen (Alt-Text, Feld file.title) für vorhandene Bilder nachtragen: setup/bildtexte [1=Probelauf]
+     * Nur leere Beschreibungen; was Autoren eingetragen haben, bleibt. Neue Bilder bekommen sie schon beim Import.
+     * - Termine/Beiträge des Kontos „Stadt Uffenheim (Website)“ und Termine mit Plakat: „Bild zu: …“ bzw. „Plakat: …“
+     * - Titelbilder des Mitteilungsblatts: „Titelseite Mitteilungsblatt Nr. …“
+     * - Fotos von Mängelmeldungen ohne Konto: „Foto zur Mängelmeldung“
+     */
+    public function actionBildtexte($probelauf = 1)
+    {
+        $F = \humhub\modules\file\models\File::class;
+        $leer = fn() => $F::find()->where(['like', 'mime_type', 'image/%', false])->andWhere(['or', ['title' => null], ['title' => '']]);
+        $stadt = \humhub\modules\user\models\User::findOne(['username' => 'stadt-uffenheim']);
+        $gesetzt = [];
+        $setze = function ($file, string $text) use ($probelauf, &$gesetzt) {
+            $text = mb_substr(trim(preg_replace('/\s+/u', ' ', $text)), 0, 250);
+            if ($text === '') {
+                return;
+            }
+            $gesetzt[] = sprintf('%-45s → %s', mb_substr($file->file_name, 0, 45), $text);
+            if (!$probelauf) {
+                $file->updateAttributes(['title' => $text]);
+            }
+        };
+        foreach ($leer()->andWhere(['object_model' => \humhub\modules\calendar\models\CalendarEntry::class])->each() as $file) {
+            $termin = \humhub\modules\calendar\models\CalendarEntry::findOne($file->object_id);
+            if ($termin === null) {
+                continue;
+            }
+            $setze($file, (str_starts_with($file->file_name, 'plakat-') ? 'Plakat: ' : 'Bild zu: ') . $termin->title);
+        }
+        foreach ($leer()->andWhere(['object_model' => \humhub\modules\post\models\Post::class])->each() as $file) {
+            $post = \humhub\modules\post\models\Post::findOne($file->object_id);
+            if ($post === null) {
+                continue;
+            }
+            if (str_starts_with($file->file_name, 'Mitteilungsblatt-')
+                && ($a = \humhub\modules\mitteilungsblatt\models\Ausgabe::findOne(['post_id' => $post->id])) !== null) {
+                $setze($file, 'Titelseite Mitteilungsblatt ' . $a->titel);
+            } elseif ($stadt !== null && $file->created_by === $stadt->id && preg_match('/^\*\*(.+?)\*\*/u', (string)$post->message, $m)) {
+                $setze($file, 'Bild zu: ' . $m[1]);
+            } elseif (preg_match('/^Foto-\d+\.jpg$/', $file->file_name)
+                && \humhub\modules\user\models\User::findOne(['id' => $file->created_by, 'username' => 'gastmeldung']) !== null) {
+                $setze($file, 'Foto zur Mängelmeldung');
+            }
+        }
+        $this->stdout(implode("\n", $gesetzt) . "\n" . count($gesetzt) . ($probelauf ? ' Bildbeschreibungen würden gesetzt (Probelauf)' : ' Bildbeschreibungen gesetzt') . "\n");
+        return ExitCode::OK;
+    }
+
+    /**
+     * Selbsttest Bildbeschreibungen (setup/bildtext-test): Alt-Text aus Beschreibung/Dateiname, Ansicht unter dem Beitrag,
+     * Rechte, Menüeintrag, Bearbeitungsseite. Legt einen Beitrag mit Bild an, alles wird zurückgerollt.
+     */
+    public function actionBildtextTest()
+    {
+        $B = \humhub\modules\designwahl\components\Bildtext::class;
+        $sprache = Yii::$app->language;
+        Yii::$app->language = 'de';
+        $ok = 0;
+        $fehler = 0;
+        $pruefe = function (string $was, bool $bedingung, string $zeige = '') use (&$ok, &$fehler) {
+            $bedingung ? $ok++ : $fehler++;
+            $this->stdout(($bedingung ? 'ok   ' : 'FEHL ') . "$was\n" . (!$bedingung && $zeige !== '' ? "     $zeige\n" : ''));
+        };
+        $tx = Yii::$app->db->beginTransaction();
+        try {
+            $pruefe('Dateiname lesbar', $B::ausDateiname('Demokratie-im-Dialog_Stammtisch-2.jpg') === 'Demokratie im Dialog Stammtisch');
+            $pruefe('Dateiname der Stadt-Website', $B::ausDateiname('csm_Internet_Darstellung_KWP_final_d082422772.png') === 'Internet Darstellung KWP final');
+            $nichts = array_filter(['IMG_7858.jpeg', 'plakat-42.jpeg', 'WhatsApp Image 2026-10-12 at 14.33.55.jpeg', 'Foto-1.jpg',
+                '68d04eca18e49266dd1ccda1c00f4a7a1648ce89.jpeg', 'Bildschirmfoto vom 2026-10-12 14-33-55.png', 'logo.png'],
+                fn($n) => $B::ausDateiname($n) !== null);
+            $pruefe('Nichtssagende Dateinamen erkannt', !$nichts, implode(', ', $nichts));
+
+            $space = \humhub\modules\space\models\Space::findOne(['url' => 'veranstaltungen']);
+            $autor = User::find()->active()->andWhere(['not', ['id' => 1]])->andWhere(['username' => ['gastmeldung', 'stadt-uffenheim', 'mitteilungsblatt']])->one()
+                ?? User::findOne(['id' => 1]);
+            $fremd = User::find()->active()->andWhere(['not', ['id' => $autor->id]])->andWhere(['not', ['id' => 1]])
+                ->andWhere(['not in', 'id', (new \yii\db\Query())->select('user_id')->from('group_user')->where(['is_group_manager' => 1])])
+                ->andWhere(['not in', 'id', (new \yii\db\Query())->select('user_id')->from('space_membership')->where(['space_id' => $space->id])->andWhere(['>=', 'group_id', 'moderator'])])
+                ->one();
+            Yii::$app->user->switchIdentity($autor);
+            $post = new \humhub\modules\post\models\Post($space);
+            $post->message = 'Test Bildbeschreibung';
+            $post->silentContentCreation = true;
+            $post->save();
+            $bilder = [];
+            foreach (['IMG_1234.jpg', 'Sommerfest-am-Marktplatz.jpg'] as $name) {
+                $f = new \humhub\modules\file\models\File(['file_name' => $name, 'mime_type' => 'image/jpeg', 'size' => 10]);
+                $f->save();
+                $im = new \Imagick();
+                $im->newImage(40, 30, 'steelblue');
+                $im->setImageFormat('jpeg');
+                $f->setStoredFileContent($im->getImageBlob());
+                $post->fileManager->attach($f);
+                $bilder[] = $f;
+            }
+            $post->refresh();
+            $pruefe('Bilder des Beitrags gefunden', count($B::bilder($post)) === 2);
+            $pruefe('Ohne Beschreibung: Hinweis bzw. lesbarer Dateiname',
+                $B::alt($bilder[0], 1, 2) === 'Bild 1 von 2, ohne Beschreibung' && $B::alt($bilder[1], 2, 2) === 'Sommerfest am Marktplatz');
+            $bilder[0]->updateAttributes(['title' => 'Kinder basteln Laternen']);
+            $pruefe('Mit Beschreibung', $B::alt($bilder[0], 1, 2) === 'Kinder basteln Laternen');
+
+            // Ansicht unter dem Beitrag (eigene Kopie von showFiles.php wie im Web per pathMap)
+            $theme = Yii::$app->view->theme;
+            if ($theme) {
+                $theme->applyTo('');
+                $theme->pathMap['@humhub/modules/file/widgets/views'] = ['@designwahl/views/file/widgets'];
+            }
+            $html = \humhub\modules\file\widgets\ShowFiles::widget(['object' => $post]);
+            $pruefe('Ansicht: Alt-Text und Titel aus der Beschreibung', str_contains($html, 'alt="Kinder basteln Laternen"')
+                && str_contains($html, 'title="Kinder basteln Laternen"') && !str_contains($html, 'alt="IMG_1234.jpg"'), mb_substr(strip_tags($html, '<img><a>'), 0, 400));
+
+            $pruefe('Autor darf bearbeiten', $B::darfBearbeiten($post));
+            $menue = \humhub\modules\content\widgets\WallEntryControls::widget(['object' => $post, 'wallEntryWidget' => new \humhub\modules\post\widgets\WallEntry(['model' => $post])]);
+            $pruefe('Beitragsmenü: Eintrag „Bildbeschreibungen“', str_contains($menue, '/designwahl/bildtext') && str_contains($menue, 'Bildbeschreibungen'));
+            if (!Yii::$app->has('session')) {
+                Yii::$app->set('session', ['class' => \yii\web\CacheSession::class]); // Html::nonce() braucht eine Sitzung
+            }
+            $seite = Yii::$app->view->render('@designwahl/views/bildtext/index', ['bilder' => $B::bilder($post), 'zurueck' => '/', 'id' => $post->content->id]);
+            $pruefe('Bearbeitungsseite: Felder mit Beschriftung und Vorschlag', substr_count($seite, '<textarea') === 2
+                && str_contains($seite, 'Beschreibung für Bild 2 von 2') && str_contains($seite, 'Kinder basteln Laternen')
+                && str_contains($seite, '„Sommerfest am Marktplatz“'));
+            if ($fremd) {
+                Yii::$app->user->switchIdentity($fremd);
+                $post = \humhub\modules\post\models\Post::findOne($post->id);
+                $pruefe('Fremdes Konto darf nicht bearbeiten', !$B::darfBearbeiten($post), $fremd->username);
+                $menue = \humhub\modules\content\widgets\WallEntryControls::widget(['object' => $post, 'wallEntryWidget' => new \humhub\modules\post\widgets\WallEntry(['model' => $post])]);
+                $pruefe('… und sieht keinen Menüeintrag', !str_contains($menue, '/designwahl/bildtext'));
+            }
+        } finally {
+            foreach ($bilder ?? [] as $f) {
+                $f->store->delete(); // Dateien liegen außerhalb der Datenbank, das Zurückrollen entfernt sie nicht
+            }
+            $tx->rollBack();
+            Yii::$app->language = $sprache;
+        }
+        $this->stdout("\n$ok ok, $fehler Fehler (alles zurückgerollt)\n");
+        return $fehler ? ExitCode::SOFTWARE : ExitCode::OK;
+    }
+
+    /**
      * Hilfe-Seiten übersetzen (setup/hilfe-uebersetzen [1 = alles neu]): modules/neuigkeiten/hilfe/de/*.html per Claude in alle
      * Sprachen, nur wenn sich der deutsche Text geändert hat (Prüfsumme in der ersten Zeile). Ergebnis nach /data/neuigkeiten/hilfe/
      * – von dort ins Repo kopieren (siehe README). Platzhalter {{…}} und HTML bleiben unverändert (wird geprüft).
@@ -2507,7 +2649,20 @@ class SetupController extends Controller
         return $data;
     }
 
-    private function attachImage($post, $url)
+    /** Bildtext der Stadt-Website (alt, sonst title) je Bild-URL, für die Bildbeschreibung beim Anhängen */
+    private array $bildtexte = [];
+
+    private function merkeBildtext(string $url, \DOMElement $img): void
+    {
+        $text = trim(preg_replace('/\s+/u', ' ', $img->getAttribute('alt') ?: $img->getAttribute('title')));
+        // Dateinamen und Platzhalter wie „Bild“ oder „image“ sind keine Beschreibung
+        if ($text !== '' && !preg_match('/\.(jpe?g|png|gif|webp)$/i', $text) && mb_strlen($text) > 5) {
+            $this->bildtexte[$url] = $text;
+        }
+    }
+
+    /** Bild herunterladen und anhängen; Bildbeschreibung (Alt-Text) aus der Website, sonst $ersatz */
+    private function attachImage($post, $url, ?string $ersatz = null)
     {
         try {
             $data = $this->download($url);
@@ -2519,6 +2674,7 @@ class SetupController extends Controller
                 'file_name' => basename(parse_url($url, PHP_URL_PATH)),
                 'mime_type' => $mime,
                 'size' => strlen($data),
+                'title' => mb_substr($this->bildtexte[$url] ?? (string)$ersatz, 0, 250) ?: null,
             ]);
             $file->save();
             $file->setStoredFileContent($data);
@@ -2552,6 +2708,7 @@ class SetupController extends Controller
             switch (strtolower($node->nodeName)) {
                 case 'img':
                     $images[] = $abs($node->getAttribute('src'));
+                    $this->merkeBildtext(end($images), $node);
                     return '';
                 case 'br':
                     return "\n";

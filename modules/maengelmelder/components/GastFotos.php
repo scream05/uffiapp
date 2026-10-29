@@ -75,6 +75,7 @@ class GastFotos
 
                 $file = new File();
                 $file->file_name = 'Foto-' . ($i + 1) . '.jpg';
+                $file->title = 'Foto zur Mängelmeldung'; // Bildbeschreibung (Alt-Text), siehe designwahl Bildtext
                 $file->mime_type = 'image/jpeg';
                 $file->size = strlen($blob);
                 if (!$file->save()) {

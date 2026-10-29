@@ -243,6 +243,7 @@ class Entwurf extends ActiveRecord
             'file_name' => 'plakat-' . $n->id . '.' . (explode('/', (string)$n->mime)[1] ?? 'jpg'),
             'mime_type' => $n->mime,
             'size' => strlen($data),
+            'title' => mb_substr('Plakat: ' . $entry->title, 0, 250), // Bildbeschreibung (Alt-Text), siehe designwahl Bildtext
         ]);
         $file->save();
         $file->setStoredFileContent($data);

@@ -166,6 +166,23 @@ class Events
      * Gäste: im Menü neben Beiträgen (Drei-Punkte-Knopf) nur „Permalink“ – z. B. keine „Teilnehmer“-Liste
      * bei Terminen und keine Trennlinien.
      */
+    /** Beitragsmenü: „Bildbeschreibungen“ bei Beiträgen mit Bildern, für alle, die den Beitrag bearbeiten dürfen */
+    public static function onWallEntryControlsInit($event)
+    {
+        try {
+            $record = $event->sender->object;
+            if (Yii::$app->user->isGuest || !$record instanceof \humhub\modules\content\components\ContentActiveRecord
+                || $record->content === null || $record->content->isNewRecord) {
+                return;
+            }
+            if (components\Bildtext::darfBearbeiten($record) && components\Bildtext::bilder($record)) {
+                $event->sender->addWidget(widgets\BildtextLink::class, ['record' => $record], ['sortOrder' => 250]);
+            }
+        } catch (\Throwable $e) {
+            Yii::error($e);
+        }
+    }
+
     public static function onWallEntryControlsRun($event)
     {
         try {
@@ -353,6 +370,7 @@ JS, ['DN_ABBRECHEN' => json_encode(Yii::t('DesignwahlModule.base', 'Abbrechen'),
         '@calendar/widgets/views' => '@designwahl/views/calendar/widgets', // nur wallEntry.php (Teilnahme-Knöpfe) + participants.php (Liste nur für Bearbeiter), Rest Original
         '@calendar/views/common' => '@designwahl/views/calendar/common', // nur defaultConfig.php (ohne Reiter „Erinnerung“)
         '@humhub/modules/space/widgets/views' => '@designwahl/views/space/widgets', // nur profileHeaderControls.php (Leiste nur für Admins)
+        '@humhub/modules/file/widgets/views' => '@designwahl/views/file/widgets', // nur showFiles.php (Alt-Text aus der Bildbeschreibung)
     ];
 
     /** Teilnehmerliste eines Termins: nur wer ihn bearbeiten darf (Ersteller, Space-Admins, Admins) */
