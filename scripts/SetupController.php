@@ -607,6 +607,27 @@ class SetupController extends Controller
     }
 
     /**
+     * Space-Bilder aus design/spaces/<space-url>.png setzen (Stil wie die übrigen: Petrol-Verlauf, Symbol orange/weiß):
+     * setup/spacebilder – nur Spaces, zu denen es eine Datei gibt. Vorlage ist die SVG daneben; ImageMagick darf
+     * hier kein SVG lesen (design/imagemagick-policy.xml), die PNG (600 px) wird darum im Browser gerendert.
+     */
+    public function actionSpacebilder()
+    {
+        foreach (glob('/tmp/design/spaces/*.png') as $png) {
+            $space = Space::findOne(['url' => basename($png, '.png')]);
+            if ($space === null) {
+                $this->stderr('Space fehlt: ' . basename($png) . "\n");
+                continue;
+            }
+            copy($png, '/tmp/spacebild.png'); // Arbeitskopie, das Original bleibt
+            $space->image->setByFile('/tmp/spacebild.png');
+            $this->stdout("Bild gesetzt: {$space->name}\n");
+        }
+        Yii::$app->cache->flush();
+        return ExitCode::OK;
+    }
+
+    /**
      * Konto „Stadt Uffenheim (Website)“ als Verfasser der Stadt-Nachrichten anlegen: setup/rssuser
      * Ohne Passwort und mit nicht zustellbarer Adresse (.invalid), also keine Anmeldung und keine Mails.
      * Bisher importierte Beiträge werden auf das Konto umgeschrieben.

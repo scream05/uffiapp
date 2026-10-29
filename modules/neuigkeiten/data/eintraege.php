@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'space-bilder-gewerbe-ideen', 'datum' => '2026-10-29', 'art' => 'besser', 'popup' => false,
+        'titel' => 'Eigene Bilder für Gewerbe und Ideen',
+        'text' => 'Die Bereiche „Gewerbe & Einkaufen“ und „Ideen & Vorschläge“ haben jetzt eigene Bilder – eine Einkaufstasche und eine Glühbirne. Ihre Beiträge tragen dieses Bild in der Kopfzeile.'],
     ['id' => 'space-bild-im-beitrag', 'datum' => '2026-10-29', 'art' => 'besser', 'popup' => false,
         'titel' => 'Beiträge zeigen das Bild ihres Bereichs',
         'text' => 'Termine, Beiträge aus dem Rathaus und aus dem Mitteilungsblatt tragen jetzt links das Bild ihres Bereichs statt eines Kalenderblatts oder Platzhalters. Der Name des Bereichs steht dafür nicht mehr extra in der Kopfzeile.'],

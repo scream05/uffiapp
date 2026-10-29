@@ -14,7 +14,7 @@ use humhub\modules\space\models\Space;
 class Kopfbild
 {
     /** Spaces, in denen jeder Beitrag mit dem Space-Bild erscheint */
-    private const SPACES = ['rathaus-uffenheim'];
+    private const SPACES = ['rathaus-uffenheim', 'gewerbe', 'vorschlaege'];
 
     /** Import- und Systemkonten ohne eigenes Profilbild (Website der Stadt, Mitteilungsblatt, Gastmeldungen) */
     private const KONTEN = ['stadt-uffenheim', 'mitteilungsblatt', 'gastmeldung'];
