@@ -301,7 +301,8 @@
     var zuletztGescrollt = 0;
     window.addEventListener('scroll', function () { zuletztGescrollt = Date.now(); }, true);
     window.addEventListener('swiped-left', function (e) {
-        if (!kastenKnopf || kastenKnopf.offsetParent === null || !document.contains(kastenKnopf)) return; // nicht Startseite/Handy: Kern
+        // Lasche ist position: fixed – offsetParent wäre in Chrome/Safari immer null, darum über die Anzeige prüfen
+        if (!kastenKnopf || !document.contains(kastenKnopf) || getComputedStyle(kastenKnopf).display === 'none') return; // nicht Startseite/Handy: Kern
         e.stopPropagation();
         var f = kastenFach();
         if (!f || !f.hidden || document.body.classList.contains('modal-open')) return;
