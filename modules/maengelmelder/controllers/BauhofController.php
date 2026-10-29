@@ -240,9 +240,9 @@ class BauhofController extends ContentContainerController
     {
         [, $mangel] = $this->mangel($id);
         foreach ($mangel->getBilder() as $file) {
-            if ($file->guid === $guid && is_file($pfad = $file->getStore()->get())) {
-                Yii::$app->response->headers->set('Cache-Control', 'private, max-age=86400');
-                return \humhub\modules\maengelmelder\components\DateiAuslieferung::senden($pfad, $file->file_name);
+            if ($file->guid === $guid && ($antwort = \humhub\modules\maengelmelder\components\DateiAuslieferung::senden($file))) {
+                $antwort->headers->set('Cache-Control', 'private, max-age=86400');
+                return $antwort;
             }
         }
         throw new NotFoundHttpException();
@@ -352,12 +352,12 @@ class BauhofController extends ContentContainerController
         if (!$file || $file->object_model !== BauhofNachricht::class || (int)$file->object_id !== (int)$n->id) {
             throw new NotFoundHttpException();
         }
-        $pfad = $file->getStore()->get();
-        if (!is_file($pfad)) {
+        $antwort = \humhub\modules\maengelmelder\components\DateiAuslieferung::senden($file);
+        if (!$antwort) {
             throw new NotFoundHttpException();
         }
-        Yii::$app->response->headers->set('Cache-Control', 'private, max-age=86400');
-        return \humhub\modules\maengelmelder\components\DateiAuslieferung::senden($pfad, $file->file_name);
+        $antwort->headers->set('Cache-Control', 'private, max-age=86400');
+        return $antwort;
     }
 
     /** Glocken-Hinweise „Gastmeldung wartet auf Freigabe“ bei allen Empfängern entfernen */

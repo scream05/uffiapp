@@ -64,7 +64,7 @@ class Mangel
         // Nur echte Rasterbilder (Typ nach Inhalt, nicht nach Angabe des Browsers) – keine SVG o. Ä.
         return array_values(array_filter($this->post->fileManager->findAll(),
             fn(File $f) => str_starts_with((string)$f->mime_type, 'image/')
-                && is_file($p = (string)$f->getStore()->get()) && \humhub\modules\maengelmelder\components\DateiAuslieferung::istBild($p)));
+                && \humhub\modules\maengelmelder\components\DateiAuslieferung::istBild($f)));
     }
 
     /** Ort als Text für Listen und WhatsApp */
