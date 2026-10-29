@@ -10,6 +10,10 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'erklaerung-barrierefreiheit', 'datum' => '2026-10-29', 'art' => 'neu', 'popup' => false,
+        'link' => [null, '/hilfe/barrierefreiheit'],
+        'titel' => 'Erklärung zur Barrierefreiheit',
+        'text' => 'Unter „Barrierefreiheit“ in der Fußzeile steht, was auf der Plattform schon gut nutzbar ist und wo es noch Barrieren gibt. Fällt dir eine auf, schreib uns.'],
     ['id' => 'barrierefreiheit-2', 'datum' => '2026-10-29', 'art' => 'besser', 'popup' => false,
         'titel' => 'Besser nutzbar mit Screenreader und Tastatur',
         'text' => 'Bilder in Vereins- und Betriebsbeiträgen sind für Screenreader jetzt benannt, Links sind überall unterstrichen und Überschriften sauber gegliedert. Auch die Spritpreise sind besser lesbar.'],

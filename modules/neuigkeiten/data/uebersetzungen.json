@@ -1,4 +1,31 @@
 {
+    "erklaerung-barrierefreiheit": {
+        "en": {
+            "titel": "Accessibility Statement",
+            "text": "Under \"Barrierefreiheit\" in the footer, you can see what already works well on the platform and where there are still barriers. If you notice one, let us know.",
+            "quelle": "dd8c212bb3188b2da72174cce58db79edb0a749f"
+        },
+        "uk": {
+            "titel": "Декларація про доступність",
+            "text": "У розділі «Доступність» внизу сторінки ти знайдеш, що на платформі вже добре працює, а де ще є перешкоди. Якщо помітиш якусь із них, напиши нам.",
+            "quelle": "dd8c212bb3188b2da72174cce58db79edb0a749f"
+        },
+        "ar": {
+            "titel": "بيان إمكانية الوصول",
+            "text": "تجد في تذييل الصفحة تحت „إمكانية الوصول“ ما يمكن استخدامه بسهولة على المنصة حتى الآن، وأين ما زالت هناك عوائق. إذا لاحظت أحدها، فاكتب لنا.",
+            "quelle": "dd8c212bb3188b2da72174cce58db79edb0a749f"
+        },
+        "tr": {
+            "titel": "Erklärung zur Erişilebilirlik",
+            "text": "Alt bilgideki „Erişilebilirlik“ bölümünde, platformda şu anda neyin iyi kullanılabildiği ve nerede hâlâ engeller bulunduğu yazıyor. Bir engel fark edersen bize yaz.",
+            "quelle": "dd8c212bb3188b2da72174cce58db79edb0a749f"
+        },
+        "ru": {
+            "titel": "Заявление о доступности",
+            "text": "В нижнем колонтитуле под пунктом «Барьерефрейность» указано, что уже хорошо работает на платформе и где ещё есть барьеры. Если заметишь какой-то, напиши нам.",
+            "quelle": "dd8c212bb3188b2da72174cce58db79edb0a749f"
+        }
+    },
     "barrierefreiheit-2": {
         "en": {
             "titel": "Easier to use with screen readers and keyboard",

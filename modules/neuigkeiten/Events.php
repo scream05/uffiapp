@@ -23,20 +23,20 @@ class Events
         }
     }
 
-    /** Kurze Adressen /hilfe/app und /hilfe/regeln */
+    /** Kurze Adressen /hilfe/app, /hilfe/regeln und /hilfe/barrierefreiheit */
     public static function onBeforeRequest($event)
     {
         try {
             Yii::$app->urlManager->addRules([
                 'hilfe' => 'neuigkeiten/hilfe/index',
-                'hilfe/<seite:(app|regeln)>' => 'neuigkeiten/hilfe/seite',
+                'hilfe/<seite:(app|regeln|barrierefreiheit)>' => 'neuigkeiten/hilfe/seite',
             ], false);
         } catch (\Throwable $e) {
             Yii::error($e, 'neuigkeiten');
         }
     }
 
-    /** Fußzeile: Link „Neuigkeiten“ (vor „Ideen & Vorschläge“ und „Quellcode“) */
+    /** Fußzeile: Links „Hilfe & Regeln“, „Barrierefreiheit“ und „Neuigkeiten“ (vor „Ideen & Vorschläge“ und „Quellcode“) */
     public static function onFooterMenuInit($event)
     {
         try {
@@ -49,6 +49,11 @@ class Events
                 'label' => Yii::t('NeuigkeitenModule.base', 'Hilfe & Regeln'),
                 'url' => \yii\helpers\Url::to(['/neuigkeiten/hilfe/seite', 'seite' => 'app']),
                 'sortOrder' => 875,
+            ]));
+            $event->sender->addEntry(new MenuLink([
+                'label' => Yii::t('NeuigkeitenModule.base', 'Barrierefreiheit'),
+                'url' => \yii\helpers\Url::to(['/neuigkeiten/hilfe/seite', 'seite' => 'barrierefreiheit']),
+                'sortOrder' => 877,
             ]));
         } catch (\Throwable $e) {
             Yii::error($e, 'neuigkeiten');

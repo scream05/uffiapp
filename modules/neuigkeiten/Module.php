@@ -23,7 +23,7 @@ class Module extends \humhub\components\Module
     public const ARTEN = ['neu' => ['Neu', 'star'], 'besser' => ['Verbessert', 'magic'], 'behoben' => ['Behoben', 'wrench']];
 
     /** Hilfe-Seiten: Schlüssel => deutscher Titel (Inhalt in hilfe/<sprache>/<schlüssel>.html) */
-    public const HILFE = ['app' => 'App-Anleitung', 'regeln' => 'Community-Regeln'];
+    public const HILFE = ['app' => 'App-Anleitung', 'regeln' => 'Community-Regeln', 'barrierefreiheit' => 'Barrierefreiheit'];
 
     private ?array $eintraege = null;
 

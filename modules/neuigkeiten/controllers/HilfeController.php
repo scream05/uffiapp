@@ -8,7 +8,7 @@ use Yii;
 use yii\web\NotFoundHttpException;
 
 /**
- * Hilfe-Seiten für alle (auch Gäste): /hilfe/app (App-Anleitung) und /hilfe/regeln (Community-Regeln).
+ * Hilfe-Seiten für alle (auch Gäste): /hilfe/app (App-Anleitung), /hilfe/regeln (Community-Regeln) und /hilfe/barrierefreiheit (Erklärung zur Barrierefreiheit).
  * Inhalt: hilfe/<sprache>/<seite>.html, siehe Module::hilfeHtml()
  *
  * @property Module $module

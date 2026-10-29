@@ -40,4 +40,5 @@ return [
     'App-Anleitung' => 'دليل التطبيق',
     'Community-Regeln' => 'قواعد المجتمع',
     'Zur Anleitung' => 'إلى الدليل',
+    'Barrierefreiheit' => 'إمكانية الوصول',
 ];

@@ -1160,7 +1160,8 @@ def community_written():
 
 HILFE_DIR = os.path.join(os.path.dirname(ROOT), 'modules', 'neuigkeiten', 'hilfe', 'de')
 HILFE_TITEL = {'app': 'Hilfe: App-Anleitung (App, Browser, Konto, Mitteilungen, erste Schritte, Probleme)',
-               'regeln': 'Hilfe: Community-Regeln der Plattform'}
+               'regeln': 'Hilfe: Community-Regeln der Plattform',
+               'barrierefreiheit': 'Hilfe: Erklärung zur Barrierefreiheit der Plattform (Stand, bekannte Barrieren, Kontakt)'}
 
 
 def community_hilfe():

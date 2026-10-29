@@ -40,4 +40,5 @@ return [
     'App-Anleitung' => 'Uygulama kılavuzu',
     'Community-Regeln' => 'Topluluk kuralları',
     'Zur Anleitung' => 'Kılavuza git',
+    'Barrierefreiheit' => 'Erişilebilirlik',
 ];

@@ -40,4 +40,5 @@ return [
     'App-Anleitung' => 'App guide',
     'Community-Regeln' => 'Community rules',
     'Zur Anleitung' => 'Open the guide',
+    'Barrierefreiheit' => 'Accessibility',
 ];

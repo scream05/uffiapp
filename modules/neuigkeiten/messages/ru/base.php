@@ -40,4 +40,5 @@ return [
     'App-Anleitung' => 'Инструкция к приложению',
     'Community-Regeln' => 'Правила сообщества',
     'Zur Anleitung' => 'К инструкции',
+    'Barrierefreiheit' => 'Доступность',
 ];
