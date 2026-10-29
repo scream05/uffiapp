@@ -2368,6 +2368,105 @@ class SetupController extends Controller
     }
 
     /**
+     * Temporäres Testkonto (kein Admin, Gruppe „Users“) für Browser-Prüfungen eingeloggter Seiten:
+     * setup/testkonto anlegen | loeschen. Passwort wird zufällig erzeugt und nur ausgegeben.
+     * Rechtstexte und Altersbestätigung bleiben unbestätigt (werden im Test mitgeprüft). Danach immer löschen.
+     */
+    public const TESTKONTO = 'a11y-test';
+
+    public function actionTestkonto($was = 'anlegen')
+    {
+        $user = User::findOne(['username' => self::TESTKONTO]);
+        if ($was === 'loeschen') {
+            if ($user === null) {
+                $this->stdout("Kein Testkonto vorhanden\n");
+                return ExitCode::OK;
+            }
+            $user->delete(); // samt Inhalten, Profil, Einstellungen und Gruppenzugehörigkeit
+            $this->stdout('Testkonto gelöscht: ' . (User::findOne(['username' => self::TESTKONTO]) === null ? 'ja' : 'NEIN') . "\n");
+            return ExitCode::OK;
+        }
+        if ($was === 'beitrag' && $user !== null) { // privater Beitrag mit Bild im eigenen Profil (Test „Bildbeschreibungen“)
+            Yii::$app->user->switchIdentity($user);
+            $post = new \humhub\modules\post\models\Post($user);
+            $post->message = 'Testbeitrag Barrierefreiheit (wird gelöscht)';
+            $post->content->visibility = \humhub\modules\content\models\Content::VISIBILITY_PRIVATE;
+            $post->silentContentCreation = true;
+            $post->save();
+            $im = new \Imagick();
+            $im->newImage(400, 300, 'steelblue');
+            $im->setImageFormat('jpeg');
+            $f = new \humhub\modules\file\models\File(['file_name' => 'IMG_0001.jpg', 'mime_type' => 'image/jpeg', 'size' => strlen($im->getImageBlob())]);
+            $f->save();
+            $f->setStoredFileContent($im->getImageBlob());
+            $post->fileManager->attach($f);
+            $this->stdout("BEITRAG {$post->content->id}\n");
+            return ExitCode::OK;
+        }
+        if ($user !== null) {
+            $this->stderr("Testkonto existiert schon (id {$user->id}) – erst löschen\n");
+            return ExitCode::UNSPECIFIED_ERROR;
+        }
+        $passwort = 'T' . bin2hex(random_bytes(9)) . '!7';
+        $user = new User(['username' => self::TESTKONTO, 'email' => self::TESTKONTO . '@example.org', 'status' => User::STATUS_ENABLED,
+            'visibility' => User::VISIBILITY_REGISTERED_ONLY, 'language' => 'de']);
+        if (!$user->save()) {
+            $this->stderr(json_encode($user->getErrors()) . "\n");
+            return ExitCode::UNSPECIFIED_ERROR;
+        }
+        $user->profile->firstname = 'Test';
+        $user->profile->lastname = 'Barrierefreiheit';
+        $user->profile->save(false);
+        $pw = new \humhub\modules\user\models\Password();
+        $pw->user_id = $user->id;
+        $pw->setPassword($passwort);
+        $pw->save();
+        $gruppe = \humhub\modules\user\models\Group::findOne(['is_default_group' => 1]);
+        if ($gruppe && !$gruppe->isMember($user)) {
+            $gruppe->addUser($user);
+        }
+        $this->stdout("Testkonto {$user->username} (id {$user->id}) angelegt\nPASSWORT $passwort\n");
+        return ExitCode::OK;
+    }
+
+    /**
+     * Selbsttest Space-Menüs (setup/space-menue-test): eigene Menüeinträge erscheinen für die richtigen Konten
+     * (u. a. „Bauhof“ nur für Admins und Bauhofleitung – fehlte vom 26. bis 29.10.2026 nach dem Wechsel auf HumHub 1.19).
+     */
+    public function actionSpaceMenueTest()
+    {
+        Yii::$app->language = 'de'; // Konsole ist en-US
+        $ok = 0;
+        $fehler = 0;
+        $pruefe = function (string $was, bool $bedingung, string $zeige = '') use (&$ok, &$fehler) {
+            $bedingung ? $ok++ : $fehler++;
+            $this->stdout(($bedingung ? 'ok   ' : 'FEHL ') . "$was\n" . (!$bedingung && $zeige !== '' ? "     $zeige\n" : ''));
+        };
+        $eintraege = function (string $spaceUrl) {
+            $menu = new \humhub\modules\space\widgets\Menu(['space' => \humhub\modules\space\models\Space::findOne(['url' => $spaceUrl])]);
+            return array_map(fn($e) => strip_tags((string)$e->getLabel()), $menu->getEntries());
+        };
+        $admin = User::findOne(['id' => 1]);
+        $normal = User::find()->active()->andWhere(['not in', 'id', (new \yii\db\Query())->select('user_id')->from('group_user')
+            ->where(['group_id' => \humhub\modules\user\models\Group::find()->select('id')->where(['or', ['is_admin_group' => 1], ['name' => 'Bauhof']])])])
+            ->andWhere(['not', ['username' => ['gastmeldung', 'stadt-uffenheim', 'mitteilungsblatt']]])->one();
+        Yii::$app->user->switchIdentity($admin);
+        $m = $eintraege('mangelmelder');
+        $pruefe('Admin: Mängelmelder mit „Mangel melden“, „Karte“, „Bauhof“', in_array('Mangel melden', $m) && in_array('Karte', $m)
+            && (bool)array_filter($m, fn($l) => str_starts_with(trim($l), 'Bauhof')), implode(' | ', $m));
+        if ($normal) {
+            Yii::$app->user->switchIdentity($normal);
+            $m = $eintraege('mangelmelder');
+            $pruefe('Mitglied: kein „Bauhof“', !array_filter($m, fn($l) => str_starts_with(trim($l), 'Bauhof')), implode(' | ', $m));
+        }
+        Yii::$app->user->setIdentity(null);
+        $m = $eintraege('mangelmelder');
+        $pruefe('Gast: kein „Bauhof“', !array_filter($m, fn($l) => str_starts_with(trim($l), 'Bauhof')), implode(' | ', $m));
+        $this->stdout("\n$ok ok, $fehler Fehler\n");
+        return $fehler ? ExitCode::SOFTWARE : ExitCode::OK;
+    }
+
+    /**
      * Selbsttest Bildbeschreibungen (setup/bildtext-test): Alt-Text aus Beschreibung/Dateiname, Ansicht unter dem Beitrag,
      * Rechte, Menüeintrag, Bearbeitungsseite. Legt einen Beitrag mit Bild an, alles wird zurückgerollt.
      */

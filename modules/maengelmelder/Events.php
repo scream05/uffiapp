@@ -111,10 +111,11 @@ class Events
                 $neu = models\BauhofNachricht::ungelesen() + (int)\humhub\modules\content\models\Content::find()
                     ->where(['state' => \humhub\modules\content\models\Content::STATE_DRAFT, 'contentcontainer_id' => $space->contentcontainer_id,
                         'created_by' => Yii::$app->getModule('maengelmelder')->getGastKonto()?->id ?? 0])->count();
-                $link = \humhub\modules\ui\menu\MenuLink::createByArray([
+                // HumHub 1.19: MenuLink::createByArray() gibt es nicht mehr, Konfiguration wie bei den anderen Einträgen
+                $link = new MenuLink([
                     'label' => 'Bauhof' . ($neu ? ' <span class="badge bg-danger">' . $neu . '</span>' : ''),
                     'url' => $space->createUrl('/maengelmelder/bauhof/index'),
-                    'icon' => '<i class="fa fa-truck"></i>',
+                    'icon' => 'truck',
                     'isActive' => $active && Yii::$app->controller->id === 'bauhof',
                     'sortOrder' => 152,
                 ]);
