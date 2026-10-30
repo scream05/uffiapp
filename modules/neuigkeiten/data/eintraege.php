@@ -13,7 +13,7 @@ return [
     ['id' => 'termine-leiste', 'datum' => '2026-10-30', 'art' => 'neu', 'popup' => true,
         'link' => ['veranstaltungen', '/calendar/view/index'],
         'titel' => 'Termine schneller finden',
-        'text' => 'Im Veranstaltungskalender findest du mit einem Tipp, was heute, morgen, am Wochenende oder in den nächsten 7 Tagen los ist. Statt zwölf Kategorien gibt es sechs übersichtliche Gruppen, zum Beispiel Feste & Kerwa oder Kultur & Musik.'],
+        'text' => 'Im Veranstaltungskalender springst du mit einem Tipp zu den Terminen von heute, morgen oder am Wochenende. Statt zwölf Kategorien gibt es sechs übersichtliche Gruppen, zum Beispiel Feste & Kerwa oder Kultur & Musik.'],
     ['id' => 'termine-liste', 'datum' => '2026-10-30', 'art' => 'besser', 'popup' => false,
         'link' => ['veranstaltungen', '/calendar/view/index'],
         'titel' => 'Termine am Handy als Liste',

@@ -2,28 +2,28 @@
     "termine-leiste": {
         "en": {
             "titel": "Find events faster",
-            "text": "In the event calendar, you can now tap once to see what's on today, tomorrow, over the weekend, or in the next 7 days. Instead of twelve categories, there are six clear groups, for example Festivals & Kerwa or Culture & Music.",
-            "quelle": "3c62f63255c7db87f96831413f41d87520b1a9f2"
+            "text": "In the event calendar, you can jump to today's, tomorrow's or this weekend's events with a single tap. Instead of twelve categories, there are now six clear groups, for example Festivals & Kerwa or Culture & Music.",
+            "quelle": "ac20d76a742cba8b5980296a5070b0184263175c"
         },
         "uk": {
-            "titel": "Termine schneller finden",
-            "text": "Im Veranstaltungskalender findest du mit einem Tipp, was heute, morgen, am Wochenende oder in den nächsten 7 Tagen los ist. Statt zwölf Kategorien gibt es sechs übersichtliche Gruppen, zum Beispiel Feste & Kerwa oder Kultur & Musik.",
-            "quelle": "3c62f63255c7db87f96831413f41d87520b1a9f2"
+            "titel": "Заходи швидше знайти",
+            "text": "У календарі заходів ти одним дотиком перейдеш до подій на сьогодні, завтра або на вихідні. Замість дванадцяти категорій тепер є шість зручних груп, наприклад Свята й Kerwa або Культура й музика.",
+            "quelle": "ac20d76a742cba8b5980296a5070b0184263175c"
         },
         "ar": {
-            "titel": "العثور على المواعيد بسرعة أكبر",
-            "text": "في تقويم الفعاليات يمكنك بنقرة واحدة معرفة ما يحدث اليوم أو غدًا أو في عطلة نهاية الأسبوع أو خلال الأيام السبعة القادمة. بدلًا من اثنتي عشرة فئة، أصبحت هناك ست مجموعات واضحة، مثل الأعياد والـ Kerwa أو الثقافة والموسيقى.",
-            "quelle": "3c62f63255c7db87f96831413f41d87520b1a9f2"
+            "titel": "مواعيد أسرع في العثور عليها",
+            "text": "في تقويم الفعاليات تنتقل بنقرة واحدة إلى مواعيد اليوم أو الغد أو عطلة نهاية الأسبوع. بدلاً من اثنتي عشرة فئة، أصبح هناك ست مجموعات واضحة، مثل الأعياد والكيروا (Kerwa) أو الثقافة والموسيقى.",
+            "quelle": "ac20d76a742cba8b5980296a5070b0184263175c"
         },
         "tr": {
-            "titel": "Termine schneller finden",
-            "text": "Im Veranstaltungskalender findest du mit einem Tipp, was heute, morgen, am Wochenende oder in den nächsten 7 Tagen los ist. Statt zwölf Kategorien gibt es sechs übersichtliche Gruppen, zum Beispiel Feste & Kerwa oder Kultur & Musik.",
-            "quelle": "3c62f63255c7db87f96831413f41d87520b1a9f2"
+            "titel": "Etkinlikleri daha hızlı bul",
+            "text": "Etkinlik takvimünde bir dokunuşla bugünün, yarının veya hafta sonunun etkinliklerine geçebilirsin. Artık on iki kategori yerine altı net grup var, örneğin Festivaller & Kerwa veya Kültür & Müzik.",
+            "quelle": "ac20d76a742cba8b5980296a5070b0184263175c"
         },
         "ru": {
-            "titel": "Termine schneller finden",
-            "text": "Im Veranstaltungskalender findest du mit einem Tipp, was heute, morgen, am Wochenende oder in den nächsten 7 Tagen los ist. Statt zwölf Kategorien gibt es sechs übersichtliche Gruppen, zum Beispiel Feste & Kerwa oder Kultur & Musik.",
-            "quelle": "3c62f63255c7db87f96831413f41d87520b1a9f2"
+            "titel": "Мероприятия находить быстрее",
+            "text": "В календаре мероприятий ты одним нажатием переходишь к событиям на сегодня, завтра или на выходные. Вместо двенадцати категорий теперь есть шесть понятных групп, например Праздники и Kerwa или Культура и музыка.",
+            "quelle": "ac20d76a742cba8b5980296a5070b0184263175c"
         }
     },
     "termine-liste": {

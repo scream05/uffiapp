@@ -117,7 +117,7 @@
     white-space: nowrap; cursor: pointer;
 }
 .dn-kal-zeit .dn-kal-chip { border: 1.5px solid rgba(255, 255, 255, .5); background: transparent; color: #fff; }
-.dn-kal-zeit .dn-kal-chip[aria-pressed="true"] { background: #fff; border-color: #fff; color: #2b4a5f; }
+.dn-kal-zeit .dn-kal-chip.dn-kal-gewaehlt, .dn-kal-zeit .dn-kal-chip:active { background: #fff; border-color: #fff; color: #2b4a5f; }
 .dn-kal.dn-kal-monat .dn-kal-zeit { display: none; }
 .dn-kal-leiste button:focus-visible, .dn-kal-chip:focus-visible, .dn-kal-laufend li:focus-visible { outline: 3px solid #e8bd3a; outline-offset: 2px; }
 

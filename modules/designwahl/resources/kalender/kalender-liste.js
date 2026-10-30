@@ -1,7 +1,7 @@
 /**
  * Kalender (alle außer Abfallkalender) mit eigener Leiste über dem Kalender, wie im Entwurf vom 30.10.2026:
  *  - Umschalter Liste | Monat (ersetzt die Ansichtsknöpfe von FullCalendar; Woche und Tag gibt es nirgends mehr)
- *  - in der Liste Zeit-Knöpfe Heute, Morgen, Wochenende, 7 Tage (nochmal tippen = wieder die nächsten 30 Tage)
+ *  - in der Liste Knöpfe Heute, Morgen, Wochenende: springen in der Liste zu diesem Tag (kein Filter, die Liste bleibt ganz)
  *  - Kategorie-Knöpfe (aus widgets/views/kalenderLegende.php hierher verschoben)
  *  - „Läuft gerade“: mehrtägige Termine, die schon vor dem ersten Tag der Liste begonnen haben
  * Liste = 30 Tage ab heute, am Handy Standard. Mehrtägige Termine (Kerwa …) stehen nur an ihrem ersten Tag, mit „bis …“.
@@ -18,7 +18,7 @@
     var LISTE = 'listDemnaechst';
     var T = $.extend({
         bis: 'bis {datum}', liste: 'Liste', monat: 'Monat', heute: 'Heute', morgen: 'Morgen', wochenende: 'Wochenende',
-        woche: '7 Tage', laeuft: 'Läuft gerade', frueher: 'Frühere Termine', spaeter: 'Spätere Termine',
+        laeuft: 'Läuft gerade', frueher: 'Frühere Termine', spaeter: 'Spätere Termine',
         ansicht: 'Ansicht', zeitraum: 'Zeitraum', kategorie: 'Kategorie'
     }, window.dnKalText || {});
 
@@ -44,9 +44,6 @@
         var liste = {type: 'list', listDayFormat: {weekday: 'long', day: 'numeric', month: 'long'}, listDayAltFormat: false};
         o.views = $.extend({}, o.views);
         o.views[LISTE] = $.extend({duration: {days: 30}}, liste);
-        o.views.listTag = $.extend({duration: {days: 1}}, liste);
-        o.views.listZwei = $.extend({duration: {days: 2}}, liste);
-        o.views.listWoche = $.extend({duration: {days: 7}}, liste);
         // Umschalten übernimmt die eigene Leiste
         ersetzen(o, /,?(dayGridMonth|list(Week|Month|Year))\b/g, '');
         o.datesRender = function (info) {
@@ -63,7 +60,6 @@
         var erstes = !this.fullCalendar;
         if (erstes && mitListe()) {
             if (view.isSmall() || /^list/.test(this.options.defaultView || '')) this.options.defaultView = LISTE;
-            zeit = null;
             leisteBauen(this.$[0]);
         }
         var r = starten.apply(this, arguments);
@@ -76,8 +72,8 @@
 
     /* ---------- Leiste ---------- */
 
-    var zeit = null; // null = 30 Tage, sonst heute | morgen | we | woche
-    var ZEITEN = [['heute', T.heute], ['morgen', T.morgen], ['we', T.wochenende], ['woche', T.woche]];
+    var ZEITEN = [['heute', T.heute], ['morgen', T.morgen], ['we', T.wochenende]];
+    var sprungZiel = null; // Tag, zu dem nach dem nächsten Zeichnen der Liste gesprungen wird
 
     function knopf(attr, wert, text) {
         return $('<button type="button" aria-pressed="false">').attr(attr, wert).text(text);
@@ -119,16 +115,27 @@
         return d;
     }
 
-    function zeitraumZeigen() {
-        if (!kalender) return;
-        var tag = heute0().getDay(); // 0 = Sonntag
-        var ziel = {
-            heute: ['listTag', heute0()],
-            morgen: ['listTag', heute0(1)],
-            we: tag === 0 ? ['listTag', heute0()] : ['listZwei', heute0(tag === 6 ? 0 : 6 - tag)],
-            woche: ['listWoche', heute0()]
-        }[zeit] || [LISTE, heute0()];
-        kalender.changeView(ziel[0], ziel[1]);
+    function zielTag(z) {
+        var tag = heute0().getDay(); // 0 = Sonntag, 6 = Samstag
+        return {heute: heute0(), morgen: heute0(1), we: heute0(tag === 0 || tag === 6 ? 0 : 6 - tag)}[z];
+    }
+
+    // In der Liste zur Überschrift des Tages scrollen (oder des nächsten Tages mit Terminen)
+    function springen(datum) {
+        var wert = iso(datum), ziel = null;
+        var koepfe = document.querySelectorAll('.fc-list-table tr.fc-list-heading:not(.dn-folgetag)');
+        for (var i = 0; i < koepfe.length && !ziel; i++) {
+            if (koepfe[i].getAttribute('data-date') >= wert) ziel = koepfe[i];
+        }
+        if (!ziel) ziel = document.querySelector('.dn-kal-blaettern') || document.querySelector('.fc-list-empty');
+        if (!ziel) return;
+        // Überschriften kleben – ihre Lage aus der Zeile danach berechnen
+        var nach = ziel.nextElementSibling;
+        var top = nach && ziel.classList.contains('fc-list-heading')
+            ? nach.getBoundingClientRect().top - ziel.offsetHeight : ziel.getBoundingClientRect().top;
+        var oben = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--dn-kal-oben'), 10) || 0;
+        var ruhig = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+        window.scrollTo({top: window.scrollY + top - oben - 8, behavior: ruhig ? 'auto' : 'smooth'});
     }
 
     function leisteAktualisieren(v) {
@@ -139,12 +146,9 @@
         $box.find('[data-ansicht]').each(function () {
             $(this).attr('aria-pressed', String(($(this).data('ansicht') === 'liste') === liste));
         });
-        $box.find('[data-zeit]').each(function () {
-            $(this).attr('aria-pressed', String($(this).data('zeit') === zeit));
-        });
         $box.find('.dn-kal-titel').text(liste ? v.title : '');
         var amAnfang = v.activeStart <= heute0();
-        $box.find('.dn-kal-blaettern').toggle(liste && !zeit);
+        $box.find('.dn-kal-blaettern').toggle(liste);
         $box.find('[data-blaettern="zurueck"]').toggle(!amAnfang);
         if (!liste) $box.find('.dn-kal-laufend').prop('hidden', true);
     }
@@ -154,13 +158,22 @@
         if ($(this).data('ansicht') === 'monat') {
             kalender.changeView('dayGridMonth', heute0());
         } else {
-            zeitraumZeigen();
+            kalender.changeView(LISTE, heute0());
         }
     });
     $(document).on('click', '.dn-kal [data-zeit]', function () {
-        var z = $(this).data('zeit');
-        zeit = zeit === z ? null : z;
-        zeitraumZeigen();
+        if (!kalender) return;
+        var tag = zielTag($(this).data('zeit'));
+        var $k = $(this).addClass('dn-kal-gewaehlt');
+        setTimeout(function () { $k.removeClass('dn-kal-gewaehlt'); }, 1200);
+        // Liste woanders geblättert: erst wieder ab heute zeigen, gesprungen wird nach dem Zeichnen
+        if (kalender.view.type !== LISTE || kalender.view.activeStart > heute0() || kalender.view.activeEnd <= tag) {
+            sprungZiel = tag;
+            kalender.changeView(LISTE, heute0());
+            setTimeout(function () { if (sprungZiel) { springen(sprungZiel); sprungZiel = null; } }, 600); // falls nichts neu gezeichnet wird
+        } else {
+            springen(tag);
+        }
     });
     $(document).on('click', '.dn-kal [data-blaettern]', function () {
         if (!kalender) return;
@@ -259,6 +272,10 @@
             return $('<li tabindex="0" role="button">').attr('data-termin', l.id).text(l.titel + ' ').append($('<small>').text(l.bis));
         }));
         $laufend.prop('hidden', !laufend.length || !$('.dn-kal').hasClass('dn-kal-liste'));
+        if (sprungZiel) {
+            springen(sprungZiel);
+            sprungZiel = null;
+        }
     }
 
     $(document).on('keydown', '.dn-kal-laufend li', function (e) {

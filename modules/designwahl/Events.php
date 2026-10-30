@@ -516,7 +516,7 @@ JS, ['DN_ABBRECHEN' => json_encode(Yii::t('DesignwahlModule.base', 'Abbrechen'),
             $view = $event->sender->getView();
             $t = fn($s) => Yii::t('DesignwahlModule.base', $s);
             $texte = ['bis' => $t('bis {datum}'), 'liste' => $t('Liste'), 'monat' => $t('Monat'), 'heute' => $t('Heute'),
-                'morgen' => $t('Morgen'), 'wochenende' => $t('Wochenende'), 'woche' => $t('7 Tage'), 'laeuft' => $t('Läuft gerade'),
+                'morgen' => $t('Morgen'), 'wochenende' => $t('Wochenende'), 'laeuft' => $t('Läuft gerade'),
                 'frueher' => $t('Frühere Termine'), 'spaeter' => $t('Spätere Termine'), 'ansicht' => $t('Ansicht'),
                 'zeitraum' => $t('Zeitraum'), 'kategorie' => $t('Kategorie')];
             $view->registerJs('window.dnKalText = ' . json_encode($texte, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) . ';',
