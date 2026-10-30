@@ -84,6 +84,45 @@ class Events
         }
     }
 
+    /**
+     * Mitgliedschaft im Mängelmelder speichern (neu per auto_add, Umschalten, Skripte): „In Übersicht anzeigen“ nur für
+     * Bauhof und Admins, sonst immer aus – Mängel stehen dann nicht in der Übersicht normaler Konten.
+     */
+    public static function onMitgliedschaftSpeichern($event)
+    {
+        try {
+            /** @var \humhub\modules\space\models\Membership $m */
+            $m = $event->sender;
+            if (!$m->show_at_dashboard || !$m->space || !$m->space->moduleManager->isEnabled('maengelmelder')) {
+                return;
+            }
+            if (!Yii::$app->getModule('maengelmelder')->maengelInUebersicht($m->user)) {
+                $m->show_at_dashboard = 0;
+            }
+        } catch (\Throwable $e) {
+            Yii::error($e);
+        }
+    }
+
+    /** Space-Menü (⋯): „Beiträge in der Übersicht anzeigen/verbergen“ im Mängelmelder nur für Bauhof und Admins */
+    public static function onHeaderControlsRun($event)
+    {
+        try {
+            $menu = $event->sender;
+            if (!$menu->space || !$menu->space->moduleManager->isEnabled('maengelmelder')
+                || Yii::$app->getModule('maengelmelder')->maengelInUebersicht(Yii::$app->user->getIdentity())) {
+                return;
+            }
+            foreach ($menu->getEntries() as $entry) {
+                if ($entry instanceof MenuLink && str_contains((string)$entry->getUrl(), 'switch-dashboard-display')) {
+                    $menu->removeEntry($entry);
+                }
+            }
+        } catch (\Throwable $e) {
+            Yii::error($e);
+        }
+    }
+
     public static function onSpaceMenuInit($event)
     {
         try {

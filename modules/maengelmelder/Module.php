@@ -106,6 +106,22 @@ class Module extends ContentContainerModule
         return Yii::t('MaengelmelderModule.base', $kategorie);
     }
 
+    /**
+     * Mängel in der Übersicht (Dashboard): nur Bauhof (Gruppe $bauhofGruppe) und System-Admins dürfen sie dort sehen
+     * und die Einstellung „In Übersicht anzeigen“ umschalten; für alle anderen ist sie fest aus (Events::onMitgliedschaftSpeichern).
+     */
+    public function maengelInUebersicht(?\humhub\modules\user\models\User $user): bool
+    {
+        if ($user === null) {
+            return false;
+        }
+        if ($user->isSystemAdmin()) {
+            return true;
+        }
+        $gruppe = \humhub\modules\user\models\Group::findOne(['name' => $this->bauhofGruppe]);
+        return $gruppe !== null && $gruppe->isMember($user);
+    }
+
     /** Globales Recht „Mängelstatus bearbeiten“ (an Gruppen vergeben) */
     public function getPermissions($contentContainer = null)
     {

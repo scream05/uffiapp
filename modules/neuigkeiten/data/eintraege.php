@@ -10,6 +10,10 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'maengel-nicht-uebersicht', 'datum' => '2026-10-30', 'art' => 'besser', 'popup' => false,
+        'link' => ['mangelmelder', '/maengelmelder/meldung/karte'],
+        'titel' => 'Mängel nicht mehr in der Übersicht',
+        'text' => 'Mängelmeldungen erscheinen nicht mehr in deiner Übersicht. Du findest sie wie bisher unter „Mangel melden“ auf der Karte und im Mängelmelder.'],
     ['id' => 'kalender-ohne-plus', 'datum' => '2026-10-30', 'art' => 'besser', 'popup' => false,
         'titel' => 'Kalender aufgeräumt',
         'text' => 'Der kleine Knopf „+“ unter dem Kalender ist weg. Einen Termin legst du an, indem du in der Monatsansicht auf den Tag tippst.'],

@@ -1089,6 +1089,47 @@ class SetupController extends Controller
         return null;
     }
 
+    /**
+     * Mängel nicht in der Übersicht normaler Konten: setup/maengel-uebersicht [probe=0]
+     * Setzt „In Übersicht anzeigen“ der Mitgliedschaften in Spaces mit Mängelmelder aus, außer bei Bauhof und Admins
+     * (dieselbe Regel gilt beim Speichern über maengelmelder Events::onMitgliedschaftSpeichern). Idempotent.
+     */
+    public function actionMaengelUebersicht($dryRun = 0)
+    {
+        $module = Yii::$app->getModule('maengelmelder');
+        if ($dryRun === 'test') {
+            // Prüft die Sperre beim Speichern: eine normale Mitgliedschaft auf „anzeigen“ speichern, muss aus bleiben
+            foreach (\humhub\modules\space\models\Membership::find()->joinWith('space')->where(['space.url' => $module->bauhofSpace])->all() as $m) {
+                if (!$module->maengelInUebersicht($m->user)) {
+                    $m->show_at_dashboard = 1;
+                    $m->save(false);
+                    $m->refresh();
+                    $this->stdout("{$m->user->username}: nach Speichern mit 1 → " . $m->show_at_dashboard . "\n");
+                    return $m->show_at_dashboard ? ExitCode::SOFTWARE : ExitCode::OK;
+                }
+            }
+            return ExitCode::OK;
+        }
+        $n = 0;
+        foreach (Space::find()->all() as $space) {
+            if (!$space->moduleManager->isEnabled('maengelmelder')) {
+                continue;
+            }
+            foreach (\humhub\modules\space\models\Membership::find()->where(['space_id' => $space->id, 'show_at_dashboard' => 1])->all() as $m) {
+                if ($module->maengelInUebersicht($m->user)) {
+                    $this->stdout("= bleibt: {$space->url} {$m->user->username}\n");
+                    continue;
+                }
+                $n++;
+                if (!$dryRun) {
+                    $m->updateAttributes(['show_at_dashboard' => 0]);
+                }
+            }
+        }
+        $this->stdout(($dryRun ? 'Probe: ' : '') . "$n Mitgliedschaften ohne Mängel in der Übersicht\n");
+        return ExitCode::OK;
+    }
+
     /** "05 Okt 2026 19:00:00" (Ortszeit) als Timestamp */
     private function germanDate($s)
     {

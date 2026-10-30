@@ -1,4 +1,31 @@
 {
+    "maengel-nicht-uebersicht": {
+        "en": {
+            "titel": "Defects no longer in the overview",
+            "text": "Defect reports no longer appear in your overview. You can still find them as before under \"Report a defect\" on the map and in the defect reporter.",
+            "quelle": "41a97c83786112ee6a3f7f66bfb7b05850e61971"
+        },
+        "uk": {
+            "titel": "Недоліки більше не відображаються в огляді",
+            "text": "Повідомлення про недоліки більше не з'являються у твоєму огляді. Ти знайдеш їх, як і раніше, під «Повідомити про недолік» на карті та в сервісі для недоліків.",
+            "quelle": "41a97c83786112ee6a3f7f66bfb7b05850e61971"
+        },
+        "ar": {
+            "titel": "الملاحظات لم تعد في النظرة العامة",
+            "text": "لم تعد بلاغات العيوب تظهر في نظرتك العامة. يمكنك العثور عليها كالمعتاد تحت \"الإبلاغ عن عيب\" على الخريطة وفي مُبلّغ العيوب.",
+            "quelle": "41a97c83786112ee6a3f7f66bfb7b05850e61971"
+        },
+        "tr": {
+            "titel": "Hatalar artık genel görünümde değil",
+            "text": "Hata bildirimleri artık senin genel görünümünde görünmüyor. Onları daha önceki gibi haritadaki „Mangel melden“ (Hata bildir) bölümünde ve Mängelmelder'de bulabilirsin.",
+            "quelle": "41a97c83786112ee6a3f7f66bfb7b05850e61971"
+        },
+        "ru": {
+            "titel": "Мелкие недостатки больше не в обзоре",
+            "text": "Сообщения о недостатках больше не появляются в твоём обзоре. Ты найдёшь их, как и раньше, под «Сообщить о недостатке» на карте и в сервисе «Mängelmelder».",
+            "quelle": "41a97c83786112ee6a3f7f66bfb7b05850e61971"
+        }
+    },
     "kalender-ohne-plus": {
         "en": {
             "titel": "Calendar tidied up",

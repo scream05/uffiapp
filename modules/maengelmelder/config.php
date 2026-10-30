@@ -27,5 +27,9 @@ return [
         ['class' => Menu::class, 'event' => Menu::EVENT_RUN, 'callback' => [Events::class, 'onSpaceMenuRun']],
         ['class' => 'humhub\modules\space\controllers\SpaceController', 'event' => 'beforeAction', 'callback' => [Events::class, 'onSpaceBeforeAction']],
         ['class' => WallEntryAddons::class, 'event' => WallEntryAddons::EVENT_INIT, 'callback' => [Events::class, 'onWallEntryAddonsInit']],
+        // Übersicht: Mängel nur für Bauhof und Admins (Einstellung „In Übersicht anzeigen“ für alle anderen fest aus)
+        ['class' => 'humhub\modules\space\models\Membership', 'event' => 'beforeInsert', 'callback' => [Events::class, 'onMitgliedschaftSpeichern']],
+        ['class' => 'humhub\modules\space\models\Membership', 'event' => 'beforeUpdate', 'callback' => [Events::class, 'onMitgliedschaftSpeichern']],
+        ['class' => 'humhub\modules\space\widgets\HeaderControlsMenu', 'event' => 'run', 'callback' => [Events::class, 'onHeaderControlsRun']],
     ],
 ];
