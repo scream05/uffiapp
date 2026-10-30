@@ -1,29 +1,29 @@
 {
     "termine-liste": {
         "en": {
-            "titel": "Events on your phone as a list",
-            "text": "On your phone, the event calendar now shows the next 30 days as a list instead of the full month. Multi-day festivals like the Kerwa only appear once, marked with \"bis …\" (until …). The categories are above the calendar and filter events even without an account.",
-            "quelle": "2bb8b8c23509ebe0dcb850b4e842a1a04be2e758"
+            "titel": "Events on mobile as a list",
+            "text": "On mobile, the event calendar now shows the next 30 days as a list instead of the full month. Multi-day festivals such as the Kerwa only appear once, marked with \"until …\". The categories and the buttons Month, Week, Day and List are now at the top, and the categories also filter without an account.",
+            "quelle": "e65ebdd8022a600f08afdc20acbc330149ed1386"
         },
         "uk": {
             "titel": "Події на телефоні у вигляді списку",
-            "text": "На телефоні календар подій тепер показує наступні 30 днів у вигляді списку, а не повний місяць. Багатоденні свята, як-от Kerwa, з'являються лише один раз, із позначкою „до …“. Категорії розташовані над календарем і працюють навіть без облікового запису.",
-            "quelle": "2bb8b8c23509ebe0dcb850b4e842a1a04be2e758"
+            "text": "На телефоні календар подій тепер показує наступні 30 днів у вигляді списку, а не весь місяць. Багатоденні свята, наприклад Kerwa, позначені лише один раз, з написом «до …». Категорії та кнопки Місяць, Тиждень, День і Список тепер розташовані нагорі, а фільтрування за категоріями працює й без облікового запису.",
+            "quelle": "e65ebdd8022a600f08afdc20acbc330149ed1386"
         },
         "ar": {
             "titel": "المواعيد على الهاتف كقائمة",
-            "text": "على الهاتف يعرض تقويم الفعاليات الآن الأيام الثلاثين القادمة كقائمة بدلاً من الشهر كاملاً. تظهر الأعياد متعددة الأيام مثل الكيرفا مرة واحدة فقط، مع عبارة „حتى …“. الفئات موجودة فوق التقويم وتقوم بالتصفية حتى بدون حساب.",
-            "quelle": "2bb8b8c23509ebe0dcb850b4e842a1a04be2e758"
+            "text": "على الهاتف يعرض تقويم الفعاليات الآن الأيام الثلاثين القادمة كقائمة بدلاً من الشهر كاملاً. تظهر الأعياد متعددة الأيام مثل Kerwa مرة واحدة فقط، مع عبارة „حتى …“. وأصبحت الفئات وأزرار الشهر والأسبوع واليوم والقائمة موجودة الآن في الأعلى، وتعمل الفئات على التصفية حتى بدون حساب.",
+            "quelle": "e65ebdd8022a600f08afdc20acbc330149ed1386"
         },
         "tr": {
-            "titel": "Etkinlikler telefonda liste olarak",
-            "text": "Telefonda etkinlik takvimi artık tam bir ay yerine önümüzdeki 30 günü liste olarak gösteriyor. Kerwa gibi birkaç gün süren festivaller listede yalnızca bir kez yer alıyor, „… tarihine kadar“ ifadesiyle. Kategoriler takvimin üstünde duruyor ve hesabın olmadan da filtreleme yapabilirsin.",
-            "quelle": "2bb8b8c23509ebe0dcb850b4e842a1a04be2e758"
+            "titel": "Telefondaki etkinlikler liste olarak",
+            "text": "Telefonunda etkinlik takvimi artık tam ay yerine önümüzdeki 30 günü liste halinde gösteriyor. Kerwa gibi birkaç günlük festivaller yalnızca bir kez, „… tarihine kadar“ ifadesiyle yer alıyor. Kategoriler ve Ay, Hafta, Gün ve Liste düğmeleri artık üstte duruyor; kategoriler hesap olmadan da filtreleme yapabiliyor.",
+            "quelle": "e65ebdd8022a600f08afdc20acbc330149ed1386"
         },
         "ru": {
-            "titel": "Мероприятия в телефоне списком",
-            "text": "На телефоне календарь мероприятий теперь показывает следующие 30 дней списком, а не весь месяц целиком. Многодневные праздники, например Kerwa, указываются только один раз, с пометкой «до …». Категории находятся над календарём и работают для фильтрации даже без регистрации.",
-            "quelle": "2bb8b8c23509ebe0dcb850b4e842a1a04be2e758"
+            "titel": "Termine am Handy als Liste",
+            "text": "Am Handy zeigt der Veranstaltungskalender jetzt die nächsten 30 Tage als Liste statt des vollen Monats. Mehrtägige Feste wie die Kerwa stehen nur einmal drin, mit „bis …“. Die Kategorien und die Knöpfe Monat, Woche, Tag und Liste stehen jetzt oben, die Kategorien filtern auch ohne Konto.",
+            "quelle": "e65ebdd8022a600f08afdc20acbc330149ed1386"
         }
     },
     "maengel-titel-link": {

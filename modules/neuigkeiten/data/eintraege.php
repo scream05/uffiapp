@@ -13,7 +13,7 @@ return [
     ['id' => 'termine-liste', 'datum' => '2026-10-30', 'art' => 'besser', 'popup' => false,
         'link' => ['veranstaltungen', '/calendar/view/index'],
         'titel' => 'Termine am Handy als Liste',
-        'text' => 'Am Handy zeigt der Veranstaltungskalender jetzt die nächsten 30 Tage als Liste statt des vollen Monats. Mehrtägige Feste wie die Kerwa stehen nur einmal drin, mit „bis …“. Die Kategorien stehen über dem Kalender und filtern auch ohne Konto.'],
+        'text' => 'Am Handy zeigt der Veranstaltungskalender jetzt die nächsten 30 Tage als Liste statt des vollen Monats. Mehrtägige Feste wie die Kerwa stehen nur einmal drin, mit „bis …“. Die Kategorien und die Knöpfe Monat, Woche, Tag und Liste stehen jetzt oben, die Kategorien filtern auch ohne Konto.'],
     ['id' => 'maengel-titel-link', 'datum' => '2026-10-29', 'art' => 'besser', 'popup' => false,
         'titel' => 'Mängelmeldungen per Klick öffnen',
         'text' => 'Ein Klick auf die Überschrift einer Mängelmeldung, zum Beispiel „Mängelmeldung: Straßenbeleuchtung“, öffnet jetzt direkt diese Meldung. Wer für den Bauhof arbeitet, landet gleich in der Bauhof-Ansicht der Meldung.'],

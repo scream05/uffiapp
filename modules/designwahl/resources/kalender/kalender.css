@@ -80,3 +80,11 @@
     .fc-list-view td { padding-top: 10px; padding-bottom: 10px; }
 }
 .fc-list-table tr.dn-heute td { background: var(--dn-bordeaux-zart, #f6e4e5); color: var(--dn-bordeaux, #7c1922); }
+
+/* Handy: Knöpfe Monat/Woche/Tag/Liste (FullCalendar legt sie in die Fußleiste) unter die Kopfzeile holen */
+@media (max-width: 767px) {
+    .fc.fc-ltr, .fc.fc-rtl { display: flex; flex-direction: column; }
+    .fc > .fc-header-toolbar { order: 0; margin-bottom: 10px; }
+    .fc > .fc-footer-toolbar { order: 1; margin: 0 0 14px; }
+    .fc > .fc-view-container { order: 2; }
+}
