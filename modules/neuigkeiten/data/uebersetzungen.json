@@ -1,4 +1,31 @@
 {
+    "kalender-ohne-plus": {
+        "en": {
+            "titel": "Calendar tidied up",
+            "text": "The small \"+\" button below the calendar is gone. To create an appointment, just tap the day in the month view.",
+            "quelle": "c7467a457912451f82d690c64519c3b11edaa777"
+        },
+        "uk": {
+            "titel": "Календар спрощено",
+            "text": "Маленької кнопки „+“ під календарем більше немає. Щоб створити подію, просто натисни на потрібний день у режимі місяця.",
+            "quelle": "c7467a457912451f82d690c64519c3b11edaa777"
+        },
+        "ar": {
+            "titel": "تم ترتيب التقويم",
+            "text": "زر «+» الصغير أسفل التقويم لم يعد موجودًا. لإضافة موعد، اضغط ببساطة على اليوم المطلوب في عرض الشهر.",
+            "quelle": "c7467a457912451f82d690c64519c3b11edaa777"
+        },
+        "tr": {
+            "titel": "Takvim sadeleşti",
+            "text": "Takvimin altındaki küçük „+“ düğmesi kaldırıldı. Bir randevu eklemek için aylık görünümde günün üzerine dokunman yeterli.",
+            "quelle": "c7467a457912451f82d690c64519c3b11edaa777"
+        },
+        "ru": {
+            "titel": "Календарь стал аккуратнее",
+            "text": "Маленькой кнопки «+» под календарём больше нет. Чтобы создать событие, просто нажми на нужный день в месячном виде.",
+            "quelle": "c7467a457912451f82d690c64519c3b11edaa777"
+        }
+    },
     "link-vorschau": {
         "en": {
             "titel": "Better preview when sharing",

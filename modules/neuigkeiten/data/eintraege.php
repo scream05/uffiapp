@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'kalender-ohne-plus', 'datum' => '2026-10-30', 'art' => 'besser', 'popup' => false,
+        'titel' => 'Kalender aufgeräumt',
+        'text' => 'Der kleine Knopf „+“ unter dem Kalender ist weg. Einen Termin legst du an, indem du in der Monatsansicht auf den Tag tippst.'],
     ['id' => 'link-vorschau', 'datum' => '2026-10-30', 'art' => 'behoben', 'popup' => false,
         'titel' => 'Bessere Vorschau beim Teilen',
         'text' => 'Wenn du einen Termin per WhatsApp teilst, zeigt die Vorschau jetzt den Titel, Zeit und Ort und das Plakat des Termins. Andere Seiten zeigen das aktuelle Symbol ihres Bereichs statt des alten.'],

@@ -40,8 +40,10 @@
     var optionen = Calendar.prototype.getDefaultOptions;
     Calendar.prototype.getDefaultOptions = function () {
         var o = optionen.apply(this, arguments);
-        // Ansichten Woche und Tag braucht hier niemand – nur Monat und Liste (alle Kalender)
+        // Ansichten Woche und Tag braucht hier niemand – nur Monat und Liste (alle Kalender);
+        // kleiner Knopf „+“ zum Anlegen entfällt (Wunsch Nutzer 30.10.2026) – Anlegen per Tipp auf einen Tag im Monat
         ersetzen(o, /,?timeGrid(Week|Day)\b/g, '');
+        ersetzen(o, /\bcreate\b ?/g, '');
         if (!mitListe()) return o;
         var liste = {type: 'list', listDayFormat: {weekday: 'long', day: 'numeric', month: 'long'}, listDayAltFormat: false};
         o.views = $.extend({}, o.views);
@@ -149,11 +151,11 @@
             $(this).attr('aria-pressed', String(($(this).data('ansicht') === 'liste') === liste));
         });
         $box.find('.dn-kal-titel').text(liste ? v.title : '');
-        // Leere Leisten von FullCalendar weg (in der Liste zählt nur „+ Termin“); :has() kann nicht jeder Browser
+        // Leere Leisten von FullCalendar weg (in der Liste bleibt dort nichts); :has() kann nicht jeder Browser
         $box.find('.fc-toolbar').each(function () {
-            // eigene Sichtbarkeit der Knöpfe („+“ ist für Gäste per CSS aus), nicht die der Leiste
+            // eigene Sichtbarkeit der Knöpfe, nicht die der Leiste
             var $k = $(this).find('button').filter(function () { return getComputedStyle(this).display !== 'none'; });
-            $(this).toggleClass('dn-leer', liste ? !$k.filter('.fc-create-button').length : !$k.length);
+            $(this).toggleClass('dn-leer', liste || !$k.length);
         });
         var amAnfang = v.activeStart <= heute0();
         $box.find('.dn-kal-blaettern').toggle(liste);
