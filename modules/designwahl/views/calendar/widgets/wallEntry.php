@@ -16,6 +16,7 @@ use humhub\modules\calendar\widgets\EntryParticipants;
 use humhub\helpers\DeviceDetectorHelper;
 use humhub\helpers\Html;
 use humhub\modules\content\widgets\richtext\RichText;
+use humhub\modules\content\widgets\stream\WallStreamEntryOptions;
 use humhub\modules\file\widgets\FilePreview;
 use humhub\modules\ui\icon\widgets\Icon;
 use humhub\widgets\bootstrap\Badge;
@@ -28,6 +29,12 @@ use yii\web\View;
 /* @var $this View */
 
 $color = 'var(--text-color-secondary)';
+
+// Knöpfe „In meinen Kalender“ usw. nur in der Einzelansicht (Permalink, Fenster aus dem Kalender, calendar/entry/view),
+// nicht in Übersicht, Space-Stream oder Suche
+$dnEinzeln = !$this->context->renderOptions->isViewContext([WallStreamEntryOptions::VIEW_CONTEXT_DEFAULT,
+        WallStreamEntryOptions::VIEW_CONTEXT_DASHBOARD, WallStreamEntryOptions::VIEW_CONTEXT_SEARCH])
+    || (Yii::$app->controller->module->id === 'calendar' && Yii::$app->controller->id === 'entry');
 
 // Angaben für Knöpfe und Gruppe
 $dnTyp = $calendarEntry->getEventType();
@@ -92,7 +99,7 @@ $dnNeu = ['target' => '_blank', 'rel' => 'noopener', 'data-pjax-prevent' => 1];
         <?php endif; ?>
     </div>
 
-    <?php if (!$calendarEntry->closed && !$calendarEntry->isPast()) : ?>
+    <?php if ($dnEinzeln && !$calendarEntry->closed && !$calendarEntry->isPast()) : ?>
         <div class="dn-termin-aktionen">
             <?= Html::a(Icon::get('calendar-plus-o') . ' ' . Yii::t('DesignwahlModule.base', 'In meinen Kalender'),
                 ['/designwahl/kalender/ics', 'id' => $calendarEntry->id], ['class' => 'dn-termin-knopf dn-termin-haupt'] + $dnNeu) ?>

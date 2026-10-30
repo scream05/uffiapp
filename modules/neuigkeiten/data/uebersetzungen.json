@@ -1,4 +1,31 @@
 {
+    "termin-knoepfe-einzeln": {
+        "en": {
+            "titel": "Overview tidied up",
+            "text": "The buttons “Add to my calendar”, “Share via WhatsApp” and “Google Calendar” no longer appear on every event in the overview. You can find them when you open an event.",
+            "quelle": "074b288429bd251a83885004bfbd831cea101a6a"
+        },
+        "uk": {
+            "titel": "Огляд охайніший",
+            "text": "Кнопки «До мого календаря», «Поділитися через WhatsApp» та «Google Календар» більше не відображаються у кожній події в огляді. Ти знайдеш їх, коли відкриєш подію.",
+            "quelle": "074b288429bd251a83885004bfbd831cea101a6a"
+        },
+        "ar": {
+            "titel": "تم ترتيب النظرة العامة",
+            "text": "لم تعد أزرار \"إضافة إلى تقويمي\" و\"مشاركة عبر WhatsApp\" و\"تقويم Google\" تظهر عند كل موعد في النظرة العامة. ستجدها عندما تفتح الموعد.",
+            "quelle": "074b288429bd251a83885004bfbd831cea101a6a"
+        },
+        "tr": {
+            "titel": "Genel görünüm düzenlendi",
+            "text": "„Takvime ekle“, „WhatsApp ile paylaş“ ve „Google Takvim“ düğmeleri artık genel görünümde her etkinliğin yanında yer almıyor. Bu düğmeleri, bir etkinliği açtığında bulabilirsin.",
+            "quelle": "074b288429bd251a83885004bfbd831cea101a6a"
+        },
+        "ru": {
+            "titel": "Обзор стал аккуратнее",
+            "text": "Кнопки «В мой календарь», «Поделиться в WhatsApp» и «Google Календарь» больше не отображаются у каждого мероприятия в обзоре. Ты найдёшь их, когда откроешь мероприятие.",
+            "quelle": "074b288429bd251a83885004bfbd831cea101a6a"
+        }
+    },
     "maengel-nicht-uebersicht": {
         "en": {
             "titel": "Defects no longer in the overview",

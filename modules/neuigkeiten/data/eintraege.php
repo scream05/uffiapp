@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'termin-knoepfe-einzeln', 'datum' => '2026-10-30', 'art' => 'besser', 'popup' => false,
+        'titel' => 'Übersicht aufgeräumt',
+        'text' => 'Die Knöpfe „In meinen Kalender“, „Per WhatsApp teilen“ und „Google Kalender“ stehen nicht mehr an jedem Termin in der Übersicht. Du findest sie, wenn du einen Termin öffnest.'],
     ['id' => 'maengel-nicht-uebersicht', 'datum' => '2026-10-30', 'art' => 'besser', 'popup' => false,
         'link' => ['mangelmelder', '/maengelmelder/meldung/karte'],
         'titel' => 'Mängel nicht mehr in der Übersicht',
