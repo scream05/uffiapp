@@ -539,8 +539,8 @@ class SetupController extends Controller
             $konto->profile->scenario = 'editAdmin';
             $konto->profile->firstname = 'Mitteilungsblatt';
             $konto->profile->lastname = '(Vereinsbeiträge)';
-            $konto->profile->about = 'Beiträge der Vereine aus dem Mitteilungsblatt der Stadt Uffenheim, übernommen mit Genehmigung '
-                . 'der Vereine und der LINUS WITTICH Medien KG. Dieses Konto wird nicht betreut – Fragen bitte an den jeweiligen Verein.';
+            $konto->profile->about = 'Beiträge der Vereine aus dem Mitteilungsblatt der Stadt Uffenheim. '
+                . 'Dieses Konto wird nicht betreut – Fragen bitte an den jeweiligen Verein.';
             $konto->profile->save();
             $this->stdout("+ Konto " . self::MB_USER . "\n");
         }
