@@ -2,28 +2,28 @@
     "kaestchen-formulare": {
         "en": {
             "titel": "Checkboxes in forms easier to read",
-            "text": "The checkboxes „Hide stream entry“ and „Public“ when creating an event now show the tick neatly centered again, white on blue. Empty checkboxes have a clearer border.",
-            "quelle": "3639e4dd9d4c8722ce361f300a80d60086725089"
+            "text": "The checkboxes “Hide stream entry” and “Public” when creating an event now look just like “All-day” and “Recurring”, with the text beside them instead of below.",
+            "quelle": "fe9b547261c0ae583d46bccef06f6c849c1c786d"
         },
         "uk": {
             "titel": "Kästchen in Formularen gut lesbar",
-            "text": "Die Kästchen „Stream-Eintrag verbergen“ und „Öffentlich“ beim Anlegen eines Termins zeigen das Häkchen wieder sauber in der Mitte, weiß auf Blau. Leere Kästchen haben einen deutlicheren Rand.",
-            "quelle": "3639e4dd9d4c8722ce361f300a80d60086725089"
+            "text": "Die Kästchen „Stream-Eintrag verbergen“ und „Öffentlich“ beim Anlegen eines Termins sehen jetzt genauso aus wie „Ganztägig“ und „Wiederkehrend“, mit dem Text daneben statt darunter.",
+            "quelle": "fe9b547261c0ae583d46bccef06f6c849c1c786d"
         },
         "ar": {
-            "titel": "صناديق الاختيار في النماذج أصبحت أوضح",
-            "text": "صناديق الاختيار «إخفاء في الخلاصة» و«عام» عند إنشاء موعد تعرض علامة الصح مرة أخرى في منتصف الصندوق بشكل مرتب، باللون الأبيض على خلفية زرقاء. الصناديق الفارغة لها حدود أوضح.",
-            "quelle": "3639e4dd9d4c8722ce361f300a80d60086725089"
+            "titel": "مربعات الاختيار في النماذج أصبحت أوضح",
+            "text": "مربعا „إخفاء إدخال البث“ و„عام“ عند إنشاء موعد يبدوان الآن تماماً مثل „طوال اليوم“ و„متكرر“، والنص بجانبهما بدلاً من أسفلهما.",
+            "quelle": "fe9b547261c0ae583d46bccef06f6c849c1c786d"
         },
         "tr": {
-            "titel": "Kutucuklar formlarda daha iyi okunuyor",
-            "text": "Bir etkinlik oluştururken yer alan „Akış girişini gizle“ ve „Herkese açık“ kutucukları artık onay işaretini ortada, beyaz üzerine mavi olarak gösteriyor. Boş kutucukların kenarlığı ise daha belirgin.",
-            "quelle": "3639e4dd9d4c8722ce361f300a80d60086725089"
+            "titel": "Kutucuklar formlarda daha okunaklı",
+            "text": "Bir etkinlik oluştururken yer alan „Akış girişini gizle“ ve „Herkese açık“ kutucukları artık „Tüm gün“ ve „Tekrarlayan“ kutucuklarıyla aynı görünümde; yazılar kutucukların altında değil, yanlarında yer alıyor.",
+            "quelle": "fe9b547261c0ae583d46bccef06f6c849c1c786d"
         },
         "ru": {
-            "titel": "Чекбоксы в формах стали лучше видны",
-            "text": "Чекбоксы «Скрыть запись в ленте» и «Публично» при создании мероприятия снова аккуратно показывают галочку по центру: белым на синем. У пустых чекбоксов более заметная рамка.",
-            "quelle": "3639e4dd9d4c8722ce361f300a80d60086725089"
+            "titel": "Чекбоксы в формах теперь лучше видны",
+            "text": "Чекбоксы «Скрыть запись в ленте» и «Публично» при создании события теперь выглядят так же, как «Весь день» и «Повторяющееся», а текст рядом с ними, а не под ними.",
+            "quelle": "fe9b547261c0ae583d46bccef06f6c849c1c786d"
         }
     },
     "termine-karten": {
