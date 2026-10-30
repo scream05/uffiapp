@@ -18,7 +18,7 @@ class Module extends ContentContainerModule
     /** Space mit dem gemeinsamen Kalender */
     public string $calendarSpaceUrl = 'veranstaltungen'; // URL des Space, bleibt beim Umbenennen gleich
     /** Kalender-Kategorie für Vereinstermine (dieselbe wie beim Import von uffenheim.de) */
-    public string $calendarType = 'Vereinsveranstaltungen, JHV, Sommerfeste, Jubiläen usw.';
+    public string $calendarType = 'Vereine & Sport';
 
     /** Antwortadresse der Ablehnungs-Mails */
     public string $kontaktMail = 'smartcity@buergerliste-uffenheim.de';

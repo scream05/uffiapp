@@ -509,12 +509,17 @@ JS, ['DN_ABBRECHEN' => json_encode(Yii::t('DesignwahlModule.base', 'Abbrechen'),
         return $legend->view->render('@designwahl/widgets/views/kalenderAbo', ['abos' => $abos, 'hinweis' => $hinweis]);
     }
 
-    /** Kalender: Liste ab heute als Handy-Standard, mehrtägige Termine nur einmal (resources/kalender/kalender-liste.js) */
+    /** Kalender: eigene Leiste (Liste/Monat, Zeit- und Kategorie-Knöpfe), Liste ab heute (resources/kalender/kalender-liste.js) */
     public static function onFullCalendar($event)
     {
         try {
             $view = $event->sender->getView();
-            $view->registerJs('window.dnKalText = ' . json_encode(['bis' => Yii::t('DesignwahlModule.base', 'bis {datum}')], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) . ';',
+            $t = fn($s) => Yii::t('DesignwahlModule.base', $s);
+            $texte = ['bis' => $t('bis {datum}'), 'liste' => $t('Liste'), 'monat' => $t('Monat'), 'heute' => $t('Heute'),
+                'morgen' => $t('Morgen'), 'wochenende' => $t('Wochenende'), 'woche' => $t('7 Tage'), 'laeuft' => $t('Läuft gerade'),
+                'frueher' => $t('Frühere Termine'), 'spaeter' => $t('Spätere Termine'), 'ansicht' => $t('Ansicht'),
+                'zeitraum' => $t('Zeitraum'), 'kategorie' => $t('Kategorie')];
+            $view->registerJs('window.dnKalText = ' . json_encode($texte, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) . ';',
                 \yii\web\View::POS_HEAD, 'dn-kal-text');
             assets\KalenderListeAsset::register($view);
         } catch (\Throwable $e) {

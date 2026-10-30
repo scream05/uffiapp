@@ -79,7 +79,6 @@
     .fc-list-view .fc-list-item-time { width: 1%; min-width: 4.5em; font-variant-numeric: tabular-nums; }
     .fc-list-view td { padding-top: 10px; padding-bottom: 10px; }
 }
-.fc-list-table tr.dn-heute td { background: var(--dn-bordeaux-zart, #f6e4e5); color: var(--dn-bordeaux, #7c1922); }
 
 /* Handy: Knöpfe Monat/Woche/Tag/Liste (FullCalendar legt sie in die Fußleiste) unter die Kopfzeile holen */
 @media (max-width: 767px) {
@@ -88,3 +87,92 @@
     .fc > .fc-footer-toolbar { order: 1; margin: 0 0 14px; }
     .fc > .fc-view-container { order: 2; }
 }
+
+/* ---------- Eigene Leiste über dem Kalender (kalender-liste.js), Entwurf vom 30.10.2026 ---------- */
+.dn-kal-leiste {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: linear-gradient(120deg, #2b4a5f, #446e88);
+    color: #fff;
+}
+.dn-kal-zeile { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.dn-kal-titel { font-size: 13px; font-weight: 700; opacity: .85; }
+.dn-kal-umschalter { display: inline-flex; padding: 3px; border-radius: 999px; background: rgba(255, 255, 255, .16); }
+.dn-kal-umschalter button {
+    border: 0; background: transparent; color: #fff; font-weight: 700; font-size: 13px;
+    padding: 5px 16px; border-radius: 999px; cursor: pointer; line-height: 1.3;
+}
+.dn-kal-umschalter button[aria-pressed="true"] { background: #fff; color: #2b4a5f; }
+.dn-kal-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+@media (max-width: 767px) {
+    .dn-kal-chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; padding-bottom: 2px; }
+    .dn-kal-chips::-webkit-scrollbar { display: none; }
+}
+.dn-kal-chip {
+    flex: none; display: inline-flex; align-items: center; gap: 6px; margin: 0;
+    padding: 5px 12px; border-radius: 999px; font-weight: 700; font-size: 13px; line-height: 1.35;
+    white-space: nowrap; cursor: pointer;
+}
+.dn-kal-zeit .dn-kal-chip { border: 1.5px solid rgba(255, 255, 255, .5); background: transparent; color: #fff; }
+.dn-kal-zeit .dn-kal-chip[aria-pressed="true"] { background: #fff; border-color: #fff; color: #2b4a5f; }
+.dn-kal.dn-kal-monat .dn-kal-zeit { display: none; }
+.dn-kal-leiste button:focus-visible, .dn-kal-chip:focus-visible, .dn-kal-laufend li:focus-visible { outline: 3px solid #e8bd3a; outline-offset: 2px; }
+
+/* Kategorie-Knöpfe: Pille mit Farbpunkt, gewählt = in Kategoriefarbe gefüllt */
+.dn-kal-kat { margin-bottom: 12px; }
+.dn-kal-kat .kal-legende-item.dn-kal-chip {
+    border: 1.5px solid var(--text-color-soft3, #e2ddd3); background: var(--background-color-main, #fff);
+    color: inherit; font-size: 12.5px; opacity: 1;
+}
+.dn-kal-kat .kal-legende-item .calendar-type-color { width: 9px; height: 9px; border-radius: 50%; margin: 0; background: var(--c) !important; }
+.dn-kal-kat .kal-legende-item.active { background: var(--c); border-color: var(--c); color: #fff; }
+.dn-kal-kat .kal-legende-item.active .calendar-type-color { background: #fff !important; }
+.kal-legende-gefiltert ~ * .dn-kal-kat .kal-legende-item:not(.active), .dn-kal-kat:has(.active) .kal-legende-item:not(.active) { opacity: .6; }
+
+/* In der Liste: Kopf von FullCalendar (Pfeile, Titel, Heute) weg – die Leiste übernimmt; „+ Termin“ bleibt */
+.dn-kal.dn-kal-liste .fc-header-toolbar .fc-left,
+.dn-kal.dn-kal-liste .fc-header-toolbar .fc-center,
+.dn-kal.dn-kal-liste .fc-today-button { display: none; }
+.dn-kal.dn-kal-liste .fc-header-toolbar:not(:has(.fc-create-button)) { display: none; }
+.dn-kal .fc-footer-toolbar:not(:has(button)) { display: none; }
+
+/* Läuft gerade */
+.dn-kal-laufend { margin-bottom: 12px; padding: 10px 12px; border-radius: 12px; background: var(--dn-gold-zart, #fbf0cc); display: grid; gap: 6px; }
+.dn-kal-laufend strong { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--dn-gold, #8a6700); }
+.dn-kal-laufend ul { margin: 0; padding: 0; list-style: none; display: flex; gap: 6px; flex-wrap: wrap; }
+@media (max-width: 767px) {
+    .dn-kal-laufend ul { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+}
+.dn-kal-laufend li {
+    flex: none; padding: 4px 11px; border-radius: 999px; background: var(--background-color-main, #fff);
+    font-size: 12.5px; font-weight: 700; cursor: pointer; white-space: nowrap;
+}
+.dn-kal-laufend li small { font-weight: 400; opacity: .75; }
+
+/* Tagesüberschriften: ruhig, kleben unter der Kopfleiste, Marke Heute/Morgen */
+.dn-kal .fc-list-table { border-collapse: separate; border-spacing: 0; }
+.dn-kal .fc-list-heading td {
+    position: sticky; top: var(--dn-kal-oben, 0px); z-index: 2; box-shadow: none !important;
+    background: var(--dn-karte, var(--background-color-main, #fff)) !important; border: 0;
+    font-size: 14px; font-weight: 800; color: var(--dn-blau-tief, #2b4a5f); padding: 12px 10px 6px;
+}
+.dn-kal .fc-list-heading .fc-list-heading-main { color: inherit; }
+.dn-kal-marke {
+    display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: 999px; vertical-align: 1px;
+    background: var(--dn-bordeaux, #7c1922); color: #fff; font-size: 11px; letter-spacing: .04em; text-transform: uppercase;
+}
+.dn-morgen .dn-kal-marke { background: var(--dn-blau, #446e88); }
+.dn-kal-blaettern { display: flex; justify-content: space-between; gap: 8px; margin-top: 12px; }
+.dn-kal-blaettern button {
+    border: 1.5px solid var(--dn-blau, #446e88); background: transparent; color: var(--dn-blau-tief, #2b4a5f);
+    border-radius: 999px; padding: 6px 14px; font-weight: 700; font-size: 13px; cursor: pointer;
+}
+.dn-kal-blaettern [data-blaettern="vor"] { margin-left: auto; }
+[data-bs-theme="dark"] .dn-kal .fc-list-heading td,
+[data-bs-theme="dark"] .dn-kal-blaettern button { color: #b9d3e4; }
+[data-bs-theme="dark"] .dn-kal-blaettern button { border-color: #7fa9c4; }
+/* Kleben geht nur ohne eigenen Scrollbereich – FullCalendar setzt overflow an Ansicht und Scroller */
+.dn-kal .fc-list-view, .dn-kal .fc-list-view .fc-scroller { overflow: visible !important; height: auto !important; }

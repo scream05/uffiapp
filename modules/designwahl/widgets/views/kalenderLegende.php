@@ -1,6 +1,8 @@
 <?php
 /**
  * Ersatz für die Kategorie-Legende des Kalenders: Kategorien als Knöpfe über dem Kalender (Events::onCalendarTypeLegend).
+ * In Kalendern mit eigener Leiste (resources/kalender/kalender-liste.js) wandern die Knöpfe in die Leiste, der Kasten bleibt leer und unsichtbar.
+ * Namen sind die sechs Gruppen (setup/kalender-gruppen), übersetzt über DesignwahlModule.base.
  * Angemeldet setzen sie den Kategorie-Filter der Filterleiste, Gäste (ohne Filterleiste) filtern direkt im Kalender.
  * Am Handy eine waagrecht wischbare Zeile.
  *
@@ -9,6 +11,7 @@
 
 use humhub\helpers\Html;
 
+usort($types, fn($a, $b) => ((int)$a->sort_order <=> (int)$b->sort_order) ?: strcmp($a->name, $b->name));
 ?>
 <div class="panel panel-default calendar-type-legend kal-legende">
     <div class="panel-heading">
@@ -19,7 +22,7 @@ use humhub\helpers\Html;
             <button type="button" class="calendar-type-item kal-legende-item" data-type-id="<?= (int)$type->id ?>"
                     data-color="<?= Html::encode($type->color) ?>" aria-pressed="false">
                 <span class="calendar-type-color" style="background:<?= Html::encode($type->color) ?>"></span>
-                <?= Html::encode($type->name) ?>
+                <?= Html::encode(Yii::t('DesignwahlModule.base', $type->name)) ?>
             </button>
         <?php endforeach ?>
     </div>
@@ -30,6 +33,7 @@ use humhub\helpers\Html;
 .kal-legende .kal-legende-item.active { border-color: currentColor; font-weight: 600; }
 .kal-legende.kal-legende-gefiltert .kal-legende-item:not(.active) { opacity: .55; }
 .kal-legende.kal-legende-oben .panel-heading { padding-bottom: 0; }
+.kal-legende.dn-kal-legende-leer { display: none; }
 @media (max-width: 767px) {
     /* eine wischbare Zeile statt zwölf Zeilen untereinander */
     .kal-legende .panel-body { display: flex; flex-wrap: nowrap; gap: 6px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }

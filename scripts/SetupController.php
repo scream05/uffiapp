@@ -818,18 +818,98 @@ class SetupController extends Controller
 
     private const EVENTS_URL = 'https://www.uffenheim.de/erleben/veranstaltungen/veranstaltungskalender/rss';
     private const EVENT_UID = 'uffenheim-de-';
-    // Kategorie auf uffenheim.de -> Farbe im Kalender
-    private const EVENT_COLORS = [
-        'Kirchweihen' => '#c0392b',
-        'Heimatfeste, Märkte, Events' => '#e67e22',
-        'Vereinsveranstaltungen, JHV, Sommerfeste, Jubiläen usw.' => '#7b3fa0',
-        'Kirchliche Veranstaltungen, Konzerte usw.' => '#1f5f8b',
-        'Häckerstuben, Weinstuben' => '#8e1b4f',
-        'Museen - Öffnungszeiten' => '#6d5c3d',
-        'Veranstaltungen für Kinder' => '#16a085',
-        'Veranstaltungen für Senioren' => '#2e7d32',
-        'Vorträge' => '#34495e',
+    /**
+     * Sechs Gruppen im Kalender (seit 30.10.2026 statt der zwölf Kategorien von uffenheim.de): Name => [Farbe, Kategorien
+     * auf uffenheim.de]. Reihenfolge = Reihenfolge der Knöpfe. Umstellen bestehender Termine: setup/kalender-gruppen
+     */
+    private const EVENT_GROUPS = [
+        'Feste & Kerwa' => ['#c0392b', ['Kirchweihen', 'Heimatfeste, Märkte, Events', 'Häckerstuben, Weinstuben']],
+        'Kultur & Musik' => ['#1f6f9c', ['Kulturveranstaltungen, Konzerte, Kabarett, Theater, Tanz, Kino',
+            'Kirchliche Veranstaltungen, Konzerte usw.', 'Museen - Öffnungszeiten']],
+        'Kinder & Familie' => ['#149e8a', ['Veranstaltungen für Kinder', 'Schulveranstaltung']],
+        'Senioren' => ['#2e7d32', ['Veranstaltungen für Senioren']],
+        'Vereine & Sport' => ['#7b45a8', ['Vereinsveranstaltungen, JHV, Sommerfeste, Jubiläen usw.']],
+        'Vorträge & Kurse' => ['#34495e', ['Vorträge', 'Sonstige Veranstaltungen']],
     ];
+    // Unbekannte Kategorie auf uffenheim.de
+    private const EVENT_GROUP_DEFAULT = 'Vorträge & Kurse';
+
+    /** Gruppe zu einer Kategorie von uffenheim.de (oder schon einer Gruppe) */
+    private static function eventGroup(string $category): string
+    {
+        foreach (self::EVENT_GROUPS as $group => [, $categories]) {
+            if ($category === $group || in_array($category, $categories, true)) {
+                return $group;
+            }
+        }
+        return self::EVENT_GROUP_DEFAULT;
+    }
+
+    /**
+     * Kategorien des Space „Veranstaltungen“ zu den sechs Gruppen zusammenfassen: setup/kalender-gruppen [probe=0]
+     * Je Gruppe wird eine passende alte Kategorie umbenannt (sonst neu angelegt), Termine der übrigen alten Kategorien
+     * wandern dorthin, die alten Kategorien werden gelöscht. Alle Termine der Gruppe bekommen ihre Farbe. Idempotent.
+     */
+    public function actionKalenderGruppen($dryRun = 0)
+    {
+        $space = Space::findOne(['url' => 'veranstaltungen']);
+        $find = fn(array $where) => \humhub\modules\calendar\models\CalendarEntryType::find()
+            ->where(['content_tag.module_id' => 'calendar', 'content_tag.contentcontainer_id' => $space->contentcontainer_id] + $where);
+        $db = Yii::$app->db;
+        $order = 0;
+        foreach (self::EVENT_GROUPS as $group => [$color, $categories]) {
+            $order++;
+            $type = $find(['content_tag.name' => $group])->one();
+            foreach ($categories as $old) {
+                $oldType = $find(['content_tag.name' => $old])->one();
+                if ($oldType === null) {
+                    continue;
+                }
+                if ($type === null) {
+                    $this->stdout("~ $old -> $group\n");
+                    $type = $oldType;
+                    if (!$dryRun) {
+                        $type->updateAttributes(['name' => $group]);
+                    }
+                    continue;
+                }
+                $n = (int)$db->createCommand('SELECT COUNT(*) FROM content_tag_relation WHERE tag_id = :t', [':t' => $oldType->id])->queryScalar();
+                $this->stdout("> $old ($n Termine) -> $group, Kategorie gelöscht\n");
+                if (!$dryRun) {
+                    // Termin hätte schon beide: alte Zuordnung einfach weg
+                    $db->createCommand('DELETE r FROM content_tag_relation r JOIN content_tag_relation r2 ON r2.content_id = r.content_id AND r2.tag_id = :neu WHERE r.tag_id = :alt',
+                        [':neu' => $type->id, ':alt' => $oldType->id])->execute();
+                    $db->createCommand()->update('content_tag_relation', ['tag_id' => $type->id], ['tag_id' => $oldType->id])->execute();
+                    $db->createCommand()->delete('content_tag', ['id' => $oldType->id])->execute();
+                }
+            }
+            if ($type === null) {
+                $this->stdout("+ $group (neu)\n");
+                if ($dryRun) {
+                    continue;
+                }
+                $type = new \humhub\modules\calendar\models\CalendarEntryType($space);
+                $type->name = $group;
+                $type->color = $color;
+                $type->save();
+            }
+            if ($dryRun) {
+                continue;
+            }
+            $type->updateAttributes(['color' => $color, 'sort_order' => $order]);
+            // Kalender färbt nach der Farbe des Termins, nicht der Kategorie
+            $n = $db->createCommand('UPDATE calendar_entry e JOIN content c ON c.object_id = e.id AND c.object_model = :m
+                JOIN content_tag_relation r ON r.content_id = c.id SET e.color = :f WHERE r.tag_id = :t AND (e.color IS NULL OR e.color <> :f)',
+                [':m' => \humhub\modules\calendar\models\CalendarEntry::class, ':f' => $color, ':t' => $type->id])->execute();
+            $this->stdout("= $group: Farbe $color" . ($n ? ", $n Termine umgefärbt" : '') . "\n");
+        }
+        $rest = $find([])->andWhere(['not in', 'content_tag.name', array_keys(self::EVENT_GROUPS)])->all();
+        foreach ($rest as $t) {
+            $this->stdout("? übrige Kategorie (nicht angefasst): {$t->name}\n");
+        }
+        Yii::$app->cache->flush();
+        return ExitCode::OK;
+    }
 
     /**
      * Veranstaltungskalender der Stadt als Termine im Space „Veranstaltungen“, Verfasser
@@ -945,7 +1025,7 @@ class SetupController extends Controller
             }
             if ($isNew) {
                 if ($ev['category'] !== '') {
-                    $type = $this->eventType($space, $ev['category']);
+                    $type = $this->eventType($space, self::eventGroup($ev['category']));
                     $entry->setType($type);
                     // Kalender färbt nach der Farbe des Termins, nicht der Kategorie
                     $entry->updateAttributes(['color' => $type->color]);
@@ -1059,7 +1139,7 @@ class SetupController extends Controller
         if ($type === null) {
             $type = new \humhub\modules\calendar\models\CalendarEntryType($space);
             $type->name = $name;
-            $type->color = self::EVENT_COLORS[$name] ?? '#7f8c8d';
+            $type->color = self::EVENT_GROUPS[$name][0] ?? '#7f8c8d';
             $type->save();
             $this->stdout("+ Kategorie $name\n");
         }
