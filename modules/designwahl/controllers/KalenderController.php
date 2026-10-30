@@ -53,4 +53,26 @@ class KalenderController extends Controller
         }
         return $this->asJson($result);
     }
+
+    /**
+     * „In meinen Kalender“ (Detailansicht): /designwahl/kalender/ics?id=98 – ein Termin als iCal, auch für Gäste.
+     * Anders als calendar/export/event mit „inline“ statt „attachment“: Die Web-App am iPhone (Startbildschirm) kann
+     * keine Downloads, ein inline ausgelieferter text/calendar im neuen Fenster zeigt dagegen „Zum Kalender hinzufügen“.
+     */
+    public function actionIcs($id)
+    {
+        $entry = CalendarEntry::findOne(['id' => (int)$id]);
+        if ($entry === null || !$entry->content->canView()) {
+            throw new \yii\web\NotFoundHttpException();
+        }
+        $ics = $entry->generateIcs(true);
+        if (empty($ics)) {
+            throw new \yii\web\NotFoundHttpException();
+        }
+        $name = trim(preg_replace('/[^\p{L}\p{N}]+/u', '-', mb_strtolower($entry->title)), '-') ?: 'termin';
+        return Yii::$app->response->sendContentAsFile(AboController::ohnePersonen($ics), mb_substr($name, 0, 60) . '.ics', [
+            'mimeType' => 'text/calendar',
+            'inline' => true,
+        ]);
+    }
 }

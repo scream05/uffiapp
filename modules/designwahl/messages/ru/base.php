@@ -159,4 +159,8 @@ return [
     'Senioren' => 'Пожилые',
     'Vereine & Sport' => 'Клубы и спорт',
     'Vorträge & Kurse' => 'Лекции и курсы',
+    'Auf der Karte' => "На карте",
+    'In meinen Kalender' => "В мой календарь",
+    'Per WhatsApp teilen' => "Поделиться в WhatsApp",
+    'Google Kalender' => "Google Календарь",
 ];

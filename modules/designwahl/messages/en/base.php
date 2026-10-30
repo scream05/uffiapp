@@ -159,4 +159,8 @@ return [
     'Senioren' => 'Seniors',
     'Vereine & Sport' => 'Clubs & sports',
     'Vorträge & Kurse' => 'Talks & courses',
+    'Auf der Karte' => "On the map",
+    'In meinen Kalender' => "Add to my calendar",
+    'Per WhatsApp teilen' => "Share via WhatsApp",
+    'Google Kalender' => "Google Calendar",
 ];

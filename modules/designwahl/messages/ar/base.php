@@ -159,4 +159,8 @@ return [
     'Senioren' => 'كبار السن',
     'Vereine & Sport' => 'الجمعيات والرياضة',
     'Vorträge & Kurse' => 'محاضرات ودورات',
+    'Auf der Karte' => "على الخريطة",
+    'In meinen Kalender' => "إضافة إلى تقويمي",
+    'Per WhatsApp teilen' => "مشاركة عبر واتساب",
+    'Google Kalender' => "تقويم Google",
 ];

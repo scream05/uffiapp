@@ -10,6 +10,10 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'termin-details', 'datum' => '2026-10-30', 'art' => 'neu', 'popup' => false,
+        'link' => ['veranstaltungen', '/calendar/view/index'],
+        'titel' => 'Termin in den eigenen Kalender',
+        'text' => 'Beim Öffnen eines Termins siehst du zuerst Zeit, Ort und Gruppe. Darunter übernimmst du ihn mit „In meinen Kalender“ in deinen Handy-Kalender, auch in der Web-App auf dem iPhone, oder teilst ihn per WhatsApp. Das Plakat steht unten.'],
     ['id' => 'kaestchen-formulare', 'datum' => '2026-10-30', 'art' => 'behoben', 'popup' => false,
         'titel' => 'Kästchen in Formularen gut lesbar',
         'text' => 'Die Kästchen „Stream-Eintrag verbergen“ und „Öffentlich“ beim Anlegen eines Termins sehen jetzt genauso aus wie „Ganztägig“ und „Wiederkehrend“, mit dem Text daneben statt darunter. Leere Kästchen haben überall einen deutlich sichtbaren Rand.'],

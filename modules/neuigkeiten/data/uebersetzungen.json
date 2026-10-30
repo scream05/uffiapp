@@ -1,4 +1,31 @@
 {
+    "termin-details": {
+        "en": {
+            "titel": "Event in your own calendar",
+            "text": "When you open an event, you first see the time, location and group. Below that, you can add it to your phone calendar with \"In meinen Kalender\" (\"Add to my calendar\"), including in the web app on the iPhone, or share it via WhatsApp. The poster is at the bottom.",
+            "quelle": "949d896f62bc02827a4d643abe2ccbf83fdd7357"
+        },
+        "uk": {
+            "titel": "Термін у власний календар",
+            "text": "Коли ти відкриваєш термін, спочатку бачиш час, місце та групу. Нижче можна додати його до свого календаря на телефоні кнопкою „In meinen Kalender“, також у веб-застосунку на iPhone, або поділитися ним через WhatsApp. Плакат знаходиться внизу.",
+            "quelle": "949d896f62bc02827a4d643abe2ccbf83fdd7357"
+        },
+        "ar": {
+            "titel": "الموعد في تقويمك الخاص",
+            "text": "عند فتح موعد ستشاهد أولاً الوقت والمكان والمجموعة. أسفل ذلك يمكنك إضافته إلى تقويم هاتفك بالضغط على „In meinen Kalender“، وهذا يعمل أيضاً في تطبيق الويب على الآيفون، أو يمكنك مشاركته عبر WhatsApp. الملصق موجود في الأسفل.",
+            "quelle": "949d896f62bc02827a4d643abe2ccbf83fdd7357"
+        },
+        "tr": {
+            "titel": "Termin in den eigenen Kalender",
+            "text": "Beim Öffnen eines Termins siehst du zuerst Zeit, Ort und Gruppe. Darunter übernimmst du ihn mit „In meinen Kalender“ in deinen Handy-Kalender, auch in der Web-App auf dem iPhone, oder teilst ihn per WhatsApp. Das Plakat steht unten.",
+            "quelle": "949d896f62bc02827a4d643abe2ccbf83fdd7357"
+        },
+        "ru": {
+            "titel": "Termin in den eigenen Kalender",
+            "text": "Wenn du einen Termin öffnest, siehst du zuerst Zeit, Ort und Gruppe. Darunter übernimmst du ihn mit „In meinen Kalender“ in deinen Handy-Kalender, auch in der Web-App auf dem iPhone, oder teilst ihn per WhatsApp. Das Plakat steht unten.",
+            "quelle": "949d896f62bc02827a4d643abe2ccbf83fdd7357"
+        }
+    },
     "kaestchen-formulare": {
         "en": {
             "titel": "Checkboxes in forms easier to read",

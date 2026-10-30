@@ -159,4 +159,8 @@ return [
     'Senioren' => 'Yaşlılar',
     'Vereine & Sport' => 'Dernekler ve spor',
     'Vorträge & Kurse' => 'Konferanslar ve kurslar',
+    'Auf der Karte' => "Haritada",
+    'In meinen Kalender' => "Takvimime ekle",
+    'Per WhatsApp teilen' => "WhatsApp'ta paylaş",
+    'Google Kalender' => "Google Takvim",
 ];

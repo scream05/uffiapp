@@ -208,3 +208,28 @@
 [data-bs-theme="dark"] .dn-kal .fc-list-item.dn-karte .fc-list-item-time { color: #b9d3e4; }
 [data-bs-theme="dark"] .dn-kal .fc-list-item.dn-karte .fc-list-item-title a { color: #e6edf2; }
 [data-bs-theme="dark"] .dn-kal-gruppe { filter: brightness(1.5); }
+
+/* ---------- Detailansicht eines Termins (views/calendar/widgets/wallEntry.php), Entwurf 30.10.2026, Plakat unten ---------- */
+.dn-termin-fakten { display: grid; gap: 8px; margin: 4px 0 14px; font-size: 15px; line-height: 1.45; }
+.dn-termin-fakt { display: flex; gap: 10px; align-items: flex-start; }
+.dn-termin-fakt > .fa, .dn-termin-fakt > i { width: 20px; flex: none; margin-top: 3px; text-align: center; font-size: 16px; }
+.dn-termin-fakt strong { font-size: 16px; }
+.dn-termin-fakt a { font-weight: 700; }
+.dn-termin-punkt { width: 12px; height: 12px; margin: 5px 4px 0; flex: none; border-radius: 50%; background: var(--c); }
+.dn-termin-gruppe { font-weight: 800; color: var(--c); }
+.dn-termin-aktionen { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0 0 16px; }
+.dn-termin-knopf {
+    display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 8px 12px;
+    border-radius: 12px; background: var(--dn-blau-zart, #e3edf3); color: var(--dn-blau-tief, #2b4a5f) !important;
+    font-weight: 700; font-size: 14px; text-align: center; text-decoration: none !important; line-height: 1.25;
+}
+.dn-termin-knopf:hover, .dn-termin-knopf:focus-visible { background: color-mix(in srgb, var(--dn-blau, #446e88) 22%, var(--dn-blau-zart, #e3edf3)); }
+.dn-termin-knopf.dn-termin-haupt { grid-column: 1 / -1; background: var(--dn-blau, #446e88); color: #fff !important; font-size: 15px; }
+.dn-termin-knopf.dn-termin-haupt:hover, .dn-termin-knopf.dn-termin-haupt:focus-visible { background: var(--dn-blau-tief, #2b4a5f); }
+.dn-termin-knopf:focus-visible { outline: 3px solid #e8bd3a; outline-offset: 2px; }
+@media (min-width: 768px) {
+    .dn-termin-aktionen { grid-template-columns: auto auto auto; justify-content: start; }
+    .dn-termin-knopf.dn-termin-haupt { grid-column: auto; }
+}
+[data-bs-theme="dark"] .dn-termin-knopf:not(.dn-termin-haupt) { color: #cfe1ec !important; }
+.dn-termin-text .event-info-section-content { margin-left: 0; padding-left: 0; }
