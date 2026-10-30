@@ -1,4 +1,31 @@
 {
+    "link-vorschau": {
+        "en": {
+            "titel": "Better preview when sharing",
+            "text": "When you share an event via WhatsApp, the preview now shows the event's title, time and location, as well as its poster. Other pages show the current icon of their section instead of the old one.",
+            "quelle": "8011999aa790e1190977e27927a4d0b7b0987798"
+        },
+        "uk": {
+            "titel": "Краще попереднє уявлення під час передачі",
+            "text": "Коли ти ділишся подією через WhatsApp, попередній перегляд тепер показує назву, час і місце, а також афішу події. Інші сторінки показують актуальний значок своєї сфери замість старого.",
+            "quelle": "8011999aa790e1190977e27927a4d0b7b0987798"
+        },
+        "ar": {
+            "titel": "أفضل معاينة عند المشاركة",
+            "text": "عندما تشارك موعدًا عبر واتساب، تعرض المعاينة الآن عنوان الموعد ووقته ومكانه وملصقه. وتعرض الصفحات الأخرى رمز قسمها الحالي بدلًا من الرمز القديم.",
+            "quelle": "8011999aa790e1190977e27927a4d0b7b0987798"
+        },
+        "tr": {
+            "titel": "Daha iyi paylaşım önizlemesi",
+            "text": "Bir etkinliği WhatsApp'ta paylaştığında, önizleme artık etkinliğin başlığını, saatini ve yerini ve etkinlik afişini gösteriyor. Diğer sayfalar ise eskisi yerine bölümlerinin güncel simgesini gösteriyor.",
+            "quelle": "8011999aa790e1190977e27927a4d0b7b0987798"
+        },
+        "ru": {
+            "titel": "Более удобный предпросмотр при отправке",
+            "text": "Когда ты делишься мероприятием в WhatsApp, предпросмотр теперь показывает название, время и место, а также афишу мероприятия. Другие сайты показывают актуальный значок своего раздела вместо старого.",
+            "quelle": "8011999aa790e1190977e27927a4d0b7b0987798"
+        }
+    },
     "termin-details": {
         "en": {
             "titel": "Event in your own calendar",

@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'link-vorschau', 'datum' => '2026-10-30', 'art' => 'behoben', 'popup' => false,
+        'titel' => 'Bessere Vorschau beim Teilen',
+        'text' => 'Wenn du einen Termin per WhatsApp teilst, zeigt die Vorschau jetzt den Titel, Zeit und Ort und das Plakat des Termins. Andere Seiten zeigen das aktuelle Symbol ihres Bereichs statt des alten.'],
     ['id' => 'termin-details', 'datum' => '2026-10-30', 'art' => 'neu', 'popup' => false,
         'link' => ['veranstaltungen', '/calendar/view/index'],
         'titel' => 'Termin in den eigenen Kalender',

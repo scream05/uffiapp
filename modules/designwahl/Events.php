@@ -402,6 +402,7 @@ JS, ['DN_ABBRECHEN' => json_encode(Yii::t('DesignwahlModule.base', 'Abbrechen'),
             if ($event->sender instanceof \humhub\modules\dashboard\controllers\DashboardController) {
                 $event->sender->setPageTitle(Yii::t('DesignwahlModule.base', 'Übersicht'));
             }
+            self::linkVorschau($event->action);
             $theme = Yii::$app->view->theme;
             if ($theme !== null) {
                 $theme->applyTo(''); // füllt die Standard-pathMap des Themes, bevor wir ergänzen
@@ -413,6 +414,50 @@ JS, ['DN_ABBRECHEN' => json_encode(Yii::t('DesignwahlModule.base', 'Abbrechen'),
             }
         } catch (\Throwable $e) {
             Yii::error($e);
+        }
+    }
+
+    /**
+     * Link-Vorschau (WhatsApp, Facebook, Messenger: og:/twitter:-Angaben). HumHub nimmt sonst das hochgeladene
+     * Space-Bild (im Design „Uffi frisch“ längst ersetzt) und als Titel nur den Space-Namen. Wir setzen vorher:
+     *  - Termin (calendar/entry/view): Titel, „Zeit · Ort“, Plakat (Vorschau des ersten angehängten Bildes)
+     *  - Seiten in Spaces mit eigenem Symbol: das Symbol als PNG (resources/spaces/<name>.png, WhatsApp kann kein SVG)
+     * ViewMeta überspringt Angaben, deren Schlüssel schon gesetzt sind.
+     */
+    private static function linkVorschau($action): void
+    {
+        $controller = $action->controller;
+        $view = $controller->getView();
+        $titel = $text = $bild = null;
+        if ($controller->uniqueId === 'calendar/entry' && $action->id === 'view') {
+            $entry = \humhub\modules\calendar\models\CalendarEntry::findOne(['id' => (int)Yii::$app->request->get('id')]);
+            if ($entry !== null && $entry->content->canView()) {
+                $titel = $entry->title;
+                $text = trim(strip_tags($entry->getFormattedTime()) . ($entry->location ? ' · ' . $entry->location : ''));
+                $datei = \humhub\modules\file\models\File::find()->where(['object_model' => get_class($entry), 'object_id' => $entry->id])
+                    ->andWhere(['like', 'mime_type', 'image/%', false])->orderBy(['id' => SORT_ASC])->one();
+                $vorschau = new \humhub\modules\file\converter\PreviewImage();
+                if ($datei !== null && $vorschau->applyFile($datei)) {
+                    $bild = Url::to($vorschau->getUrl(), true);
+                }
+            }
+        }
+        $space = $controller instanceof \humhub\modules\content\components\ContentContainerController ? $controller->contentContainer : null;
+        if ($bild === null && $space instanceof \humhub\modules\space\models\Space && isset(widgets\DesignNeu::SPACE_SYMBOLE[$space->url])) {
+            [, $url] = Yii::$app->assetManager->publish('@designwahl/resources/spaces');
+            $bild = Url::to($url . '/' . widgets\DesignNeu::SPACE_SYMBOLE[$space->url] . '.png', true);
+        }
+        if ($titel !== null) {
+            $view->registerMetaTag(['property' => 'og:title', 'content' => mb_substr($titel, 0, 90)], 'og:title');
+            $view->registerMetaTag(['property' => 'twitter:title', 'content' => mb_substr($titel, 0, 90)], 'twitter:title');
+        }
+        if ($text) {
+            $view->registerMetaTag(['property' => 'og:description', 'content' => mb_substr($text, 0, 200)], 'og:description');
+            $view->registerMetaTag(['property' => 'twitter:description', 'content' => mb_substr($text, 0, 200)], 'twitter:description');
+        }
+        if ($bild !== null) {
+            $view->registerMetaTag(['property' => 'og:image', 'content' => $bild], 'og:image');
+            $view->registerMetaTag(['name' => 'twitter:image', 'content' => $bild], 'twitter:image');
         }
     }
 
