@@ -233,3 +233,19 @@ html.design-neu .dn-mehr .dn-ziel .dn-ziel-text {
    zu 24 px und zur Anordnung oben, deshalb auch hier Kästchen und Text nebeneinander */
 .content-form-body .contentForm_options .mb-3 .checkbox > label { padding-left: 0; }
 .content-form-body .contentForm_options .mb-3 .checkbox > label > input[type="checkbox"] { position: relative; top: auto; left: auto; }
+/* Kalender-Terminformular: ActiveField gibt den Kästchen von ContentHiddenCheckbox/ContentVisibilitySelect die Klasse
+   .form-control mit – dann wären sie 44 px hohe, volle Breite „Textfelder“ (neu.css) und der Text stünde darunter */
+.checkbox > label > input[type="checkbox"].form-control {
+    display: inline-block;
+    width: 24px !important;
+    min-width: 24px;
+    height: 24px !important;
+    min-height: 0 !important;
+    border-radius: 5px !important;
+    box-shadow: none;
+}
+.checkbox > label > input[type="checkbox"].form-control:checked {
+    border-color: #446e88 !important;
+    background: #446e88 url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e") center / 100% no-repeat !important;
+}
+.checkbox > label > input[type="checkbox"].form-control:not(:checked) { background: var(--hh-background-color-main, #fff) !important; border: 2px solid #6b7680 !important; }
