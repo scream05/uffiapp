@@ -66,3 +66,24 @@
     // HumHub meldet jeden PJAX-Seitenwechsel
     if (window.jQuery) jQuery(document).on('humhub:ready', springen);
 })();
+
+/**
+ * „In meinen Kalender“ (Detailansicht, dn-termin-haupt) in der Web-App am iPhone/iPad (Startbildschirm): Dort öffnet iOS
+ * keine Kalenderdateien – weder als Download noch inline. Seit iOS 17 übergibt „x-safari-https://…“ den Link an Safari,
+ * das dann „Zum Kalender hinzufügen“ zeigt. Im normalen Browser bleibt der Link unverändert.
+ */
+(function () {
+    function iosWebApp() {
+        var ios = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        var standalone = window.navigator.standalone === true
+            || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
+        return ios && standalone;
+    }
+    document.addEventListener('click', function (e) {
+        var a = e.target.closest && e.target.closest('a.dn-termin-haupt');
+        if (!a || !iosWebApp()) return;
+        e.preventDefault();
+        e.stopPropagation();
+        window.location.href = 'x-safari-' + new URL(a.getAttribute('href'), location.href).href;
+    }, true);
+})();
