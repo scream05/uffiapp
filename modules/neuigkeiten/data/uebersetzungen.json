@@ -2,28 +2,28 @@
     "kalender-ohne-filter": {
         "en": {
             "titel": "Calendar without filter fields",
-            "text": "The selection fields above the calendar are gone. To filter, just tap one of the colored groups.",
-            "quelle": "c738cf89a593673fd22b5d3de6e5851d1049ed34"
+            "text": "The selection fields, the heading and the export button above the calendar are gone, so it now starts higher up. To filter, simply tap one of the colored groups.",
+            "quelle": "7bdd97b4c53c27ee77a24579a3bbd45178d7ab83"
         },
         "uk": {
             "titel": "Календар без полів фільтрації",
-            "text": "Поля вибору над календарем прибрано. Щоб відфільтрувати, просто натисни на одну з кольорових груп.",
-            "quelle": "c738cf89a593673fd22b5d3de6e5851d1049ed34"
+            "text": "Поля вибору, заголовок і кнопка експорту над календарем прибрані, тепер він починається вище. Щоб відфільтрувати, просто натисни на одну з кольорових груп.",
+            "quelle": "7bdd97b4c53c27ee77a24579a3bbd45178d7ab83"
         },
         "ar": {
-            "titel": "التقويم بدون حقول تصفية",
-            "text": "حقول الاختيار فوق التقويم لم تعد موجودة. للتصفية، ما عليك سوى النقر على إحدى المجموعات الملونة.",
-            "quelle": "c738cf89a593673fd22b5d3de6e5851d1049ed34"
+            "titel": "تقويم بدون حقول تصفية",
+            "text": "حقول الاختيار والعنوان وزر التصدير فوق التقويم أُزيلت، ولذلك يبدأ الآن أعلى من قبل. للتصفية تكفي أن تنقر على إحدى المجموعات الملوّنة.",
+            "quelle": "7bdd97b4c53c27ee77a24579a3bbd45178d7ab83"
         },
         "tr": {
-            "titel": "Filtre alanları olmadan takvim",
-            "text": "Takvimin üstündeki seçim alanları kaldırıldı. Filtrelemek için renkli gruplardan birine dokunman yeterli.",
-            "quelle": "c738cf89a593673fd22b5d3de6e5851d1049ed34"
+            "titel": "Takvim filtre alanları olmadan",
+            "text": "Takvimin üstündeki seçim alanları, başlık ve dışa aktarma düğmesi kaldırıldı; takvim artık daha yukarıdan başlıyor. Filtrelemek için renkli gruplardan birine dokunman yeterli.",
+            "quelle": "7bdd97b4c53c27ee77a24579a3bbd45178d7ab83"
         },
         "ru": {
-            "titel": "Календарь без полей фильтров",
-            "text": "Поля выбора над календарём убраны. Для фильтрации просто нажми на одну из цветных групп.",
-            "quelle": "c738cf89a593673fd22b5d3de6e5851d1049ed34"
+            "titel": "Kalender ohne Filterfelder",
+            "text": "Die Auswahlfelder, die Überschrift und der Export-Knopf über dem Kalender sind weg, er beginnt jetzt weiter oben. Zum Filtern tippst du einfach auf eine der farbigen Gruppen.",
+            "quelle": "7bdd97b4c53c27ee77a24579a3bbd45178d7ab83"
         }
     },
     "termin-knoepfe-einzeln": {
