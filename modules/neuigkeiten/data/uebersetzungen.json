@@ -1,4 +1,31 @@
 {
+    "kaestchen-formulare": {
+        "en": {
+            "titel": "Checkboxes in forms easier to read",
+            "text": "The checkboxes „Hide stream entry“ and „Public“ when creating an event now show the tick neatly centered again, white on blue. Empty checkboxes have a clearer border.",
+            "quelle": "3639e4dd9d4c8722ce361f300a80d60086725089"
+        },
+        "uk": {
+            "titel": "Kästchen in Formularen gut lesbar",
+            "text": "Die Kästchen „Stream-Eintrag verbergen“ und „Öffentlich“ beim Anlegen eines Termins zeigen das Häkchen wieder sauber in der Mitte, weiß auf Blau. Leere Kästchen haben einen deutlicheren Rand.",
+            "quelle": "3639e4dd9d4c8722ce361f300a80d60086725089"
+        },
+        "ar": {
+            "titel": "صناديق الاختيار في النماذج أصبحت أوضح",
+            "text": "صناديق الاختيار «إخفاء في الخلاصة» و«عام» عند إنشاء موعد تعرض علامة الصح مرة أخرى في منتصف الصندوق بشكل مرتب، باللون الأبيض على خلفية زرقاء. الصناديق الفارغة لها حدود أوضح.",
+            "quelle": "3639e4dd9d4c8722ce361f300a80d60086725089"
+        },
+        "tr": {
+            "titel": "Kutucuklar formlarda daha iyi okunuyor",
+            "text": "Bir etkinlik oluştururken yer alan „Akış girişini gizle“ ve „Herkese açık“ kutucukları artık onay işaretini ortada, beyaz üzerine mavi olarak gösteriyor. Boş kutucukların kenarlığı ise daha belirgin.",
+            "quelle": "3639e4dd9d4c8722ce361f300a80d60086725089"
+        },
+        "ru": {
+            "titel": "Чекбоксы в формах стали лучше видны",
+            "text": "Чекбоксы «Скрыть запись в ленте» и «Публично» при создании мероприятия снова аккуратно показывают галочку по центру: белым на синем. У пустых чекбоксов более заметная рамка.",
+            "quelle": "3639e4dd9d4c8722ce361f300a80d60086725089"
+        }
+    },
     "termine-karten": {
         "en": {
             "titel": "Events with poster",

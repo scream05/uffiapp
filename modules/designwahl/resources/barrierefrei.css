@@ -143,6 +143,35 @@ label > input[type="checkbox"][name="aktiv"] {
     margin: 0 8px 0 0;
     vertical-align: -6px;
 }
+/* Häkchen dazu passend (z. B. „Stream-Eintrag verbergen“, „Öffentlich“ im Terminformular): Das Theme setzt ein 12-px-Symbol
+   oben links in Akzentfarbe mit dunklem Zeichen – bei 24 px verrutscht und kaum lesbar. Stattdessen wie .form-check-input:
+   Stahlblau mit weißem Haken in der Mitte; leerer Rand mit 3:1 Kontrast (1.4.11). Text neben dem Kästchen statt darunter. */
+.checkbox > label {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding-left: 0;
+    line-height: 1.4;
+}
+.checkbox > label > input[type="checkbox"] {
+    flex: none;
+    margin: -1px 0 0 0;
+    vertical-align: 0;
+    padding: 0;
+    border: 2px solid #6b7680;
+    border-radius: 5px;
+    background-color: var(--hh-background-color-main, #fff);
+}
+.checkbox > label > input[type="checkbox"]:checked {
+    border-color: #446e88;
+    background: #446e88 url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e") center / 100% no-repeat;
+}
+.checkbox > label > input[type="checkbox"]:checked::after { content: none; }
+.checkbox > label > input[type="checkbox"]:focus-visible { outline: 3px solid #e8bd3a; outline-offset: 2px; }
+[data-bs-theme="dark"] .checkbox > label > input[type="checkbox"] { border-color: #9aa6b0; }
+[data-bs-theme="dark"] .checkbox > label > input[type="checkbox"]:checked { border-color: #7fa9c4; background-color: #446e88; }
+/* Hinweistext unter dem Kästchen bündig mit dem Text */
+div.mb-3 div.checkbox .form-text { margin-left: 32px; }
 
 /* Kommentare: Name des Verfassers nicht nur über die Farbe als Link erkennbar (1.4.1) */
 .comment-heading a {
@@ -200,3 +229,7 @@ html.design-neu .dn-mehr .dn-ziel .dn-ziel-text {
     overflow: visible;
     text-overflow: clip;
 }
+/* Beitragsformular (Optionen unter „Absenden“): Theme setzt das Kästchen absolut neben einen 22-px-Einzug – passt nicht
+   zu 24 px und zur Anordnung oben, deshalb auch hier Kästchen und Text nebeneinander */
+.content-form-body .contentForm_options .mb-3 .checkbox > label { padding-left: 0; }
+.content-form-body .contentForm_options .mb-3 .checkbox > label > input[type="checkbox"] { position: relative; top: auto; left: auto; }
