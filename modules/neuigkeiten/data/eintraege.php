@@ -12,7 +12,7 @@
 return [
     ['id' => 'kaestchen-formulare', 'datum' => '2026-10-30', 'art' => 'behoben', 'popup' => false,
         'titel' => 'Kästchen in Formularen gut lesbar',
-        'text' => 'Die Kästchen „Stream-Eintrag verbergen“ und „Öffentlich“ beim Anlegen eines Termins sehen jetzt genauso aus wie „Ganztägig“ und „Wiederkehrend“, mit dem Text daneben statt darunter.'],
+        'text' => 'Die Kästchen „Stream-Eintrag verbergen“ und „Öffentlich“ beim Anlegen eines Termins sehen jetzt genauso aus wie „Ganztägig“ und „Wiederkehrend“, mit dem Text daneben statt darunter. Leere Kästchen haben überall einen deutlich sichtbaren Rand.'],
     ['id' => 'termine-karten', 'datum' => '2026-10-30', 'art' => 'besser', 'popup' => false,
         'link' => ['veranstaltungen', '/calendar/view/index'],
         'titel' => 'Termine mit Plakat',
