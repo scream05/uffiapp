@@ -1,6 +1,6 @@
 /**
  * Kalender am Handy: Liste „ab heute, 30 Tage“ statt Monatsraster (nicht im Abfallkalender, dort bleibt der Monat).
- * Der Knopf „Liste“ zeigt überall diese Liste statt der Kalenderwoche.
+ * Der Knopf „Liste“ zeigt überall diese Liste statt der Kalenderwoche; die Knöpfe „Woche“ und „Tag“ entfallen überall.
  * Mehrtägige Termine (Kerwa …) stehen in der Liste nur einmal – am ersten Tag bzw. am ersten sichtbaren Tag – mit „bis …“.
  *
  * Läuft nach dem Kalendermodul (KalenderListeAsset hängt an CalendarAsset) und vor dem Start des Kalenders (humhub:ready).
@@ -21,6 +21,13 @@
     var optionen = Calendar.prototype.getDefaultOptions;
     Calendar.prototype.getDefaultOptions = function () {
         var o = optionen.apply(this, arguments);
+        // Ansichten Woche und Tag braucht hier niemand – nur Monat und Liste (alle Kalender)
+        ['header', 'footer'].forEach(function (k) {
+            if (!o[k]) return;
+            Object.keys(o[k]).forEach(function (pos) {
+                if (typeof o[k][pos] === 'string') o[k][pos] = o[k][pos].replace(/,?timeGrid(Week|Day)\b/g, '');
+            });
+        });
         if (!mitListe()) return o;
         o.views = $.extend({}, o.views);
         o.views[LISTE] = {type: 'list', duration: {days: 30}, buttonText: (o.buttonText && o.buttonText.list) || 'Liste',
