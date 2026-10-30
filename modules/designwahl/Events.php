@@ -572,13 +572,18 @@ JS, ['DN_ABBRECHEN' => json_encode(Yii::t('DesignwahlModule.base', 'Abbrechen'),
         }
     }
 
-    /** Abfallkalender: Filter „Nur anzeigen“ (Teilnahme/Eigene …) ausblenden – für Abfuhrtermine sinnlos */
+    /**
+     * Filterleiste der Kalender (nur Angemeldete): „Nur anzeigen“ und „Veranstaltungsarten“ überall aus (Wunsch Nutzer,
+     * 30.10.2026) – die Gruppen filtern die Knöpfe der Legende (setzen dann options.types wie bei Gästen).
+     * Bleibt nichts übrig (Space-Kalender ohne Auswahl „Ansicht“/„Kalender“), wird die Leiste gar nicht gezeichnet.
+     */
     public static function onCalendarFilterBar($event)
     {
         try {
-            $container = \humhub\modules\content\helpers\ContentContainerHelper::getCurrent();
-            if ($container instanceof \humhub\modules\space\models\Space && $container->url === 'abfall-and-termine') {
-                $event->sender->showFilter = false;
+            $event->sender->showFilter = false;
+            $event->sender->showTypes = false;
+            if (!$event->sender->showSelectors) {
+                $event->isValid = false;
             }
         } catch (\Throwable $e) {
             Yii::error($e, 'designwahl');

@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'kalender-ohne-filter', 'datum' => '2026-10-30', 'art' => 'besser', 'popup' => false,
+        'titel' => 'Kalender ohne Filterfelder',
+        'text' => 'Die Felder „Nur anzeigen“ und „Veranstaltungsarten“ über dem Kalender sind weg. Zum Filtern tippst du einfach auf eine der farbigen Gruppen.'],
     ['id' => 'termin-knoepfe-einzeln', 'datum' => '2026-10-30', 'art' => 'besser', 'popup' => false,
         'titel' => 'Übersicht aufgeräumt',
         'text' => 'Die Knöpfe „In meinen Kalender“, „Per WhatsApp teilen“ und „Google Kalender“ stehen nicht mehr an jedem Termin in der Übersicht. Du findest sie, wenn du einen Termin öffnest.'],

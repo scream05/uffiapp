@@ -3,7 +3,7 @@
  * Ersatz für die Kategorie-Legende des Kalenders: Kategorien als Knöpfe über dem Kalender (Events::onCalendarTypeLegend).
  * In Kalendern mit eigener Leiste (resources/kalender/kalender-liste.js) wandern die Knöpfe in die Leiste, der Kasten bleibt leer und unsichtbar.
  * Namen sind die sechs Gruppen (setup/kalender-gruppen), übersetzt über DesignwahlModule.base.
- * Angemeldet setzen sie den Kategorie-Filter der Filterleiste, Gäste (ohne Filterleiste) filtern direkt im Kalender.
+ * Ohne Feld „Veranstaltungsarten“ (seit 30.10.2026 für alle aus, Events::onCalendarFilterBar) filtern sie direkt im Kalender (options.types).
  * Am Handy eine waagrecht wischbare Zeile.
  *
  * @var \humhub\modules\calendar\models\CalendarEntryType[] $types
