@@ -141,4 +141,5 @@ return [
     'Speichern' => 'Kaydet',
     'Wem das gefällt' => 'Bunu beğenenler',
     'Passwort anzeigen' => 'Şifreyi göster',
+    'bis {datum}' => '{datum} tarihine kadar',
 ];

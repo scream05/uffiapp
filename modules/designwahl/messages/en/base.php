@@ -141,4 +141,5 @@ return [
     'Speichern' => 'Save',
     'Wem das gefällt' => 'Who likes this',
     'Passwort anzeigen' => 'Show password',
+    'bis {datum}' => 'until {datum}',
 ];

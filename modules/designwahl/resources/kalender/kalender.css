@@ -70,3 +70,13 @@
 /* Kalender-Erinnerungen sind systemweit aus: im Terminformular kein Haken „Erinnerung aktivieren“ und kein Reiter */
 #calendar-entry-form .field-calendarentryform-reminder,
 #calendar-entry-form .tab-reminder { display: none !important; }
+
+/* Liste ab heute (kalender-liste.js): mehrtägige Termine nur einmal, Zeitspalte „19:00 · bis 9.11.“ */
+.fc-list-table tr.dn-folgetag { display: none; }
+.fc-list-table .dn-mehrtaegig .fc-list-item-time { white-space: normal; }
+.fc-list-view .fc-list-item-title a { font-weight: 700; }
+@media (max-width: 767px) {
+    .fc-list-view .fc-list-item-time { width: 1%; min-width: 4.5em; font-variant-numeric: tabular-nums; }
+    .fc-list-view td { padding-top: 10px; padding-bottom: 10px; }
+}
+.fc-list-table tr.dn-heute td { background: var(--dn-bordeaux-zart, #f6e4e5); color: var(--dn-bordeaux, #7c1922); }

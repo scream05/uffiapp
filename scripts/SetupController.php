@@ -912,6 +912,11 @@ class SetupController extends Controller
 
             $entry = $query()->andWhere(['calendar_entry.uid' => $uid])->one();
             $isNew = $entry === null;
+            if ($isNew && ($dup = $this->eventDuplicate($space, $ev)) !== null) {
+                // Schon von Hand oder per WhatsApp eingetragen: nicht doppelt anlegen
+                $this->stdout("= schon im Kalender: {$ev['start']} {$ev['title']} (#{$dup->id} {$dup->title})\n");
+                continue;
+            }
             if ($isNew) {
                 $entry = new \humhub\modules\calendar\models\CalendarEntry($space);
                 $entry->uid = $uid;
@@ -975,6 +980,33 @@ class SetupController extends Controller
         $this->stdout(date('Y-m-d H:i:s') . ': ' . count($events) . ' Termine im Feed, '
             . implode(', ', array_map(fn($k, $v) => "$v $k", array_keys($stats), $stats)) . "\n");
         return ExitCode::OK;
+    }
+
+    /**
+     * Termin im Space, der nicht aus dem Import stammt (von Hand, WhatsApp) und derselbe ist: gleicher Beginn und
+     * die Titel teilen die meisten Wörter („Zentraler Reformationsgottesdienst 2026“ = „… in Uffenheim“).
+     * Jahreszahlen, kurze Wörter und „Uffenheim“ zählen nicht, sonst wären alle Kirchweihen eines Abends gleich.
+     */
+    private function eventDuplicate(Space $space, array $ev)
+    {
+        $words = function ($title) {
+            preg_match_all('/\p{L}{4,}/u', mb_strtolower($title), $m);
+            return array_values(array_diff(array_unique($m[0]), ['uffenheim']));
+        };
+        $own = $words($ev['title']);
+        if ($own === []) {
+            return null;
+        }
+        $candidates = \humhub\modules\calendar\models\CalendarEntry::find()->contentContainer($space)
+            ->andWhere(['calendar_entry.start_datetime' => $ev['start']])
+            ->andWhere(['or', ['calendar_entry.uid' => null], ['not like', 'calendar_entry.uid', self::EVENT_UID . '%', false]])->all();
+        foreach ($candidates as $entry) {
+            $other = $words($entry->title);
+            if ($other !== [] && count(array_intersect($own, $other)) / min(count($own), count($other)) >= 0.6) {
+                return $entry;
+            }
+        }
+        return null;
     }
 
     /** "05 Okt 2026 19:00:00" (Ortszeit) als Timestamp */

@@ -1,4 +1,31 @@
 {
+    "termine-liste": {
+        "en": {
+            "titel": "Events on your phone as a list",
+            "text": "On your phone, the event calendar now shows the next 30 days as a list instead of the full month. Multi-day festivals like the Kerwa only appear once, marked with \"bis …\" (until …). The categories are above the calendar and filter events even without an account.",
+            "quelle": "2bb8b8c23509ebe0dcb850b4e842a1a04be2e758"
+        },
+        "uk": {
+            "titel": "Події на телефоні у вигляді списку",
+            "text": "На телефоні календар подій тепер показує наступні 30 днів у вигляді списку, а не повний місяць. Багатоденні свята, як-от Kerwa, з'являються лише один раз, із позначкою „до …“. Категорії розташовані над календарем і працюють навіть без облікового запису.",
+            "quelle": "2bb8b8c23509ebe0dcb850b4e842a1a04be2e758"
+        },
+        "ar": {
+            "titel": "المواعيد على الهاتف كقائمة",
+            "text": "على الهاتف يعرض تقويم الفعاليات الآن الأيام الثلاثين القادمة كقائمة بدلاً من الشهر كاملاً. تظهر الأعياد متعددة الأيام مثل الكيرفا مرة واحدة فقط، مع عبارة „حتى …“. الفئات موجودة فوق التقويم وتقوم بالتصفية حتى بدون حساب.",
+            "quelle": "2bb8b8c23509ebe0dcb850b4e842a1a04be2e758"
+        },
+        "tr": {
+            "titel": "Etkinlikler telefonda liste olarak",
+            "text": "Telefonda etkinlik takvimi artık tam bir ay yerine önümüzdeki 30 günü liste olarak gösteriyor. Kerwa gibi birkaç gün süren festivaller listede yalnızca bir kez yer alıyor, „… tarihine kadar“ ifadesiyle. Kategoriler takvimin üstünde duruyor ve hesabın olmadan da filtreleme yapabilirsin.",
+            "quelle": "2bb8b8c23509ebe0dcb850b4e842a1a04be2e758"
+        },
+        "ru": {
+            "titel": "Мероприятия в телефоне списком",
+            "text": "На телефоне календарь мероприятий теперь показывает следующие 30 дней списком, а не весь месяц целиком. Многодневные праздники, например Kerwa, указываются только один раз, с пометкой «до …». Категории находятся над календарём и работают для фильтрации даже без регистрации.",
+            "quelle": "2bb8b8c23509ebe0dcb850b4e842a1a04be2e758"
+        }
+    },
     "maengel-titel-link": {
         "en": {
             "titel": "Defect reports open with one click",

@@ -141,4 +141,5 @@ return [
     'Speichern' => 'Сохранить',
     'Wem das gefällt' => 'Кому это нравится',
     'Passwort anzeigen' => 'Показать пароль',
+    'bis {datum}' => 'до {datum}',
 ];

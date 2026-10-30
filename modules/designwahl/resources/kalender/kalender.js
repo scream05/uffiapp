@@ -45,6 +45,7 @@
             if (meinLauf !== lauf || benutzt || ++versuche > 55) return;
             setTimeout(pruefen, 150);
             var fc = document.querySelector('.fc');
+            if (document.querySelector('.fc-list-view')) return; // Liste beginnt ohnehin heute (kalender-liste.js)
             var zeile = heuteZeile();
             var h = fc ? fc.offsetHeight : 0;
             var stabil = h === hoehe;

@@ -141,4 +141,5 @@ return [
     'Speichern' => 'حفظ',
     'Wem das gefällt' => 'من أعجبه هذا',
     'Passwort anzeigen' => 'إظهار كلمة المرور',
+    'bis {datum}' => 'حتى {datum}',
 ];

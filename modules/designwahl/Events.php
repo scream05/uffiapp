@@ -457,8 +457,8 @@ JS, ['DN_ABBRECHEN' => json_encode(Yii::t('DesignwahlModule.base', 'Abbrechen'),
     }
 
     /**
-     * Kalender: Kategorien in der Legende unter dem Kalender anklickbar – setzt den Kategorie-Filter
-     * der Filterleiste (nur eingeloggt, Gäste haben keine Filterleiste). Erneuter Klick hebt ihn auf.
+     * Kalender: Kategorien als Knöpfe über dem Kalender – setzt den Kategorie-Filter der Filterleiste,
+     * bei Gästen (ohne Filterleiste) direkt den Filter des Kalenders. Erneuter Klick hebt ihn auf.
      * Gilt in beiden Designs.
      */
     public static function onCalendarTypeLegend($event)
@@ -466,7 +466,7 @@ JS, ['DN_ABBRECHEN' => json_encode(Yii::t('DesignwahlModule.base', 'Abbrechen'),
         try {
             /** @var \humhub\modules\calendar\widgets\CalendarTypeLegend $legend */
             $legend = $event->sender;
-            if (!Yii::$app->user->isGuest && $event->result !== '') {
+            if ($event->result !== '') {
                 $event->result = $legend->view->render('@designwahl/widgets/views/kalenderLegende', [
                     'types' => $legend->getCalendarTypes(),
                 ]);
@@ -507,6 +507,19 @@ JS, ['DN_ABBRECHEN' => json_encode(Yii::t('DesignwahlModule.base', 'Abbrechen'),
             return '';
         }
         return $legend->view->render('@designwahl/widgets/views/kalenderAbo', ['abos' => $abos, 'hinweis' => $hinweis]);
+    }
+
+    /** Kalender: Liste ab heute als Handy-Standard, mehrtägige Termine nur einmal (resources/kalender/kalender-liste.js) */
+    public static function onFullCalendar($event)
+    {
+        try {
+            $view = $event->sender->getView();
+            $view->registerJs('window.dnKalText = ' . json_encode(['bis' => Yii::t('DesignwahlModule.base', 'bis {datum}')], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) . ';',
+                \yii\web\View::POS_HEAD, 'dn-kal-text');
+            assets\KalenderListeAsset::register($view);
+        } catch (\Throwable $e) {
+            Yii::error($e, 'designwahl');
+        }
     }
 
     /** Abfallkalender: Filter „Nur anzeigen“ (Teilnahme/Eigene …) ausblenden – für Abfuhrtermine sinnlos */

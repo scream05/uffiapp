@@ -1,7 +1,8 @@
 <?php
 /**
- * Ersatz für die Kategorie-Legende des Kalenders: Kategorien als Knöpfe, die den Kategorie-Filter
- * der Filterleiste setzen (Events::onCalendarTypeLegend).
+ * Ersatz für die Kategorie-Legende des Kalenders: Kategorien als Knöpfe über dem Kalender (Events::onCalendarTypeLegend).
+ * Angemeldet setzen sie den Kategorie-Filter der Filterleiste, Gäste (ohne Filterleiste) filtern direkt im Kalender.
+ * Am Handy eine waagrecht wischbare Zeile.
  *
  * @var \humhub\modules\calendar\models\CalendarEntryType[] $types
  */
@@ -28,29 +29,64 @@ use humhub\helpers\Html;
 .kal-legende .kal-legende-item:hover { border-color: var(--text-color-soft3, #ccc); }
 .kal-legende .kal-legende-item.active { border-color: currentColor; font-weight: 600; }
 .kal-legende.kal-legende-gefiltert .kal-legende-item:not(.active) { opacity: .55; }
+.kal-legende.kal-legende-oben .panel-heading { padding-bottom: 0; }
+@media (max-width: 767px) {
+    /* eine wischbare Zeile statt zwölf Zeilen untereinander */
+    .kal-legende .panel-body { display: flex; flex-wrap: nowrap; gap: 6px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+    .kal-legende .panel-body::-webkit-scrollbar { display: none; }
+    .kal-legende .kal-legende-item { flex: none; white-space: nowrap; margin: 0; }
+}
 CSS, [], 'kal-legende') ?>
 <?php ob_start() ?>
 (function () {
     var select = function () { return $('select[name="filterType[]"]'); };
+    var kalender = function () {
+        var el = document.getElementById('calendar');
+        return el ? humhub.require('ui.widget').Widget.instance(el) : null;
+    };
+
+    // Über den Kalender stellen (der Kalender rendert die Legende darunter)
+    var $legende = $('.kal-legende').last();
+    var $panel = $('#calendar').closest('.panel');
+    if ($legende.length && $panel.length && !$legende.hasClass('kal-legende-oben')) {
+        $legende.addClass('kal-legende-oben').insertBefore($panel);
+    }
+
+    // Gäste: gewählte Kategorie merkt sich der Kalender selbst (options.types)
+    function aktiveIds() {
+        if (select().length) return (select().val() || []).map(String);
+        var w = kalender();
+        return w && w.options.types ? w.options.types.map(String) : [];
+    }
 
     // Knöpfe zeigen, welche Kategorie gerade gefiltert ist (auch nach Änderung in der Filterleiste oder „x“)
     function markieren() {
-        var aktiv = (select().val() || []).map(String);
+        var aktiv = aktiveIds();
         $('.kal-legende-item').each(function () {
             var an = aktiv.indexOf(String($(this).data('type-id'))) !== -1;
             $(this).toggleClass('active', an).attr('aria-pressed', an ? 'true' : 'false');
         });
         $('.kal-legende').toggleClass('kal-legende-gefiltert', aktiv.length > 0);
+        // Am Handy (wischbare Zeile): gewählte Kategorie ins Bild holen
+        var an = $('.kal-legende-item.active')[0];
+        if (an && an.parentNode.scrollWidth > an.parentNode.clientWidth) {
+            an.parentNode.scrollLeft = an.offsetLeft - an.parentNode.offsetLeft - 16;
+        }
     }
 
     if (!window.kalLegende) {
         window.kalLegende = true; // Seitenwechsel per PJAX: Handler nur einmal binden
         $(document).on('click', '.kal-legende-item', function () {
-            var $sel = select();
-            if (!$sel.length) return;
             var id = String($(this).data('type-id'));
-            var aktiv = ($sel.val() || []).map(String);
-            if (aktiv.length === 1 && aktiv[0] === id) {
+            var aktiv = aktiveIds();
+            var aus = aktiv.length === 1 && aktiv[0] === id;
+            var $sel = select();
+            if (!$sel.length) {
+                var w = kalender();
+                if (!w || !w.fullCalendar) return;
+                w.options.types = aus ? [] : [id];
+                w.initFullCalendar(true);
+            } else if (aus) {
                 $sel.val(null).trigger('change');
             } else {
                 $sel.find('option').remove();
@@ -58,9 +94,6 @@ CSS, [], 'kal-legende') ?>
                     .attr({'data-id': id, 'data-text': $.trim($(this).text()), 'data-image': $(this).data('color')})
                     .prop('selected', true).appendTo($sel);
                 $sel.trigger('change');
-                // Legende steht unter dem Kalender: zum Ergebnis hochscrollen
-                var cal = document.querySelector('.calendar-filter-bar') || document.querySelector('.fc');
-                if (cal) cal.scrollIntoView({behavior: 'smooth', block: 'start'});
             }
             markieren();
         });
