@@ -573,21 +573,13 @@ JS, ['DN_ABBRECHEN' => json_encode(Yii::t('DesignwahlModule.base', 'Abbrechen'),
     }
 
     /**
-     * Filterleiste der Kalender (nur Angemeldete): „Nur anzeigen“ und „Veranstaltungsarten“ überall aus (Wunsch Nutzer,
-     * 30.10.2026) – die Gruppen filtern die Knöpfe der Legende (setzen dann options.types wie bei Gästen).
-     * Bleibt nichts übrig (Space-Kalender ohne Auswahl „Ansicht“/„Kalender“), wird die Leiste gar nicht gezeichnet.
+     * Filterleiste der Kalender (nur Angemeldete) ganz aus (Wunsch Nutzer, 30.10.2026): „Nur anzeigen“, „Veranstaltungsarten“
+     * und im globalen Kalender „Ansicht“/„Kalender“. Es gilt dann der Standard (Meine Kalender, alle); die Gruppen filtern
+     * die Knöpfe der Legende (setzen options.types wie bei Gästen).
      */
     public static function onCalendarFilterBar($event)
     {
-        try {
-            $event->sender->showFilter = false;
-            $event->sender->showTypes = false;
-            if (!$event->sender->showSelectors) {
-                $event->isValid = false;
-            }
-        } catch (\Throwable $e) {
-            Yii::error($e, 'designwahl');
-        }
+        $event->isValid = false;
     }
 
     /**

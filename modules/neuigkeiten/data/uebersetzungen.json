@@ -2,28 +2,28 @@
     "kalender-ohne-filter": {
         "en": {
             "titel": "Calendar without filter fields",
-            "text": "The fields „Show only“ and „Event types“ above the calendar are gone. To filter, you simply tap one of the colored groups.",
-            "quelle": "454c7ab5d7fb6555436e662597c6db860dbd1636"
+            "text": "The selection fields above the calendar are gone. To filter, just tap one of the colored groups.",
+            "quelle": "c738cf89a593673fd22b5d3de6e5851d1049ed34"
         },
         "uk": {
             "titel": "Календар без полів фільтрації",
-            "text": "Поля «Лише показувати» та «Типи заходів» над календарем прибрано. Щоб відфільтрувати, просто натисни на одну з кольорових груп.",
-            "quelle": "454c7ab5d7fb6555436e662597c6db860dbd1636"
+            "text": "Поля вибору над календарем прибрано. Щоб відфільтрувати, просто натисни на одну з кольорових груп.",
+            "quelle": "c738cf89a593673fd22b5d3de6e5851d1049ed34"
         },
         "ar": {
-            "titel": "التقويم بدون حقول التصفية",
-            "text": "حقلا „عرض فقط“ و„أنواع الفعاليات“ فوق التقويم لم يعودا موجودين. للتصفية، اضغط ببساطة على إحدى المجموعات الملونة.",
-            "quelle": "454c7ab5d7fb6555436e662597c6db860dbd1636"
+            "titel": "التقويم بدون حقول تصفية",
+            "text": "حقول الاختيار فوق التقويم لم تعد موجودة. للتصفية، ما عليك سوى النقر على إحدى المجموعات الملونة.",
+            "quelle": "c738cf89a593673fd22b5d3de6e5851d1049ed34"
         },
         "tr": {
-            "titel": "Takvimde filtre alanları yok",
-            "text": "Takvimin üstündeki „Sadece göster“ ve „Etkinlik türleri“ alanları kaldırıldı. Filtrelemek için artık renkli gruplardan birine dokunman yeterli.",
-            "quelle": "454c7ab5d7fb6555436e662597c6db860dbd1636"
+            "titel": "Filtre alanları olmadan takvim",
+            "text": "Takvimin üstündeki seçim alanları kaldırıldı. Filtrelemek için renkli gruplardan birine dokunman yeterli.",
+            "quelle": "c738cf89a593673fd22b5d3de6e5851d1049ed34"
         },
         "ru": {
-            "titel": "Календарь без полей фильтрации",
-            "text": "Поля «Показывать только» и «Типы мероприятий» над календарём убраны. Для фильтрации просто нажми на одну из цветных групп.",
-            "quelle": "454c7ab5d7fb6555436e662597c6db860dbd1636"
+            "titel": "Календарь без полей фильтров",
+            "text": "Поля выбора над календарём убраны. Для фильтрации просто нажми на одну из цветных групп.",
+            "quelle": "c738cf89a593673fd22b5d3de6e5851d1049ed34"
         }
     },
     "termin-knoepfe-einzeln": {
