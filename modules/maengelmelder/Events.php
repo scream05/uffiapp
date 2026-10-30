@@ -114,7 +114,9 @@ class Events
                 return;
             }
             foreach ($menu->getEntries() as $entry) {
-                if ($entry instanceof MenuLink && str_contains((string)$entry->getUrl(), 'switch-dashboard-display')) {
+                // auch den Ersatzlink „In meiner Übersicht anzeigen …“ des Moduls uebersicht
+                if ($entry instanceof MenuLink && (str_contains((string)$entry->getUrl(), 'switch-dashboard-display')
+                        || str_contains((string)$entry->getUrl(), 'uebersicht/einstellungen'))) {
                     $menu->removeEntry($entry);
                 }
             }

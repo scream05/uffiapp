@@ -74,7 +74,18 @@ class Module extends \humhub\components\Module
     public function getBereiche(User $user): array
     {
         return Space::find()->visible($user)->andWhere(['space.status' => Space::STATUS_ENABLED])
-            ->andWhere(['not in', 'space.url', $this->ohneSchalter])->orderBy(['space.name' => SORT_ASC])->all();
+            ->andWhere(['not in', 'space.url', array_merge($this->ohneSchalter, $this->gesperrt($user))])
+            ->orderBy(['space.name' => SORT_ASC])->all();
+    }
+
+    /**
+     * @return string[] URLs der Spaces, die die Person gar nicht in der Übersicht haben darf (nicht wählbar, immer aus):
+     * der Mängelmelder außer für Bauhof und Admins (maengelmelder\Module::maengelInUebersicht)
+     */
+    public function gesperrt(User $user): array
+    {
+        $maengel = \Yii::$app->getModule('maengelmelder');
+        return $maengel && method_exists($maengel, 'maengelInUebersicht') && !$maengel->maengelInUebersicht($user) ? [$maengel->bauhofSpace] : [];
     }
 
     /** @return string[] GUIDs der ausgeschalteten Spaces (eigene Wahl plus nicht eingeschaltete aus $standardAus) */
@@ -97,9 +108,12 @@ class Module extends \humhub\components\Module
         $standard = $this->standardAusGuids();
         $this->settings->user($user)->set('ausgeblendet', json_encode(array_values(array_diff($guids, $standard))));
         $this->settings->user($user)->set('eingeblendet', json_encode(array_values(array_diff($standard, $guids))));
+        $gesperrt = $this->gesperrt($user);
         foreach (Membership::findAll(['user_id' => $user->id]) as $m) {
             $space = $m->space;
-            if ($space && !in_array($space->url, $this->ohneSchalter, true)) {
+            if ($space && in_array($space->url, $gesperrt, true)) {
+                $m->updateAttributes(['show_at_dashboard' => 0]);
+            } elseif ($space && !in_array($space->url, $this->ohneSchalter, true)) {
                 $m->updateAttributes(['show_at_dashboard' => in_array($space->guid, $guids, true) ? 0 : 1]);
             }
         }
@@ -136,6 +150,9 @@ class Module extends \humhub\components\Module
             } else {
                 $an[] = (int)$space->contentcontainer_id;
             }
+        }
+        if ($gesperrt = $this->gesperrt($user)) {
+            $weg = array_merge($weg, array_map('intval', Space::find()->select('contentcontainer_id')->where(['url' => $gesperrt])->column()));
         }
         return [$an, $weg];
     }
