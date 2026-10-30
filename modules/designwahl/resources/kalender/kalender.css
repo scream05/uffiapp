@@ -136,8 +136,7 @@
 .dn-kal.dn-kal-liste .fc-header-toolbar .fc-left,
 .dn-kal.dn-kal-liste .fc-header-toolbar .fc-center,
 .dn-kal.dn-kal-liste .fc-today-button { display: none; }
-.dn-kal.dn-kal-liste .fc-header-toolbar:not(:has(.fc-create-button)) { display: none; }
-.dn-kal .fc-footer-toolbar:not(:has(button)) { display: none; }
+.dn-kal .fc-toolbar.dn-leer { display: none !important; }
 
 /* Läuft gerade */
 .dn-kal-laufend { margin-bottom: 12px; padding: 10px 12px; border-radius: 12px; background: var(--dn-gold-zart, #fbf0cc); display: grid; gap: 6px; }
@@ -176,3 +175,36 @@
 [data-bs-theme="dark"] .dn-kal-blaettern button { border-color: #7fa9c4; }
 /* Kleben geht nur ohne eigenen Scrollbereich – FullCalendar setzt overflow an Ansicht und Scroller */
 .dn-kal .fc-list-view, .dn-kal .fc-list-view .fc-scroller { overflow: visible !important; height: auto !important; }
+
+/* ---------- Terminkarten in der Liste (Entwurf 30.10.2026): Zeit · Titel, Ort, Gruppe · Plakat ---------- */
+.dn-kal.dn-kal-liste .fc-list-view { border: 0; border-radius: 14px; background: var(--dn-feld, #f3efe7); padding: 0 10px 4px; }
+.dn-kal.dn-kal-liste .fc-list-table { border-spacing: 0 8px; }
+.dn-kal.dn-kal-liste .fc-list-heading td { background: var(--dn-feld, #f3efe7) !important; padding: 12px 4px 2px; }
+.dn-kal .fc-list-item.dn-karte td {
+    background: var(--dn-karte, var(--background-color-main, #fff)) !important; border: 0; box-shadow: none !important;
+    padding: 12px 10px; vertical-align: top;
+}
+.dn-kal .fc-list-item.dn-karte:hover td { background: var(--dn-blau-zart, #e3edf3) !important; }
+.dn-kal .fc-list-item.dn-karte .fc-list-item-marker { display: none; }
+.dn-kal .fc-list-item.dn-karte .fc-list-item-time {
+    width: 1%; min-width: 64px; white-space: nowrap; border-left: 4px solid var(--c); border-radius: 12px 0 0 12px;
+    font-variant-numeric: tabular-nums; color: var(--dn-blau-tief, #2b4a5f); line-height: 1.2;
+}
+.dn-kal .fc-list-item.dn-karte .fc-list-item-time b { display: block; font-size: 15px; font-weight: 800; }
+.dn-kal .fc-list-item.dn-karte .fc-list-item-time small { display: block; margin-top: 3px; font-size: 11.5px; font-weight: 600; color: var(--text-color-soft, #6b7280); white-space: normal; }
+.dn-kal .fc-list-item.dn-karte .fc-list-item-title { border-radius: 0 12px 12px 0; line-height: 1.3; }
+.dn-kal .fc-list-item.dn-karte .fc-list-item-title a { font-size: 15px; font-weight: 700; color: var(--text-color-main, #212529); text-decoration: none; }
+.dn-kal .fc-list-item.dn-karte:hover .fc-list-item-title a { text-decoration: underline; }
+.dn-kal-info { display: block; }
+.dn-kal-ort { display: block; margin-top: 3px; font-size: 13px; color: var(--text-color-soft, #6b7280); }
+.dn-kal-gruppe { display: inline-block; margin-top: 5px; font-size: 11.5px; font-weight: 800; color: var(--c); }
+.dn-kal-plakat {
+    float: right; width: 58px; height: 74px; margin: 0 0 4px 10px; object-fit: cover; border-radius: 8px;
+    background: var(--dn-feld, #f3efe7);
+}
+@media (min-width: 768px) {
+    .dn-kal-plakat { width: 72px; height: 92px; }
+}
+[data-bs-theme="dark"] .dn-kal .fc-list-item.dn-karte .fc-list-item-time { color: #b9d3e4; }
+[data-bs-theme="dark"] .dn-kal .fc-list-item.dn-karte .fc-list-item-title a { color: #e6edf2; }
+[data-bs-theme="dark"] .dn-kal-gruppe { filter: brightness(1.5); }

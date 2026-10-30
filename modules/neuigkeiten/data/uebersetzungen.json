@@ -1,4 +1,31 @@
 {
+    "termine-karten": {
+        "en": {
+            "titel": "Events with poster",
+            "text": "In the event list, every event now appears on its own card: time, title, location and group, plus the poster as a small image. Tap the card to open the event.",
+            "quelle": "42fedff2d3b8cc69ce4e6723cf7afc8b577142fb"
+        },
+        "uk": {
+            "titel": "Заходи з афішею",
+            "text": "У списку заходів тепер кожен захід має власну картку: час, назва, місце та група, а також афіша як маленьке зображення. Торкніться картки, щоб відкрити захід.",
+            "quelle": "42fedff2d3b8cc69ce4e6723cf7afc8b577142fb"
+        },
+        "ar": {
+            "titel": "مواعيد مع ملصق",
+            "text": "في قائمة المواعيد أصبح كل موعد الآن على بطاقة خاصة به: الوقت والعنوان والمكان والمجموعة، بالإضافة إلى الملصق كصورة صغيرة. بنقرة واحدة على البطاقة يُفتح الموعد.",
+            "quelle": "42fedff2d3b8cc69ce4e6723cf7afc8b577142fb"
+        },
+        "tr": {
+            "titel": "Etkinlikler afişli",
+            "text": "Etkinlik listesinde artık her etkinlik kendi kartında yer alıyor: saat, başlık, yer ve grup bilgisi, ayrıca afiş küçük bir resim olarak görünüyor. Karta dokunursan etkinlik açılır.",
+            "quelle": "42fedff2d3b8cc69ce4e6723cf7afc8b577142fb"
+        },
+        "ru": {
+            "titel": "Termine mit Plakat",
+            "text": "In der Terminliste steht jetzt jeder Termin auf einer eigenen Karte: Uhrzeit, Titel, Ort und Gruppe, dazu das Plakat als kleines Bild. Ein Tipp auf die Karte öffnet den Termin.",
+            "quelle": "42fedff2d3b8cc69ce4e6723cf7afc8b577142fb"
+        }
+    },
     "termine-leiste": {
         "en": {
             "titel": "Find events faster",

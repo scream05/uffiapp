@@ -10,6 +10,10 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'termine-karten', 'datum' => '2026-10-30', 'art' => 'besser', 'popup' => false,
+        'link' => ['veranstaltungen', '/calendar/view/index'],
+        'titel' => 'Termine mit Plakat',
+        'text' => 'In der Terminliste steht jetzt jeder Termin auf einer eigenen Karte: Uhrzeit, Titel, Ort und Gruppe, dazu das Plakat als kleines Bild. Ein Tipp auf die Karte öffnet den Termin.'],
     ['id' => 'termine-leiste', 'datum' => '2026-10-30', 'art' => 'neu', 'popup' => true,
         'link' => ['veranstaltungen', '/calendar/view/index'],
         'titel' => 'Termine schneller finden',

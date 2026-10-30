@@ -4,6 +4,8 @@
  *  - in der Liste Knöpfe Heute, Morgen, Wochenende: springen in der Liste zu diesem Tag (kein Filter, die Liste bleibt ganz)
  *  - Kategorie-Knöpfe (aus widgets/views/kalenderLegende.php hierher verschoben)
  *  - „Läuft gerade“: mehrtägige Termine, die schon vor dem ersten Tag der Liste begonnen haben
+ *  - Termine als Karten: Uhrzeit · Titel, Ort, Gruppe · Plakat; Farbstreifen der Gruppe links
+ *    (Ort, Gruppe und Plakat holt /designwahl/kalender/details nach, FullCalendar liefert sie nicht)
  * Liste = 30 Tage ab heute, am Handy Standard. Mehrtägige Termine (Kerwa …) stehen nur an ihrem ersten Tag, mit „bis …“.
  * Im Abfallkalender bleiben Monat und die Knöpfe von FullCalendar (ohne Woche/Tag).
  *
@@ -147,6 +149,12 @@
             $(this).attr('aria-pressed', String(($(this).data('ansicht') === 'liste') === liste));
         });
         $box.find('.dn-kal-titel').text(liste ? v.title : '');
+        // Leere Leisten von FullCalendar weg (in der Liste zählt nur „+ Termin“); :has() kann nicht jeder Browser
+        $box.find('.fc-toolbar').each(function () {
+            // eigene Sichtbarkeit der Knöpfe („+“ ist für Gäste per CSS aus), nicht die der Leiste
+            var $k = $(this).find('button').filter(function () { return getComputedStyle(this).display !== 'none'; });
+            $(this).toggleClass('dn-leer', liste ? !$k.filter('.fc-create-button').length : !$k.length);
+        });
         var amAnfang = v.activeStart <= heute0();
         $box.find('.dn-kal-blaettern').toggle(liste);
         $box.find('[data-blaettern="zurueck"]').toggle(!amAnfang);
@@ -217,9 +225,54 @@
         return T.bis.replace('{datum}', ende.toLocaleDateString(sprache, {day: 'numeric', month: 'numeric'}));
     }
 
-    function zeitText(ev) {
-        var sprache = document.documentElement.lang || 'de';
-        return ev.allDay ? bisText(ev) : ev.start.toLocaleTimeString(sprache, {hour: '2-digit', minute: '2-digit'}) + ' · ' + bisText(ev);
+    function uhr(d) {
+        return d.toLocaleTimeString(document.documentElement.lang || 'de', {hour: '2-digit', minute: '2-digit'});
+    }
+
+    // Zeitspalte der Karte: Beginn groß, darunter klein das Ende („bis 21:00“) bzw. bei mehreren Tagen „bis 9.11.“
+    function zeitZelle(ev, td) {
+        var $td = $(td);
+        if (ev.allDay && !mehrtaegig(ev)) return; // „Ganztägig“ von FullCalendar
+        var klein = mehrtaegig(ev) ? bisText(ev) : (ev.end ? T.bis.replace('{datum}', uhr(ev.end)) : '');
+        $td.empty().append($('<b>').text(ev.allDay ? '' : uhr(ev.start)));
+        if (klein) $td.append($('<small>').text(klein));
+    }
+
+    /* ---------- Karten: Ort, Gruppe, Plakat ---------- */
+
+    var details = {}; // Termin-ID → {ort, gruppe, farbe, bild}, null = wird geladen
+
+    function karteFuellen(tr) {
+        var d = details[tr.getAttribute('data-dn-id')];
+        if (!d || tr.hasAttribute('data-dn-gefuellt')) return;
+        tr.setAttribute('data-dn-gefuellt', '1');
+        var td = tr.querySelector('.fc-list-item-title');
+        if (!td) return;
+        var $info = $('<span class="dn-kal-info">');
+        if (d.ort) $info.append($('<span class="dn-kal-ort">').text(d.ort));
+        if (d.gruppe) $info.append($('<span class="dn-kal-gruppe">').text(d.gruppe));
+        $(td).append($info);
+        if (d.bild) {
+            $('<img class="dn-kal-plakat" alt="" loading="lazy" decoding="async">').attr('src', d.bild).prependTo(td);
+            tr.classList.add('dn-mit-plakat');
+        }
+    }
+
+    function kartenLaden() {
+        var fehlen = [];
+        document.querySelectorAll('.fc-list-table tr[data-dn-id]').forEach(function (tr) {
+            var id = tr.getAttribute('data-dn-id');
+            if (details[id] === undefined && fehlen.indexOf(id) === -1) fehlen.push(id);
+            karteFuellen(tr);
+        });
+        if (!fehlen.length) return;
+        fehlen.forEach(function (id) { details[id] = null; });
+        $.getJSON('/designwahl/kalender/details', {ids: fehlen}).done(function (antwort) {
+            fehlen.forEach(function (id) { details[id] = antwort[id] || {}; });
+            document.querySelectorAll('.fc-list-table tr[data-dn-id]').forEach(karteFuellen);
+        }).fail(function () {
+            fehlen.forEach(function (id) { delete details[id]; });
+        });
     }
 
     function iso(d) {
@@ -272,6 +325,7 @@
             return $('<li tabindex="0" role="button">').attr('data-termin', l.id).text(l.titel + ' ').append($('<small>').text(l.bis));
         }));
         $laufend.prop('hidden', !laufend.length || !$('.dn-kal').hasClass('dn-kal-liste'));
+        kartenLaden();
         if (sprungZiel) {
             springen(sprungZiel);
             sprungZiel = null;
@@ -290,15 +344,18 @@
         var r = zeichnen.apply(this, arguments);
         if (!info.view || info.view.type.indexOf('list') !== 0) return r;
         if (!geplant) geplant = setTimeout(aufraeumen, 0);
+        var $el = $(info.el);
+        $el.addClass('dn-karte').attr('data-dn-id', info.event.id);
+        info.el.style.setProperty('--c', info.event.backgroundColor || 'var(--dn-blau, #446e88)');
+        zeitZelle(info.event, info.el.querySelector('.fc-list-item-time'));
+        if (details[info.event.id]) setTimeout(function () { karteFuellen(info.el); }, 0);
         if (mehrtaegig(info.event)) {
-            var $el = $(info.el);
             $el.attr({
                 'data-dn-termin': info.event.id + '@' + info.event.start.getTime(),
                 'data-dn-titel': info.event.title,
                 'data-dn-bis': bisText(info.event)
             }).addClass('dn-mehrtaegig');
             if (info.isStart) $el.attr('data-dn-start', '1');
-            $el.find('.fc-list-item-time').text(zeitText(info.event));
         }
         return r;
     };
