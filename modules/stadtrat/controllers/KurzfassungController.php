@@ -78,7 +78,7 @@ class KurzfassungController extends ContentContainerController
                     'vorlese' => trim((string)$req->post('vorlese'))], false);
                 if ($k->vorlese !== $vorher) {
                     // Aufnahme passt nicht mehr zum Text
-                    @unlink(Erklaert::wav($s->id));
+                    Erklaert::audioLoeschen($s->id);
                     $k->audio_text = $k->audio_pruefung = null;
                 }
                 $k->save(false);
@@ -109,17 +109,17 @@ class KurzfassungController extends ContentContainerController
             'k' => $k,
             'laeuft' => $laeuft,
             'hatPdf' => is_file(Erklaert::pdf($s->id)),
-            'hatAudio' => is_file(Erklaert::wav($s->id)),
+            'hatAudio' => Erklaert::audioDatei($s->id) !== null,
         ]);
     }
 
     /** Aufnahme zum Anhören vor der Freigabe */
     public function actionHoeren($id)
     {
-        $datei = Erklaert::wav((int)$id);
-        if (!is_file($datei)) {
+        $datei = Erklaert::audioDatei((int)$id);
+        if ($datei === null) {
             throw new NotFoundHttpException();
         }
-        return Yii::$app->response->sendFile($datei, "stadtrat-$id.wav", ['mimeType' => 'audio/wav', 'inline' => true]);
+        return Yii::$app->response->sendFile($datei, "stadtrat-$id." . pathinfo($datei, PATHINFO_EXTENSION), ['mimeType' => Erklaert::mimeType($datei), 'inline' => true]);
     }
 }

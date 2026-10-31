@@ -8,6 +8,12 @@ if [ "${1:-}" = ki-composer ]; then
   exec docker run --rm -u "$(id -u):$(id -g)" -v "$PWD/modules/ki-assistent:/app" -e COMPOSER_HOME=/tmp composer:2 \
     composer install --no-interaction --no-dev --optimize-autoloader
 fi
+# MP3-Kodierer für „Stadtrat kurz erklärt“ (lameenc = LAME, LGPL) nach modules/stadtrat/vendor-py (nicht im Git);
+# das python3 im HumHub-Container (3.13) lädt es von dort, das offizielle Image bleibt unverändert
+if [ "${1:-}" = stadtrat-mp3 ]; then
+  exec docker run --rm -u "$(id -u):$(id -g)" -v "$PWD/modules/stadtrat:/m" -e HOME=/tmp python:3.13-slim \
+    pip install --no-cache-dir --disable-pip-version-check --target /m/vendor-py lameenc
+fi
 # Abhängigkeiten des Gewerbeverzeichnisses (QR-Codes der Gutscheine, bacon/bacon-qr-code) nach modules/gewerbe/vendor (nicht im Git)
 if [ "${1:-}" = gewerbe-composer ]; then
   exec docker run --rm -u "$(id -u):$(id -g)" -v "$PWD/modules/gewerbe:/app" -e COMPOSER_HOME=/tmp composer:2 \

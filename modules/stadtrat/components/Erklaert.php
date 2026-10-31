@@ -34,6 +34,49 @@ class Erklaert
         return self::module()->verzeichnis . "/$id.wav";
     }
 
+    public static function mp3(int $id): string
+    {
+        return self::module()->verzeichnis . "/$id.mp3";
+    }
+
+    /** Vorhandene Aufnahme (MP3, sonst WAV, falls der Kodierer fehlte) oder null */
+    public static function audioDatei(int $id): ?string
+    {
+        foreach ([self::mp3($id), self::wav($id)] as $datei) {
+            if (is_file($datei)) {
+                return $datei;
+            }
+        }
+        return null;
+    }
+
+    public static function mimeType(string $datei): string
+    {
+        return str_ends_with($datei, '.mp3') ? 'audio/mpeg' : 'audio/wav';
+    }
+
+    public static function audioLoeschen(int $id): void
+    {
+        @unlink(self::mp3($id));
+        @unlink(self::wav($id));
+    }
+
+    /** Aufnahme als MP3 speichern (64 kbit/s, rund 0,5 MB pro Minute); ohne Kodierer (vendor-py fehlt) als WAV */
+    private static function speichernAudio(int $id, string $wav): void
+    {
+        self::audioLoeschen($id);
+        $tmp = self::wav($id);
+        file_put_contents($tmp, $wav);
+        $befehl = 'python3 ' . escapeshellarg(__DIR__ . '/../data/mp3.py') . ' ' . escapeshellarg($tmp) . ' ' . escapeshellarg(self::mp3($id)) . ' 2>&1';
+        exec($befehl, $ausgabe, $rc);
+        if ($rc === 0 && is_file(self::mp3($id)) && filesize(self::mp3($id)) > 1000) {
+            @unlink($tmp);
+        } else {
+            @unlink(self::mp3($id));
+            Yii::warning('MP3 fehlgeschlagen, WAV bleibt: ' . implode(' ', $ausgabe), 'stadtrat');
+        }
+    }
+
     public static function speichernPdf(int $id, string $tmpDatei): void
     {
         FileHelper::createDirectory(self::module()->verzeichnis, 0770);
@@ -94,7 +137,7 @@ class Erklaert
             }
             $k->setAttributes(['kurz' => trim($json['kurz']), 'lang' => trim($json['lang']), 'vorlese' => trim($json['vorlese']),
                 'audio_text' => null, 'audio_pruefung' => null, 'status' => 'entwurf', 'fehler' => null], false);
-            @unlink(self::wav($id));
+            self::audioLoeschen($id);
         } catch (\Throwable $e) {
             Yii::error($e, 'stadtrat');
             $k->fehler = 'Entwurf: ' . $e->getMessage();
@@ -188,12 +231,12 @@ class Erklaert
                     }
                 }
                 $bericht[] = "Versuch $versuch: " . ($ok ? 'ok' : trim($b));
-                file_put_contents(self::wav($id), $wav);
                 $k->audio_text = $text;
-                if ($ok) {
+                if ($ok || $versuch === 3) {
                     break;
                 }
             }
+            self::speichernAudio($id, $wav);
             $k->audio_pruefung = implode("\n", $bericht);
             $k->fehler = null;
         } catch (\Throwable $e) {

@@ -34,7 +34,7 @@ $sitzung = function ($s, bool $offen) use ($t, $module, $erklaert) {
             <?php if ($k): ?>
                 <div class="sr-erklaert">
                     <?= \humhub\modules\stadtrat\components\Erklaert::html($k->kurz) ?>
-                    <?php if (is_file(\humhub\modules\stadtrat\components\Erklaert::wav($s->id))): ?>
+                    <?php if (\humhub\modules\stadtrat\components\Erklaert::audioDatei($s->id) !== null): ?>
                         <div class="sr-klein" style="margin:4px 0"><i class="fa fa-headphones" aria-hidden="true"></i> <?= $t('Zum Anhören:') ?></div>
                         <audio controls preload="none" src="<?= Html::encode(\yii\helpers\Url::to(['/stadtrat/index/audio', 'id' => $s->id, 'v' => strtotime($k->geaendert_am)])) ?>"></audio>
                     <?php endif ?>

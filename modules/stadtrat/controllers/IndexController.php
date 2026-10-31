@@ -78,11 +78,11 @@ class IndexController extends ContentContainerController
     public function actionAudio($id)
     {
         $k = Kurzfassung::findOne((int)$id);
-        $datei = Erklaert::wav((int)$id);
-        if ($k === null || !$k->istFreigegeben() || !is_file($datei)) {
+        $datei = Erklaert::audioDatei((int)$id);
+        if ($k === null || !$k->istFreigegeben() || $datei === null) {
             throw new NotFoundHttpException();
         }
-        return Yii::$app->response->sendFile($datei, "stadtrat-kurz-erklaert-$id.wav", ['mimeType' => 'audio/wav', 'inline' => true]);
+        return Yii::$app->response->sendFile($datei, "stadtrat-kurz-erklaert-$id." . pathinfo($datei, PATHINFO_EXTENSION), ['mimeType' => Erklaert::mimeType($datei), 'inline' => true]);
     }
 
     /** Abo „Neue Tagesordnung“ an/aus */
