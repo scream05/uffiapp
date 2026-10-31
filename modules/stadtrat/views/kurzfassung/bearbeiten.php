@@ -11,8 +11,10 @@ use humhub\modules\stadtrat\components\Ris;
 /** @var bool $hatAudio */
 $t = fn($x, $p = []) => Yii::t('StadtratModule.base', $x, $p);
 $hatText = $k->kurz !== null;
+// data-params: Mit data-confirm schickt yii.js das Formular nach der Rückfrage selbst ab, ohne Namen/Wert des Knopfs –
+// „tun“ kommt dann nur als verstecktes Feld aus data-params an
 $knopf = fn($tun, $label, $klasse = 'btn-light btn-default', $extra = []) => Html::button($label, ['type' => 'submit', 'name' => 'tun', 'value' => $tun,
-    'class' => "btn btn-sm $klasse", 'disabled' => $laeuft] + $extra);
+    'class' => "btn btn-sm $klasse", 'disabled' => $laeuft] + $extra + (isset($extra['data-confirm']) ? ['data-params' => json_encode(['tun' => $tun])] : []));
 ?>
 <?php if ($laeuft): ?><meta http-equiv="refresh" content="10"><?php endif ?>
 <style <?= Html::nonce() ?>>
