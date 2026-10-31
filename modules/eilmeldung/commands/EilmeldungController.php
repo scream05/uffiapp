@@ -81,6 +81,10 @@ class EilmeldungController extends Controller
             $neu(['gueltig_bis' => date('Y-m-d H:i:s', strtotime('-1 hour'))]);
             $neu(['gueltig_bis' => date('Y-m-d H:i:s', strtotime('+1 hour')), 'beendet_am' => date('Y-m-d H:i:s')]);
             $pruefen('nur laufende (nicht abgelaufen, nicht beendet)', $vorher + 1, (int)Eilmeldung::aktiv()->count());
+            $w = new Eilmeldung(['art' => 'warnung', 'titel' => 'x', 'quelle' => 'hand', 'gueltig_bis' => date('Y-m-d H:i:s')]);
+            $pruefen('von Hand keine „Amtliche Warnung“', false, $w->validate());
+            $w->quelle = 'nina';
+            $pruefen('aus NINA „Amtliche Warnung“ erlaubt', true, $w->validate());
             $e = new Eilmeldung(['art' => 'gibtsnicht', 'titel' => '', 'gueltig_bis' => 'morgen']);
             $pruefen('Formular prüft Art, Titel, Datum', ['art', 'gueltig_bis', 'titel'], ($e->validate() ? [] : (function ($k) { sort($k); return $k; })(array_keys($e->getErrors()))));
         } finally {

@@ -33,6 +33,9 @@ class Eilmeldung extends ActiveRecord
         return [
             [['art', 'titel', 'gueltig_bis'], 'required'],
             ['art', 'in', 'range' => array_keys(Module::ARTEN)],
+            // „Amtliche Warnung“ nur aus NINA – eine eigene Meldung soll nicht wie eine Warnung einer Behörde aussehen
+            ['art', 'compare', 'compareValue' => 'warnung', 'operator' => '!==', 'when' => fn($m) => $m->quelle !== 'nina',
+                'message' => Yii::t('EilmeldungModule.base', '„Amtliche Warnung“ gibt es nur für Warnungen aus NINA.')],
             ['titel', 'string', 'max' => 150],
             ['text', 'string', 'max' => 2000],
             ['gueltig_bis', 'datetime', 'format' => 'php:Y-m-d H:i:s'],

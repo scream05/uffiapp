@@ -40,6 +40,12 @@ class Module extends \humhub\components\Module
         'sonstiges' => ['Hinweis', 'info-circle'],
     ];
 
+    /** Arten, die man von Hand wählen kann (ohne „Amtliche Warnung“, die kommt nur aus NINA) */
+    public static function artenVonHand(): array
+    {
+        return array_values(array_diff(array_keys(self::ARTEN), ['warnung']));
+    }
+
     public function artName(string $art): string
     {
         return \Yii::t('EilmeldungModule.base', self::ARTEN[$art][0] ?? 'Hinweis');

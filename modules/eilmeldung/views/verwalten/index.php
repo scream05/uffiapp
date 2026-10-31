@@ -26,7 +26,7 @@ $t = fn($s, $p = []) => Yii::t('EilmeldungModule.base', $s, $p);
             <?= Html::beginForm(['index'], 'post') ?>
             <div class="mb-3 form-group">
                 <label class="control-label" for="em-art"><?= $model->getAttributeLabel('art') ?></label>
-                <?= Html::activeDropDownList($model, 'art', array_map(fn($k) => $module->artName($k), array_combine(array_keys(Module::ARTEN), array_keys(Module::ARTEN))), ['class' => 'form-control form-select', 'id' => 'em-art']) ?>
+                <?= Html::activeDropDownList($model, 'art', array_map(fn($k) => $module->artName($k), array_combine(Module::artenVonHand(), Module::artenVonHand())), ['class' => 'form-control form-select', 'id' => 'em-art']) ?>
             </div>
             <div class="mb-3 form-group<?= $model->hasErrors('titel') ? ' has-error' : '' ?>">
                 <label class="control-label" for="em-titel"><?= $model->getAttributeLabel('titel') ?></label>
