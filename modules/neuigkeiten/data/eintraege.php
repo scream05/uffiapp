@@ -10,6 +10,10 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'abfall-liste', 'datum' => '2026-10-31', 'art' => 'besser', 'popup' => false,
+        'link' => ['abfall-and-termine', '/calendar/view/index'],
+        'titel' => 'Abfuhrtermine als Liste',
+        'text' => 'Der Abfallkalender zeigt jetzt wie die Veranstaltungen eine Liste der Abfuhrtermine der nächsten 30 Tage statt nur der laufenden Woche. Mit „Heute“, „Morgen“ und „Wochenende“ springst du zum Tag, mit „Monat“ wechselst du zur Monatsansicht.'],
     ['id' => 'veranstaltungen-liste-pc', 'datum' => '2026-10-31', 'art' => 'besser', 'popup' => false,
         'link' => ['veranstaltungen', '/calendar/view/index'],
         'titel' => 'Veranstaltungen als Liste',

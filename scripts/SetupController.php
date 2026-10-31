@@ -409,9 +409,9 @@ class SetupController extends Controller
             return ExitCode::DATAERR;
         }
 
-        // Alle Bürger als Mitglieder (für die Abfuhr-Erinnerung), nicht die Import-Konten
+        // Alle Bürger als Mitglieder (für die Abfuhr-Erinnerung), nicht die Import-Konten und nicht das Konto für Gastmeldungen
         foreach (User::find()->active()->all() as $user) {
-            $import = in_array($user->username, [self::RSS_USER, self::FB_USER, self::MB_USER], true);
+            $import = in_array($user->username, [self::RSS_USER, self::FB_USER, self::MB_USER, 'gastmeldung'], true);
             if (!$import && !$space->isMember($user->id)) {
                 $space->addMember($user->id, 1, false);
                 $this->stdout("+ Mitglied {$user->username}\n");
@@ -420,6 +420,10 @@ class SetupController extends Controller
                 $this->stdout("- Mitglied {$user->username}\n");
             }
         }
+
+        // Liste (30 Tage, kalender-liste.js) als Standardansicht wie bei Veranstaltungen; Wunsch Nutzer 31.10.2026
+        Yii::$app->getModule('calendar')->settings->contentContainer($space)->set(\humhub\modules\calendar\models\participation\FullCalendarSettings::SETTING_VIEW_MODE_KEY,
+            \humhub\modules\calendar\models\participation\FullCalendarSettings::SETTING_LIST);
 
         \humhub\modules\external_calendar\Events::registerAutoloader();
         // Abfuhrtermine nur im Kalender, nicht jeder einzeln im Stream (gilt modulweit)

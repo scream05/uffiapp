@@ -1,13 +1,15 @@
 /**
- * Kalender (alle außer Abfallkalender) mit eigener Leiste über dem Kalender, wie im Entwurf vom 30.10.2026:
+ * Alle Kalender mit eigener Leiste über dem Kalender, wie im Entwurf vom 30.10.2026:
  *  - Umschalter Liste | Monat (ersetzt die Ansichtsknöpfe von FullCalendar; Woche und Tag gibt es nirgends mehr)
  *  - in der Liste Knöpfe Heute, Morgen, Wochenende: springen in der Liste zu diesem Tag (kein Filter, die Liste bleibt ganz)
  *  - Kategorie-Knöpfe (aus widgets/views/kalenderLegende.php hierher verschoben)
  *  - „Läuft gerade“: mehrtägige Termine, die schon vor dem ersten Tag der Liste begonnen haben
  *  - Termine als Karten: Uhrzeit · Titel, Ort, Gruppe · Plakat; Farbstreifen der Gruppe links
  *    (Ort, Gruppe und Plakat holt /designwahl/kalender/details nach, FullCalendar liefert sie nicht)
- * Liste = 30 Tage ab heute, am Handy Standard, am PC wenn der Space Liste als Standardansicht hat (Veranstaltungen, setup/kalender-gruppen). Mehrtägige Termine (Kerwa …) stehen nur an ihrem ersten Tag, mit „bis …“.
- * Im Abfallkalender bleiben Monat und die Knöpfe von FullCalendar (ohne Woche/Tag).
+ * Liste = 30 Tage ab heute, am Handy Standard, am PC wenn der Space Liste als Standardansicht hat
+ * (Veranstaltungen: setup/kalender-gruppen, Abfall & Termine: setup/abfall). Mehrtägige Termine (Kerwa …) stehen nur an ihrem ersten Tag, mit „bis …“.
+ * Seit 31.10.2026 auch im Abfallkalender (vorher Monat mit Knöpfen von FullCalendar, Liste nur eine Woche);
+ * Abfuhrtermine (External Calendar) haben keine ID, für sie gibt es keine Details.
  *
  * Läuft nach dem Kalendermodul (KalenderListeAsset hängt an CalendarAsset, defer) und vor dem Start des Kalenders.
  */
@@ -23,10 +25,6 @@
         laeuft: 'Läuft gerade', frueher: 'Frühere Termine', spaeter: 'Spätere Termine',
         ansicht: 'Ansicht', zeitraum: 'Zeitraum', kategorie: 'Kategorie'
     }, window.dnKalText || {});
-
-    function mitListe() {
-        return location.pathname.indexOf('/s/abfall-and-termine/') === -1;
-    }
 
     function ersetzen(o, muster, durch) {
         ['header', 'footer'].forEach(function (k) {
@@ -44,7 +42,6 @@
         // kleiner Knopf „+“ zum Anlegen entfällt (Wunsch Nutzer 30.10.2026) – Anlegen per Tipp auf einen Tag im Monat
         ersetzen(o, /,?timeGrid(Week|Day)\b/g, '');
         ersetzen(o, /\bcreate\b ?/g, '');
-        if (!mitListe()) return o;
         var liste = {type: 'list', listDayFormat: {weekday: 'long', day: 'numeric', month: 'long'}, listDayAltFormat: false};
         o.views = $.extend({}, o.views);
         o.views[LISTE] = $.extend({duration: {days: 30}}, liste);
@@ -62,12 +59,12 @@
     var starten = Calendar.prototype.initFullCalendar;
     Calendar.prototype.initFullCalendar = function (reload) {
         var erstes = !this.fullCalendar;
-        if (erstes && mitListe()) {
+        if (erstes) {
             if (view.isSmall() || /^list/.test(this.options.defaultView || '')) this.options.defaultView = LISTE;
             leisteBauen(this.$[0]);
         }
         var r = starten.apply(this, arguments);
-        if (erstes && mitListe()) {
+        if (erstes) {
             kalender = this.fullCalendar;
             leisteAktualisieren(kalender.view);
         }
@@ -347,7 +344,8 @@
         if (!info.view || info.view.type.indexOf('list') !== 0) return r;
         if (!geplant) geplant = setTimeout(aufraeumen, 0);
         var $el = $(info.el);
-        $el.addClass('dn-karte').attr('data-dn-id', info.event.id);
+        $el.addClass('dn-karte');
+        if (info.event.id) $el.attr('data-dn-id', info.event.id); // Abfuhrtermine haben keine ID
         info.el.style.setProperty('--c', info.event.backgroundColor || 'var(--dn-blau, #446e88)');
         zeitZelle(info.event, info.el.querySelector('.fc-list-item-time'));
         if (details[info.event.id]) setTimeout(function () { karteFuellen(info.el); }, 0);
