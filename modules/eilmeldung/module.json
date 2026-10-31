@@ -1,0 +1,8 @@
+{
+  "id": "eilmeldung",
+  "name": "Eilmeldungen",
+  "description": "Eilmeldungen für ganz Uffenheim (Sperrungen, Wasser, Strom, Unwetter, amtliche NINA-Warnungen) als Hinweis auf der Startseite und per Push.",
+  "keywords": ["eilmeldung", "warnung", "nina", "push"],
+  "version": "0.1.0",
+  "humhub": {"minVersion": "1.18"}
+}

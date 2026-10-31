@@ -59,6 +59,10 @@ class Context
     private static function buildAktuell(): string
     {
         $parts = [Warnungen::forAssistant()];
+        // Eilmeldungen der Community (Sperrungen, Wasser, Strom …); das Modul leert diesen Zwischenspeicher bei jeder Änderung
+        if (Yii::$app->hasModule('eilmeldung') && Yii::$app->db->getTableSchema('eilmeldung') !== null) {
+            $parts[] = \humhub\modules\eilmeldung\components\Versand::forAssistant();
+        }
         if (Yii::$app->hasModule('vereine') && Yii::$app->db->getTableSchema('verein_spiel') !== null
             && ($sport = \humhub\modules\vereine\components\Bfv::forAssistant()) !== null) {
             $parts[] = $sport; // alle Sportarten mit Spielquelle
