@@ -12,7 +12,7 @@ use yii\helpers\Html;
         <a class="eilmeldung-zeile" href="<?= Html::encode($e->getUrl()) ?>">
             <i class="fa fa-<?= Html::encode($e->getSymbol()) ?>" aria-hidden="true"></i>
             <span><strong><?= Html::encode($module->artName($e->art)) ?>:</strong> <?= Html::encode($e->titel) ?>
-                <small><?= Html::encode(Yii::t('EilmeldungModule.base', 'bis {zeit}', ['zeit' => Yii::$app->formatter->asDatetime($e->gueltig_bis, 'php:j.n., G:i')])) ?></small></span>
+                <small><?= Html::encode(Yii::t('EilmeldungModule.base', 'bis {zeit}', ['zeit' => date('j.n., G:i', strtotime($e->gueltig_bis))])) ?></small></span>
         </a>
     <?php endforeach ?>
 </div>

@@ -13,7 +13,7 @@ return [
         'eilmeldung' => 'humhub\modules\eilmeldung\commands\EilmeldungController',
     ],
     'events' => [
-        ['class' => DashboardContent::class, 'event' => Widget::EVENT_AFTER_RUN, 'callback' => [Events::class, 'onDashboardContentAfterRun']],
+        ['class' => DashboardContent::class, 'event' => Widget::EVENT_BEFORE_RUN, 'callback' => [Events::class, 'onDashboardContentBeforeRun']],
         ['class' => AccountMenu::class, 'event' => AccountMenu::EVENT_INIT, 'callback' => [Events::class, 'onAccountMenuInit']],
     ],
 ];

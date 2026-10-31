@@ -10,12 +10,11 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 
 $this->title = Yii::t('EilmeldungModule.base', 'Eilmeldungen');
-$f = Yii::$app->formatter;
-$karte = function ($e, bool $laeuft) use ($module, $f) {
+$karte = function ($e, bool $laeuft) use ($module) {
     $zeit = Yii::t('EilmeldungModule.base', 'seit {von}, gilt bis {bis}', [
-        'von' => $f->asDatetime($e->created_at, 'php:j.n.Y, G:i'), 'bis' => $f->asDatetime($e->gueltig_bis, 'php:j.n.Y, G:i')]);
+        'von' => date('j.n.Y, G:i', strtotime($e->created_at)), 'bis' => date('j.n.Y, G:i', strtotime($e->gueltig_bis))]);
     if (!$laeuft) {
-        $zeit = Yii::t('EilmeldungModule.base', 'vom {von}, beendet', ['von' => $f->asDatetime($e->created_at, 'php:j.n.Y, G:i')]);
+        $zeit = Yii::t('EilmeldungModule.base', 'vom {von}, beendet', ['von' => date('j.n.Y, G:i', strtotime($e->created_at))]);
     }
     return Html::tag('div',
         Html::tag('h2', '<i class="fa fa-' . Html::encode($e->getSymbol()) . '" aria-hidden="true"></i> '

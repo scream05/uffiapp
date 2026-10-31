@@ -56,7 +56,7 @@ $t = fn($s, $p = []) => Yii::t('EilmeldungModule.base', $s, $p);
                     <?php foreach ($aktiv as $e): ?>
                         <li style="padding:6px 0;border-bottom:1px solid #eee">
                             <?= Html::encode($module->artName($e->art) . ': ' . $e->titel) ?>
-                            <span class="text-muted small">(<?= Html::encode($t('bis {zeit}', ['zeit' => Yii::$app->formatter->asDatetime($e->gueltig_bis, 'php:j.n., G:i')]))
+                            <span class="text-muted small">(<?= Html::encode($t('bis {zeit}', ['zeit' => date('j.n., G:i', strtotime($e->gueltig_bis))]))
                                 . ($e->quelle === 'nina' ? ', NINA' : '') . ($e->empfaenger ? ', ' . Html::encode($t('Push an {n}', ['n' => $e->empfaenger])) : '') ?>)</span>
                             <?= Html::beginForm(['beenden', 'id' => $e->id], 'post', ['style' => 'display:inline']) ?>
                             <button type="submit" class="btn btn-light btn-sm"><?= $t('Beenden') ?></button>

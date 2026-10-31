@@ -9,11 +9,14 @@ use yii\helpers\Url;
 
 class Events
 {
-    /** Startseite (auch für Gäste): laufende Eilmeldungen ganz oben über dem Stream */
-    public static function onDashboardContentAfterRun($event)
+    /**
+     * Startseite (auch für Gäste): laufende Eilmeldungen ganz oben über dem Stream. Vor dem Lauf ausgeben –
+     * DashboardContent gibt den Stream direkt aus, ein an das Ergebnis gehängter Kasten stünde darunter.
+     */
+    public static function onDashboardContentBeforeRun($event)
     {
         try {
-            $event->result = Hinweis::widget() . $event->result;
+            echo Hinweis::widget();
         } catch (\Throwable $e) {
             Yii::error($e);
         }
