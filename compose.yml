@@ -32,6 +32,7 @@ services:
       - ./modules/maengelmelder:/data/modules/maengelmelder:ro
       - ./modules/vereine:/data/modules/vereine:ro
       - ./modules/abfuhr:/data/modules/abfuhr:ro
+      - ./modules/wochenblick:/data/modules/wochenblick:ro
       - ./modules/notdienst:/data/modules/notdienst:ro
       - ./modules/whatsapp:/data/modules/whatsapp:ro
       - ./modules/designwahl:/data/modules/designwahl:ro
