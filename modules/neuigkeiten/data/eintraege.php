@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'spiel-nicht-mehr-live', 'datum' => '2026-10-31', 'art' => 'behoben', 'popup' => false,
+        'titel' => 'Beendete Spiele nicht mehr „live“',
+        'text' => 'Bleibt der Liveticker eines Spiels hängen, stand es bisher noch lange als „live“ da. Sobald das Ergebnis da ist, gilt das Spiel jetzt als beendet.'],
     ['id' => 'abfall-liste', 'datum' => '2026-10-31', 'art' => 'besser', 'popup' => false,
         'link' => ['abfall-and-termine', '/calendar/view/index'],
         'titel' => 'Abfuhrtermine als Liste',

@@ -115,7 +115,8 @@ class VereinSpiel extends ActiveRecord
 
     public function istVorbei(?int $jetzt = null): bool
     {
-        if ($this->ticker_status === 'beendet') {
+        // Ergebnis aus der Schnittstelle ist da (holt live() erst gegen Spielende): vorbei, auch wenn der Ticker hängt
+        if ($this->ticker_status === 'beendet' || $this->getTore() !== null) {
             return true;
         }
         if ($this->ticker_status === 'live') {

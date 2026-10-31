@@ -1,4 +1,31 @@
 {
+    "spiel-nicht-mehr-live": {
+        "en": {
+            "titel": "Finished games no longer show as \"live\"",
+            "text": "If a game's live ticker gets stuck, it used to show as \"live\" for a long time. As soon as the result is in, the game now counts as finished.",
+            "quelle": "dc51e899a47bcce0003672bdf757576707d23e1f"
+        },
+        "uk": {
+            "titel": "Завершені матчі більше не позначаються як «наживо»",
+            "text": "Якщо жива трансляція матчу зависала, раніше він довго відображався як «наживо». Тепер, щойно з'являється результат, матч вважається завершеним.",
+            "quelle": "dc51e899a47bcce0003672bdf757576707d23e1f"
+        },
+        "ar": {
+            "titel": "المباريات المنتهية لم تعد „مباشرة“",
+            "text": "إذا علقت النتائج المباشرة لمباراة ما، كانت تظهر حتى الآن كـ„مباشرة“ لفترة طويلة. بمجرد ظهور النتيجة، تُعتبر المباراة الآن منتهية.",
+            "quelle": "dc51e899a47bcce0003672bdf757576707d23e1f"
+        },
+        "tr": {
+            "titel": "Biten maçlar artık „canlı“ görünmüyor",
+            "text": "Bir maçın canlı skor takibi takılı kalırsa, maç uzun süre „canlı“ olarak görünüyordu. Artık sonuç belli olur olmaz maç bitmiş sayılıyor.",
+            "quelle": "dc51e899a47bcce0003672bdf757576707d23e1f"
+        },
+        "ru": {
+            "titel": "Beendete Spiele nicht mehr „live“",
+            "text": "Blieb der Liveticker eines Spiels hängen, wurde es bisher noch lange als „live“ angezeigt. Sobald das Ergebnis vorliegt, gilt das Spiel jetzt als beendet.",
+            "quelle": "dc51e899a47bcce0003672bdf757576707d23e1f"
+        }
+    },
     "abfall-liste": {
         "en": {
             "titel": "Collection dates as a list",

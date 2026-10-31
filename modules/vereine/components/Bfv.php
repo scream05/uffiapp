@@ -314,7 +314,7 @@ class Bfv
             if ($seit < -self::LIVE_VORHER || $spiel->getZustand() !== null || $spiel->ticker_status === 'beendet') {
                 continue;
             }
-            if ($seit > self::LIVE_NACHHER) {
+            if ($seit > self::LIVE_NACHHER || $spiel->getTore() !== null) {
                 if ($spiel->ticker_status === 'live') {
                     VereinSpiel::updateAll(['ticker_status' => 'beendet'], ['spiel_id' => $spiel->spiel_id]); // Ticker nicht zu Ende geführt
                     $log[] = "{$spiel->heim} – {$spiel->gast}: Ticker ohne Abpfiff, als beendet markiert";
