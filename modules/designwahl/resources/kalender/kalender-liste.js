@@ -6,7 +6,7 @@
  *  - „Läuft gerade“: mehrtägige Termine, die schon vor dem ersten Tag der Liste begonnen haben
  *  - Termine als Karten: Uhrzeit · Titel, Ort, Gruppe · Plakat; Farbstreifen der Gruppe links
  *    (Ort, Gruppe und Plakat holt /designwahl/kalender/details nach, FullCalendar liefert sie nicht)
- * Liste = 30 Tage ab heute, am Handy Standard. Mehrtägige Termine (Kerwa …) stehen nur an ihrem ersten Tag, mit „bis …“.
+ * Liste = 30 Tage ab heute, am Handy Standard, am PC wenn der Space Liste als Standardansicht hat (Veranstaltungen, setup/kalender-gruppen). Mehrtägige Termine (Kerwa …) stehen nur an ihrem ersten Tag, mit „bis …“.
  * Im Abfallkalender bleiben Monat und die Knöpfe von FullCalendar (ohne Woche/Tag).
  *
  * Läuft nach dem Kalendermodul (KalenderListeAsset hängt an CalendarAsset, defer) und vor dem Start des Kalenders.

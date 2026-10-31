@@ -1,4 +1,31 @@
 {
+    "veranstaltungen-liste-pc": {
+        "en": {
+            "titel": "Events as a List",
+            "text": "The calendar in the Events section now also shows the list of upcoming dates first on PC. To switch to the month view, tap \"Monat\" at the top.",
+            "quelle": "6beff1e42a55add81b299e7f390bf903a32c8e4b"
+        },
+        "uk": {
+            "titel": "Заходи у вигляді списку",
+            "text": "Календар у розділі «Заходи» тепер і на ПК спочатку показує список найближчих подій. Щоб перейти до місячного вигляду, натисни вгорі «Місяць».",
+            "quelle": "6beff1e42a55add81b299e7f390bf903a32c8e4b"
+        },
+        "ar": {
+            "titel": "الفعاليات كقائمة",
+            "text": "يعرض التقويم في قسم الفعاليات الآن أيضاً على الكمبيوتر أولاً قائمة المواعيد القادمة. للانتقال إلى عرض الشهر، اضغط في الأعلى على „Monat“.",
+            "quelle": "6beff1e42a55add81b299e7f390bf903a32c8e4b"
+        },
+        "tr": {
+            "titel": "Etkinlikler liste olarak",
+            "text": "Etkinlikler bölümündeki takvim artık bilgisayarda da önce yaklaşan etkinliklerin listesini gösteriyor. Aylık görünüme geçmek için üstteki „Monat“ seçeneğine tıklayabilirsin.",
+            "quelle": "6beff1e42a55add81b299e7f390bf903a32c8e4b"
+        },
+        "ru": {
+            "titel": "Мероприятия списком",
+            "text": "Календарь в разделе «Мероприятия» теперь и на компьютере сначала показывает список ближайших событий. Чтобы перейти к виду по месяцам, нажми вверху на «Месяц».",
+            "quelle": "6beff1e42a55add81b299e7f390bf903a32c8e4b"
+        }
+    },
     "kalender-ohne-filter": {
         "en": {
             "titel": "Calendar without filter fields",

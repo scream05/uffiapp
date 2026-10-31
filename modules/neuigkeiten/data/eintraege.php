@@ -10,6 +10,10 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'veranstaltungen-liste-pc', 'datum' => '2026-10-31', 'art' => 'besser', 'popup' => false,
+        'link' => ['veranstaltungen', '/calendar/view/index'],
+        'titel' => 'Veranstaltungen als Liste',
+        'text' => 'Der Kalender im Bereich Veranstaltungen zeigt jetzt auch am PC zuerst die Liste der nächsten Termine. Zur Monatsansicht wechselst du oben mit „Monat“.'],
     ['id' => 'kalender-ohne-filter', 'datum' => '2026-10-30', 'art' => 'besser', 'popup' => false,
         'titel' => 'Kalender ohne Filterfelder',
         'text' => 'Die Auswahlfelder, die Überschrift und der Export-Knopf über dem Kalender sind weg, er beginnt jetzt weiter oben. Zum Filtern tippst du einfach auf eine der farbigen Gruppen.'],

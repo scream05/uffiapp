@@ -907,6 +907,12 @@ class SetupController extends Controller
         foreach ($rest as $t) {
             $this->stdout("? übrige Kategorie (nicht angefasst): {$t->name}\n");
         }
+        if (!$dryRun) {
+            // Liste als Standardansicht auch am PC (am Handy ohnehin, kalender-liste.js); Wunsch Nutzer 31.10.2026
+            Yii::$app->getModule('calendar')->settings->contentContainer($space)->set(\humhub\modules\calendar\models\participation\FullCalendarSettings::SETTING_VIEW_MODE_KEY,
+                \humhub\modules\calendar\models\participation\FullCalendarSettings::SETTING_LIST);
+            $this->stdout("= Standardansicht: Liste\n");
+        }
         Yii::$app->cache->flush();
         return ExitCode::OK;
     }
