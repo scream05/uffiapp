@@ -44,10 +44,11 @@ class Module extends \humhub\components\Module
     public string $abschriftModell = 'gemini-3.8-flash';
 
     /**
-     * Regieanweisung vor dem Vorlesetext. Deutsch wird mitgesprochen, Englisch nicht (Probe 31.10.2026);
-     * eine getrennte Systemanweisung lehnt das Sprachmodell ab.
+     * Regieanweisung vor dem Vorlesetext – leer lassen: Das Sprachmodell liest jede Anweisung mit vor, auf Deutsch
+     * wie auf Englisch (vom Nutzer am 01.11.2026 gehört; die Abschrift hatte den englischen Satz verschluckt).
+     * Eine getrennte Systemanweisung lehnt das Sprachmodell ab. Der Ton kommt allein von der Stimme.
      */
-    public string $regie = 'Read aloud in a warm, calm and friendly tone: ';
+    public string $regie = '';
 
     /** Kurzfassungen schreiben und freigeben: System-Admins (und nur, solange das Modul für sie freigegeben ist) */
     public function darfBearbeiten(?User $user): bool
