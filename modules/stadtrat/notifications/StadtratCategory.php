@@ -19,7 +19,7 @@ class StadtratCategory extends NotificationCategory
 
     public function getDescription()
     {
-        return Yii::t('StadtratModule.base', 'Neue Tagesordnungen von Stadtrat und Ausschüssen (nur wenn du sie auf der Seite „Stadtrat“ abonniert hast).');
+        return Yii::t('StadtratModule.base', 'Neue Tagesordnungen und Kurzfassungen von Stadtrat und Ausschüssen (nur wenn du sie auf der Seite „Stadtrat“ abonniert hast).');
     }
 
     /** Glocke und Push ja, E-Mail nur, wenn man es selbst einschaltet */

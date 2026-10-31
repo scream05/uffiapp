@@ -228,8 +228,9 @@ class Ris
             . self::module()->risUrl . "; Seite in der Community: " . self::url(null, true) . ")\n"
             . "Sitzungen sind öffentlich, Zuhören ist ohne Anmeldung möglich. Beschlüsse und Sitzungsunterlagen stehen nicht im öffentlichen RIS; "
             . "die Niederschriften öffentlicher Sitzungen dürfen Gemeindebürger im Rathaus einsehen (Art. 54 Abs. 3 GO). "
-            . "Gib die Tagesordnung neutral wieder, ohne politische Bewertung.\n"
+            . "Gib Tagesordnung und Kurzfassungen neutral wieder, ohne politische Bewertung.\n"
             . ($kommend ? implode("\n", $kommend) : '- Keine kommenden Sitzungen bekannt.')
-            . ($vorbei ? "\nZuletzt:\n" . implode("\n", $vorbei) : '');
+            . ($vorbei ? "\nZuletzt:\n" . implode("\n", $vorbei) : '')
+            . (($kurz = Erklaert::forAssistant()) !== '' ? "\n\n" . $kurz : '');
     }
 }

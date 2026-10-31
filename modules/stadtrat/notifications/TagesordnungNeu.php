@@ -8,7 +8,10 @@ use humhub\modules\stadtrat\models\Sitzung;
 use Yii;
 use yii\helpers\Html;
 
-/** „Tagesordnung veröffentlicht: Stadtrat am Do., 19.11.2026 (6 Punkte)“ – Daten im payload: id, gremium, tag, top */
+/**
+ * „Tagesordnung veröffentlicht: Stadtrat am Do., 19.11.2026 (6 Punkte)“ bzw. mit art = kurz „Stadtrat kurz erklärt: …“
+ * Daten im payload: id, gremium, tag, top, art
+ */
 class TagesordnungNeu extends BaseNotification
 {
     public $moduleId = 'stadtrat';
@@ -46,6 +49,10 @@ class TagesordnungNeu extends BaseNotification
     private function satz(): array
     {
         $d = $this->data();
+        if (($d['art'] ?? '') === 'kurz') {
+            return [Yii::t('StadtratModule.base', 'Stadtrat kurz erklärt'), Yii::t('StadtratModule.base', 'Das Wichtigste aus {gremium} am {tag}', [
+                'gremium' => $d['gremium'] ?? '', 'tag' => $d['tag'] ?? ''])];
+        }
         return [Yii::t('StadtratModule.base', 'Tagesordnung veröffentlicht'), Yii::t('StadtratModule.base', '{gremium} am {tag} ({n, plural, =1{1 Punkt} other{# Punkte}})', [
             'gremium' => $d['gremium'] ?? '', 'tag' => $d['tag'] ?? '', 'n' => (int)($d['top'] ?? 0)])];
     }

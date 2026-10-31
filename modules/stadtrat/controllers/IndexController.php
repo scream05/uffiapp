@@ -4,7 +4,9 @@ namespace humhub\modules\stadtrat\controllers;
 
 use humhub\modules\content\components\ContentContainerController;
 use humhub\modules\space\models\Space;
+use humhub\modules\stadtrat\components\Erklaert;
 use humhub\modules\stadtrat\components\Ris;
+use humhub\modules\stadtrat\models\Kurzfassung;
 use humhub\modules\stadtrat\models\Sitzung;
 use Yii;
 use yii\web\NotFoundHttpException;
@@ -31,8 +33,9 @@ class IndexController extends ContentContainerController
             || ($this->contentContainer !== null && $this->contentContainer->url !== $this->module->spaceUrl)) {
             throw new NotFoundHttpException();
         }
-        if ($this->contentContainer === null && ($space = Space::findOne(['url' => $this->module->spaceUrl])) !== null) {
-            $this->redirect($space->createUrl('/stadtrat/' . $action->id, Yii::$app->request->get()));
+        // Nur Aufrufe umleiten – Formulare (POST) gehen ohne Space-Pfad direkt durch, sonst gingen ihre Daten verloren
+        if ($this->contentContainer === null && Yii::$app->request->isGet && ($space = Space::findOne(['url' => $this->module->spaceUrl])) !== null) {
+            $this->redirect($space->createUrl('/stadtrat/index/' . $action->id, Yii::$app->request->get()));
             return false;
         }
         return true;
@@ -54,11 +57,14 @@ class IndexController extends ContentContainerController
         $vergangen = $filter(Sitzung::vergangene());
         $anzahl = (int)(clone $vergangen)->count();
         $user = Yii::$app->user->getIdentity();
+        $vergangene = $vergangen->limit($alle || trim($q) !== '' ? 200 : 6)->all();
         $this->view->setPageTitle(Yii::t('StadtratModule.base', 'Stadtrat'));
         return $this->render('index', [
             'module' => $this->module,
             'kommende' => $filter(Sitzung::kommende())->all(),
-            'vergangene' => $vergangen->limit($alle || trim($q) !== '' ? 200 : 6)->all(),
+            'vergangene' => $vergangene,
+            'erklaert' => Erklaert::freigegebene(array_map(fn($s) => $s->id, $vergangene)),
+            'darfBearbeiten' => $this->module->darfBearbeiten($user),
             'mehr' => $alle || trim($q) !== '' ? 0 : max(0, $anzahl - 6),
             'gremien' => Sitzung::find()->select('gremium')->distinct()->orderBy('gremium')->column(),
             'gremium' => $gremium,
@@ -66,6 +72,17 @@ class IndexController extends ContentContainerController
             'abo' => $user ? Ris::abo($user) : null,
             'stand' => Sitzung::find()->max('abgerufen_am'),
         ]);
+    }
+
+    /** Aufnahme einer veröffentlichten Kurzfassung */
+    public function actionAudio($id)
+    {
+        $k = Kurzfassung::findOne((int)$id);
+        $datei = Erklaert::wav((int)$id);
+        if ($k === null || !$k->istFreigegeben() || !is_file($datei)) {
+            throw new NotFoundHttpException();
+        }
+        return Yii::$app->response->sendFile($datei, "stadtrat-kurz-erklaert-$id.wav", ['mimeType' => 'audio/wav', 'inline' => true]);
     }
 
     /** Abo „Neue Tagesordnung“ an/aus */

@@ -12,21 +12,37 @@ use humhub\modules\stadtrat\components\Ris;
 /** @var string $q */
 /** @var bool|null $abo null = Gast */
 /** @var string|null $stand */
+/** @var \humhub\modules\stadtrat\models\Kurzfassung[] $erklaert sitzung_id => veröffentlichte Kurzfassung */
+/** @var bool $darfBearbeiten */
 
 $t = fn($s, $p = []) => Yii::t('StadtratModule.base', $s, $p);
 $this->title = $t('Stadtrat');
 $filterLink = fn($label, $g) => Html::a(Html::encode($label), Ris::url() . ($g !== '' || $q !== '' ? '?' . http_build_query(array_filter(['gremium' => $g, 'q' => $q])) : ''),
     ['class' => 'btn btn-sm ' . ($g === $gremium ? 'btn-primary' : 'btn-default btn-light')]);
-$sitzung = function ($s, bool $offen) use ($t, $module) {
+$sitzung = function ($s, bool $offen) use ($t, $module, $erklaert) {
     $punkte = $s->getPunkte();
+    $k = $erklaert[$s->id] ?? null;
     ob_start(); ?>
     <details class="sr-sitzung" id="sitzung-<?= $s->id ?>"<?= $offen ? ' open' : '' ?>>
         <summary>
             <span class="sr-datum"><?= Html::encode($s->tag()) ?><?= $s->beginn ? ', ' . Html::encode($t('{uhr} Uhr', ['uhr' => $s->beginn])) : '' ?></span>
             <strong><?= Html::encode($s->gremium) ?></strong>
             <span class="sr-klein"><?= $punkte ? $t('{n, plural, =1{1 Punkt} other{# Punkte}}', ['n' => count($punkte)]) : $t('Tagesordnung folgt') ?></span>
+            <?php if ($k): ?><span class="sr-marke"><i class="fa fa-commenting-o" aria-hidden="true"></i> <?= $t('kurz erklärt') ?></span><?php endif ?>
         </summary>
         <div class="sr-inhalt">
+            <?php if ($k): ?>
+                <div class="sr-erklaert">
+                    <?= \humhub\modules\stadtrat\components\Erklaert::html($k->kurz) ?>
+                    <?php if (is_file(\humhub\modules\stadtrat\components\Erklaert::wav($s->id))): ?>
+                        <div class="sr-klein" style="margin:4px 0"><i class="fa fa-headphones" aria-hidden="true"></i> <?= $t('Zum Anhören:') ?></div>
+                        <audio controls preload="none" src="<?= Html::encode(\yii\helpers\Url::to(['/stadtrat/index/audio', 'id' => $s->id, 'v' => strtotime($k->geaendert_am)])) ?>"></audio>
+                    <?php endif ?>
+                    <details class="sr-lang"><summary><?= $t('Ausführlich erklärt') ?></summary><?= \humhub\modules\stadtrat\components\Erklaert::html($k->lang) ?></details>
+                    <div class="sr-klein"><?= $t('Kurzfassung in einfacher Sprache, ohne Gewähr. Verbindlich ist die Niederschrift der Stadt Uffenheim.') ?></div>
+                </div>
+                <div class="sr-klein" style="margin:10px 0 2px"><strong><?= $t('Tagesordnung') ?></strong></div>
+            <?php endif ?>
             <?php if ($s->ort): ?><div class="sr-klein"><i class="fa fa-map-marker" aria-hidden="true"></i> <?= Html::encode($s->ort) ?></div><?php endif ?>
             <?php foreach ($s->getHinweise() as [$k, $text]): ?>
                 <div class="sr-hinweis"><i class="fa fa-info-circle" aria-hidden="true"></i> <?= Html::encode($text) ?></div>
@@ -61,19 +77,26 @@ $sitzung = function ($s, bool $offen) use ($t, $module) {
     #stadtrat .sr-klein { font-size: 0.88em; color: var(--hh-text-color-soft, #6b6b6b); }
     #stadtrat .sr-hinweis { margin: 6px 0; padding: 6px 10px; border-left: 3px solid var(--hh-primary, #21a1b3); background: var(--hh-background-color-secondary, #f5f7f8); }
     #stadtrat h2 { font-size: 1.05em; margin: 18px 0 4px; }
+    #stadtrat .sr-marke { font-size: 0.8em; padding: 1px 8px; border-radius: 10px; background: var(--hh-primary, #21a1b3); color: #fff; }
+    #stadtrat .sr-erklaert { margin: 8px 0; padding: 10px 14px; border-radius: 6px; background: var(--hh-background-color-secondary, #f5f7f8); }
+    #stadtrat .sr-erklaert h3 { font-size: 1.05em; margin: 2px 0 8px; }
+    #stadtrat .sr-erklaert audio { width: 100%; max-width: 420px; margin-bottom: 6px; }
+    #stadtrat .sr-lang { margin: 6px 0; }
+    #stadtrat .sr-lang summary { cursor: pointer; font-weight: 600; }
 </style>
 <script <?= Html::nonce() ?>>
     // Link mit #sitzung-… (Push, Wochenüberblick, Kasten): diese Sitzung aufklappen
     $(function () { var d = location.hash && document.getElementById(location.hash.slice(1)); if (d && d.tagName === 'DETAILS') { d.open = true; d.scrollIntoView(); } });
 </script>
 <div class="panel panel-default" id="stadtrat">
-    <div class="panel-heading"><strong><?= $t('Stadtrat und Ausschüsse') ?></strong></div>
+    <div class="panel-heading"><strong><?= $t('Stadtrat und Ausschüsse') ?></strong>
+        <?php if ($darfBearbeiten): ?><?= Html::a($t('Kurz erklärt schreiben'), ['/stadtrat/kurzfassung/index'], ['class' => 'btn btn-sm btn-primary float-end pull-right']) ?><?php endif ?></div>
     <div class="panel-body">
         <p><?= $t('Wann tagen Stadtrat, Finanz- und Werkausschuss und Verwaltungs- und Bauausschuss – und worüber wird beraten? Die Sitzungen sind öffentlich, zuhören darf jede und jeder ohne Anmeldung.') ?></p>
 
         <?php if ($abo !== null): ?>
             <?= Html::beginForm(['abo'], 'post', ['class' => 'checkbox', 'style' => 'margin:0 0 12px']) ?>
-            <label><?= Html::checkbox('abo', $abo, ['onchange' => 'this.form.submit()']) ?> <?= $t('Benachrichtige mich, sobald eine neue Tagesordnung veröffentlicht ist') ?></label>
+            <label><?= Html::checkbox('abo', $abo, ['onchange' => 'this.form.submit()']) ?> <?= $t('Benachrichtige mich, sobald eine neue Tagesordnung oder eine Kurzfassung erscheint') ?></label>
             <noscript><button type="submit" class="btn btn-sm btn-primary"><?= $t('Speichern') ?></button></noscript>
             <?= Html::endForm() ?>
         <?php endif ?>

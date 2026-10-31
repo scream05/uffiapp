@@ -2,6 +2,7 @@
 
 namespace humhub\modules\stadtrat\commands;
 
+use humhub\modules\stadtrat\components\Erklaert;
 use humhub\modules\stadtrat\components\Ris;
 use humhub\modules\stadtrat\models\Sitzung;
 use humhub\modules\stadtrat\notifications\TagesordnungNeu;
@@ -15,6 +16,8 @@ use yii\console\ExitCode;
  * /app/yii stadtrat/liste                     kommende Sitzungen
  * /app/yii stadtrat/test <benutzer>           Probe-Push zur nächsten Sitzung nur an dieses Konto
  * /app/yii stadtrat/uffi                      Text, den Uffi bekommt
+ * /app/yii stadtrat/entwurf <sitzung>         Kurzfassung aus /data/stadtrat/<sitzung>.pdf entwerfen (sonst über die Seite)
+ * /app/yii stadtrat/audio <sitzung>           Aufnahme erzeugen und prüfen
  */
 class StadtratController extends Controller
 {
@@ -57,6 +60,22 @@ class StadtratController extends Controller
         TagesordnungNeu::instance()->payload(Ris::payload($s))->send($user);
         $this->stdout("Probe-Push zu {$s->gremium} am {$s->datum} an {$user->username} geschickt\n");
         return ExitCode::OK;
+    }
+
+    public function actionEntwurf($id)
+    {
+        Erklaert::entwurf((int)$id);
+        $k = Erklaert::fassung((int)$id);
+        $this->stdout(($k->fehler ?: "kurz:\n{$k->kurz}\n\nlang:\n{$k->lang}\n\nvorlese:\n{$k->vorlese}") . "\n");
+        return $k->fehler ? ExitCode::UNAVAILABLE : ExitCode::OK;
+    }
+
+    public function actionAudio($id)
+    {
+        Erklaert::audio((int)$id);
+        $k = Erklaert::fassung((int)$id);
+        $this->stdout(($k->fehler ?: $k->audio_pruefung) . "\n");
+        return $k->fehler ? ExitCode::UNAVAILABLE : ExitCode::OK;
     }
 
     public function actionUffi()

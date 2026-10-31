@@ -1,0 +1,91 @@
+<?php
+
+use humhub\helpers\Html;
+use humhub\modules\stadtrat\components\Erklaert;
+use humhub\modules\stadtrat\components\Ris;
+
+/** @var \humhub\modules\stadtrat\models\Sitzung $s */
+/** @var \humhub\modules\stadtrat\models\Kurzfassung $k */
+/** @var bool $laeuft */
+/** @var bool $hatPdf */
+/** @var bool $hatAudio */
+$t = fn($x, $p = []) => Yii::t('StadtratModule.base', $x, $p);
+$hatText = $k->kurz !== null;
+$knopf = fn($tun, $label, $klasse = 'btn-light btn-default', $extra = []) => Html::button($label, ['type' => 'submit', 'name' => 'tun', 'value' => $tun,
+    'class' => "btn btn-sm $klasse", 'disabled' => $laeuft] + $extra);
+?>
+<?php if ($laeuft): ?><meta http-equiv="refresh" content="10"><?php endif ?>
+<style <?= Html::nonce() ?>>
+    #sr-kf textarea { font-family: inherit; font-size: 0.95em; }
+    #sr-kf .sr-vorschau { border: 1px solid var(--hh-border-color, #e5e5e5); border-radius: 6px; padding: 10px 14px; background: var(--hh-background-color-secondary, #fafafa); }
+    #sr-kf .sr-vorschau h3 { font-size: 1.05em; margin: 4px 0 8px; }
+    #sr-kf .sr-knoepfe { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+    #sr-kf .sr-pruefung { white-space: pre-wrap; font-size: 0.9em; }
+    #sr-kf h2 { font-size: 1.05em; margin: 20px 0 6px; }
+</style>
+<div class="panel panel-default" id="sr-kf">
+    <div class="panel-heading"><strong><?= $t('Stadtrat kurz erklärt') ?>: <?= Html::encode($s->gremium . ', ' . $s->tag()) ?></strong>
+        · <?= Html::a($t('alle Sitzungen'), ['index']) ?></div>
+    <div class="panel-body">
+        <p><?= $t('Stand:') ?> <strong><?= $k->istFreigegeben() ? $t('veröffentlicht am {zeit}', ['zeit' => date('j.n.Y, G:i', strtotime($k->freigegeben_am))]) : ($hatText ? $t('Entwurf – noch nicht öffentlich') : $t('noch kein Entwurf')) ?></strong></p>
+        <?php if ($laeuft): ?>
+            <div class="alert alert-info"><i class="fa fa-spinner fa-spin"></i> <?= $k->arbeit === 'entwurf' ? $t('Claude schreibt den Entwurf (etwa 1–2 Minuten) …') : $t('Audio wird erzeugt und geprüft (etwa 1–3 Minuten) …') ?> <?= $t('Die Seite lädt sich selbst neu.') ?></div>
+        <?php endif ?>
+        <?php if ($k->fehler): ?><div class="alert alert-danger"><?= Html::encode($k->fehler) ?></div><?php endif ?>
+
+        <h2>1. <?= $t('Niederschrift') ?></h2>
+        <?= Html::beginForm(['bearbeiten', 'id' => $s->id], 'post', ['enctype' => 'multipart/form-data']) ?>
+        <p class="text-muted small"><?= $hatPdf ? $t('Niederschrift ist hochgeladen (nicht öffentlich).') : $t('Niederschrift der öffentlichen Sitzung als PDF. Sie bleibt intern und wird nur an Claude geschickt.') ?></p>
+        <?php if (!$k->istFreigegeben()): ?>
+            <div class="sr-knoepfe">
+                <input type="file" name="pdf" accept="application/pdf,.pdf" <?= $laeuft ? 'disabled' : '' ?>>
+                <?= $knopf('hochladen', $hatPdf ? $t('Neue Niederschrift hochladen und Entwurf erstellen') : $t('Hochladen und Entwurf erstellen'), 'btn-primary') ?>
+                <?php if ($hatPdf): ?><?= $knopf('entwurf', $hatText ? $t('Entwurf neu erstellen (überschreibt die Texte)') : $t('Entwurf erstellen'), 'btn-light btn-default',
+                    $hatText ? ['data-confirm' => $t('Deine Änderungen an den Texten gehen verloren. Fortfahren?')] : []) ?><?php endif ?>
+            </div>
+        <?php endif ?>
+        <?= Html::endForm() ?>
+
+        <?php if ($hatText): ?>
+            <?= Html::beginForm(['bearbeiten', 'id' => $s->id], 'post') ?>
+            <h2>2. <?= $t('Texte prüfen') ?></h2>
+            <p class="text-muted small"><?= $t('Bitte mit der Niederschrift vergleichen: Stimmen Beschlüsse und Zahlen? Keine Namen, keine Wertungen? Format: „## Überschrift“, „- Liste“, „**fett**“.') ?></p>
+            <label class="control-label"><?= $t('Kurzfassung (Seite und Push)') ?></label>
+            <?= Html::textarea('kurz', $k->kurz, ['class' => 'form-control', 'rows' => 14, 'disabled' => $laeuft]) ?>
+            <details style="margin:6px 0 14px"><summary><?= $t('Vorschau') ?></summary><div class="sr-vorschau"><?= Erklaert::html((string)$k->kurz) ?></div></details>
+            <label class="control-label"><?= $t('Ausführliche Fassung') ?></label>
+            <?= Html::textarea('lang', $k->lang, ['class' => 'form-control', 'rows' => 22, 'disabled' => $laeuft]) ?>
+            <details style="margin:6px 0 14px"><summary><?= $t('Vorschau') ?></summary><div class="sr-vorschau"><?= Erklaert::html((string)$k->lang) ?></div></details>
+            <label class="control-label"><?= $t('Vorlesetext (Zahlen bitte als Wörter, sonst liest die Stimme sie manchmal falsch)') ?></label>
+            <?= Html::textarea('vorlese', $k->vorlese, ['class' => 'form-control', 'rows' => 12, 'disabled' => $laeuft]) ?>
+            <div class="sr-knoepfe"><?= $knopf('speichern', $t('Speichern'), 'btn-primary') ?></div>
+
+            <h2>3. <?= $t('Audio') ?></h2>
+            <?php if ($hatAudio): ?>
+                <audio controls preload="none" src="<?= Html::encode(\yii\helpers\Url::to(['/stadtrat/kurzfassung/hoeren', 'id' => $s->id, 'v' => strtotime($k->geaendert_am)])) ?>" style="width:100%;max-width:480px"></audio>
+                <p class="small" style="margin-top:6px"><?= Erklaert::audioOk($k)
+                        ? '<span class="text-success"><i class="fa fa-check"></i> ' . $t('Automatische Prüfung: Die Abschrift stimmt mit dem Vorlesetext überein. Bitte trotzdem anhören.') . '</span>'
+                        : '<span class="text-danger"><i class="fa fa-exclamation-triangle"></i> ' . $t('Automatische Prüfung hat Abweichungen gefunden – bitte anhören und ggf. neu erzeugen:') . '</span>' ?></p>
+                <?php if ($k->audio_pruefung): ?><div class="sr-pruefung text-muted"><?= Html::encode($k->audio_pruefung) ?></div><?php endif ?>
+                <?php if ($k->audio_text): ?><details><summary class="small"><?= $t('Abschrift der Aufnahme') ?></summary><div class="sr-pruefung"><?= Html::encode($k->audio_text) ?></div></details><?php endif ?>
+            <?php else: ?>
+                <p class="text-muted small"><?= $t('Noch keine Aufnahme. Der Vorlesetext geht dafür an Google (Gemini). Ohne Aufnahme wird nur der Text veröffentlicht.') ?></p>
+            <?php endif ?>
+            <div class="sr-knoepfe"><?= $knopf('audio', $hatAudio ? $t('Speichern und Audio neu erzeugen') : $t('Speichern und Audio erzeugen')) ?></div>
+
+            <h2>4. <?= $t('Veröffentlichen') ?></h2>
+            <p class="text-muted small"><?= $k->istFreigegeben()
+                    ? $t('Änderungen sind nach „Speichern“ sofort öffentlich. Zurückziehen nimmt die Kurzfassung von der Seite.')
+                    : $t('Danach erscheint die Kurzfassung bei der Sitzung auf der Seite „Stadtrat“ (mit Audio, falls vorhanden), Uffi kennt sie, und alle mit Abo bekommen einen Push.') ?></p>
+            <div class="sr-knoepfe">
+                <?php if (!$k->istFreigegeben()): ?>
+                    <?= $knopf('freigeben', $t('Geprüft – speichern und veröffentlichen'), 'btn-success', ['data-confirm' => $t('Texte geprüft und Audio angehört? Dann jetzt veröffentlichen.')]) ?>
+                <?php else: ?>
+                    <?= $knopf('zurueckziehen', $t('Zurückziehen'), 'btn-danger', ['data-confirm' => $t('Kurzfassung von der Seite nehmen?')]) ?>
+                    <?= Html::a($t('Ansehen'), Ris::url($s)) ?>
+                <?php endif ?>
+            </div>
+            <?= Html::endForm() ?>
+        <?php endif ?>
+    </div>
+</div>

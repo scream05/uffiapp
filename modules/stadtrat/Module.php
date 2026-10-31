@@ -31,6 +31,30 @@ class Module extends \humhub\components\Module
     public int $tageZurueck = 400;
     public int $tageVoraus = 180;
 
+    /** „Stadtrat kurz erklärt“: Niederschriften (PDF) und Aufnahmen, nicht öffentlich erreichbar (humhub-data/stadtrat) */
+    public string $verzeichnis = '/data/stadtrat';
+
+    /** Claude-Modell für den Entwurf (Genauigkeit vor Preis) und für den Abgleich der Aufnahme */
+    public string $modellEntwurf = 'claude-opus-5-5';
+    public string $modellPruefung = 'claude-sonnet-5-5';
+
+    /** Gemini: Sprachmodell und Stimme für die Vorlesefassung, Modell für die Abschrift zur Prüfung */
+    public string $ttsModell = 'gemini-3.8-flash-tts';
+    public string $stimme = 'Kore';
+    public string $abschriftModell = 'gemini-3.8-flash';
+
+    /**
+     * Regieanweisung vor dem Vorlesetext. Deutsch wird mitgesprochen, Englisch nicht (Probe 31.10.2026);
+     * eine getrennte Systemanweisung lehnt das Sprachmodell ab.
+     */
+    public string $regie = 'Read aloud in a warm, calm and friendly tone: ';
+
+    /** Kurzfassungen schreiben und freigeben: System-Admins (und nur, solange das Modul für sie freigegeben ist) */
+    public function darfBearbeiten(?User $user): bool
+    {
+        return $user !== null && $user->isSystemAdmin() && $this->istFreigegeben($user);
+    }
+
     public function istFreigegeben(?User $user): bool
     {
         if ($this->freigabe === null) {
