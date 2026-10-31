@@ -421,9 +421,9 @@ class SetupController extends Controller
             }
         }
 
-        // Liste (30 Tage, kalender-liste.js) als Standardansicht wie bei Veranstaltungen; Wunsch Nutzer 31.10.2026
+        // Monat als Standardansicht, auch am Handy (wenige Termine je Tag); Liste nur über den Umschalter (Wunsch Nutzer 31.10.2026)
         Yii::$app->getModule('calendar')->settings->contentContainer($space)->set(\humhub\modules\calendar\models\participation\FullCalendarSettings::SETTING_VIEW_MODE_KEY,
-            \humhub\modules\calendar\models\participation\FullCalendarSettings::SETTING_LIST);
+            \humhub\modules\calendar\models\participation\FullCalendarSettings::SETTING_GRID_MONTH);
 
         \humhub\modules\external_calendar\Events::registerAutoloader();
         // Abfuhrtermine nur im Kalender, nicht jeder einzeln im Stream (gilt modulweit)

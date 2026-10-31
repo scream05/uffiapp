@@ -2,28 +2,28 @@
     "abfall-liste": {
         "en": {
             "titel": "Collection dates as a list",
-            "text": "Like the events, the waste calendar now shows a list of collection dates for the next 30 days instead of only the current week. Use \"Today\", \"Tomorrow\" and \"Weekend\" to jump to the day, and \"Month\" to switch to the monthly view.",
-            "quelle": "5c0a76569530006d0721842c768ce38fa9751c25"
+            "text": "In the waste calendar, the list now shows the collection dates for the next 30 days, just like the events, instead of only the current week. You open it at the top with \"Liste\"; as usual, you first see the month.",
+            "quelle": "9a62659b90fff7653cb7d133b9e71bdc6e72bed8"
         },
         "uk": {
-            "titel": "Вивізи сміття списком",
-            "text": "Календар вивозу сміття тепер, як і заходи, показує список вивозів на наступні 30 днів, а не лише поточний тиждень. За допомогою «Сьогодні», «Завтра» та «Вихідні» ти швидко перейдеш до потрібного дня, а «Місяць» переключить на вигляд місяця.",
-            "quelle": "5c0a76569530006d0721842c768ce38fa9751c25"
+            "titel": "Список вивезення відходів",
+            "text": "У календарі відходів список тепер, як і для заходів, показує дати вивезення на наступні 30 днів, а не лише поточний тиждень. Відкрий його вгорі кнопкою «Список», спочатку ти, як і раніше, побачиш місяць.",
+            "quelle": "9a62659b90fff7653cb7d133b9e71bdc6e72bed8"
         },
         "ar": {
             "titel": "مواعيد جمع النفايات كقائمة",
-            "text": "يعرض تقويم النفايات الآن، مثل الفعاليات، قائمة بمواعيد جمع النفايات للأيام الثلاثين القادمة بدلاً من الأسبوع الجاري فقط. عن طريق „اليوم“ و„غداً“ و„عطلة نهاية الأسبوع“ تنتقل مباشرةً إلى اليوم المطلوب، وعن طريق „شهر“ تنتقل إلى عرض الشهر.",
-            "quelle": "5c0a76569530006d0721842c768ce38fa9751c25"
+            "text": "في تقويم النفايات تعرض القائمة الآن، مثل قائمة الفعاليات، مواعيد جمع النفايات للأيام الثلاثين القادمة بدلاً من الأسبوع الجاري فقط. تفتحها من الأعلى عبر „Liste“، أما أولاً فسترى الشهر كالمعتاد.",
+            "quelle": "9a62659b90fff7653cb7d133b9e71bdc6e72bed8"
         },
         "tr": {
-            "titel": "Abfuhrtermine als Liste",
-            "text": "Der Abfallkalender zeigt jetzt wie die Veranstaltungen eine Liste der Abfuhrtermine der nächsten 30 Tage statt nur der laufenden Woche. Mit „Heute“, „Morgen“ und „Wochenende“ springst du zum Tag, mit „Monat“ wechselst du zur Monatsansicht.",
-            "quelle": "5c0a76569530006d0721842c768ce38fa9751c25"
+            "titel": "Çöp toplama tarihleri liste olarak",
+            "text": "Çöp takvimindeki liste artık etkinliklerde olduğu gibi yalnızca bu haftayı değil, önümüzdeki 30 günün çöp toplama tarihlerini gösteriyor. Listeyi üstteki „Liste“ butonuyla açabilirsin; önce her zamanki gibi ayı görürsün.",
+            "quelle": "9a62659b90fff7653cb7d133b9e71bdc6e72bed8"
         },
         "ru": {
-            "titel": "Вывоз мусора списком",
-            "text": "Календарь вывоза мусора теперь, как и мероприятия, показывает список дат вывоза на ближайшие 30 дней, а не только текущую неделю. С помощью кнопок «Сегодня», «Завтра» и «Выходные» ты переходишь к нужному дню, а кнопка «Месяц» переключает на вид по месяцам.",
-            "quelle": "5c0a76569530006d0721842c768ce38fa9751c25"
+            "titel": "Даты вывоза мусора списком",
+            "text": "В календаре вывоза мусора список теперь, как и у мероприятий, показывает даты вывоза на ближайшие 30 дней, а не только на текущую неделю. Открыть его можно сверху, нажав «Список», а сначала, как и раньше, ты увидишь месяц.",
+            "quelle": "9a62659b90fff7653cb7d133b9e71bdc6e72bed8"
         }
     },
     "veranstaltungen-liste-pc": {

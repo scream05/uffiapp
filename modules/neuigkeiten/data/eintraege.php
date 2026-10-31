@@ -13,7 +13,7 @@ return [
     ['id' => 'abfall-liste', 'datum' => '2026-10-31', 'art' => 'besser', 'popup' => false,
         'link' => ['abfall-and-termine', '/calendar/view/index'],
         'titel' => 'Abfuhrtermine als Liste',
-        'text' => 'Der Abfallkalender zeigt jetzt wie die Veranstaltungen eine Liste der Abfuhrtermine der nächsten 30 Tage statt nur der laufenden Woche. Mit „Heute“, „Morgen“ und „Wochenende“ springst du zum Tag, mit „Monat“ wechselst du zur Monatsansicht.'],
+        'text' => 'Im Abfallkalender zeigt die Liste jetzt wie bei den Veranstaltungen die Abfuhrtermine der nächsten 30 Tage statt nur der laufenden Woche. Du öffnest sie oben mit „Liste“, zuerst siehst du wie gewohnt den Monat.'],
     ['id' => 'veranstaltungen-liste-pc', 'datum' => '2026-10-31', 'art' => 'besser', 'popup' => false,
         'link' => ['veranstaltungen', '/calendar/view/index'],
         'titel' => 'Veranstaltungen als Liste',

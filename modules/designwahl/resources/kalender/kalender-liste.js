@@ -6,8 +6,8 @@
  *  - „Läuft gerade“: mehrtägige Termine, die schon vor dem ersten Tag der Liste begonnen haben
  *  - Termine als Karten: Uhrzeit · Titel, Ort, Gruppe · Plakat; Farbstreifen der Gruppe links
  *    (Ort, Gruppe und Plakat holt /designwahl/kalender/details nach, FullCalendar liefert sie nicht)
- * Liste = 30 Tage ab heute, am Handy Standard, am PC wenn der Space Liste als Standardansicht hat
- * (Veranstaltungen: setup/kalender-gruppen, Abfall & Termine: setup/abfall). Mehrtägige Termine (Kerwa …) stehen nur an ihrem ersten Tag, mit „bis …“.
+ * Liste = 30 Tage ab heute, am Handy Standard (außer Abfallkalender: dort immer Monat), am PC wenn der Space
+ * Liste als Standardansicht hat (Veranstaltungen: setup/kalender-gruppen). Mehrtägige Termine (Kerwa …) stehen nur an ihrem ersten Tag, mit „bis …“.
  * Seit 31.10.2026 auch im Abfallkalender (vorher Monat mit Knöpfen von FullCalendar, Liste nur eine Woche);
  * Abfuhrtermine (External Calendar) haben keine ID, für sie gibt es keine Details.
  *
@@ -60,7 +60,8 @@
     Calendar.prototype.initFullCalendar = function (reload) {
         var erstes = !this.fullCalendar;
         if (erstes) {
-            if (view.isSmall() || /^list/.test(this.options.defaultView || '')) this.options.defaultView = LISTE;
+            var monat = location.pathname.indexOf('/s/abfall-and-termine/') !== -1; // wenige Termine je Tag
+            if ((view.isSmall() && !monat) || /^list/.test(this.options.defaultView || '')) this.options.defaultView = LISTE;
             leisteBauen(this.$[0]);
         }
         var r = starten.apply(this, arguments);
