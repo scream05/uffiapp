@@ -14,7 +14,7 @@ $li = 'padding:3px 0';
 $klein = 'color:#6b6b6b;font-size:13px';
 $ul = 'list-style:none;padding:0;margin:0';
 $t = fn($s, $p = []) => Yii::t('WochenblickModule.base', $s, $p);
-$leer = !$d['termine'] && !$d['abfuhr'] && !$d['spiele'] && !$d['wetter'] && !$d['mb'] && !$d['gutscheine'];
+$leer = !$d['termine'] && !$d['abfuhr'] && !$d['spiele'] && !$d['wetter'] && !$d['mb'] && !$d['gutscheine'] && !($d['sitzungen'] ?? []);
 ?>
 <div style="font-size:15px;line-height:1.45">
     <p style="margin:0 0 4px"><?= Html::encode($t('Das steht in Uffenheim an ({von} bis {bis}):', ['von' => Ueberblick::tag($d['von']), 'bis' => Ueberblick::tag($d['bis'])])) ?></p>
@@ -53,6 +53,15 @@ $leer = !$d['termine'] && !$d['abfuhr'] && !$d['spiele'] && !$d['wetter'] && !$d
         <ul style="<?= $ul ?>">
             <?php foreach ($d['spiele'] as [$tag, $uhr, $text, $zustand]): ?>
                 <li style="<?= $li ?>"><strong><?= Html::encode($tag) ?><?= $uhr !== '' ? ', ' . Html::encode($uhr) : '' ?></strong> · <?= Html::encode($text) ?><?php if ($zustand !== ''): ?> <span style="<?= $klein ?>">(<?= Html::encode($zustand) ?>)</span><?php endif ?></li>
+            <?php endforeach ?>
+        </ul>
+    <?php endif ?>
+
+    <?php if ($d['sitzungen'] ?? []): ?>
+        <div style="<?= $h ?>"><?= Html::encode($t('Stadtrat und Ausschüsse')) ?></div>
+        <ul style="<?= $ul ?>">
+            <?php foreach ($d['sitzungen'] as [$tag, $uhr, $gremium, $top, $url]): ?>
+                <li style="<?= $li ?>"><strong><?= Html::encode($tag) ?><?= $uhr !== '' ? ', ' . Html::encode($uhr) : '' ?></strong> · <?= Ueberblick::link($gremium, $url) ?> <span style="<?= $klein ?>">(<?= Html::encode($top ? $t('{n, plural, =1{1 Punkt} other{# Punkte}} auf der Tagesordnung', ['n' => $top]) : $t('Tagesordnung folgt')) ?>)</span></li>
             <?php endforeach ?>
         </ul>
     <?php endif ?>

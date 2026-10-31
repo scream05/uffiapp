@@ -63,6 +63,11 @@ class Context
         if (Yii::$app->hasModule('eilmeldung') && Yii::$app->db->getTableSchema('eilmeldung') !== null) {
             $parts[] = \humhub\modules\eilmeldung\components\Versand::forAssistant();
         }
+        // Stadtrat: Sitzungen und öffentliche Tagesordnungen (der Kontext gilt für alle – erst nach Freigabe für alle)
+        if (Yii::$app->hasModule('stadtrat') && Yii::$app->getModule('stadtrat')->freigabe === null
+            && Yii::$app->db->getTableSchema('stadtrat_sitzung') !== null) {
+            $parts[] = \humhub\modules\stadtrat\components\Ris::forAssistant();
+        }
         if (Yii::$app->hasModule('vereine') && Yii::$app->db->getTableSchema('verein_spiel') !== null
             && ($sport = \humhub\modules\vereine\components\Bfv::forAssistant()) !== null) {
             $parts[] = $sport; // alle Sportarten mit Spielquelle

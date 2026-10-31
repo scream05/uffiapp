@@ -34,6 +34,7 @@ services:
       - ./modules/abfuhr:/data/modules/abfuhr:ro
       - ./modules/wochenblick:/data/modules/wochenblick:ro
       - ./modules/eilmeldung:/data/modules/eilmeldung:ro
+      - ./modules/stadtrat:/data/modules/stadtrat:ro
       - ./modules/notdienst:/data/modules/notdienst:ro
       - ./modules/whatsapp:/data/modules/whatsapp:ro
       - ./modules/designwahl:/data/modules/designwahl:ro

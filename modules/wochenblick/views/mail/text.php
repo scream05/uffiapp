@@ -36,6 +36,12 @@ if ($d['spiele']) {
         $z[] = "- $tag" . ($uhr !== '' ? ", $uhr" : '') . ": $text" . ($zustand !== '' ? " ($zustand)" : '');
     }
 }
+if ($d['sitzungen'] ?? []) {
+    $z[] = "\n" . $t('Stadtrat und Ausschüsse');
+    foreach ($d['sitzungen'] as [$tag, $uhr, $gremium, $top, $url]) {
+        $z[] = "- $tag" . ($uhr !== '' ? ", $uhr" : '') . ": $gremium (" . ($top ? $t('{n, plural, =1{1 Punkt} other{# Punkte}} auf der Tagesordnung', ['n' => $top]) : $t('Tagesordnung folgt')) . ")\n  $url";
+    }
+}
 if ($d['mb']) {
     $z[] = "\n" . $t('Mitteilungsblatt') . "\n- " . $t('Neue Ausgabe {titel} vom {datum}', ['titel' => $d['mb'][0], 'datum' => $d['mb'][1]]) . "\n  " . $d['mb'][2];
 }

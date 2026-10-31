@@ -49,7 +49,7 @@ class Ueberblick
 
     /**
      * Alle Teile des Überblicks für ein Konto; leere Teile fehlen.
-     * @return array{von:string, bis:string, abfuhr:array, gebiet:?string, termine:array, mehrTermine:int, spiele:array, wetter:array, mb:?array, gutscheine:array}
+     * @return array{von:string, bis:string, abfuhr:array, gebiet:?string, termine:array, mehrTermine:int, spiele:array, wetter:array, mb:?array, gutscheine:array, sitzungen:array}
      */
     public static function daten(User $user, ?int $jetzt = null): array
     {
@@ -69,6 +69,7 @@ class Ueberblick
             'wetter' => self::wetter($von),
             'mb' => self::mitteilungsblatt($jetzt),
             'gutscheine' => self::gutscheine($jetzt),
+            'sitzungen' => self::sitzungen($user, $von, $bis),
         ];
     }
 
@@ -253,6 +254,16 @@ class Ueberblick
         return ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'][(int)date('w', strtotime($ymd))] . ', ' . date('j.n.', strtotime($ymd));
     }
 
+    /** Sitzungen von Stadtrat und Ausschüssen im Zeitraum (Modul stadtrat, nur wenn dort freigegeben): [[tag, uhr, gremium, TOP, url]] */
+    private static function sitzungen(User $user, string $von, string $bis): array
+    {
+        if (!Yii::$app->hasModule('stadtrat') || !Yii::$app->getModule('stadtrat')->istFreigegeben($user)
+            || Yii::$app->db->getTableSchema('stadtrat_sitzung') === null) {
+            return [];
+        }
+        return array_map(fn($z) => [self::tag($z[0])] + $z, \humhub\modules\stadtrat\components\Ris::zeitraum($von, $bis));
+    }
+
     /** Kurztext für Push und Glocke, z. B. „Wochenende: 4 Termine, 3 Spiele · Abfuhr: Mo Restmüll · Sa 12°, So 9°“ */
     public static function kurz(array $d): string
     {
@@ -271,6 +282,9 @@ class Ueberblick
         }
         if ($d['wetter']) {
             $teile[] = implode(', ', array_map(fn($w) => explode(',', $w[0])[0] . ' ' . $w[1] . ' ' . $w[4] . '°', $d['wetter']));
+        }
+        if ($d['sitzungen'] ?? []) {
+            $teile[] = Yii::t('WochenblickModule.base', '{n, plural, =1{1 Ratssitzung} other{# Ratssitzungen}}', ['n' => count($d['sitzungen'])]);
         }
         if ($d['mb']) {
             $teile[] = Yii::t('WochenblickModule.base', 'Neues Mitteilungsblatt');

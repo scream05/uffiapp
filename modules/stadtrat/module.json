@@ -1,0 +1,8 @@
+{
+  "id": "stadtrat",
+  "name": "Stadtrat transparent",
+  "description": "Sitzungen und öffentliche Tagesordnungen von Stadtrat und Ausschüssen der Stadt Uffenheim aus dem Ratsinformationssystem, mit Push bei neuer Tagesordnung.",
+  "keywords": ["stadtrat", "ris", "tagesordnung", "sitzung"],
+  "version": "0.1.0",
+  "humhub": {"minVersion": "1.18"}
+}
