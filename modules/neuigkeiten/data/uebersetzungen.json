@@ -56,28 +56,28 @@
     "stadtrat": {
         "en": {
             "titel": "City Council: Meetings and Agendas",
-            "text": "In the space \"Rathaus Uffenheim\" you'll find all meetings of the city council and its committees under \"Stadtrat\", including the public agenda. Tick the box and we'll let you know as soon as a new agenda is available. For many meetings there's also a short explanation in plain language that you can read or listen to.",
-            "quelle": "f46cb685d485401e410c760f1427d93f081e5872"
+            "text": "In the space \"Rathaus Uffenheim\" you'll find all meetings of the city council and its committees under \"Stadtrat\", including the public agenda. Many meetings also come with a short explanation in plain language that you can read or listen to.",
+            "quelle": "5bac7641b3f192b21a0484a1ff31161e87f506c5"
         },
         "uk": {
             "titel": "Stadtrat: Sitzungen und Tagesordnungen",
-            "text": "Im Space „Rathaus Uffenheim“ findest du unter „Stadtrat“ alle Sitzungen von Stadtrat und Ausschüssen mit der öffentlichen Tagesordnung. Mit einem Häkchen bekommst du Bescheid, sobald eine neue Tagesordnung da ist, und zu vielen Sitzungen gibt es eine kurze Erklärung in einfacher Sprache zum Lesen und Anhören.",
-            "quelle": "f46cb685d485401e410c760f1427d93f081e5872"
+            "text": "Im Space „Rathaus Uffenheim“ findest du unter „Stadtrat“ alle Sitzungen von Stadtrat und Ausschüssen mit der öffentlichen Tagesordnung. Zu vielen Sitzungen gibt es eine kurze Erklärung in einfacher Sprache zum Lesen und Anhören.",
+            "quelle": "5bac7641b3f192b21a0484a1ff31161e87f506c5"
         },
         "ar": {
             "titel": "المجلس البلدي: الجلسات وجداول الأعمال",
-            "text": "في مساحة „Rathaus Uffenheim“ تجد تحت „Stadtrat“ جميع جلسات المجلس البلدي واللجان مع جدول الأعمال العلني. إذا وضعت علامة صح، ستصلك رسالة فور توفر جدول أعمال جديد، وتتوفر لكثير من الجلسات شرح قصير بلغة سهلة للقراءة والاستماع.",
-            "quelle": "f46cb685d485401e410c760f1427d93f081e5872"
+            "text": "في مساحة „Rathaus Uffenheim“ ستجد تحت „Stadtrat“ جميع جلسات المجلس البلدي واللجان مع جدول الأعمال العام. ولكثير من الجلسات يوجد شرح قصير بلغة بسيطة يمكنك قراءته والاستماع إليه.",
+            "quelle": "5bac7641b3f192b21a0484a1ff31161e87f506c5"
         },
         "tr": {
-            "titel": "Stadtrat: Sitzungen und Tagesordnungen",
-            "text": "Im Space „Rathaus Uffenheim“ findest du unter „Stadtrat“ alle Sitzungen von Stadtrat und Ausschüssen mit der öffentlichen Tagesordnung. Mit einem Häkchen bekommst du Bescheid, sobald eine neue Tagesordnung da ist, und zu vielen Sitzungen gibt es eine kurze Erklärung in einfacher Sprache zum Lesen und Anhören.",
-            "quelle": "f46cb685d485401e410c760f1427d93f081e5872"
+            "titel": "Stadtrat: Sitzungen ve Gündemler",
+            "text": "„Rathaus Uffenheim“ alanında „Stadtrat“ bölümünde Stadtrat ve komitelerin tüm toplantılarını, herkese açık gündemleriyle birlikte bulabilirsin. Birçok toplantı için okumak ve dinlemek üzere sade bir dille hazırlanmış kısa bir açıklama da var.",
+            "quelle": "5bac7641b3f192b21a0484a1ff31161e87f506c5"
         },
         "ru": {
             "titel": "Stadtrat: Sitzungen und Tagesordnungen",
-            "text": "Im Space „Rathaus Uffenheim“ findest du unter „Stadtrat“ alle Sitzungen von Stadtrat und Ausschüssen mit der öffentlichen Tagesordnung. Mit einem Häkchen bekommst du Bescheid, sobald eine neue Tagesordnung da ist, und zu vielen Sitzungen gibt es eine kurze Erklärung in einfacher Sprache zum Lesen und Anhören.",
-            "quelle": "f46cb685d485401e410c760f1427d93f081e5872"
+            "text": "Im Space „Rathaus Uffenheim“ findest du unter „Stadtrat“ alle Sitzungen von Stadtrat und Ausschüssen mit der öffentlichen Tagesordnung. Zu vielen Sitzungen gibt es eine kurze Erklärung in einfacher Sprache zum Lesen und Anhören.",
+            "quelle": "5bac7641b3f192b21a0484a1ff31161e87f506c5"
         }
     },
     "live-stand-blau": {

@@ -5,7 +5,6 @@ namespace humhub\modules\stadtrat\components;
 use humhub\modules\stadtrat\models\Kurzfassung;
 use humhub\modules\stadtrat\models\Sitzung;
 use humhub\modules\stadtrat\Module;
-use humhub\modules\stadtrat\notifications\TagesordnungNeu;
 use humhub\modules\user\models\User;
 use Yii;
 use yii\helpers\FileHelper;
@@ -256,21 +255,12 @@ class Erklaert
 
     // ---- Freigabe ----
 
-    /** Freigeben und an alle mit Abo melden (nur beim ersten Freigeben) */
-    public static function freigeben(Kurzfassung $k, User $von): int
+    /** Freigeben (ohne Push – das Abo gibt es seit 01.11.2026 nicht mehr) */
+    public static function freigeben(Kurzfassung $k, User $von): void
     {
-        $erstes = $k->freigegeben_am === null;
         $k->setAttributes(['status' => 'freigegeben', 'freigegeben_am' => $k->freigegeben_am ?? date('Y-m-d H:i:s'), 'freigegeben_von' => $von->id], false);
         $k->save(false);
         Yii::$app->cache->delete('ki-assistent-context-aktuell');
-        if (!$erstes) {
-            return 0;
-        }
-        $n = (int)Ris::empfaenger()->count();
-        if ($n) {
-            TagesordnungNeu::instance()->payload(Ris::payload($k->sitzung) + ['art' => 'kurz'])->sendBulk(Ris::empfaenger());
-        }
-        return $n;
     }
 
     // ---- Beitrag in der Übersicht ----

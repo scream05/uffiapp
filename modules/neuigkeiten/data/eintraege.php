@@ -21,7 +21,7 @@ return [
     ['id' => 'stadtrat', 'datum' => '2026-11-01', 'art' => 'neu', 'popup' => true,
         'link' => ['rathaus-uffenheim', '/stadtrat/index'],
         'titel' => 'Stadtrat: Sitzungen und Tagesordnungen',
-        'text' => 'Im Space „Rathaus Uffenheim“ findest du unter „Stadtrat“ alle Sitzungen von Stadtrat und Ausschüssen mit der öffentlichen Tagesordnung. Mit einem Häkchen bekommst du Bescheid, sobald eine neue Tagesordnung da ist, und zu vielen Sitzungen gibt es eine kurze Erklärung in einfacher Sprache zum Lesen und Anhören.'],
+        'text' => 'Im Space „Rathaus Uffenheim“ findest du unter „Stadtrat“ alle Sitzungen von Stadtrat und Ausschüssen mit der öffentlichen Tagesordnung. Zu vielen Sitzungen gibt es eine kurze Erklärung in einfacher Sprache zum Lesen und Anhören.'],
     ['id' => 'live-stand-blau', 'datum' => '2026-11-01', 'art' => 'besser', 'popup' => false,
         'titel' => 'Laufende Spiele nicht mehr rot',
         'text' => 'Der Spielstand eines laufenden Spiels ist jetzt blau statt rot hinterlegt. Rot und Grün zeigen nur noch nach dem Abpfiff, ob verloren oder gewonnen wurde. Der Stand steht wie üblich als Heim:Gast – bei Auswärtsspielen heißt 0:1 also, dass Uffenheim führt.'],

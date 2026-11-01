@@ -2,7 +2,6 @@
 
 namespace humhub\modules\stadtrat;
 
-use humhub\modules\stadtrat\notifications\TagesordnungNeu;
 use humhub\modules\user\models\User;
 
 class Module extends \humhub\components\Module
@@ -14,7 +13,7 @@ class Module extends \humhub\components\Module
     public string $spaceUrl = 'rathaus-uffenheim';
 
     /**
-     * Wer Seite, Kasten und Abo sieht (Benutzernamen); null = alle, auch Gäste.
+     * Wer Seite und Kasten sieht (Benutzernamen); null = alle, auch Gäste.
      * 31.10.2026 nur ['admin'] zum Ausprobieren, seit 01.11.2026 für alle freigegeben.
      */
     public ?array $freigabe = null;
@@ -67,10 +66,5 @@ class Module extends \humhub\components\Module
     public function sitzungUrl(int $risId): string
     {
         return $this->risUrl . '/app/sitzungen/' . $risId;
-    }
-
-    public function getNotifications()
-    {
-        return [TagesordnungNeu::class];
     }
 }

@@ -92,8 +92,8 @@ class KurzfassungController extends ContentContainerController
                 $k->save(false);
                 Yii::$app->queue->push(new AudioJob(['sitzungId' => $s->id]));
             } elseif ($tun === 'freigeben' && $k->kurz && $k->lang) {
-                $n = Erklaert::freigeben($k, $user);
-                $this->view->success(Yii::t('StadtratModule.base', 'Veröffentlicht. Push an {n} Konten.', ['n' => $n]));
+                Erklaert::freigeben($k, $user);
+                $this->view->success(Yii::t('StadtratModule.base', 'Veröffentlicht.'));
             } elseif ($tun === 'beitrag' && $k->istFreigegeben() && $k->kurz) {
                 Erklaert::beitrag($k, $user);
                 $this->view->success(Yii::t('StadtratModule.base', 'Beitrag in der Übersicht erstellt.'));

@@ -13,7 +13,6 @@ use yii\helpers\Url;
 /** @var string[] $gremien */
 /** @var string $gremium */
 /** @var string $q */
-/** @var bool|null $abo null = Gast */
 /** @var string|null $stand */
 /** @var \humhub\modules\stadtrat\models\Kurzfassung[] $erklaert sitzung_id => veröffentlichte Kurzfassung */
 /** @var bool $darfBearbeiten */
@@ -117,15 +116,6 @@ $sitzung = function ($s, bool $offen) use ($t, $module, $erklaert) {
     <div class="panel-heading"><strong><?= $t('Stadtrat und Ausschüsse') ?></strong>
         <?php if ($darfBearbeiten): ?><?= Html::a($t('Kurz erklärt schreiben'), ['/stadtrat/kurzfassung/index'], ['class' => 'btn btn-sm btn-primary float-end pull-right']) ?><?php endif ?></div>
     <div class="panel-body">
-        <p><?= $t('Wann tagen Stadtrat, Finanz- und Werkausschuss und Verwaltungs- und Bauausschuss – und worüber wird beraten? Die Sitzungen sind öffentlich, zuhören darf jede und jeder ohne Anmeldung.') ?></p>
-
-        <?php if ($abo !== null): ?>
-            <?= Html::beginForm(['abo'], 'post', ['class' => 'checkbox', 'style' => 'margin:0 0 12px']) ?>
-            <label><?= Html::checkbox('abo', $abo, ['onchange' => 'this.form.submit()']) ?> <?= $t('Benachrichtige mich, sobald eine neue Tagesordnung oder eine Kurzfassung erscheint') ?></label>
-            <noscript><button type="submit" class="btn btn-sm btn-primary"><?= $t('Speichern') ?></button></noscript>
-            <?= Html::endForm() ?>
-        <?php endif ?>
-
         <div class="sr-filter">
             <?= $filterLink($t('Alle Gremien'), '') ?>
             <?php foreach ($gremien as $g): ?><?= $filterLink($g, $g) ?><?php endforeach ?>

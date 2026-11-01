@@ -15,7 +15,7 @@ use yii\db\ActiveRecord;
  * @property string|null $tagesordnung JSON [[nr, titel], …]
  * @property string|null $hinweise JSON [[überschrift, text], …] (z. B. Bürgerfragestunde)
  * @property string|null $ris_stand Änderungszeit im RIS (opdatetime), nur bei Änderung neu abrufen
- * @property string|null $gemeldet_am Push „Tagesordnung veröffentlicht“ verschickt (oder beim ersten Abruf übersprungen)
+ * @property string|null $gemeldet_am ungenutzt (Push „Tagesordnung veröffentlicht“, bis 01.11.2026)
  * @property string $abgerufen_am
  */
 class Sitzung extends ActiveRecord

@@ -78,7 +78,7 @@ $knopf = fn($tun, $label, $klasse = 'btn-light btn-default', $extra = []) => Htm
             <h2>4. <?= $t('Veröffentlichen') ?></h2>
             <p class="text-muted small"><?= $k->istFreigegeben()
                     ? $t('Änderungen sind nach „Speichern“ sofort öffentlich. Zurückziehen nimmt die Kurzfassung von der Seite.')
-                    : $t('Danach erscheint die Kurzfassung bei der Sitzung auf der Seite „Stadtrat“ (mit Audio, falls vorhanden), Uffi kennt sie, und alle mit Abo bekommen einen Push.') ?></p>
+                    : $t('Danach erscheint die Kurzfassung bei der Sitzung auf der Seite „Stadtrat“ (mit Audio, falls vorhanden), und Uffi kennt sie.') ?></p>
             <div class="sr-knoepfe">
                 <?php if (!$k->istFreigegeben()): ?>
                     <?= $knopf('freigeben', $t('Geprüft – speichern und veröffentlichen'), 'btn-success', ['data-confirm' => $t('Texte geprüft und Audio angehört? Dann jetzt veröffentlichen.')]) ?>

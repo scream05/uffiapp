@@ -4,8 +4,6 @@ namespace humhub\modules\stadtrat\components;
 
 use humhub\modules\stadtrat\models\Sitzung;
 use humhub\modules\stadtrat\Module;
-use humhub\modules\stadtrat\notifications\TagesordnungNeu;
-use humhub\modules\user\models\User;
 use Yii;
 use yii\helpers\Url;
 
@@ -13,13 +11,10 @@ use yii\helpers\Url;
  * Abgleich mit dem öffentlichen Ratsinformationssystem (Gast-Schnittstelle, nur was dort jeder ohne Anmeldung sieht):
  * Sitzungen der Stadt Uffenheim mit Gremium, Ort, Beginn und Tagesordnung des öffentlichen Teils.
  * Texte werden unverändert übernommen – keine Kürzung, keine Bewertung; nur bei Bauanträgen fehlt die genaue Adresse (ohneAdresse).
- * Abo je Konto (Modul-Einstellung „abo“, wird mit dem Konto gelöscht): Push, sobald eine Tagesordnung erscheint.
+ * Keine Push-Nachrichten (Abo „Neue Tagesordnung“ am 01.11.2026 auf Wunsch entfernt).
  */
 class Ris
 {
-    /** Import- und Systemkonten bekommen keine Push-Nachricht */
-    private const OHNE = ['stadt-uffenheim', 'mitteilungsblatt', 'gastmeldung', 'facebook'];
-
     public static function module(): Module
     {
         return Yii::$app->getModule('stadtrat');
@@ -67,15 +62,13 @@ class Ris
     }
 
     /**
-     * Liste holen, geänderte Sitzungen einzeln nachladen, Push bei neu veröffentlichter Tagesordnung.
-     * Beim allerersten Abruf wird nichts gemeldet (sonst käme für jede bekannte Sitzung ein Push).
+     * Liste holen, geänderte Sitzungen einzeln nachladen.
      * @return string[] Protokollzeilen
      */
     public static function abgleich(bool $dryRun = false): array
     {
         $m = self::module();
         $log = [];
-        $ersterAbruf = !Sitzung::find()->exists();
         $liste = self::get('web/guestmeetings', ['client' => $m->mandant,
             'from' => date('Y-m-d', strtotime("-{$m->tageZurueck} days")), 'until' => date('Y-m-d', strtotime("+{$m->tageVoraus} days"))]);
         $ids = [];
@@ -123,20 +116,11 @@ class Ris
                 'ris_stand' => (string)$eintrag['opdatetime'],
                 'abgerufen_am' => date('Y-m-d H:i:s'),
             ], false);
-            if ($ersterAbruf || !$s->istKommend()) {
-                $s->gemeldet_am ??= date('Y-m-d H:i:s'); // nichts nachmelden
-            }
-            $melden = $punkte && !$hatteTo && $s->gemeldet_am === null;
-            $log[] = ($neu ? 'neu ' : 'geändert ') . "{$s->datum} {$s->gremium} ($id): " . count($punkte) . ' TOP' . ($melden ? ', Push' : '');
+            $log[] = ($neu ? 'neu ' : 'geändert ') . "{$s->datum} {$s->gremium} ($id): " . count($punkte) . ' TOP';
             if ($dryRun) {
                 continue;
             }
             $s->save(false);
-            if ($melden) {
-                $n = self::melden($s);
-                $s->updateAttributes(['gemeldet_am' => date('Y-m-d H:i:s')]);
-                $log[] = "  Push an $n Konten";
-            }
         }
         // Im RIS gelöschte (abgesagte) künftige Sitzungen entfernen; vergangene bleiben, bis sie aus dem Zeitraum fallen
         if ($ids && !$dryRun) {
@@ -150,41 +134,6 @@ class Ris
             Yii::$app->cache->delete('ki-assistent-context-aktuell');
         }
         return $log;
-    }
-
-    public static function abo(User $user): bool
-    {
-        return (bool)self::module()->settings->user($user)->get('abo', false);
-    }
-
-    public static function setAbo(User $user, bool $an): void
-    {
-        self::module()->settings->user($user)->set('abo', $an ? 1 : 0);
-    }
-
-    /** Konten mit Abo (und Freigabe) */
-    public static function empfaenger(): \humhub\modules\user\components\ActiveQueryUser
-    {
-        $q = User::find()->active()->andWhere(['not in', 'user.username', self::OHNE])
-            ->innerJoin('contentcontainer_setting cs', 'cs.contentcontainer_id = user.contentcontainer_id AND cs.module_id = :m AND cs.name = :n AND cs.value = :v',
-                [':m' => 'stadtrat', ':n' => 'abo', ':v' => '1']);
-        $liste = self::module()->freigabe;
-        return $liste === null ? $q : $q->andWhere(['user.username' => $liste]);
-    }
-
-    public static function melden(Sitzung $s): int
-    {
-        $n = (int)self::empfaenger()->count();
-        if ($n) {
-            TagesordnungNeu::instance()->payload(self::payload($s))->sendBulk(self::empfaenger());
-        }
-        Yii::info("Tagesordnung {$s->id} an $n Konten", 'stadtrat');
-        return $n;
-    }
-
-    public static function payload(Sitzung $s): array
-    {
-        return ['id' => $s->id, 'gremium' => $s->gremium, 'tag' => $s->tag(), 'top' => count($s->getPunkte())];
     }
 
     public static function url(?Sitzung $s = null, bool $absolut = false): string

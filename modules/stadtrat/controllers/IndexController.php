@@ -69,7 +69,6 @@ class IndexController extends ContentContainerController
             'gremien' => Sitzung::find()->select('gremium')->distinct()->orderBy('gremium')->column(),
             'gremium' => $gremium,
             'q' => trim($q),
-            'abo' => $user ? Ris::abo($user) : null,
             'stand' => Sitzung::find()->max('abgerufen_am'),
         ]);
     }
@@ -83,17 +82,5 @@ class IndexController extends ContentContainerController
             throw new NotFoundHttpException();
         }
         return Yii::$app->response->sendFile($datei, "stadtrat-kurz-erklaert-$id." . pathinfo($datei, PATHINFO_EXTENSION), ['mimeType' => Erklaert::mimeType($datei), 'inline' => true]);
-    }
-
-    /** Abo „Neue Tagesordnung“ an/aus */
-    public function actionAbo()
-    {
-        $user = Yii::$app->user->getIdentity();
-        if ($user === null || !Yii::$app->request->isPost) {
-            throw new NotFoundHttpException();
-        }
-        Ris::setAbo($user, (bool)Yii::$app->request->post('abo'));
-        $this->view->saved();
-        return $this->redirect(Ris::url());
     }
 }
