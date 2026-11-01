@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'mails-neu', 'datum' => '2026-11-01', 'art' => 'besser', 'popup' => false,
+        'titel' => 'E-Mails im Stil der App',
+        'text' => 'Benachrichtigungen per E-Mail sehen jetzt aus wie die App: blaue Kopfleiste, helle Karten und runde Knöpfe. Statt „Space“ steht dort jetzt „Kategorie“.'],
     ['id' => 'eilmeldungen', 'datum' => '2026-11-01', 'art' => 'neu', 'popup' => true,
         'link' => [null, '/eilmeldung/index'],
         'titel' => 'Eilmeldungen aufs Handy',

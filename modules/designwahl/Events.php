@@ -61,6 +61,7 @@ class Events
      */
     public static function uebersetzungenRegistrieren(): void
     {
+        self::mailLayout();
         foreach (Module::DEUTSCHE_MODULE as $id) {
             if (Yii::$app->hasModule($id)) {
                 Yii::$app->i18n->translations[\humhub\libs\I18NHelper::getModuleTranslationCategory($id) . 'base'] = [
@@ -69,6 +70,25 @@ class Events
                     'sourceLanguage' => 'de',
                 ];
             }
+        }
+    }
+
+    /**
+     * Mails im Stil der App (seit 01.11.2026): Rahmen und Knopf als eigene Dateien über die pathMap des Mailer-Themes
+     * (Einzeldatei-Einträge, HumHub-Kern bleibt unverändert). Läuft bei jedem Start, auch in der Konsole/Warteschlange,
+     * aus der die meisten Mails kommen.
+     */
+    public static function mailLayout(): void
+    {
+        try {
+            $theme = Yii::$app->mailer->view->theme;
+            if ($theme instanceof \humhub\components\Theme) {
+                $theme->applyTo(''); // Standard-pathMap füllen, bevor wir ergänzen
+                $theme->pathMap['@humhub/views/mail/layouts/html.php'] = ['@designwahl/views/mail/layout.php'];
+                $theme->pathMap['@humhub/widgets/mails/views/mailButton.php'] = ['@designwahl/views/mail/button.php'];
+            }
+        } catch (\Throwable $e) {
+            Yii::error($e);
         }
     }
 

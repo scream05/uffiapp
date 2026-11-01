@@ -1,4 +1,31 @@
 {
+    "mails-neu": {
+        "en": {
+            "titel": "Emails in the App's Style",
+            "text": "Notification emails now look like the app: a blue header bar, light cards and round buttons. Instead of \"Space\", they now say \"Category\".",
+            "quelle": "2d62c62e0387df4acef11f787279d635d4092942"
+        },
+        "uk": {
+            "titel": "Електронні листи у стилі застосунку",
+            "text": "Сповіщення на електронну пошту тепер виглядають так само, як застосунок: синя верхня смуга, світлі картки та круглі кнопки. Замість «Space» там тепер написано «Категорія».",
+            "quelle": "2d62c62e0387df4acef11f787279d635d4092942"
+        },
+        "ar": {
+            "titel": "رسائل البريد الإلكتروني بتصميم التطبيق",
+            "text": "إشعارات البريد الإلكتروني أصبحت الآن تبدو مثل التطبيق: شريط علوي أزرق وبطاقات فاتحة وأزرار دائرية. وبدلاً من كلمة „Space“ ستجد هنا الآن كلمة „الفئة“.",
+            "quelle": "2d62c62e0387df4acef11f787279d635d4092942"
+        },
+        "tr": {
+            "titel": "Uygulamanın tarzında e-postalar",
+            "text": "E-posta bildirimleri artık uygulamayla aynı görünüyor: mavi üst çubuk, açık renkli kartlar ve yuvarlak düğmeler. Orada artık „Space“ yerine „Kategorie“ yazıyor.",
+            "quelle": "2d62c62e0387df4acef11f787279d635d4092942"
+        },
+        "ru": {
+            "titel": "Письма в стиле приложения",
+            "text": "Уведомления по электронной почте теперь выглядят так же, как приложение: синяя шапка, светлые карточки и круглые кнопки. Вместо «Space» там теперь написано «Категория».",
+            "quelle": "2d62c62e0387df4acef11f787279d635d4092942"
+        }
+    },
     "eilmeldungen": {
         "en": {
             "titel": "Breaking alerts on your phone",
