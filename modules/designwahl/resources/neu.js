@@ -271,7 +271,24 @@
             'scroll ' + fach.scrollLeft + '/' + fach.scrollTop + ' sw ' + fach.scrollWidth + ' cw ' + fach.clientWidth,
             'lasche ' + (l ? Math.round(l.left) + '–' + Math.round(l.right) : '-') + ' doc sw ' + document.documentElement.scrollWidth,
             'ua ' + navigator.userAgent.replace(/^Mozilla\/5\.0 /, '').slice(0, 90)
-        ].concat(breit.slice(0, 8));
+        ].concat(breit.slice(0, 4));
+        // Was ragt auf der ganzen Seite über die Bildschirmbreite (cw) hinaus? Elemente in fixierten Vorfahren zählen nicht mit.
+        var cw = document.documentElement.clientWidth, seite = [];
+        z.push('body sw ' + document.body.scrollWidth + ' lc ' + (document.getElementById('layout-content') || {}).scrollWidth);
+        document.querySelectorAll('body *').forEach(function (e) {
+            if (seite.length >= 10 || e.closest('#dn-diag')) return;
+            var b = e.getBoundingClientRect();
+            if (!b.width || b.right <= cw + 1) return;
+            for (var a = e; a && a !== document.body; a = a.parentElement) if (getComputedStyle(a).position === 'fixed') return;
+            for (var p = e.parentElement; p && p !== document.body; p = p.parentElement) if (p.getBoundingClientRect().right > cw + 1 && seite.indexOf(p) >= 0) return;
+            seite.push(e);
+        });
+        seite.forEach(function (e) {
+            var b = e.getBoundingClientRect(), wurzel = e;
+            while (wurzel.parentElement && wurzel.parentElement !== document.body) wurzel = wurzel.parentElement;
+            z.push('> ' + e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + '.' + String(e.className).split(' ').slice(0, 3).join('.')
+                + ' ' + Math.round(b.left) + '–' + Math.round(b.right) + ' ' + getComputedStyle(e).position + ' in ' + wurzel.tagName.toLowerCase() + '#' + wurzel.id + '.' + String(wurzel.className).split(' ')[0]);
+        });
         var d = document.getElementById('dn-diag') || document.createElement('pre');
         d.id = 'dn-diag';
         d.style.cssText = 'position:fixed;left:4px;right:4px;bottom:4px;z-index:2000;margin:0;padding:6px;max-height:45vh;overflow:auto;'
