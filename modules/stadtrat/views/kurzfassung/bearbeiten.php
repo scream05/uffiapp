@@ -83,10 +83,24 @@ $knopf = fn($tun, $label, $klasse = 'btn-light btn-default', $extra = []) => Htm
                 <?php if (!$k->istFreigegeben()): ?>
                     <?= $knopf('freigeben', $t('Geprüft – speichern und veröffentlichen'), 'btn-success', ['data-confirm' => $t('Texte geprüft und Audio angehört? Dann jetzt veröffentlichen.')]) ?>
                 <?php else: ?>
-                    <?= $knopf('zurueckziehen', $t('Zurückziehen'), 'btn-danger', ['data-confirm' => $t('Kurzfassung von der Seite nehmen?')]) ?>
+                    <?= $knopf('zurueckziehen', $t('Zurückziehen'), 'btn-danger', ['data-confirm' => $k->beitrag_id
+                        ? $t('Kurzfassung von der Seite nehmen und den Beitrag in der Übersicht löschen?') : $t('Kurzfassung von der Seite nehmen?')]) ?>
                     <?= Html::a($t('Ansehen'), Ris::url($s)) ?>
                 <?php endif ?>
             </div>
+
+            <?php if ($k->istFreigegeben()): ?>
+                <h2>5. <?= $t('Beitrag in der Übersicht') ?></h2>
+                <?php if (($beitragUrl = Erklaert::beitragUrl($k)) !== null): ?>
+                    <p class="small"><i class="fa fa-check text-success"></i> <?= $t('Die Kurzfassung steht als Beitrag im Space „Rathaus Uffenheim“ und damit in der Übersicht.') ?>
+                        <?= Html::a($t('Beitrag ansehen'), $beitragUrl) ?></p>
+                    <p class="text-muted small"><?= $t('Spätere Änderungen an der Kurzfassung ändern den Beitrag nicht – ihn bei Bedarf direkt bearbeiten.') ?></p>
+                <?php else: ?>
+                    <p class="text-muted small"><?= $t('Teilt die Kurzfassung als öffentlichen Beitrag im Space „Rathaus Uffenheim“ unter deinem Namen, mit Hinweis auf die Niederschrift. So sehen alle sie in ihrer Übersicht.') ?></p>
+                    <details style="margin:6px 0"><summary class="small"><?= $t('Vorschau des Beitragstexts') ?></summary><div class="sr-pruefung"><?= Html::encode(Erklaert::beitragText($k)) ?></div></details>
+                    <div class="sr-knoepfe"><?= $knopf('beitrag', $t('Als Beitrag in der Übersicht teilen'), 'btn-primary', ['data-confirm' => $t('Kurzfassung jetzt als öffentlichen Beitrag in der Übersicht teilen?')]) ?></div>
+                <?php endif ?>
+            <?php endif ?>
             <?= Html::endForm() ?>
         <?php endif ?>
     </div>

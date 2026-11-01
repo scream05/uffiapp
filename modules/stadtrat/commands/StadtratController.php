@@ -78,6 +78,18 @@ class StadtratController extends Controller
         return $k->fehler ? ExitCode::UNAVAILABLE : ExitCode::OK;
     }
 
+    /** Text des Beitrags für die Übersicht (nur anzeigen; geteilt wird auf der Seite „Kurz erklärt“) */
+    public function actionBeitrag($id)
+    {
+        $k = \humhub\modules\stadtrat\models\Kurzfassung::findOne((int)$id);
+        if ($k === null || !$k->kurz) {
+            $this->stderr("Keine Kurzfassung zu Sitzung $id\n");
+            return ExitCode::DATAERR;
+        }
+        $this->stdout(\humhub\modules\stadtrat\components\Erklaert::beitragText($k) . "\n");
+        return ExitCode::OK;
+    }
+
     public function actionUffi()
     {
         $this->stdout(Ris::forAssistant() . "\n");

@@ -18,6 +18,7 @@ use yii\db\ActiveRecord;
  * @property string $geaendert_am
  * @property string|null $freigegeben_am
  * @property int|null $freigegeben_von
+ * @property int|null $beitrag_id Post in der Übersicht (Space „Rathaus Uffenheim“), falls geteilt
  * @property-read Sitzung $sitzung
  */
 class Kurzfassung extends ActiveRecord

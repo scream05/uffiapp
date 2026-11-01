@@ -273,6 +273,93 @@ class Erklaert
         return $n;
     }
 
+    // ---- Beitrag in der Übersicht ----
+
+    /**
+     * Freigegebene Kurzfassung als Beitrag im Space „Rathaus Uffenheim“ – erscheint so in der Übersicht aller,
+     * die dem Space folgen. Verfasser ist das Konto, das teilt (Inhalt der Plattform, nicht der Stadt). Öffentlich wie
+     * die übrigen Rathaus-Beiträge. Gibt die Post-id zurück; vorhandener Beitrag wird nicht doppelt angelegt.
+     */
+    public static function beitrag(Kurzfassung $k, User $von): int
+    {
+        if ($k->beitrag_id && ($alt = \humhub\modules\post\models\Post::findOne($k->beitrag_id)) !== null) {
+            return $alt->id;
+        }
+        $space = \humhub\modules\space\models\Space::findOne(['url' => self::module()->spaceUrl])
+            ?? throw new \RuntimeException('Space ' . self::module()->spaceUrl . ' fehlt');
+        $vorher = Yii::$app->user->getIdentity();
+        if ($vorher === null || $vorher->id !== $von->id) {
+            Yii::$app->user->switchIdentity($von); // Konsole bzw. anderes Konto: Verfasser ist $von
+        }
+        try {
+            $post = new \humhub\modules\post\models\Post($space);
+            $post->message = self::beitragText($k);
+            $post->content->visibility = \humhub\modules\content\models\Content::VISIBILITY_PUBLIC;
+            if (!$post->save()) {
+                throw new \RuntimeException('Beitrag: ' . json_encode($post->getErrors(), JSON_UNESCAPED_UNICODE));
+            }
+        } finally {
+            if ($vorher !== null && $vorher->id !== $von->id) {
+                Yii::$app->user->switchIdentity($vorher);
+            }
+        }
+        $k->updateAttributes(['beitrag_id' => $post->id]);
+        return $post->id;
+    }
+
+    /** Beitrag beim Zurückziehen mit entfernen */
+    public static function beitragLoeschen(Kurzfassung $k): void
+    {
+        if ($k->beitrag_id && ($post = \humhub\modules\post\models\Post::findOne($k->beitrag_id)) !== null) {
+            $post->delete();
+        }
+        $k->updateAttributes(['beitrag_id' => null]);
+    }
+
+    public static function beitragUrl(Kurzfassung $k): ?string
+    {
+        $post = $k->beitrag_id ? \humhub\modules\post\models\Post::findOne($k->beitrag_id) : null;
+        return $post?->content->getUrl();
+    }
+
+    /**
+     * Kurzfassung (## Überschrift, - Liste, **fett**, → Zeilen, je Zeile ein Absatz) als HumHub-Markdown:
+     * Absätze brauchen dort eine Leerzeile, Listen eine Leerzeile davor und danach. Darunter Quelle und Hinweis.
+     */
+    public static function beitragText(Kurzfassung $k): string
+    {
+        $bloecke = [];
+        $liste = [];
+        foreach (preg_split('/\R/u', trim((string)$k->kurz)) as $zeile) {
+            $z = trim($zeile);
+            if (preg_match('/^[-•]\s+(.*)$/u', $z, $m)) {
+                $liste[] = '- ' . $m[1];
+                continue;
+            }
+            if ($liste) {
+                $bloecke[] = implode("\n", $liste);
+                $liste = [];
+            }
+            if ($z !== '') {
+                // „1. Punkt“ am Zeilenanfang würde sonst zur nummerierten Liste
+                $bloecke[] = preg_replace('/^(\d+)\.(\s)/u', '$1\\.$2', $z);
+            }
+        }
+        if ($liste) {
+            $bloecke[] = implode("\n", $liste);
+        }
+        $s = $k->sitzung;
+        $fuss = 'Zusammengefasst in einfacher Sprache aus der Niederschrift der öffentlichen Sitzung und vom Team der Plattform geprüft. '
+            . 'Verbindlich ist allein die Niederschrift – Bürgerinnen und Bürger können sie im Rathaus einsehen.';
+        if (self::module()->freigabe === null) {
+            $fuss .= ' Zum Anhören und ausführlich: [Seite „Stadtrat“](' . Ris::url($s, true) . ').';
+        }
+        $fuss .= ' Sitzung im [Ratsinformationssystem](' . self::module()->sitzungUrl($s->id) . ').';
+        $bloecke[] = '---';
+        $bloecke[] = '*' . $fuss . '*';
+        return implode("\n\n", $bloecke);
+    }
+
     // ---- Anzeige ----
 
     /** Einfaches Markdown (## Überschrift, - Liste, **fett**, → Pfeilzeilen) sicher als HTML */

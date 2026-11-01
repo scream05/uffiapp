@@ -94,7 +94,11 @@ class KurzfassungController extends ContentContainerController
             } elseif ($tun === 'freigeben' && $k->kurz && $k->lang) {
                 $n = Erklaert::freigeben($k, $user);
                 $this->view->success(Yii::t('StadtratModule.base', 'Veröffentlicht. Push an {n} Konten.', ['n' => $n]));
+            } elseif ($tun === 'beitrag' && $k->istFreigegeben() && $k->kurz) {
+                Erklaert::beitrag($k, $user);
+                $this->view->success(Yii::t('StadtratModule.base', 'Beitrag in der Übersicht erstellt.'));
             } elseif ($tun === 'zurueckziehen' && $k->istFreigegeben()) {
+                Erklaert::beitragLoeschen($k);
                 $k->status = 'entwurf';
                 $k->save(false);
                 Yii::$app->cache->delete('ki-assistent-context-aktuell');
