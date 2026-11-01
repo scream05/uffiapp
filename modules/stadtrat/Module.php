@@ -15,9 +15,9 @@ class Module extends \humhub\components\Module
 
     /**
      * Wer Seite, Kasten und Abo sieht (Benutzernamen); null = alle, auch Gäste.
-     * Erst nur zum Ausprobieren (31.10.2026).
+     * 31.10.2026 nur ['admin'] zum Ausprobieren, seit 01.11.2026 für alle freigegeben.
      */
-    public ?array $freigabe = ['admin'];
+    public ?array $freigabe = null;
 
     /** Ratsinformationssystem der VG Uffenheim (komuna/KIC): öffentliche Gast-Schnittstelle */
     public string $api = 'https://risapi3.komuna.net/';

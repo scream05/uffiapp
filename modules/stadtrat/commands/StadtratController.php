@@ -18,6 +18,7 @@ use yii\console\ExitCode;
  * /app/yii stadtrat/uffi                      Text, den Uffi bekommt
  * /app/yii stadtrat/entwurf <sitzung>         Kurzfassung aus /data/stadtrat/<sitzung>.pdf entwerfen (sonst über die Seite)
  * /app/yii stadtrat/audio <sitzung>           Aufnahme erzeugen und prüfen
+ * /app/yii stadtrat/beitraege-erneuern [1]    Text geteilter Beiträge neu erzeugen (z. B. Link nach Freigabe); 1 = nur zeigen
  */
 class StadtratController extends Controller
 {
@@ -93,6 +94,25 @@ class StadtratController extends Controller
     public function actionUffi()
     {
         $this->stdout(Ris::forAssistant() . "\n");
+        return ExitCode::OK;
+    }
+
+    public function actionBeitraegeErneuern($probe = 0)
+    {
+        foreach (\humhub\modules\stadtrat\models\Kurzfassung::find()->where(['not', ['beitrag_id' => null]])->all() as $k) {
+            $post = \humhub\modules\post\models\Post::findOne($k->beitrag_id);
+            $neu = Erklaert::beitragText($k);
+            if ($post === null || $post->message === $neu) {
+                $this->stdout("Sitzung {$k->sitzung_id}: " . ($post === null ? 'Beitrag fehlt' : 'unverändert') . "\n");
+                continue;
+            }
+            if (!$probe) {
+                // nur den Text: ohne save(), damit weder „bearbeitet“-Hinweis noch Benachrichtigungen entstehen
+                $post->updateAttributes(['message' => $neu]);
+                Yii::$app->cache->flush();
+            }
+            $this->stdout("Sitzung {$k->sitzung_id}: Beitrag {$post->id} " . ($probe ? 'würde erneuert' : 'erneuert') . "\n");
+        }
         return ExitCode::OK;
     }
 }
