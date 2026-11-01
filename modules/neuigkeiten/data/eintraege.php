@@ -10,6 +10,10 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'eilmeldungen', 'datum' => '2026-11-01', 'art' => 'neu', 'popup' => true,
+        'link' => [null, '/eilmeldung/index'],
+        'titel' => 'Eilmeldungen aufs Handy',
+        'text' => 'Bei Straßensperrungen, Wasserrohrbrüchen, Stromausfällen, Unwettern und amtlichen Warnungen für den Landkreis bekommst du jetzt sofort eine Push-Nachricht. Die Meldung steht außerdem oben auf der Startseite. Wenn du keine Nachrichten möchtest, schaltest du sie unter Konto → Benachrichtigungen → „Eilmeldungen“ ab.'],
     ['id' => 'stadtrat-aufklappen', 'datum' => '2026-11-01', 'art' => 'besser', 'popup' => false,
         'link' => ['rathaus-uffenheim', '/stadtrat/index'],
         'titel' => 'Stadtrat übersichtlicher',

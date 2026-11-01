@@ -1,4 +1,31 @@
 {
+    "eilmeldungen": {
+        "en": {
+            "titel": "Breaking alerts on your phone",
+            "text": "For road closures, water main breaks, power outages, severe weather and official warnings for the district, you'll now get a push notification right away. The alert also appears at the top of the home page. If you don't want these messages, you can turn them off under Account → Notifications → \"Eilmeldungen\".",
+            "quelle": "c079fcdf2deaf73beec471a27c71a292fc96b411"
+        },
+        "uk": {
+            "titel": "Термінові повідомлення на телефон",
+            "text": "Про перекриття доріг, аварії водопроводу, відключення електроенергії, негоду та офіційні попередження для району ти тепер одразу отримуватимеш push-сповіщення. Повідомлення також з'являється вгорі на головній сторінці. Якщо ти не хочеш отримувати такі повідомлення, вимкни їх у розділі Обліковий запис → Сповіщення → „Термінові повідомлення“.",
+            "quelle": "c079fcdf2deaf73beec471a27c71a292fc96b411"
+        },
+        "ar": {
+            "titel": "حمل التنبيهات العاجلة على هاتفك",
+            "text": "عند إغلاق الطرق بسبب أعمال أو انفجار أنابيب المياه أو انقطاع الكهرباء أو العواصف الشديدة أو التحذيرات الرسمية لمنطقة الحي (Landkreis)، ستتلقى الآن إشعارًا فوريًا على هاتفك. وتظهر الرسالة أيضًا في أعلى الصفحة الرئيسية. وإذا لم تكن ترغب في تلقي هذه الرسائل، يمكنك إيقافها من: الحساب ← الإشعارات ← „تنبيهات عاجلة“.",
+            "quelle": "c079fcdf2deaf73beec471a27c71a292fc96b411"
+        },
+        "tr": {
+            "titel": "Eilmeldungen aufs Handy",
+            "text": "Bei Straßensperrungen, Wasserrohrbrüchen, Stromausfällen, Unwettern und amtlichen Warnungen für den Landkreis bekommst du jetzt sofort eine Push-Nachricht. Die Meldung steht außerdem oben auf der Startseite. Wenn du keine Nachrichten möchtest, schaltest du sie unter Konto → Benachrichtigungen → „Eilmeldungen“ ab.",
+            "quelle": "c079fcdf2deaf73beec471a27c71a292fc96b411"
+        },
+        "ru": {
+            "titel": "Экстренные уведомления на телефон",
+            "text": "О перекрытиях дорог, порывах водопроводных труб, отключениях электричества, непогоде и официальных предупреждениях для района ты теперь сразу получишь push-уведомление. Сообщение также появится наверху главной страницы. Если ты не хочешь получать уведомления, отключи их в разделе Конто → Уведомления → «Экстренные уведомления».",
+            "quelle": "c079fcdf2deaf73beec471a27c71a292fc96b411"
+        }
+    },
     "stadtrat-aufklappen": {
         "en": {
             "titel": "Stadtrat übersichtlicher",

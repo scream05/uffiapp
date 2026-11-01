@@ -13,10 +13,10 @@ class Module extends \humhub\components\Module
 
     /**
      * Wer die Push-Nachricht bekommt (Benutzernamen); null = alle aktiven Konten (abbestellbar unter
-     * Benachrichtigungen → „Eilmeldungen“). Erst nur zum Ausprobieren (31.10.2026).
+     * Benachrichtigungen → „Eilmeldungen“). Bis 01.11.2026 nur ['admin'], seitdem alle.
      * Der Hinweis auf der Startseite gilt immer für alle, auch Gäste.
      */
-    public ?array $empfaenger = ['admin'];
+    public ?array $empfaenger = null;
 
     /** Wer Eilmeldungen von Hand schreiben darf: System-Admins und diese Gruppe (wie im Mängelmelder) */
     public string $gruppe = 'Bauhof';
