@@ -2297,7 +2297,7 @@ class SetupController extends Controller
             Yii::$app->language = Yii::$app->formatter->locale = 'en-US';
             $en = Yii::$app->view->renderFile('@neuigkeiten/views/index/index.php', ['module' => $modul, 'art' => 'neu', 'eintraege' => array_slice($alle, 0, 2)]);
             $pruefe('Seite englisch', str_contains($en, 'What’s new') && str_contains($en, \humhub\helpers\Html::encode($tr[$alle[0]['id']]['en']['titel'] ?? '###'))
-                && str_contains($en, 'October 2026'));
+                && str_contains($en, date('F Y', strtotime($alle[0]['datum']))));
             foreach (array_keys(\humhub\modules\neuigkeiten\Module::HILFE) as $seite) {
                 $de = (string)file_get_contents($modul->getBasePath() . "/hilfe/de/$seite.html");
                 $veraltet = [];
