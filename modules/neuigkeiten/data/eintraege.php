@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'kaestenfach-handy-rand', 'datum' => '2026-11-01', 'art' => 'behoben', 'popup' => false,
+        'titel' => 'Fach „Auf einen Blick“ wieder ganz sichtbar',
+        'text' => 'Auf manchen Android-Handys ragte das Fach mit Notdiensten, Öffnungszeiten und Spritpreisen rechts über den Bildschirmrand hinaus. Jetzt passt es wieder vollständig hinein, auch die Lasche am rechten Rand ist wieder zu sehen.'],
     ['id' => 'spiel-nicht-mehr-live', 'datum' => '2026-10-31', 'art' => 'behoben', 'popup' => false,
         'titel' => 'Beendete Spiele nicht mehr „live“',
         'text' => 'Bleibt der Liveticker eines Spiels hängen, stand es bisher noch lange als „live“ da. Sobald das Ergebnis da ist, gilt das Spiel jetzt als beendet.'],

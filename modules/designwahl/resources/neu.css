@@ -1495,6 +1495,14 @@ html.design-neu[data-bs-theme="dark"] .dn-wf-werte .fa {
     }
 }
 
+/* Nichts darf seitlich über den Bildschirm hinausragen: Chrome am Handy (Android) verbreitert sonst den
+   „Layout-Viewport“ auf die Inhaltsbreite – alles, was mit right: 0 fixiert ist (Lasche, Kästen-Fach),
+   rutscht dann rechts aus dem Bild (Pixel 8, eingeloggt, 01.11.2026). clip statt hidden: kein Scrollcontainer,
+   position: sticky bleibt intakt; nicht an html, sonst greift die Scroll-Sperre per body { overflow: hidden } nicht mehr. */
+html.design-neu #layout-content {
+    overflow-x: clip;
+}
+
 /* ---------- Kästen der Seitenleiste am Handy/Tablet: Lasche am rechten Rand, Fach fährt von rechts herein ---------- */
 html.design-neu .dn-kasten-lasche {
     display: none;

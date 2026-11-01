@@ -1,4 +1,31 @@
 {
+    "kaestenfach-handy-rand": {
+        "en": {
+            "titel": "\"At a Glance\" panel fully visible again",
+            "text": "On some Android phones, the panel with emergency services, opening hours and fuel prices stuck out past the right edge of the screen. It now fits completely again, and the tab on the right edge is visible once more.",
+            "quelle": "3e26ae044f6801668ed8517a417546f3294dfc30"
+        },
+        "uk": {
+            "titel": "Фан «Одним поглядом» знову повністю видно",
+            "text": "На деяких Android-телефонах фан із черговими службами, часами роботи та цінами на пальне виходив за правий край екрана. Тепер він знову повністю поміщається, і язичок на правому краю знову видно.",
+            "quelle": "3e26ae044f6801668ed8517a417546f3294dfc30"
+        },
+        "ar": {
+            "titel": "الخانة «نظرة سريعة» تظهر كاملة مرة أخرى",
+            "text": "على بعض هواتف أندرويد، كانت الخانة التي تضم خدمات الطوارئ وأوقات الفتح وأسعار الوقود تتجاوز حافة الشاشة من اليمين. الآن تتسع لها بالكامل من جديد، وأصبح الزر الصغير على الحافة اليمنى مرئيًا مرة أخرى.",
+            "quelle": "3e26ae044f6801668ed8517a417546f3294dfc30"
+        },
+        "tr": {
+            "titel": "„Auf einen Blick“-Fach jetzt wieder ganz sichtbar",
+            "text": "Auf manchen Android-Handys ragte das Fach mit Notdiensten, Öffnungszeiten und Spritpreisen rechts über den Bildschirmrand hinaus. Jetzt passt es wieder vollständig hinein, auch die Lasche am rechten Rand ist wieder zu sehen.",
+            "quelle": "3e26ae044f6801668ed8517a417546f3294dfc30"
+        },
+        "ru": {
+            "titel": "Фасад «Всё на одном взгляде» снова полностью виден",
+            "text": "На некоторых Android-телефонах блок с аварийными службами, часами работы и ценами на топливо выходил за правый край экрана. Теперь он снова полностью помещается, и язычок на правом краю тоже снова виден.",
+            "quelle": "3e26ae044f6801668ed8517a417546f3294dfc30"
+        }
+    },
     "spiel-nicht-mehr-live": {
         "en": {
             "titel": "Finished games no longer show as \"live\"",
