@@ -250,6 +250,34 @@
         }
         document.documentElement.classList.toggle('dn-kasten-offen', auf);
         if (kastenKnopf) kastenKnopf.setAttribute('aria-expanded', auf ? 'true' : 'false');
+        if (auf && /[?&]dn-diag/.test(location.search)) setTimeout(function () { kastenDiag(f); }, 800);
+    }
+
+    // Nur mit ?dn-diag in der Adresse: Messwerte des Fachs anzeigen (Fehlersuche am Handy, eingeloggt nicht nachstellbar)
+    function kastenDiag(f) {
+        var fach = f.querySelector('.dn-mehr-fach'), r = fach.getBoundingClientRect(), cs = getComputedStyle(fach);
+        var rm = f.getBoundingClientRect(), vv = window.visualViewport, l = kastenKnopf && kastenKnopf.getBoundingClientRect();
+        var breit = [];
+        fach.querySelectorAll('*').forEach(function (e) {
+            var b = e.getBoundingClientRect();
+            if (b.width && (b.right > r.right + 1 || b.left < r.left - 1)) breit.push(e.tagName.toLowerCase() + '.' + String(e.className).split(' ').slice(0, 2).join('.') + ' ' + Math.round(b.left) + '–' + Math.round(b.right));
+        });
+        var z = [
+            'iw ' + innerWidth + ' cw ' + document.documentElement.clientWidth + ' dpr ' + devicePixelRatio,
+            'vv ' + (vv ? Math.round(vv.width) + ' x' + vv.scale.toFixed(2) + ' off ' + Math.round(vv.offsetLeft) : '-'),
+            'mehr ' + Math.round(rm.left) + '–' + Math.round(rm.right),
+            'fach ' + Math.round(r.left) + '–' + Math.round(r.right) + ' w ' + cs.width + ' l ' + cs.left + ' r ' + cs.right,
+            'tr ' + cs.transform + ' tn ' + cs.transitionDuration + ' an ' + cs.animationName,
+            'scroll ' + fach.scrollLeft + '/' + fach.scrollTop + ' sw ' + fach.scrollWidth + ' cw ' + fach.clientWidth,
+            'lasche ' + (l ? Math.round(l.left) + '–' + Math.round(l.right) : '-') + ' doc sw ' + document.documentElement.scrollWidth,
+            'ua ' + navigator.userAgent.replace(/^Mozilla\/5\.0 /, '').slice(0, 90)
+        ].concat(breit.slice(0, 8));
+        var d = document.getElementById('dn-diag') || document.createElement('pre');
+        d.id = 'dn-diag';
+        d.style.cssText = 'position:fixed;left:4px;right:4px;bottom:4px;z-index:2000;margin:0;padding:6px;max-height:45vh;overflow:auto;'
+            + 'background:#ffc;color:#000;font:11px/1.3 monospace;white-space:pre-wrap;border:1px solid #c90;';
+        d.textContent = z.join('\n');
+        document.body.appendChild(d);
     }
 
     function kaesten() {
