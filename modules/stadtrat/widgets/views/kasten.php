@@ -12,12 +12,14 @@ $zeigen = 5;
     #stadtrat-kasten ol { padding-left: 0; list-style: none; margin: 8px 0 0; }
     #stadtrat-kasten li { padding: 3px 0; border-top: 1px solid var(--hh-border-color, #eee); display: flex; gap: 6px; }
     #stadtrat-kasten .sr-nr { color: var(--hh-text-color-soft, #777); min-width: 1.6em; font-variant-numeric: tabular-nums; }
+    #stadtrat-kasten .sr-gremium { display: flex; align-items: center; gap: 8px; }
+    #stadtrat-kasten .sr-symbol { flex: 0 0 auto; width: 26px; height: 26px; border-radius: 50%; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; }
     #stadtrat-kasten .sr-klein { font-size: 0.85em; color: var(--hh-text-color-soft, #777); }
 </style>
 <div class="panel panel-default" id="stadtrat-kasten">
     <div class="panel-heading"><i class="fa fa-university"></i> <strong><?= $t('Nächste Sitzung') ?></strong></div>
     <div class="panel-body">
-        <div><strong><?= Html::encode($s->gremium) ?></strong></div>
+        <div class="sr-gremium"><?= \humhub\modules\stadtrat\models\Sitzung::symbolHtml($s->gremium) ?><strong><?= Html::encode($s->gremium) ?></strong></div>
         <div class="sr-klein"><?= Html::encode($s->tag() . ($s->beginn ? ', ' . $t('{uhr} Uhr', ['uhr' => $s->beginn]) : '')) ?><?= $s->ort ? ' · ' . Html::encode($s->ort) : '' ?></div>
         <?php if ($punkte): ?>
             <ol>

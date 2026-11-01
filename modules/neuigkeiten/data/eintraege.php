@@ -10,6 +10,10 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'stadtrat-aufklappen', 'datum' => '2026-11-01', 'art' => 'besser', 'popup' => false,
+        'link' => ['rathaus-uffenheim', '/stadtrat/index'],
+        'titel' => 'Stadtrat übersichtlicher',
+        'text' => 'Jede Sitzung zeigt Kurz erklärt, Zum Anhören, Ausführlich erklärt und die Tagesordnung jetzt als eigene Abschnitte zum Aufklappen. Stadtrat, Finanz- und Werkausschuss sowie Verwaltungs- und Bauausschuss erkennst du an eigenen Symbolen und Farben.'],
     ['id' => 'stadtrat', 'datum' => '2026-11-01', 'art' => 'neu', 'popup' => true,
         'link' => ['rathaus-uffenheim', '/stadtrat/index'],
         'titel' => 'Stadtrat: Sitzungen und Tagesordnungen',

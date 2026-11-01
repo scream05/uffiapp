@@ -1,4 +1,31 @@
 {
+    "stadtrat-aufklappen": {
+        "en": {
+            "titel": "Stadtrat übersichtlicher",
+            "text": "Jede Sitzung zeigt Kurz erklärt, Zum Anhören, Ausführlich erklärt und die Tagesordnung jetzt als eigene Abschnitte zum Aufklappen. Stadtrat, Finanz- und Werkausschuss sowie Verwaltungs- und Bauausschuss erkennst du an eigenen Symbolen und Farben.",
+            "quelle": "db680f6ed61be5797e372993746e0c3355703640"
+        },
+        "uk": {
+            "titel": "Stadtrat übersichtlicher",
+            "text": "Jede Sitzung zeigt jetzt Kurz erklärt, Zum Anhören, Ausführlich erklärt und die Tagesordnung als eigene Abschnitte zum Aufklappen. Stadtrat, Finanz- und Werkausschuss sowie Verwaltungs- und Bauausschuss erkennst du an eigenen Symbolen und Farben.",
+            "quelle": "db680f6ed61be5797e372993746e0c3355703640"
+        },
+        "ar": {
+            "titel": "Stadtrat übersichtlicher",
+            "text": "Jede Sitzung zeigt jetzt „Kurz erklärt“, „Zum Anhören“, „Ausführlich erklärt“ und die Tagesordnung als eigene Abschnitte zum Aufklappen. Stadtrat, Finanz- und Werkausschuss sowie Verwaltungs- und Bauausschuss erkennst du an eigenen Symbolen und Farben.",
+            "quelle": "db680f6ed61be5797e372993746e0c3355703640"
+        },
+        "tr": {
+            "titel": "Stadtrat übersichtlicher",
+            "text": "Jede Sitzung zeigt Kurz erklärt, Zum Anhören, Ausführlich erklärt ve Gündemi artık açılır bölümler olarak ayrı ayrı görebilirsin. Stadtrat, Finanz- und Werkausschuss sowie Verwaltungs- und Bauausschuss erkennst du an eigenen Symbolen und Farben.",
+            "quelle": "db680f6ed61be5797e372993746e0c3355703640"
+        },
+        "ru": {
+            "titel": "Stadtrat übersichtlicher",
+            "text": "Jede Sitzung zeigt jetzt „Kurz erklärt“, „Zum Anhören“, „Ausführlich erklärt“ und die Tagesordnung als eigene Abschnitte zum Aufklappen. Stadtrat, Finanz- und Werkausschuss sowie Verwaltungs- und Bauausschuss erkennst du an eigenen Symbolen und Farben.",
+            "quelle": "db680f6ed61be5797e372993746e0c3355703640"
+        }
+    },
     "stadtrat": {
         "en": {
             "titel": "City Council: Meetings and Agendas",

@@ -25,6 +25,30 @@ class Sitzung extends ActiveRecord
         return 'stadtrat_sitzung';
     }
 
+    /**
+     * Symbol und Farbe je Gremium (Farben aus dem Erscheinungsbild der Stadt, Weiß darauf mindestens 4,5:1):
+     * Stadtrat Stahlblau mit Rathaus, Finanz- und Werkausschuss Dunkelgrün mit Euro, Verwaltungs- und Bauausschuss
+     * Bordeaux mit Gebäude, sonst Grau mit Personen. Unterscheidung nie nur über die Farbe, das Symbol ist immer dabei.
+     * @return array{0: string, 1: string} [Font-Awesome-Name, Farbe]
+     */
+    public static function symbol(string $gremium): array
+    {
+        $g = mb_strtolower($gremium);
+        return match (true) {
+            str_contains($g, 'bau') => ['building', '#7c1922'],
+            str_contains($g, 'finanz') || str_contains($g, 'werk') => ['eur', '#005828'],
+            str_contains($g, 'stadtrat') => ['university', '#446e88'],
+            default => ['users', '#505050'],
+        };
+    }
+
+    /** Rundes Symbol des Gremiums (nur Schmuck, der Name steht immer daneben) */
+    public static function symbolHtml(string $gremium, string $klasse = 'sr-symbol'): string
+    {
+        [$icon, $farbe] = self::symbol($gremium);
+        return '<span class="' . $klasse . '" style="background:' . $farbe . '" aria-hidden="true"><i class="fa fa-' . $icon . '"></i></span>';
+    }
+
     /** @return array[] [[nr, titel], …] */
     public function getPunkte(): array
     {
