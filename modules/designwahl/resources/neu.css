@@ -1503,6 +1503,16 @@ html.design-neu #layout-content {
     overflow-x: clip;
 }
 
+/* Eigentliche Ursache (per ?dn-diag gefunden): HumHub hängt für „Letzte Aktivitäten“ (nur eingeloggt) eine
+   nicescroll-Leiste (#ascrail…, position: absolute) direkt an body. Liegt der Kasten am Handy versteckt bzw. im Fach,
+   bleibt die Leiste an veralteter Stelle rechts außerhalb stehen (bei 725 px) → Seite 732 statt 411 px breit.
+   Am Handy/Tablet wird ohnehin mit dem Finger gescrollt, die Leiste braucht es dort nicht. */
+@media (max-width: 991.98px) {
+    html.design-neu .nicescroll-rails {
+        display: none !important;
+    }
+}
+
 /* ---------- Kästen der Seitenleiste am Handy/Tablet: Lasche am rechten Rand, Fach fährt von rechts herein ---------- */
 html.design-neu .dn-kasten-lasche {
     display: none;
