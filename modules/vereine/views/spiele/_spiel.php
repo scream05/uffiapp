@@ -50,7 +50,8 @@ $wertungText = ['s' => Yii::t('VereineModule.base', 'gewonnen'), 'u' => Yii::t('
         <?php endif ?>
     </span>
     <?php if ($laeuft): ?>
-        <span class="fvs-ergebnis fvs-live"><?= $spiel->getAnzeigeStand() !== null ? Html::encode($spiel->getAnzeigeStand()) : Yii::t('VereineModule.base', 'läuft') ?></span>
+        <?php $lage = $spiel->getLiveLage() ?>
+        <span class="fvs-ergebnis fvs-live"<?= $lage !== null ? ' title="' . Html::encode($lage) . '"' : '' ?>><?= $spiel->getAnzeigeStand() !== null ? Html::encode($spiel->getAnzeigeStand()) : Yii::t('VereineModule.base', 'läuft') ?><?php if ($lage !== null): ?><span class="visually-hidden"> – <?= Html::encode($lage) ?></span><?php endif ?></span>
     <?php elseif ($wertung !== null): ?>
         <span class="fvs-ergebnis fvs-<?= $wertung ?>" title="<?= Html::encode($wertungText[$wertung]) ?>">
             <?= Html::encode($spiel->getAnzeigeStand()) ?><span class="visually-hidden"> (<?= Html::encode($wertungText[$wertung]) ?>)</span>

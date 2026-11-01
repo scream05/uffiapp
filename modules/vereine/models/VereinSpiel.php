@@ -89,6 +89,20 @@ class VereinSpiel extends ActiveRecord
         return preg_match('/^(\d+)\s*:\s*(\d+)/', (string)$this->ergebnis, $m) ? [(int)$m[1], (int)$m[2]] : null;
     }
 
+    /**
+     * Laufendes Spiel: Lage aus Sicht der eigenen Mannschaft als Text („Wir führen“ …), null ohne Stand.
+     * Der Stand selbst steht wie üblich als Heim:Gast – bei Auswärtsspielen heißt 0:1 also: wir führen.
+     */
+    public function getLiveLage(): ?string
+    {
+        $stand = $this->getAnzeigeStand();
+        if ($stand === null || !preg_match('/^(\d+)\s*:\s*(\d+)/', $stand, $m)) {
+            return null;
+        }
+        [$eigen, $fremd] = $this->heim_eigen ? [(int)$m[1], (int)$m[2]] : [(int)$m[2], (int)$m[1]];
+        return Yii::t('VereineModule.base', $eigen > $fremd ? 'Wir führen' : ($eigen === $fremd ? 'Unentschieden' : 'Wir liegen zurück'));
+    }
+
     /** s = gewonnen, u = unentschieden, n = verloren (aus Sicht der eigenen Mannschaft) */
     public function getWertung(): ?string
     {

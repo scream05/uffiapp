@@ -1,4 +1,31 @@
 {
+    "live-stand-blau": {
+        "en": {
+            "titel": "Running games no longer red",
+            "text": "The score of a game in progress is now highlighted in blue instead of red. Red and green now only show after the final whistle, whether the game was lost or won. The score is shown as usual as Home:Away – so for away games, 0:1 means Uffenheim is leading.",
+            "quelle": "5b525361e575fa2055cf240a402784dd195420a0"
+        },
+        "uk": {
+            "titel": "Запущені матчі більше не червоні",
+            "text": "Рахунок запущеної гри тепер підсвічується синім, а не червоним. Червоний і зелений тепер показують лише після фінального свистка, чи програно чи виграно. Рахунок, як звичайно, вказано як Господарі:Гості – тож при виїзних іграх 0:1 означає, що Uffenheim веде.",
+            "quelle": "5b525361e575fa2055cf240a402784dd195420a0"
+        },
+        "ar": {
+            "titel": "المباريات الجارية لم تعد حمراء",
+            "text": "أصبح نتيجة المباراة الجارية مُظللة باللون الأزرق بدلاً من الأحمر. الأحمر والأخضر يظهران الآن فقط بعد صافرة النهاية، لتعرف إن كان الفريق قد خسر أم فاز. تُكتب النتيجة كالمعتاد على شكل المضيف:الضيف – وفي المباريات الخارجية تعني 0:1 إذن أن أوفنهايم متقدمة.",
+            "quelle": "5b525361e575fa2055cf240a402784dd195420a0"
+        },
+        "tr": {
+            "titel": "Devam eden maçlarda artık kırmızı değil",
+            "text": "Devam eden bir maçın skoru artık kırmızı yerine mavi arka planla gösteriliyor. Kırmızı ve yeşil artık yalnızca maç bittikten sonra kaybedilip kazanılmadığını gösteriyor. Skor her zamanki gibi Ev sahibi:Deplasman olarak yazılıyor – deplasman maçlarında 0:1 demek, Uffenheim'ın öne geçtiği anlamına geliyor.",
+            "quelle": "5b525361e575fa2055cf240a402784dd195420a0"
+        },
+        "ru": {
+            "titel": "Идущие матчи больше не красные",
+            "text": "Счёт идущего матча теперь выделяется синим, а не красным. Красный и зелёный теперь показывают только после окончания игры, проиграли или выиграли. Счёт, как обычно, записан в формате Хозяева:Гости – значит, при выездных матчах 0:1 означает, что Уффенхайм ведёт.",
+            "quelle": "5b525361e575fa2055cf240a402784dd195420a0"
+        }
+    },
     "kaestenfach-handy-rand": {
         "en": {
             "titel": "\"At a Glance\" panel fully visible again",

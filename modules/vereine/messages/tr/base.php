@@ -328,4 +328,7 @@ return [
     'Auch in der Übersicht zeigen' => 'Genel bakışta da göster',
     'Aus der Übersicht nehmen? Kommentare dort werden gelöscht; auf der Vereinsseite bleibt der Beitrag.' => 'Genel bakıştan kaldırılsın mı? Oradaki yorumlar silinir; gönderi kulüp sayfasında kalır.',
     'Bild {nr} von {anzahl} in voller Größe öffnen' => '{anzahl} görselden {nr}. görseli tam boyutta aç',
+    'Wir führen' => 'Öndeyiz',
+    'Wir liegen zurück' => 'Gerideyiz',
+    'Unentschieden' => 'Berabere',
 ];

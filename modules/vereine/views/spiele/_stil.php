@@ -30,7 +30,7 @@ use humhub\helpers\Html;
     .fvs-tabelle .zahl { text-align: right; width: 1%; white-space: nowrap; }
     .fvs-tabelle tr.eigen td { font-weight: 700; background: var(--bs-primary-bg-subtle, #e3ecf2); }
     @media (max-width: 575.98px) { .fvs-tabelle .breit { display: none; } }
-    .fvs-live { background: #c62828; color: #fff; }
+    .fvs-live { background: var(--dn-blau, #446e88); color: #fff; } /* neutral: Rot/Grün nur für Niederlage/Sieg nach Abpfiff */
     .fvs-live-marke { background: #c62828; color: #fff; border-radius: 4px; padding: 0 5px; font-weight: 600; }
     .fvs-live-punkt { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #c62828; margin-right: 2px;
         animation: fvs-puls 1.6s ease-in-out infinite; }

@@ -328,4 +328,7 @@ return [
     'Auch in der Übersicht zeigen' => 'Показать также в обзоре',
     'Aus der Übersicht nehmen? Kommentare dort werden gelöscht; auf der Vereinsseite bleibt der Beitrag.' => 'Убрать из обзора? Комментарии там будут удалены; на странице клуба публикация останется.',
     'Bild {nr} von {anzahl} in voller Größe öffnen' => 'Открыть изображение {nr} из {anzahl} в полном размере',
+    'Wir führen' => 'Мы ведём',
+    'Wir liegen zurück' => 'Мы проигрываем',
+    'Unentschieden' => 'Ничья',
 ];

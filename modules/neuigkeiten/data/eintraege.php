@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'live-stand-blau', 'datum' => '2026-11-01', 'art' => 'besser', 'popup' => false,
+        'titel' => 'Laufende Spiele nicht mehr rot',
+        'text' => 'Der Spielstand eines laufenden Spiels ist jetzt blau statt rot hinterlegt. Rot und Grün zeigen nur noch nach dem Abpfiff, ob verloren oder gewonnen wurde. Der Stand steht wie üblich als Heim:Gast – bei Auswärtsspielen heißt 0:1 also, dass Uffenheim führt.'],
     ['id' => 'kaestenfach-handy-rand', 'datum' => '2026-11-01', 'art' => 'behoben', 'popup' => false,
         'titel' => 'Fach „Auf einen Blick“ wieder ganz sichtbar',
         'text' => 'Auf manchen Android-Handys ragte das Fach mit Notdiensten, Öffnungszeiten und Spritpreisen rechts über den Bildschirmrand hinaus. Jetzt passt es wieder vollständig hinein, auch die Lasche am rechten Rand ist wieder zu sehen.'],

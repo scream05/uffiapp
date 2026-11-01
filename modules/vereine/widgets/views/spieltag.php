@@ -44,7 +44,8 @@ $wertungText = ['s' => Yii::t('VereineModule.base', 'gewonnen'), 'u' => Yii::t('
         #fvs-heute .fvh-stand { flex: 0 0 auto; min-width: 48px; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums;
             border-radius: 6px; padding: 3px 7px; background: var(--bs-secondary-bg, #eee); line-height: 1.2; }
         #fvs-heute .fvh-stand small { display: block; font-weight: 400; font-size: .75em; }
-        #fvs-heute .fvh-live { background: #c62828; color: #fff; }
+        /* Laufender Stand neutral (Stadtblau): Rot/Grün bleiben Niederlage/Sieg nach Abpfiff, sonst wirkt ein 0:1 auswärts wie ein Rückstand */
+        #fvs-heute .fvh-live { background: var(--dn-blau, #446e88); color: #fff; }
         #fvs-heute .fvh-s { background: var(--bs-success-bg-subtle, #d1e7dd); color: var(--bs-success-text-emphasis, #0a3622); }
         #fvs-heute .fvh-n { background: var(--bs-danger-bg-subtle, #f8d7da); color: var(--bs-danger-text-emphasis, #58151c); }
         #fvs-heute .fvh-leise { font-weight: 400; font-size: .85em; color: var(--bs-secondary-color, #6b6b6b); background: transparent; }
@@ -83,7 +84,8 @@ $wertungText = ['s' => Yii::t('VereineModule.base', 'gewonnen'), 'u' => Yii::t('
                             : Yii::t('VereineModule.base', 'bei {gegner}', ['gegner' => Html::encode($s->heim)]) ?></span>
                 </span>
                 <?php if ($s->laeuft()): ?>
-                    <span class="fvh-stand fvh-live"><?= $stand !== null ? Html::encode($stand) : Yii::t('VereineModule.base', 'läuft') ?>
+                    <?php $lage = $s->getLiveLage() ?>
+                    <span class="fvh-stand fvh-live"<?= $lage !== null ? ' title="' . Html::encode($lage) . '"' : '' ?>><?= $stand !== null ? Html::encode($stand) : Yii::t('VereineModule.base', 'läuft') ?><?php if ($lage !== null): ?><span class="visually-hidden"> – <?= Html::encode($lage) ?></span><?php endif ?>
                         <?php if ($s->ticker_minute !== null): ?><small><?= (int)$s->ticker_minute ?>.</small><?php endif ?></span>
                 <?php elseif ($gestrichen($s)): ?>
                     <span class="fvh-stand fvh-leise fvh-abgesetzt"><?= Html::encode($s->getZustand()) ?></span>

@@ -328,4 +328,7 @@ return [
     'Auch in der Übersicht zeigen' => 'إظهار في النظرة العامة أيضًا',
     'Aus der Übersicht nehmen? Kommentare dort werden gelöscht; auf der Vereinsseite bleibt der Beitrag.' => 'إزالة من النظرة العامة؟ ستُحذف التعليقات هناك؛ ويبقى المنشور في صفحة النادي.',
     'Bild {nr} von {anzahl} in voller Größe öffnen' => 'فتح الصورة {nr} من {anzahl} بالحجم الكامل',
+    'Wir führen' => 'نحن متقدمون',
+    'Wir liegen zurück' => 'نحن متأخرون',
+    'Unentschieden' => 'تعادل',
 ];
