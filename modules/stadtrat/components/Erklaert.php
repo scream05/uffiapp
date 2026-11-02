@@ -104,7 +104,11 @@ class Erklaert
         if (($key = $ki->getApiKey()) === null) {
             throw new \RuntimeException('Kein Claude-Schlüssel');
         }
-        $client = new \Anthropic\Client(apiKey: $key);
+        // Opus braucht für eine ganze Niederschrift oft länger als die 60 s default_socket_timeout,
+        // nach denen der automatisch gefundene HTTP-Client sonst abbricht („Idle timeout reached“).
+        $http = new \Symfony\Component\HttpClient\Psr18Client(
+            \Symfony\Component\HttpClient\HttpClient::create(['timeout' => 600, 'max_duration' => 900]));
+        $client = new \Anthropic\Client(apiKey: $key, requestOptions: ['transporter' => $http, 'streamingTransporter' => $http]);
         $m = $client->messages->create(model: $modell, maxTokens: $maxTokens, system: $system,
             messages: [['role' => 'user', 'content' => $inhalt]]);
         $text = '';
