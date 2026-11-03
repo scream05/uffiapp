@@ -19,7 +19,7 @@ class Module extends \humhub\components\Module
     public int $kastenRadius = 5;
 
     /** Preise höchstens so oft neu abrufen (Tankerkönig: nicht öfter als alle 5 Minuten, nur bei Bedarf) */
-    public int $maxAlterMinuten = 10;
+    public int $maxAlterMinuten = 5;
 
     /** Ältere Daten gelten als veraltet und werden nicht mehr angezeigt */
     public int $veraltetMinuten = 90;

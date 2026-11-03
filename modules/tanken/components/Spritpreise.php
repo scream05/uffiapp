@@ -10,7 +10,7 @@ use yii\helpers\Url;
 /**
  * Spritpreise der Markttransparenzstelle für Kraftstoffe (MTS-K) über die Schnittstelle von Tankerkönig.
  * Regeln von Tankerkönig: nur bei Bedarf abrufen (hier: wenn jemand Seite/Kasten/Uffi nutzt und die Daten
- * älter als 10 Minuten sind, sonst stündlich), höchstens 1 Anfrage je Minute, keine ungefragte Filterung,
+ * älter als 5 Minuten sind, sonst stündlich), höchstens 1 Anfrage je Minute, keine ungefragte Filterung,
  * Namensnennung (CC BY 4.0), Schlüssel geheim halten. Ein Abruf (list.php) liefert alle Tankstellen im Umkreis.
  */
 class Spritpreise
