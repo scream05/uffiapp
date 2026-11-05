@@ -823,6 +823,13 @@ class SetupController extends Controller
     private const EVENTS_URL = 'https://www.uffenheim.de/erleben/veranstaltungen/veranstaltungskalender/rss';
     private const EVENT_UID = 'uffenheim-de-';
     /**
+     * Termine von uffenheim.de, die wir nicht übernehmen (gewerblich, Entscheidung des Betreibers) – Muster auf den
+     * Titel. Der Import überspringt sie und löscht schon vorhandene Treffer (auch vergangene).
+     */
+    private const EVENT_IGNORE = [
+        '/Schoppenstube/iu', // Alt's Schoppenstube, Weinbau Familie Alt, Ippesheim (05.11.2026)
+    ];
+    /**
      * Sechs Gruppen im Kalender (seit 30.10.2026 statt der zwölf Kategorien von uffenheim.de): Name => [Farbe, Kategorien
      * auf uffenheim.de]. Reihenfolge = Reihenfolge der Knöpfe. Umstellen bestehender Termine: setup/kalender-gruppen
      */
@@ -964,9 +971,13 @@ class SetupController extends Controller
             if ($end <= $start) {
                 $end = $start + 3600;
             }
+            $title = trim(html_entity_decode((string)$entry->title, ENT_QUOTES | ENT_HTML5));
+            if (self::eventIgnored($title)) {
+                continue;
+            }
             $events[self::EVENT_UID . substr(sha1($link), 0, 20)] = [
                 'link' => $link,
-                'title' => trim(html_entity_decode((string)$entry->title, ENT_QUOTES | ENT_HTML5)),
+                'title' => $title,
                 'start' => date('Y-m-d H:i:s', $start),
                 'end' => date('Y-m-d H:i:s', $end),
                 'category' => (string)($entry->category['term'] ?? ''),
@@ -982,6 +993,17 @@ class SetupController extends Controller
             ->andWhere(['like', 'calendar_entry.uid', self::EVENT_UID . '%', false]);
         $firstRun = !$query()->exists();
         $stats = ['neu' => 0, 'geändert' => 0, 'gelöscht' => 0];
+
+        // Gesperrte Termine (EVENT_IGNORE) ganz entfernen, auch vergangene
+        if (!$dryRun) {
+            foreach ($query()->all() as $entry) {
+                if (self::eventIgnored($entry->title)) {
+                    $entry->hardDelete();
+                    $stats['gelöscht']++;
+                    $this->stdout("- gesperrt: {$entry->start_datetime} {$entry->title}\n");
+                }
+            }
+        }
 
         // Späteste zuerst anlegen, damit im Stream die nächsten Termine oben stehen
         uasort($events, fn($a, $b) => strcmp($b['start'], $a['start']));
@@ -1058,7 +1080,7 @@ class SetupController extends Controller
             $used = \humhub\modules\calendar\models\CalendarEntryParticipant::find()
                     ->where(['calendar_entry_id' => $entry->id])->exists()
                 || \humhub\modules\comment\models\Comment::find()
-                    ->where(['object_model' => $entry::class, 'object_id' => $entry->id])->exists();
+                    ->where(['content_id' => $entry->content->id])->exists();
             if ($used) {
                 $this->stdout("? nicht mehr auf uffenheim.de, bleibt wegen Zusagen/Kommentaren: {$entry->title}\n");
             } else {
@@ -1070,6 +1092,16 @@ class SetupController extends Controller
         $this->stdout(date('Y-m-d H:i:s') . ': ' . count($events) . ' Termine im Feed, '
             . implode(', ', array_map(fn($k, $v) => "$v $k", array_keys($stats), $stats)) . "\n");
         return ExitCode::OK;
+    }
+
+    private static function eventIgnored(string $title): bool
+    {
+        foreach (self::EVENT_IGNORE as $pattern) {
+            if (preg_match($pattern, $title)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
