@@ -31,7 +31,7 @@ echo $this->render('_stil');
         <div class="d-flex flex-wrap gap-1 mb-3">
             <?= Html::a('<i class="fa fa-user-plus"></i> Von Hand eintragen', $space->createUrl('/kurse/anmeldung/hand', ['kurs' => $kurs->id]), ['class' => 'btn btn-light btn-sm']) ?>
             <?= Html::a('<i class="fa fa-envelope"></i> Rundmail', $space->createUrl('/kurse/kurs/rundmail', ['id' => $kurs->id]), ['class' => 'btn btn-light btn-sm']) ?>
-            <?= Html::a('<i class="fa fa-download"></i> Liste (Excel/CSV)', $space->createUrl('/kurse/kurs/export', ['id' => $kurs->id]), ['class' => 'btn btn-light btn-sm']) ?>
+            <?= Html::a('<i class="fa fa-download"></i> Liste (Excel/CSV)', $space->createUrl('/kurse/kurs/export', ['id' => $kurs->id]), ['class' => 'btn btn-light btn-sm', 'data-pjax-prevent' => '', 'download' => '']) ?>
         </div>
 
         <ul class="nav nav-tabs mb-2">
