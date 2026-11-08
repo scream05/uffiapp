@@ -358,7 +358,11 @@ class Dienst
             $html = nl2br(Html::encode($text), false);
             $html = preg_replace('#https?://[^\s<]+#', '<a href="$0">$0</a>', $html);
             if ($knopf) {
-                $html .= '<br><br>' . MailButton::widget(['url' => $knopf[0], 'text' => $knopf[1]]);
+                // MailButton liefert nur ein <td> – eigene Tabelle drumherum, sonst steht der Knopf als Spalte neben dem Text
+                $html .= '<table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top:20px"><tr>'
+                    . '<td align="center"><table role="presentation" border="0" cellspacing="0" cellpadding="0" align="center"><tr>'
+                    . MailButton::widget(['url' => $knopf[0], 'text' => $knopf[1]])
+                    . '</tr></table></td></tr></table>';
             }
             $mailer = Yii::$app->mailer;
             $html = $mailer->render('@humhub/views/mail/TextOnly', ['message' => $html], $mailer->htmlLayout);
