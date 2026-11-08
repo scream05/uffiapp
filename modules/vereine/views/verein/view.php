@@ -110,6 +110,10 @@ $module = Yii::$app->getModule('vereine');
     </div>
 </div>
 
+<?php if (Yii::$app->hasModule('kurse') && Yii::$app->getModule('kurse') !== null): ?>
+    <?= \humhub\modules\kurse\widgets\VereinKurse::widget(['verein' => $verein]) ?>
+<?php endif ?>
+
 <?php $quellen = $verein->getQuellenList(); ?>
 <?php if ($quellen || $verein->logo_quelle): ?>
 <div class="panel panel-default">

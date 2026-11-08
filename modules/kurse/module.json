@@ -1,0 +1,10 @@
+{
+  "id": "kurse",
+  "name": "Kurse",
+  "description": "Kursverwaltung für freigeschaltete Vereine (z. B. Schwimmkurse): Anmeldung durch Eltern, Warteliste, Bezahlstatus, Mails.",
+  "keywords": ["kurse", "vereine", "anmeldung"],
+  "version": "0.1.0",
+  "humhub": {
+    "minVersion": "1.18"
+  }
+}
