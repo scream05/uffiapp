@@ -17,8 +17,11 @@ use humhub\helpers\Html;
     .fvs-ort { font-size: .8em; color: var(--bs-secondary-color, #777); }
     .fvs-ergebnis { flex: 0 0 auto; min-width: 48px; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums;
         border-radius: 6px; padding: 3px 8px; background: var(--bs-secondary-bg, #eee); }
-    .fvs-s { background: var(--bs-success-bg-subtle, #d1e7dd); color: var(--bs-success-text-emphasis, #0a3622); }
-    .fvs-n { background: var(--bs-danger-bg-subtle, #f8d7da); color: var(--bs-danger-text-emphasis, #58151c); }
+    /* Eigene Farben: das Stadt-Design setzt success-bg-subtle fast grau (#dfe5ce) – Sieg war nicht als grün erkennbar */
+    .fvs-s { background: #c6e48a; color: #263304; }
+    [data-bs-theme="dark"] .fvs-s { background: #3d5a0a; color: #e3f2c0; }
+    .fvs-n { background: #ffd8d6; color: #661813; }
+    [data-bs-theme="dark"] .fvs-n { background: #5c1a16; color: #ffd8d6; }
     .fvs-zustand { font-weight: 400; font-size: .8em; color: var(--bs-secondary-color, #777); }
     .fvs-datum { margin: 16px 0 2px; font-size: .95em; font-weight: 600; }
     .fvs-datum:first-child { margin-top: 0; }

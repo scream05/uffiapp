@@ -46,8 +46,11 @@ $wertungText = ['s' => Yii::t('VereineModule.base', 'gewonnen'), 'u' => Yii::t('
         #fvs-heute .fvh-stand small { display: block; font-weight: 400; font-size: .75em; }
         /* Laufender Stand neutral (Stadtblau): Rot/Grün bleiben Niederlage/Sieg nach Abpfiff, sonst wirkt ein 0:1 auswärts wie ein Rückstand */
         #fvs-heute .fvh-live { background: var(--dn-blau, #446e88); color: #fff; }
-        #fvs-heute .fvh-s { background: var(--bs-success-bg-subtle, #d1e7dd); color: var(--bs-success-text-emphasis, #0a3622); }
-        #fvs-heute .fvh-n { background: var(--bs-danger-bg-subtle, #f8d7da); color: var(--bs-danger-text-emphasis, #58151c); }
+        /* Eigene Farben: das Stadt-Design setzt success-bg-subtle fast grau (#dfe5ce) – Sieg war nicht als grün erkennbar */
+        #fvs-heute .fvh-s { background: #c6e48a; color: #263304; }
+        [data-bs-theme="dark"] #fvs-heute .fvh-s { background: #3d5a0a; color: #e3f2c0; }
+        #fvs-heute .fvh-n { background: #ffd8d6; color: #661813; }
+        [data-bs-theme="dark"] #fvs-heute .fvh-n { background: #5c1a16; color: #ffd8d6; }
         #fvs-heute .fvh-leise { font-weight: 400; font-size: .85em; color: var(--bs-secondary-color, #6b6b6b); background: transparent; }
         #fvs-heute .fvh-punkt { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #c62828; margin-right: 2px; animation: fvh-puls 1.6s ease-in-out infinite; }
         @keyframes fvh-puls { 50% { opacity: .25; } }

@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'sieg-gruen', 'datum' => '2026-11-09', 'art' => 'behoben', 'popup' => false,
+        'titel' => 'Siege wieder deutlich grün',
+        'text' => 'Gewonnene Spiele waren so blass hinterlegt, dass sie fast grau aussahen. Siege sind jetzt klar grün und Niederlagen rot, auch im dunklen Modus.'],
     ['id' => 'mails-neu', 'datum' => '2026-11-01', 'art' => 'besser', 'popup' => false,
         'titel' => 'E-Mails im Stil der App',
         'text' => 'Benachrichtigungen per E-Mail sehen jetzt aus wie die App: blaue Kopfleiste, helle Karten und runde Knöpfe. Statt „Space“ steht dort jetzt „Kategorie“.'],

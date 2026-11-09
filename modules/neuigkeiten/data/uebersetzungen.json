@@ -1,4 +1,31 @@
 {
+    "sieg-gruen": {
+        "en": {
+            "titel": "Wins clearly green again",
+            "text": "Won matches had such a pale background that they looked almost grey. Wins are now clearly green and losses red, in dark mode too.",
+            "quelle": "f53e881f2d29095bd06834af3544de1e1412416b"
+        },
+        "uk": {
+            "titel": "Перемоги знову чітко зелені",
+            "text": "Виграні матчі мали такий блідий фон, що виглядали майже сірими. Тепер перемоги чітко зелені, а поразки червоні, також у темному режимі.",
+            "quelle": "f53e881f2d29095bd06834af3544de1e1412416b"
+        },
+        "ar": {
+            "titel": "الانتصارات باللون الأخضر الواضح مجددًا",
+            "text": "كانت خلفية المباريات التي فزنا بها باهتة لدرجة أنها بدت رمادية تقريبًا. أصبحت الانتصارات الآن خضراء بوضوح والهزائم حمراء، وكذلك في الوضع الداكن.",
+            "quelle": "f53e881f2d29095bd06834af3544de1e1412416b"
+        },
+        "tr": {
+            "titel": "Galibiyetler yeniden net yeşil",
+            "text": "Kazanılan maçların arka planı o kadar soluktu ki neredeyse gri görünüyordu. Galibiyetler artık net yeşil, yenilgiler kırmızı – karanlık modda da.",
+            "quelle": "f53e881f2d29095bd06834af3544de1e1412416b"
+        },
+        "ru": {
+            "titel": "Победы снова чётко зелёные",
+            "text": "Выигранные матчи были выделены так бледно, что выглядели почти серыми. Теперь победы чётко зелёные, а поражения красные, в том числе в тёмном режиме.",
+            "quelle": "f53e881f2d29095bd06834af3544de1e1412416b"
+        }
+    },
     "mails-neu": {
         "en": {
             "titel": "Emails in the App's Style",
