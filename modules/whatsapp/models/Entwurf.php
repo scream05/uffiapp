@@ -7,6 +7,7 @@ use DateTimeZone;
 use humhub\modules\calendar\helpers\CalendarUtils;
 use humhub\modules\calendar\models\CalendarEntry;
 use humhub\modules\calendar\models\CalendarEntryType;
+use humhub\modules\content\models\Content;
 use humhub\modules\file\models\File;
 use humhub\modules\space\models\Space;
 use yii\db\ActiveRecord;
@@ -131,11 +132,13 @@ class Entwurf extends ActiveRecord
         if (!$start) {
             return [];
         }
-        $words = fn($s) => array_filter(preg_split('/[^\p{L}\p{N}]+/u', mb_strtolower($s)), fn($w) => mb_strlen($w) >= 5);
+        $words = fn($s) => array_filter(preg_split('/[^\p{L}\p{N}]+/u', mb_strtolower($s)), fn($w) => mb_strlen($w) >= 5
+            && !in_array($w, ['uffenheim', 'uffenheimer', 'veranstaltung', 'bürgerliste'], true)); // Allerweltswörter zählen nicht als Übereinstimmung
         $mine = $words($this->titel);
         $day = $start->format('Y-m-d');
         $found = [];
         foreach (CalendarEntry::find()->contentContainer($space)
+                     ->andWhere(['!=', 'content.state', Content::STATE_DELETED]) // Papierkorb nicht mitzählen
                      ->andWhere(['<=', 'calendar_entry.start_datetime', "$day 23:59:59"])
                      ->andWhere(['>=', 'calendar_entry.end_datetime', "$day 00:00:00"])->all() as $e) {
             if (array_intersect($mine, $words($e->title))

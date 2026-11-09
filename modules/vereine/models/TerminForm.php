@@ -115,11 +115,13 @@ class TerminForm extends Model
         if (!$start) {
             return [];
         }
-        $words = fn($s) => array_filter(preg_split('/[^\p{L}\p{N}]+/u', mb_strtolower($s)), fn($w) => mb_strlen($w) >= 5);
+        $words = fn($s) => array_filter(preg_split('/[^\p{L}\p{N}]+/u', mb_strtolower($s)), fn($w) => mb_strlen($w) >= 5
+            && !in_array($w, ['uffenheim', 'uffenheimer', 'veranstaltung', 'bürgerliste'], true)); // Allerweltswörter zählen nicht als Übereinstimmung
         $mine = $words($this->titel);
         $day = $start->format('Y-m-d');
         $found = [];
         foreach (CalendarEntry::find()->contentContainer($space)
+                     ->andWhere(['!=', 'content.state', \humhub\modules\content\models\Content::STATE_DELETED]) // Papierkorb nicht mitzählen
                      ->andWhere(['like', 'calendar_entry.uid', 'uffenheim-de-%', false])
                      ->andWhere(['<=', 'calendar_entry.start_datetime', "$day 23:59:59"])
                      ->andWhere(['>=', 'calendar_entry.end_datetime', "$day 00:00:00"])->all() as $e) {
