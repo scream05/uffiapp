@@ -142,8 +142,25 @@ class OpenAi implements KiModell
         return $out;
     }
 
-    /** @return array [['text', 'calls', 'ende'], Eingabe-Tokens (Cache-Anteil zu 10 %), Ausgabe-Tokens] */
+    /**
+     * Mit einem zweiten Versuch bei kurzen Störungen von OpenAI (HTTP 500/502/503, Verbindungsabbruch). Gestreamt wurde
+     * dann noch nichts, weil Text erst bei HTTP 200 weitergereicht wird.
+     * @return array [['text', 'calls', 'ende'], Eingabe-Tokens (Cache-Anteil zu 10 %), Ausgabe-Tokens]
+     */
     private function senden(array $body, ?callable $onText = null): array
+    {
+        try {
+            return $this->sendenEinmal($body, $onText);
+        } catch (\RuntimeException $e) {
+            if (!preg_match('/^OpenAI (HTTP 50[023]|nicht erreichbar)/', $e->getMessage())) {
+                throw $e;
+            }
+            sleep(1);
+            return $this->sendenEinmal($body, $onText);
+        }
+    }
+
+    private function sendenEinmal(array $body, ?callable $onText = null): array
     {
         $body['model'] = $this->model;
         if ($this->reasoning !== '') {

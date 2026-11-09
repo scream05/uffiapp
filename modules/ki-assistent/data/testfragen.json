@@ -402,5 +402,12 @@
       "\\d+ ?: ?\\d+",
       "Platz \\d+"
     ]
+  },
+  {
+    "frage": "Gibt es dieses Jahr eine X-Mas Party?",
+    "erwartet": [
+      "27\\.( ?12\\.| ?Dezember)",
+      "X-?Mas"
+    ]
   }
 ]
