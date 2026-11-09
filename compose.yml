@@ -73,8 +73,8 @@ services:
       # KI-Anbieter für Uffi, Übersetzen, WhatsApp-Auslesen, Stadtrat, Mitteilungsblatt: openai oder claude (in .env umschalten)
       - KI_ANBIETER=${KI_ANBIETER:-claude}
       - CLAUDE_MODEL=${CLAUDE_MODEL:-claude-haiku-5-5}
-      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-5-mini}
-      - OPENAI_MODEL_STARK=${OPENAI_MODEL_STARK:-gpt-5}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-5.4}
+      - OPENAI_MODEL_STARK=${OPENAI_MODEL_STARK:-gpt-5.5}
       # Denkaufwand der Reasoning-Modelle (minimal/low/medium/high, „aus“ = nicht senden)
       - OPENAI_REASONING=${OPENAI_REASONING:-low}
       # https://eu.api.openai.com/v1 für Verarbeitung in der EU (nur für Projekte mit EU-Datenstandort)

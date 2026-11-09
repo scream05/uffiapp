@@ -155,7 +155,9 @@ class Notdienst
             $lines[] = '(Aktuelle Daten fehlen – auf die Notdienstsuche der Kammer verweisen.)';
         }
         foreach (self::periods(3) as $p) {
-            $lines[] = 'Notdienst ' . self::time($p['von']) . ' bis ' . self::time($p['bis']) . ':';
+            // Laufenden Zeitraum ausdrücklich kennzeichnen: kleine Modelle lasen „bis Di 8:30“ sonst als schon vorbei
+            $jetzt = $p['von'] <= time() && $p['bis'] > time();
+            $lines[] = ($jetzt ? 'JETZT GERADE dienstbereit (' : 'Danach (') . 'Notdienst ' . self::time($p['von']) . ' bis ' . self::time($p['bis']) . '):';
             foreach ($p['apotheken'] as $a) {
                 $lines[] = "- {$a['name']}, " . self::address($a) . ", Tel. {$a['telefon']} ({$a['km']} km)";
             }

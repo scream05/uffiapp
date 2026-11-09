@@ -73,4 +73,4 @@ docker compose exec -T humhub sh -c '
 # Zusätzlich /app/runtime zurück an www-data: Cache-Dateien, die ein Befehl als root angelegt hat,
 # kann HumHub nicht überschreiben und liest dann veraltete Werte (am 17.10.2026: 2FA-Code galt sofort als abgelaufen)
 trap 'docker compose exec -T humhub sh -c "cp /tmp/console.php.orig /data/config/console.php && chown www-data:www-data /data/config/console.php; chown -R www-data:www-data /app/runtime"' EXIT
-docker compose exec -T -u www-data humhub /app/yii "setup/$1" "${@:2}"
+docker compose exec -T -u www-data ${KI_TEST_ENV:+-e "$KI_TEST_ENV"} humhub /app/yii "setup/$1" "${@:2}"

@@ -68,7 +68,7 @@ class Module extends \humhub\components\Module
     public function getModel(string $stufe = 'standard', ?string $claudeModell = null): string
     {
         if ($this->getAnbieter() === 'openai') {
-            return ($stufe === 'stark' ? getenv('OPENAI_MODEL_STARK') : null) ?: getenv('OPENAI_MODEL') ?: 'gpt-5-mini';
+            return ($stufe === 'stark' ? getenv('OPENAI_MODEL_STARK') : null) ?: getenv('OPENAI_MODEL') ?: 'gpt-5.4';
         }
         return $claudeModell ?: getenv('CLAUDE_MODEL') ?: 'claude-haiku-5-5';
     }
