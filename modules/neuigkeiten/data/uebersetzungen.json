@@ -1,4 +1,31 @@
 {
+    "ki-openai": {
+        "en": {
+            "titel": "Uffi now replies with ChatGPT",
+            "text": "Uffi, the translation and the reading of WhatsApp posters now use OpenAI's AI (ChatGPT) instead of Claude. Nothing changes for you. You can find out what happens with your data in the privacy policy.",
+            "quelle": "6c341a7b2c7701cf6f0431c5069411e4e12ead9c"
+        },
+        "uk": {
+            "titel": "Uffi тепер відповідає за допомогою ChatGPT",
+            "text": "Uffi, переклад і зчитування плакатів із WhatsApp тепер використовують ШІ від OpenAI (ChatGPT) замість Claude. Для тебе нічого не змінюється. Що при цьому відбувається з твоїми даними, описано в політиці конфіденційності.",
+            "quelle": "6c341a7b2c7701cf6f0431c5069411e4e12ead9c"
+        },
+        "ar": {
+            "titel": "Uffi يرد الآن باستخدام ChatGPT",
+            "text": "Uffi، أصبح الترجمة وقراءة ملصقات WhatsApp يستخدمان الآن ذكاء OpenAI الاصطناعي (ChatGPT) بدلًا من Claude. بالنسبة إليك، لا يتغير شيء. ما الذي يحدث لبياناتك في هذا السياق موضح في سياسة الخصوصية.",
+            "quelle": "6c341a7b2c7701cf6f0431c5069411e4e12ead9c"
+        },
+        "tr": {
+            "titel": "Uffi artık ChatGPT ile yanıt veriyor",
+            "text": "Uffi, çeviri yapmak ve WhatsApp afişlerini okumak için artık Claude yerine OpenAI’nin yapay zekâsını (ChatGPT) kullanıyor. Senin için hiçbir şey değişmiyor. Verilerinin bunun sırasında nasıl işlendiğini gizlilik politikasında bulabilirsin.",
+            "quelle": "6c341a7b2c7701cf6f0431c5069411e4e12ead9c"
+        },
+        "ru": {
+            "titel": "Uffi теперь отвечает с ChatGPT",
+            "text": "Uffi, перевод и распознавание плакатов из WhatsApp теперь используют ИИ от OpenAI (ChatGPT) вместо Claude. Для тебя ничего не меняется. Что при этом происходит с твоими данными, указано в политике конфиденциальности.",
+            "quelle": "6c341a7b2c7701cf6f0431c5069411e4e12ead9c"
+        }
+    },
     "sieg-gruen": {
         "en": {
             "titel": "Wins clearly green again",

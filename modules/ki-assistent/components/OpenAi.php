@@ -147,7 +147,8 @@ class OpenAi implements KiModell
     {
         $body['model'] = $this->model;
         if ($this->reasoning !== '') {
-            $body['reasoning_effort'] = $this->reasoning;
+            // Chat Completions erlaubt Werkzeuge bei neueren Modellen (z. B. gpt-5.4-mini) nur ohne Denkmodus
+            $body['reasoning_effort'] = isset($body['tools']) ? 'none' : $this->reasoning;
         }
         $stream = $onText !== null;
         if ($stream) {

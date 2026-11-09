@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'ki-openai', 'datum' => '2026-11-09', 'art' => 'besser', 'popup' => false,
+        'titel' => 'Uffi antwortet jetzt mit ChatGPT',
+        'text' => 'Uffi, das Übersetzen und das Auslesen von WhatsApp-Plakaten nutzen jetzt die KI von OpenAI (ChatGPT) statt Claude. Für dich ändert sich nichts. Was dabei mit deinen Angaben passiert, steht in der Datenschutzerklärung.'],
     ['id' => 'sieg-gruen', 'datum' => '2026-11-09', 'art' => 'behoben', 'popup' => false,
         'titel' => 'Siege wieder deutlich grün',
         'text' => 'Gewonnene Spiele waren so blass hinterlegt, dass sie fast grau aussahen. Siege sind jetzt klar grün und Niederlagen rot, auch im dunklen Modus.'],
