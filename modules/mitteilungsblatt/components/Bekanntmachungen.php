@@ -106,7 +106,7 @@ TXT;
         foreach ($seiten as $nr => $t) {
             $text .= "=== Seite $nr ===\n$t\n\n";
         }
-        $claude = new \humhub\modules\kiAssistent\components\Claude($ki->getApiKey(), $ki->getModel());
+        $claude = $ki->ki();
         [$antwort, $in, $out] = $claude->ask($system, [['role' => 'user', 'text' => $text]]);
         if (!preg_match('/\[.*\]/s', $antwort, $m) || !is_array($liste = json_decode($m[0], true))) {
             throw new \RuntimeException('Antwort ist kein JSON: ' . mb_substr($antwort, 0, 200));

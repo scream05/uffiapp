@@ -53,6 +53,7 @@ services:
       - ./wissen:/srv/wissen:ro
     secrets:
       - anthropic_api_key
+      - openai_api_key
       # Gemini (Google): Vorlesefassung „Stadtrat kurz erklärt“ (Modul stadtrat)
       - gemini_api_key
       - blak_notdienst_url
@@ -69,7 +70,15 @@ services:
       # TLS terminiert der Nginx Proxy Manager im LAN: dessen X-Forwarded-* Headern vertrauen
       - 'HUMHUB_WEB_CONFIG__COMPONENTS__REQUEST__TRUSTED_HOSTS=["192.168.178.0/24"]'
       - HUMHUB_WEB_CONFIG__COMPONENTS__REQUEST__SECURE_PORT=443
+      # KI-Anbieter für Uffi, Übersetzen, WhatsApp-Auslesen, Stadtrat, Mitteilungsblatt: openai oder claude (in .env umschalten)
+      - KI_ANBIETER=${KI_ANBIETER:-claude}
       - CLAUDE_MODEL=${CLAUDE_MODEL:-claude-haiku-5-5}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-5-mini}
+      - OPENAI_MODEL_STARK=${OPENAI_MODEL_STARK:-gpt-5}
+      # Denkaufwand der Reasoning-Modelle (minimal/low/medium/high, „aus“ = nicht senden)
+      - OPENAI_REASONING=${OPENAI_REASONING:-low}
+      # https://eu.api.openai.com/v1 für Verarbeitung in der EU (nur für Projekte mit EU-Datenstandort)
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://api.openai.com/v1}
       # Anfragekörper schon im Webserver begrenzen (passend zu post_max_size, auch ohne Content-Length)
       - |
         CADDY_SERVER_EXTRA_DIRECTIVES=request_body {
@@ -151,6 +160,9 @@ secrets:
   # Claude-API-Schlüssel (Anthropic) für den KI-Assistenten (Datei nicht im Git, Verzeichnis secrets/ chmod 700)
   anthropic_api_key:
     file: ./secrets/anthropic_api_key
+  # OpenAI-API-Schlüssel (ChatGPT), wenn KI_ANBIETER=openai; leere Datei = nicht eingerichtet
+  openai_api_key:
+    file: ./secrets/openai_api_key
   gemini_api_key:
     file: ./secrets/gemini_api_key
   # Schnittstellen-Link der Bayerischen Landesapothekerkammer (Apotheken-Notdienst), an die Registrierung der BLU gebunden

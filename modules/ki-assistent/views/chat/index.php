@@ -32,7 +32,7 @@ $this->registerJs('window.kiChatDomains = ' . json_encode(Yii::$app->getModule('
                 @media (max-width: 767px) { #ki-messages { max-height: none; overflow: visible; } }
             </style>
             <details id="ki-info" open>
-                <summary><?= Yii::t('KiAssistentModule.base', 'KI-Antworten von Claude (Anthropic) – unverbindlich. Persönliche Daten nur für Formulare angeben.') ?> <u><?= Yii::t('KiAssistentModule.base', 'Mehr') ?></u></summary>
+                <summary><?= Yii::t('KiAssistentModule.base', 'KI-Antworten von {anbieter} – unverbindlich. Persönliche Daten nur für Formulare angeben.', ['anbieter' => Yii::$app->getModule('ki-assistent')->getAnbieterName()]) ?> <u><?= Yii::t('KiAssistentModule.base', 'Mehr') ?></u></summary>
                 <p class="help-block" style="margin-top:6px">
                     <?= Yii::t('KiAssistentModule.base', 'Beantwortet Fragen zu Abfuhrterminen, Veranstaltungen, Vereinen, Nachrichten und Informationen der Stadt, bereitet Mängelmeldungen vor, trägt Termine in deinen Kalender ein und füllt ausgewählte Antragsformulare der Stadt mit dir aus. Deine Nachrichten – bei Formularen auch deine Angaben wie Name und Anschrift – werden zur Beantwortung an Claude von Anthropic ({modell}) übermittelt und hier nicht gespeichert; ein ausgefülltes Formular ist eine Stunde lang abrufbar und wird dann gelöscht. Bewertest du eine Antwort mit 👍/👎, speichern wir Frage und Antwort ohne deinen Namen, um Uffi zu verbessern. Antworten sind keine verbindliche Auskunft der Stadt Uffenheim.', ['modell' => Html::encode($model)]) ?>
                 </p>
@@ -47,7 +47,7 @@ $this->registerJs('window.kiChatDomains = ' . json_encode(Yii::$app->getModule('
                 <?php endif ?>
             </details>
             <?php if (!$configured): ?>
-                <div class="alert alert-danger">Kein Claude-Schlüssel hinterlegt (<code>secrets/anthropic_api_key</code>).</div>
+                <div class="alert alert-danger">Kein KI-Schlüssel hinterlegt (<code><?= Html::encode(Yii::$app->getModule('ki-assistent')->getApiKeyDatei()) ?></code>).</div>
             <?php endif ?>
             <?php if (!$ageConfirmed): ?>
                 <div class="alert alert-info">

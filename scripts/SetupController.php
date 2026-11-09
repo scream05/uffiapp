@@ -1249,11 +1249,11 @@ class SetupController extends Controller
             return ExitCode::OK;
         }
         if ($module->getApiKey() === null) {
-            $this->stderr("Kein Schlüssel in secrets/anthropic_api_key\n");
+            $this->stderr("Kein Schlüssel in " . Yii::$app->getModule('ki-assistent')->getApiKeyDatei() . "\n");
             return ExitCode::CONFIG;
         }
         $t = microtime(true);
-        [$answer, $in, $out] = (new \humhub\modules\kiAssistent\components\Claude($module->getApiKey(), $module->getModel()))
+        [$answer, $in, $out] = ($module->ki())
             ->ask($teile, [['role' => 'user', 'text' => $question]]);
         $module->addTestUsage($in, $out);
         $this->stdout($answer . "\n\n(" . round(microtime(true) - $t, 1) . " s, $in Eingabe- / $out Ausgabe-Tokens)\n");
@@ -1300,11 +1300,11 @@ class SetupController extends Controller
         Yii::$app->user->switchIdentity(User::findOne(['username' => 'admin']));
         $module = Yii::$app->getModule('ki-assistent');
         if ($module->getApiKey() === null) {
-            $this->stderr("Kein Schlüssel in secrets/anthropic_api_key\n");
+            $this->stderr("Kein Schlüssel in " . Yii::$app->getModule('ki-assistent')->getApiKeyDatei() . "\n");
             return ExitCode::CONFIG;
         }
         $tests = json_decode(file_get_contents($module->getBasePath() . '/data/testfragen.json'), true);
-        $claude = new \humhub\modules\kiAssistent\components\Claude($module->getApiKey(), $module->getModel());
+        $claude = $module->ki();
         $ok = 0;
         $run = 0;
         foreach ($tests as $i => $t) {
@@ -2100,7 +2100,7 @@ class SetupController extends Controller
             $pruefe('Kontext: keine Namen der Verfasser', !str_contains($abschnitt, $nutzer[0]->displayName));
             $pruefe('Kontext im Prompt', str_contains(\humhub\modules\kiAssistent\components\Context::get(), 'Dunkles Design für die App'));
 
-            $claude = new \humhub\modules\kiAssistent\components\Claude($ki->getApiKey(), $ki->getModel());
+            $claude = $ki->ki();
             $fragen = [
                 ['Kann man die Abfuhrtermine eigentlich als Kalender abonnieren? Das wäre echt praktisch.',
                     ['geplant', 'November', preg_quote($abo->content->getUrl(), '/')]],
@@ -2377,11 +2377,11 @@ class SetupController extends Controller
         $modul = Yii::$app->getModule('neuigkeiten');
         $ki = Yii::$app->getModule('ki-assistent');
         if ($ki->getApiKey() === null) {
-            $this->stderr("Kein Schlüssel in secrets/anthropic_api_key\n");
+            $this->stderr("Kein Schlüssel in " . Yii::$app->getModule('ki-assistent')->getApiKeyDatei() . "\n");
             return ExitCode::CONFIG;
         }
         $tr = $alles ? [] : $modul->uebersetzungen();
-        $claude = new \humhub\modules\kiAssistent\components\Claude($ki->getApiKey(), $ki->getModel());
+        $claude = $ki->ki();
         $ids = array_column($modul->eintraege(), 'id');
         foreach (\humhub\modules\kiAssistent\components\Uebersetzer::SPRACHEN as $lang => $sprache) {
             $offen = [];
@@ -2523,9 +2523,7 @@ class SetupController extends Controller
             return ExitCode::OK;
         }
         $ki = Yii::$app->getModule('ki-assistent');
-        $key = $ki->getApiKey() ?? throw new \RuntimeException('Kein Claude-Schlüssel');
-        require_once '/data/modules/ki-assistent/vendor/autoload.php'; // Anthropic-SDK liegt im Modul ki-assistent
-        $client = new \Anthropic\Client(apiKey: $key);
+        $client = $ki->ki();
         $system = 'Du schreibst Bildbeschreibungen (Alternativtexte für Screenreader) für Bilder auf einer Bürgerplattform '
             . "für Uffenheim (Mittelfranken). Trag die Beschreibung ins Werkzeug bildbeschreibung ein, ohne Anführungszeichen.\n\nRegeln:\n"
             . "- Deutsch, kurz und sachlich: Fotos ein Satz mit höchstens 140 Zeichen, Plakate und Grafiken höchstens 200 Zeichen.\n"
@@ -2554,32 +2552,20 @@ class SetupController extends Controller
                 $kontext = $obj instanceof \humhub\modules\calendar\models\CalendarEntry
                     ? $obj->title . "\n" . $obj->description : (string)($obj->message ?? '');
                 $kontext = mb_substr(trim(preg_replace('/\s+/u', ' ', strip_tags(preg_replace('/[*_#>\[\]]|\(https?:[^)]*\)/u', ' ', $kontext)))), 0, 800);
-                $antwort = $client->messages->create(
-                    model: $ki->getModel(),
-                    maxTokens: 600,
-                    system: $system,
-                    tools: [['name' => 'bildbeschreibung', 'description' => 'Bildbeschreibung (Alternativtext) speichern',
-                        'inputSchema' => ['type' => 'object', 'properties' => ['text' => ['type' => 'string',
-                            'description' => 'Die Beschreibung, höchstens 200 Zeichen']], 'required' => ['text']]]],
-                    toolChoice: ['type' => 'tool', 'name' => 'bildbeschreibung'],
-                    messages: [['role' => 'user', 'content' => [
-                        ['type' => 'image', 'source' => ['type' => 'base64', 'media_type' => 'image/jpeg', 'data' => base64_encode($daten)]],
-                        ['type' => 'text', 'text' => 'Begleittext des Beitrags: ' . ($kontext !== '' ? $kontext : '(keiner)')],
-                    ]]],
-                );
-                $text = '';
-                foreach ($antwort->content as $block) {
-                    if ($block instanceof \Anthropic\Messages\ToolUseBlock) {
-                        $text = (string)($block->input['text'] ?? '');
-                    }
-                }
+                [$args, $tin, $tout] = $client->werkzeug($system, [
+                    ['bild' => ['image/jpeg', $daten]],
+                    ['text' => 'Begleittext des Beitrags: ' . ($kontext !== '' ? $kontext : '(keiner)')],
+                ], ['name' => 'bildbeschreibung', 'description' => 'Bildbeschreibung (Alternativtext) speichern',
+                    'inputSchema' => ['type' => 'object', 'properties' => ['text' => ['type' => 'string',
+                        'description' => 'Die Beschreibung, höchstens 200 Zeichen']], 'required' => ['text']]], 600);
+                $text = (string)($args['text'] ?? '');
                 $text = trim(preg_replace('/\s+/u', ' ', trim($text, " \n\"„“»«")));
                 if (mb_strlen($text) > 250) { // an der letzten Wortgrenze kürzen
                     $text = preg_replace('/\s+\S*$/u', '', mb_substr($text, 0, 249)) . '…';
                 }
-                $in += $antwort->usage->inputTokens;
-                $out += $antwort->usage->outputTokens;
-                $ki->addUebersetzungUsage($antwort->usage->inputTokens, $antwort->usage->outputTokens);
+                $in += $tin;
+                $out += $tout;
+                $ki->addUebersetzungUsage($tin, $tout);
                 if (mb_strlen($text) < 8) {
                     throw new \RuntimeException('leere Antwort');
                 }
@@ -2798,10 +2784,10 @@ class SetupController extends Controller
         $modul = Yii::$app->getModule('neuigkeiten');
         $ki = Yii::$app->getModule('ki-assistent');
         if ($ki->getApiKey() === null) {
-            $this->stderr("Kein Schlüssel in secrets/anthropic_api_key\n");
+            $this->stderr("Kein Schlüssel in " . Yii::$app->getModule('ki-assistent')->getApiKeyDatei() . "\n");
             return ExitCode::CONFIG;
         }
-        $claude = new \humhub\modules\kiAssistent\components\Claude($ki->getApiKey(), $ki->getModel());
+        $claude = $ki->ki();
         $basis = $modul->getBasePath() . '/hilfe';
         $fehler = 0;
         foreach (array_diff(array_keys(\humhub\modules\neuigkeiten\Module::HILFE), \humhub\modules\neuigkeiten\Module::NUR_DEUTSCH) as $seite) {

@@ -7,7 +7,7 @@ use humhub\components\Controller;
 use humhub\modules\kiAssistent\components\Aktionen;
 use humhub\modules\kiAssistent\components\Context;
 use humhub\modules\kiAssistent\components\Formulare;
-use humhub\modules\kiAssistent\components\Claude;
+use humhub\modules\kiAssistent\components\KiModell;
 use humhub\modules\kiAssistent\components\Embeddings;
 use humhub\modules\kiAssistent\components\Wissen;
 use humhub\modules\kiAssistent\models\Feedback;
@@ -82,7 +82,7 @@ class ChatController extends Controller
         }
         $key = $this->module->getApiKey();
         if ($key === null) {
-            Yii::error('KI-Assistent: kein Claude-Schlüssel hinterlegt (secrets/anthropic_api_key)', 'ki-assistent');
+            Yii::error('KI-Assistent: kein KI-Schlüssel hinterlegt (' . $this->module->getApiKeyDatei() . ')', 'ki-assistent');
             return $this->asJson(['error' => Yii::t('KiAssistentModule.base', 'Uffi ist gerade nicht erreichbar. Bitte versuch es später noch einmal.')]);
         }
         if (($grund = $this->module->reserve()) !== null) {
@@ -91,7 +91,7 @@ class ChatController extends Controller
 
         $antworten = function (?callable $senden) use ($key, $history) {
             try {
-                [$answer, $cards, $memo, $in, $out] = self::converse(new Claude($key, $this->module->getModel()),
+                [$answer, $cards, $memo, $in, $out] = self::converse($this->module->ki(),
                     self::systemPrompt(self::searchText($history)), $history, $senden);
             } catch (\Throwable $e) {
                 // Nur die Fehlermeldung protokollieren, nie den Inhalt der Frage
@@ -142,9 +142,9 @@ class ChatController extends Controller
      * @param callable|null $senden fn(array): gestreamt – Textstücke als ['text' => …], Aktionen als ['status' => …]
      * @return array [Antwort, Karten, Memo für den Verlauf, Eingabe-Tokens, Ausgabe-Tokens]
      */
-    public static function converse(Claude $claude, string|array $systemPrompt, array $history, ?callable $senden = null): array
+    public static function converse(KiModell $claude, string|array $systemPrompt, array $history, ?callable $senden = null): array
     {
-        $messages = Claude::messages($history);
+        $messages = $claude->messages($history);
         $tools = Aktionen::declarations();
         $cards = [];
         $memo = [];
@@ -166,14 +166,14 @@ class ChatController extends Controller
             [$message, $i, $o] = $claude->generate($systemPrompt, $messages, $round < 4 ? $tools : [], $onText);
             $in += $i;
             $out += $o;
-            $calls = Claude::toolCalls($message);
+            $calls = $claude->werkzeugAufrufe($message);
             if (!$calls) {
-                $teile[] = trim(Claude::text($message));
+                $teile[] = trim($claude->antwortText($message));
                 $answer = implode("\n\n", array_filter($teile, fn($t) => $t !== ''));
                 break;
             }
-            $teile[] = trim(Claude::text($message));
-            $messages[] = ['role' => 'assistant', 'content' => $message->content]; // unverändert, inkl. Denk-Blöcken
+            $teile[] = trim($claude->antwortText($message));
+            array_push($messages, ...$claude->antwortNachrichten($message)); // unverändert, bei Claude inkl. Denk-Blöcken
             $results = [];
             foreach ($calls as [$id, $name, $args]) {
                 if ($senden !== null) {
@@ -187,12 +187,9 @@ class ChatController extends Controller
                 }
                 $memo[] = "[Aktion $name" . (isset($args['formular_id']) ? " ({$args['formular_id']})" : '') . ': '
                     . (!empty($result['ok']) ? 'erledigt' : (isset($result['fehlende_angaben']) ? 'Angaben fehlen' : (isset($result['felder']) ? 'Formular geladen' : 'fehlgeschlagen'))) . ']';
-                $results[] = ['type' => 'tool_result', 'toolUseID' => $id,
-                    'content' => json_encode($result, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
-                    'isError' => isset($result['fehler'])];
+                $results[] = [$id, json_encode($result, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), isset($result['fehler'])];
             }
-            // alle Ergebnisse in einer Nachricht zurück
-            $messages[] = ['role' => 'user', 'content' => $results];
+            array_push($messages, ...$claude->ergebnisNachrichten($results));
         }
         $answer ??= implode("\n\n", array_filter($teile, fn($t) => $t !== ''));
         if ($answer === '') {

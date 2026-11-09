@@ -4,7 +4,7 @@ namespace humhub\modules\kiAssistent;
 
 class Module extends \humhub\components\Module
 {
-    /** Obergrenze an Anfragen pro Kalendermonat, damit das Claude-Guthaben nicht unbemerkt aufgebraucht wird */
+    /** Obergrenze an Anfragen pro Kalendermonat, damit das KI-Guthaben nicht unbemerkt aufgebraucht wird */
     public int $monthlyLimit = 1000;
 
     /** Davon höchstens so viele für Gäste (ohne Konto), damit Missbrauch Uffi nicht für alle Angemeldeten abschaltet */
@@ -48,17 +48,57 @@ class Module extends \humhub\components\Module
     /** Bereiche, die man bei Terminland auswählen kann */
     public array $terminlandAemter = ['Einwohnermeldeamt', 'Passamt', 'Standesamt', 'Gewerbeamt', 'Ordnungsamt', 'Fundsachen'];
 
-    /** Claude-Modell, per CLAUDE_MODEL in compose.yml änderbar */
-    public function getModel(): string
+    /** KI-Anbieter: „openai“ oder „claude“, per KI_ANBIETER in compose.yml umschaltbar */
+    public function getAnbieter(): string
     {
-        return getenv('CLAUDE_MODEL') ?: 'claude-haiku-5-5';
+        return getenv('KI_ANBIETER') === 'openai' ? 'openai' : 'claude';
     }
 
-    /** API-Schlüssel als Docker-Secret (secrets/anthropic_api_key auf dem Host) */
+    /** Anzeigename des Anbieters für Hinweise („ChatGPT (OpenAI)“) */
+    public function getAnbieterName(): string
+    {
+        return $this->getAnbieter() === 'openai' ? 'ChatGPT (OpenAI)' : 'Claude (Anthropic)';
+    }
+
+    /**
+     * Modell des Anbieters, per CLAUDE_MODEL/OPENAI_MODEL in compose.yml änderbar.
+     * @param string $stufe standard (Uffi, Übersetzen, Auslesen) oder stark (lange, anspruchsvolle Texte)
+     * @param string|null $claudeModell abweichendes Claude-Modell (z. B. aus der Konfiguration eines Moduls)
+     */
+    public function getModel(string $stufe = 'standard', ?string $claudeModell = null): string
+    {
+        if ($this->getAnbieter() === 'openai') {
+            return ($stufe === 'stark' ? getenv('OPENAI_MODEL_STARK') : null) ?: getenv('OPENAI_MODEL') ?: 'gpt-5-mini';
+        }
+        return $claudeModell ?: getenv('CLAUDE_MODEL') ?: 'claude-haiku-5-5';
+    }
+
+    /** Pfad des Schlüssels auf dem Host (für Fehlermeldungen) */
+    public function getApiKeyDatei(): string
+    {
+        return $this->getAnbieter() === 'openai' ? 'secrets/openai_api_key' : 'secrets/anthropic_api_key';
+    }
+
+    /** API-Schlüssel des Anbieters als Docker-Secret (secrets/openai_api_key bzw. secrets/anthropic_api_key auf dem Host) */
     public function getApiKey(): ?string
     {
-        $key = @file_get_contents('/run/secrets/anthropic_api_key');
+        $key = @file_get_contents('/run/secrets/' . basename($this->getApiKeyDatei()));
         return $key !== false && trim($key) !== '' ? trim($key) : null;
+    }
+
+    /**
+     * KI-Client des eingestellten Anbieters.
+     * @param int|null $timeout Sekunden für lange Antworten (Stadtrat)
+     */
+    public function ki(string $stufe = 'standard', ?string $claudeModell = null, ?int $timeout = null): components\KiModell
+    {
+        $key = $this->getApiKey() ?? throw new \RuntimeException('Kein KI-Schlüssel (' . $this->getApiKeyDatei() . ')');
+        if ($this->getAnbieter() === 'openai') {
+            return new components\OpenAi($key, $this->getModel($stufe), getenv('OPENAI_REASONING') === false ? 'low' : (getenv('OPENAI_REASONING') === 'aus' ? '' : getenv('OPENAI_REASONING')), $timeout ?? 300,
+                getenv('OPENAI_BASE_URL') ?: 'https://api.openai.com/v1');
+        }
+        require_once __DIR__ . '/vendor/autoload.php';
+        return new components\Claude($key, $this->getModel($stufe, $claudeModell), $timeout);
     }
 
     /**

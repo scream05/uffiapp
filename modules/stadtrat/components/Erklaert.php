@@ -95,30 +95,17 @@ class Erklaert
         return $ids ? Kurzfassung::find()->where(['sitzung_id' => $ids, 'status' => 'freigegeben'])->indexBy('sitzung_id')->all() : [];
     }
 
-    // ---- Claude ----
+    // ---- KI (Anbieter des KI-Assistenten) ----
 
+    /** @param array $inhalt neutrale Inhalte (['text' => …], ['pdf' => …]), siehe KiModell */
     private static function claude(string $modell, string $system, array $inhalt, int $maxTokens = 16000): string
     {
         $ki = Yii::$app->getModule('ki-assistent');
-        require_once $ki->basePath . '/vendor/autoload.php';
-        if (($key = $ki->getApiKey()) === null) {
-            throw new \RuntimeException('Kein Claude-Schlüssel');
-        }
-        // Opus braucht für eine ganze Niederschrift oft länger als die 60 s default_socket_timeout,
-        // nach denen der automatisch gefundene HTTP-Client sonst abbricht („Idle timeout reached“).
-        $http = new \Symfony\Component\HttpClient\Psr18Client(
-            \Symfony\Component\HttpClient\HttpClient::create(['timeout' => 600, 'max_duration' => 900]));
-        $client = new \Anthropic\Client(apiKey: $key, requestOptions: ['transporter' => $http, 'streamingTransporter' => $http]);
-        $m = $client->messages->create(model: $modell, maxTokens: $maxTokens, system: $system,
-            messages: [['role' => 'user', 'content' => $inhalt]]);
-        $text = '';
-        foreach ($m->content as $block) {
-            if ($block->type === 'text') {
-                $text .= $block->text;
-            }
-        }
-        Yii::info("Claude $modell: {$m->usage->inputTokens} ein, {$m->usage->outputTokens} aus", 'stadtrat');
-        return trim($text);
+        // Eine ganze Niederschrift dauert oft länger als 60 s, nach denen der Standard-HTTP-Client abbricht
+        $client = $ki->ki($modell === self::module()->modellEntwurf ? 'stark' : 'standard', $modell, 600);
+        [$text, $in, $out] = $client->inhalt($system, $inhalt, $maxTokens);
+        Yii::info($client->name() . " $modell: $in ein, $out aus", 'stadtrat');
+        return $text;
     }
 
     /** Entwurf aus der Niederschrift; überschreibt einen vorhandenen Entwurf (nicht eine freigegebene Fassung) */
@@ -131,12 +118,12 @@ class Erklaert
                 throw new \RuntimeException('Sitzung oder Niederschrift fehlt');
             }
             $antwort = self::claude(self::module()->modellEntwurf, file_get_contents(__DIR__ . '/../data/anleitung.md'), [
-                ['type' => 'document', 'source' => ['type' => 'base64', 'mediaType' => 'application/pdf', 'data' => base64_encode(file_get_contents(self::pdf($id)))]],
-                ['type' => 'text', 'text' => "Niederschrift: {$s->titel} am " . date('j.n.Y', strtotime($s->datum)) . " ({$s->gremium}). Schreibe die drei Fassungen."],
+                ['pdf' => file_get_contents(self::pdf($id)), 'name' => 'niederschrift'],
+                ['text' => "Niederschrift: {$s->titel} am " . date('j.n.Y', strtotime($s->datum)) . " ({$s->gremium}). Schreibe die drei Fassungen."],
             ]);
             $json = json_decode(preg_match('/\{.*\}/s', $antwort, $m) ? $m[0] : '', true);
             if (!is_array($json) || empty($json['kurz']) || empty($json['lang']) || empty($json['vorlese'])) {
-                throw new \RuntimeException('Antwort von Claude nicht lesbar: ' . mb_substr($antwort, 0, 300));
+                throw new \RuntimeException('Antwort der KI nicht lesbar: ' . mb_substr($antwort, 0, 300));
             }
             $k->setAttributes(['kurz' => trim($json['kurz']), 'lang' => trim($json['lang']), 'vorlese' => trim($json['vorlese']),
                 'audio_text' => null, 'audio_pruefung' => null, 'status' => 'entwurf', 'fehler' => null], false);
@@ -209,7 +196,7 @@ class Erklaert
             . 'Melde nur inhaltliche Abweichungen: andere Zahlen, Jahre oder Beträge, fehlende oder zusätzliche Wörter mit Bedeutung, vertauschte Begriffe, mitgesprochene Anweisungen '
             . 'oder Sätze in einer anderen Sprache (etwa englisch, vor allem am Anfang). '
             . 'Erste Zeile genau „OK“ oder „ABWEICHUNG“, danach bei Abweichungen je Zeile „- Text: … / Aufnahme: …“.',
-            [['type' => 'text', 'text' => "VORLESETEXT:\n$soll\n\nABSCHRIFT DER AUFNAHME:\n$ist"]], 2000);
+            [['text' => "VORLESETEXT:\n$soll\n\nABSCHRIFT DER AUFNAHME:\n$ist"]], 2000);
         return [str_starts_with(strtoupper(ltrim($antwort)), 'OK'), $antwort];
     }
 

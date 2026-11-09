@@ -17,13 +17,25 @@ require_once __DIR__ . '/../vendor/autoload.php';
  * Client für die Claude-API (Anthropic PHP SDK, vendor/ per scripts/run-setup.sh ki-composer).
  * @see https://docs.claude.com/en/api/messages
  */
-class Claude
+class Claude implements KiModell
 {
     private Client $client;
 
-    public function __construct(string $apiKey, private string $model)
+    /** @param int|null $timeout Sekunden für lange Antworten (Standard-Client bricht sonst nach 60 s ohne Daten ab) */
+    public function __construct(string $apiKey, private string $model, ?int $timeout = null)
     {
-        $this->client = new Client(apiKey: $apiKey);
+        if ($timeout === null) {
+            $this->client = new Client(apiKey: $apiKey);
+            return;
+        }
+        $http = new \Symfony\Component\HttpClient\Psr18Client(
+            \Symfony\Component\HttpClient\HttpClient::create(['timeout' => $timeout, 'max_duration' => $timeout + 300]));
+        $this->client = new Client(apiKey: $apiKey, requestOptions: ['transporter' => $http, 'streamingTransporter' => $http]);
+    }
+
+    public function name(): string
+    {
+        return 'Claude';
     }
 
     /**
@@ -33,7 +45,7 @@ class Claude
      */
     public function ask(string|array $systemPrompt, array $history): array
     {
-        [$message, $in, $out] = $this->generate($systemPrompt, self::messages($history));
+        [$message, $in, $out] = $this->generate($systemPrompt, $this->messages($history));
         $text = self::text($message);
         if ($text === '') {
             throw new \RuntimeException('Claude lieferte keine Antwort');
@@ -106,7 +118,7 @@ class Claude
     }
 
     /** Verlauf aus dem Browser (role user/model) als Claude-„messages“ */
-    public static function messages(array $history): array
+    public function messages(array $history): array
     {
         return array_map(fn($m) => ['role' => $m['role'] === 'model' ? 'assistant' : 'user', 'content' => $m['text']], $history);
     }
@@ -133,5 +145,70 @@ class Claude
             }
         }
         return $calls;
+    }
+
+    public function antwortText($antwort): string
+    {
+        return self::text($antwort);
+    }
+
+    public function werkzeugAufrufe($antwort): array
+    {
+        return self::toolCalls($antwort);
+    }
+
+    public function antwortNachrichten($antwort): array
+    {
+        return [['role' => 'assistant', 'content' => $antwort->content]]; // unverändert, inkl. Denk-Blöcken
+    }
+
+    public function ergebnisNachrichten(array $ergebnisse): array
+    {
+        // alle Ergebnisse in einer Nachricht zurück
+        return [['role' => 'user', 'content' => array_map(fn($e) => ['type' => 'tool_result', 'toolUseID' => $e[0],
+            'content' => $e[1], 'isError' => (bool)$e[2]], $ergebnisse)]];
+    }
+
+    public function werkzeug(string $system, array $teile, array $werkzeug, int $maxTokens = 4000): array
+    {
+        $message = $this->client->messages->create(
+            model: $this->model,
+            maxTokens: $maxTokens,
+            system: $system,
+            messages: [['role' => 'user', 'content' => self::teile($teile)]],
+            tools: [$werkzeug],
+            toolChoice: ['type' => 'tool', 'name' => $werkzeug['name']],
+        );
+        $u = $message->usage;
+        $in = $u->inputTokens + (int)$u->cacheCreationInputTokens + (int)$u->cacheReadInputTokens;
+        foreach ($message->content as $block) {
+            if ($block instanceof ToolUseBlock && $block->name === $werkzeug['name']) {
+                return [json_decode(json_encode($block->input), true) ?: [], $in, $u->outputTokens];
+            }
+        }
+        throw new \RuntimeException('Claude lieferte kein Ergebnis (' . $message->stopReason . ')');
+    }
+
+    public function inhalt(string $system, array $teile, int $maxTokens = 8000): array
+    {
+        $message = $this->client->messages->create(model: $this->model, maxTokens: $maxTokens, system: $system,
+            messages: [['role' => 'user', 'content' => self::teile($teile)]]);
+        return [self::text($message), $message->usage->inputTokens, $message->usage->outputTokens];
+    }
+
+    /** Neutrale Inhalte (text/bild/pdf) als Claude-Inhaltsblöcke */
+    private static function teile(array $teile): array
+    {
+        $out = [];
+        foreach ($teile as $t) {
+            if (isset($t['text'])) {
+                $out[] = ['type' => 'text', 'text' => $t['text']];
+            } elseif (isset($t['bild'])) {
+                $out[] = ['type' => 'image', 'source' => ['type' => 'base64', 'media_type' => $t['bild'][0], 'data' => base64_encode($t['bild'][1])]];
+            } elseif (isset($t['pdf'])) {
+                $out[] = ['type' => 'document', 'source' => ['type' => 'base64', 'media_type' => 'application/pdf', 'data' => base64_encode($t['pdf'])]];
+            }
+        }
+        return $out;
     }
 }
