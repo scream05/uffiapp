@@ -35,7 +35,7 @@ class Module extends \humhub\components\Module
         'sport' => ['humhub\modules\vereine\widgets\SpieltagKasten', 'Sport heute (nur an Spieltagen)'],
         'oeffnungszeiten' => ['humhub\modules\oeffnungszeiten\widgets\Kasten', 'Öffnungszeiten'],
         'sprit' => ['humhub\modules\tanken\widgets\SpritKasten', 'Spritpreise'],
-        'aktivitaeten' => ['humhub\modules\activity\widgets\ActivityStreamViewer', 'Letzte Aktivitäten'],
+        'aktivitaeten' => ['humhub\modules\activity\widgets\ActivityBox', 'Letzte Aktivitäten'], // nur Admins (Events::nurAdminsAktivitaeten)
         'veranstaltungen' => ['humhub\modules\calendar\widgets\UpcomingEvents', 'Anstehende Veranstaltungen'],
     ];
 
@@ -43,6 +43,9 @@ class Module extends \humhub\components\Module
     public function getKaesten(User $user): array
     {
         $vorhanden = array_keys(array_filter(self::KAESTEN, fn($k) => class_exists($k[0])));
+        if (!$user->isSystemAdmin()) {
+            $vorhanden = array_values(array_diff($vorhanden, ['aktivitaeten'])); // „Letzte Aktivitäten“ nur für Admins
+        }
         $eigen = json_decode((string)$this->settings->user($user)->get('kaesten', '[]'), true) ?: [];
         $eigen = array_values(array_intersect($eigen, $vorhanden));
         return array_merge($eigen, array_values(array_diff($vorhanden, $eigen)));

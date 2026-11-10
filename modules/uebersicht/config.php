@@ -19,7 +19,8 @@ return [
         ['class' => 'humhub\modules\space\widgets\HeaderControlsMenu', 'event' => 'run', 'callback' => [Events::class, 'onSpaceHeaderControlsRun']],
         ['class' => 'humhub\modules\dashboard\stream\DashboardStreamQuery', 'event' => 'beforeFilter', 'callback' => [Events::class, 'onDashboardStreamBeforeFilter']],
         ['class' => 'humhub\modules\content\widgets\WallEntryControls', 'event' => 'init', 'callback' => [Events::class, 'onWallEntryControlsInit']],
-        // „Letzte Aktivitäten“ in Spaces nur für Angemeldete
+        // „Letzte Aktivitäten“ nur für Admins (Übersicht: onDashboardSidebarInit, Spaces: onSpaceSidebarInit, Nachladen gesperrt)
+        ['class' => 'humhub\modules\activity\controllers\ActivityBoxController', 'event' => 'beforeAction', 'callback' => [Events::class, 'onActivityBoxBeforeAction']],
         ['class' => 'humhub\modules\space\widgets\Sidebar', 'event' => 'init', 'callback' => [Events::class, 'onSpaceSidebarInit']],
         ['class' => 'humhub\modules\space\widgets\Sidebar', 'event' => 'afterRun', 'callback' => [Events::class, 'onSpaceSidebarAfterRun']],
         // „Neue Spaces“ in der Seitenleiste der Übersicht nur für Admins

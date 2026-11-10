@@ -28,21 +28,34 @@ class Events
         }
     }
 
-    /** Spaces: Gäste sehen in der Seitenleiste keine „Letzten Aktivitäten“ */
+    /** „Letzte Aktivitäten“ (Kern-Widget ActivityBox) nur für Systemadmins: aus einer Seitenleiste entfernen */
+    public static function nurAdminsAktivitaeten($sidebar): void
+    {
+        if (!Yii::$app->user->isGuest && Yii::$app->user->isAdmin()) {
+            return;
+        }
+        foreach ($sidebar->widgets as $k => $widget) {
+            if (($widget[0] ?? null) === \humhub\modules\activity\widgets\ActivityBox::class) {
+                unset($sidebar->widgets[$k]);
+            }
+        }
+    }
+
+    /** Spaces: „Letzte Aktivitäten“ in der Seitenleiste nur für Admins */
     public static function onSpaceSidebarInit($event)
     {
         try {
-            $sidebar = $event->sender;
-            if (!Yii::$app->user->isGuest) {
-                return;
-            }
-            foreach ($sidebar->widgets as $k => $widget) {
-                if (($widget[0] ?? null) === \humhub\modules\activity\widgets\ActivityStreamViewer::class) {
-                    unset($sidebar->widgets[$k]);
-                }
-            }
+            self::nurAdminsAktivitaeten($event->sender);
         } catch (\Throwable $e) {
             Yii::error($e);
+        }
+    }
+
+    /** Nachladen der „Letzten Aktivitäten“ (activity/activity-box/load) nur für Admins */
+    public static function onActivityBoxBeforeAction($event)
+    {
+        if (Yii::$app->user->isGuest || !Yii::$app->user->isAdmin()) {
+            throw new \yii\web\ForbiddenHttpException();
         }
     }
 
@@ -57,11 +70,12 @@ class Events
         }
     }
 
-    /** Seitenleiste der Übersicht: „Neue Spaces“ (Kern zeigt es nur Gästen) nur für Admins */
+    /** Seitenleiste der Übersicht: „Neue Spaces“ (Kern zeigt es nur Gästen) und „Letzte Aktivitäten“ nur für Admins */
     public static function onDashboardSidebarInit($event)
     {
         try {
             $sidebar = $event->sender;
+            self::nurAdminsAktivitaeten($sidebar);
             $neueSpaces = \humhub\modules\space\widgets\NewSpaces::class;
             foreach ($sidebar->widgets as $k => $widget) {
                 if (($widget[0] ?? null) === $neueSpaces) {

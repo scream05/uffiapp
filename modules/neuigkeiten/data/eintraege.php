@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'aktivitaeten-ausgeblendet', 'datum' => '2026-11-10', 'art' => 'besser', 'popup' => false,
+        'titel' => 'Kasten „Letzte Aktivitäten“ ausgeblendet',
+        'text' => 'Der Kasten „Letzte Aktivitäten“ rechts in der Übersicht und in den Spaces ist nicht mehr zu sehen. Was neu ist, findest du wie gewohnt direkt in den Beiträgen.'],
     ['id' => 'uffi-links-schliessen', 'datum' => '2026-11-10', 'art' => 'behoben', 'popup' => false,
         'titel' => 'Uffi macht Platz für Links',
         'text' => 'Wenn du am Handy in Uffis Fenster auf „Datenschutz“ tippst, schließt sich Uffi jetzt und du siehst gleich die Datenschutzerklärung. Vorher blieb Uffi im Vordergrund und es sah aus, als passiere nichts.'],

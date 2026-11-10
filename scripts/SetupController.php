@@ -2367,6 +2367,41 @@ class SetupController extends Controller
             $ue->setKaestenAus($nutzer, []);
             Yii::$app->cache->flush();
             $gleich('alle wieder an: keine Einstellung gespeichert', $ue->settings->user($nutzer)->get('kaesten_aus'), null);
+            // „Letzte Aktivitäten“ (ActivityBox) nur für Systemadmins
+            $admin = User::find()->active()->andWhere(['id' => \humhub\modules\user\models\GroupUser::find()->select('user_id')
+                ->where(['group_id' => \humhub\modules\user\models\Group::getAdminGroupId()])])->one();
+            $mitglied = User::find()->active()->andWhere(['NOT IN', 'id', \humhub\modules\user\models\GroupUser::find()->select('user_id')
+                ->where(['group_id' => \humhub\modules\user\models\Group::getAdminGroupId()])])->one();
+            $box = \humhub\modules\activity\widgets\ActivityBox::class;
+            $mitBox = function (?User $u) use ($box): array {
+                Yii::$app->user->switchIdentity($u);
+                $res = [];
+                foreach (['dashboard', 'space'] as $art) {
+                    $sb = new class { public $widgets = []; };
+                    $sb->widgets = [[$box, [], ['sortOrder' => 10]], ['humhub\modules\space\widgets\Members', [], ['sortOrder' => 30]]];
+                    $art === 'dashboard' ? \humhub\modules\uebersicht\Events::onDashboardSidebarInit((object)['sender' => $sb])
+                        : \humhub\modules\uebersicht\Events::onSpaceSidebarInit((object)['sender' => $sb]);
+                    $res[] = in_array($box, array_map(fn($w) => $w[0], $sb->widgets), true);
+                }
+                return $res;
+            };
+            $gleich('Aktivitäten: Klasse in KAESTEN existiert', class_exists($klasse('aktivitaeten')), true);
+            $gleich('Aktivitäten: Admin sieht sie (Übersicht, Space)', $mitBox($admin), [true, true]);
+            $gleich('Aktivitäten: Mitglied sieht sie nicht', $mitBox($mitglied), [false, false]);
+            $gleich('Aktivitäten: Gast sieht sie nicht', $mitBox(null), [false, false]);
+            $gleich('Aktivitäten: in „Meine Übersicht“ nur für Admin wählbar',
+                [in_array('aktivitaeten', $ue->getKaesten($admin), true), in_array('aktivitaeten', $ue->getKaesten($mitglied), true)], [true, false]);
+            $nachladen = function (?User $u) {
+                Yii::$app->user->switchIdentity($u);
+                try {
+                    \humhub\modules\uebersicht\Events::onActivityBoxBeforeAction(null);
+                    return 'erlaubt';
+                } catch (\yii\web\ForbiddenHttpException $e) {
+                    return '403';
+                }
+            };
+            $gleich('Aktivitäten nachladen: Admin erlaubt, Mitglied/Gast 403', [$nachladen($admin), $nachladen($mitglied), $nachladen(null)], ['erlaubt', '403', '403']);
+            Yii::$app->user->switchIdentity(null);
         } finally {
             $tx->rollBack();
             Yii::$app->cache->flush();

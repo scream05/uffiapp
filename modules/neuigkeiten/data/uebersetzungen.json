@@ -1,4 +1,31 @@
 {
+    "aktivitaeten-ausgeblendet": {
+        "en": {
+            "titel": "“Latest Activities” box hidden",
+            "text": "The “Latest Activities” box on the right in the overview and in the Spaces is no longer visible. As usual, you can find what’s new directly in the posts.",
+            "quelle": "39a31286b12c292dca80ee3809a79d8232ee11b7"
+        },
+        "uk": {
+            "titel": "Блок «Останні активності» приховано",
+            "text": "Блок «Останні активності» праворуч в огляді та в Spaces більше не видно. Що нового, як і раніше, знайдеш безпосередньо в дописах.",
+            "quelle": "39a31286b12c292dca80ee3809a79d8232ee11b7"
+        },
+        "ar": {
+            "titel": "تم إخفاء مربع «آخر الأنشطة»",
+            "text": "مربع «آخر الأنشطة» على اليمين في الصفحة الرئيسية وفي الـ Spaces لم يعد ظاهرًا. ستجدين\/ستجد كل جديد كما تعوّدت مباشرةً في المنشورات.",
+            "quelle": "39a31286b12c292dca80ee3809a79d8232ee11b7"
+        },
+        "tr": {
+            "titel": "\"Son aktiviteler\" kutusu gizlendi",
+            "text": "Genel görünümde ve Spaces'te sağ taraftaki \"Son aktiviteler\" kutusu artık görünmüyor. Nelerin yeni olduğunu her zamanki gibi doğrudan gönderilerde bulabilirsin.",
+            "quelle": "39a31286b12c292dca80ee3809a79d8232ee11b7"
+        },
+        "ru": {
+            "titel": "Блок «Последние активности» скрыт",
+            "text": "Блок «Последние активности» справа в обзоре и в Spaces больше не отображается. Что нового, ты, как обычно, найдёшь прямо в публикациях.",
+            "quelle": "39a31286b12c292dca80ee3809a79d8232ee11b7"
+        }
+    },
     "uffi-links-schliessen": {
         "en": {
             "titel": "Uffi makes room for links",
