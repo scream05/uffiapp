@@ -189,10 +189,11 @@ use yii\helpers\Url;
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && body.classList.contains('ki-fab-open')) toggle(false);
     });
-    // Handy: Link in einer Antwort angetippt → Fenster schließen, damit man die Seite sieht
-    panel.querySelector('.ki-messages').addEventListener('click', function (e) {
+    // Handy: Link im Fenster angetippt (Antwort, Datenschutz, „Als Seite öffnen“) → Fenster schließen, damit man die
+    // Seite sieht; sonst bleibt Uffi über der neuen Seite und es wirkt, als passiere nichts (10.11.2026)
+    panel.addEventListener('click', function (e) {
         var a = e.target.closest('a[href]');
-        if (a && mobile() && !a.target && !a.hasAttribute('download')) toggle(false);
+        if (a && mobile() && !a.target && !a.hasAttribute('download') && a.getAttribute('href') !== '#') toggle(false);
     });
     // Am Computer bleibt das Fenster auch nach einem vollen Seitenaufbau offen
     try { if (!mobile() && sessionStorage.getItem('ki-assistent-open')) toggle(true); } catch (e) {}

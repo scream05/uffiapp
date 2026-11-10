@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'uffi-links-schliessen', 'datum' => '2026-11-10', 'art' => 'behoben', 'popup' => false,
+        'titel' => 'Uffi macht Platz für Links',
+        'text' => 'Wenn du am Handy in Uffis Fenster auf „Datenschutz“ tippst, schließt sich Uffi jetzt und du siehst gleich die Datenschutzerklärung. Vorher blieb Uffi im Vordergrund und es sah aus, als passiere nichts.'],
     ['id' => 'aktivitaeten-deutsch', 'datum' => '2026-11-10', 'art' => 'behoben', 'popup' => false,
         'titel' => 'Letzte Aktivitäten in richtigem Deutsch',
         'text' => 'Bei den letzten Aktivitäten stand „hat ein neues Beitrag erstellt“ oder „hat ein neues Termin erstellt“. Jetzt steht dort zum Beispiel „Neu von Stadt Uffenheim: Termin …“.'],

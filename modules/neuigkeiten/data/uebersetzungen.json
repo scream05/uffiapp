@@ -1,4 +1,31 @@
 {
+    "uffi-links-schliessen": {
+        "en": {
+            "titel": "Uffi makes room for links",
+            "text": "If you tap “Privacy Policy” in Uffi’s window on your phone, Uffi now closes right away and you’ll see the privacy policy immediately. Before, Uffi stayed in the foreground and it looked like nothing was happening.",
+            "quelle": "a25f5449972705eeabde73c74757a0cfc391a17f"
+        },
+        "uk": {
+            "titel": "Uffi звільняє місце для посилань",
+            "text": "Якщо ти на телефоні у вікні Uffi натиснеш «Захист даних», Uffi тепер закриється, і ти одразу побачиш декларацію про захист даних. Раніше Uffi залишався на передньому плані, і здавалося, ніби нічого не відбувається.",
+            "quelle": "a25f5449972705eeabde73c74757a0cfc391a17f"
+        },
+        "ar": {
+            "titel": "Uffi يفسح المجال للروابط",
+            "text": "إذا ضغطت على «Datenschutz» في نافذة Uffi على الموبايل، فإن Uffi يُغلق الآن مباشرة وسترى بيان الخصوصية فورًا. في السابق كان Uffi يبقى في المقدمة، وكان يبدو وكأن شيئًا لا يحدث.",
+            "quelle": "a25f5449972705eeabde73c74757a0cfc391a17f"
+        },
+        "tr": {
+            "titel": "Uffi bağlantılar için yer açıyor",
+            "text": "Telefonda Uffi’nin penceresinde “Datenschutz”a dokunduğunda, Uffi artık kapanıyor ve gizlilik açıklamasını hemen görüyorsun. Önceden Uffi önde kalıyordu ve sanki hiçbir şey olmuyormuş gibi görünüyordu.",
+            "quelle": "a25f5449972705eeabde73c74757a0cfc391a17f"
+        },
+        "ru": {
+            "titel": "Uffi освобождает место для ссылок",
+            "text": "Если ты на телефоне в окне Uffi нажмёшь на «Datenschutz», Uffi теперь закроется, и ты сразу увидишь Datenschutzerklärung. Раньше Uffi оставался на переднем плане, и казалось, будто ничего не происходит.",
+            "quelle": "a25f5449972705eeabde73c74757a0cfc391a17f"
+        }
+    },
     "aktivitaeten-deutsch": {
         "en": {
             "titel": "Recent activities in proper English",
