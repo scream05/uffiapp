@@ -34,9 +34,11 @@ $logo = $isNew ? null : $verein->getLogo();
         </div>
         <?= $form->field($verein, 'beschreibung')->widget(RichTextField::class, [
             'placeholder' => Yii::t('VereineModule.base', 'Wer sind wir, was machen wir, wann trifft man uns, wie kann man mitmachen?'),
-            'exclude' => ['mention', 'oembed', 'upload'],
+            // Bilder im Text erlaubt (Büroklammer bzw. Einfügen), beim Speichern an den Verein gehängt (Verein::afterSave)
+            'exclude' => $isNew ? ['mention', 'oembed', 'upload'] : ['mention', 'oembed'],
             'pluginOptions' => ['maxHeight' => '400px'],
         ]) ?>
+        <?php if (!$isNew): ?><p class="help-block" style="margin-top:-8px"><?= Yii::t('VereineModule.base', 'Bilder kannst du direkt in den Text einfügen. Nur eigene Fotos oder Fotos mit Erlaubnis; bei Personen bitte deren Einverständnis.') ?></p><?php endif ?>
         <?= $form->field($verein, 'treffpunkt')->textInput(['placeholder' => Yii::t('VereineModule.base', 'z. B. Sportheim, Am Sportplatz 1, 97215 Uffenheim')]) ?>
         <div class="row">
             <div class="col-sm-4"><?= $form->field($verein, 'website')->textInput(['placeholder' => 'https://…']) ?></div>

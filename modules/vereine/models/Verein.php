@@ -325,6 +325,15 @@ class Verein extends ActiveRecord implements ViewableInterface
         return parent::beforeSave($insert);
     }
 
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+        // Bilder im Vorstellungstext (file-guid:…) an den Verein hängen, damit Gäste sie sehen (wie bei Beiträgen)
+        if ($insert || array_key_exists('beschreibung', $changedAttributes)) {
+            \humhub\modules\content\widgets\richtext\RichText::postProcess($this->beschreibung, $this, 'beschreibung');
+        }
+    }
+
     public function afterDelete()
     {
         foreach ($this->fileManager->findAll() as $file) {
@@ -418,11 +427,12 @@ class Verein extends ActiveRecord implements ViewableInterface
         return $this->bild($this->teambild_guid);
     }
 
-    /** @return File[] Bilder ohne Logo, Titel- und Teambild */
+    /** @return File[] Bilder ohne Logo, Titel- und Teambild und ohne die Bilder im Vorstellungstext */
     public function getGallery(): array
     {
         $ohne = array_filter([$this->logo_guid, $this->titelbild_guid, $this->teambild_guid]);
-        return array_values(array_filter($this->images(), fn($f) => !in_array($f->guid, $ohne, true)));
+        $imText = fn(File $f) => str_contains((string)$this->beschreibung, 'file-guid:' . $f->guid);
+        return array_values(array_filter($this->images(), fn($f) => !in_array($f->guid, $ohne, true) && !$imText($f)));
     }
 
     /** @return CalendarEntry[] */

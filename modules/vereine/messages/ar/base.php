@@ -358,4 +358,5 @@ return [
     'Zeile unter dem Knopftext' => 'سطر تحت نص الزر',
     'z. B. Jetzt Kurs buchen!' => 'مثلًا: احجز دورة الآن!',
     'z. B. Schwimmen lernen. Vertrauen gewinnen. Gemeinsam wachsen.' => 'مثلًا: تعلّم السباحة. اكسب الثقة. لننمُ معًا.',
+    'Bilder kannst du direkt in den Text einfügen. Nur eigene Fotos oder Fotos mit Erlaubnis; bei Personen bitte deren Einverständnis.' => 'يمكنك إدراج الصور مباشرة في النص. صورك الخاصة فقط أو صور بإذن؛ وإذا ظهر أشخاص فبموافقتهم.',
 ];

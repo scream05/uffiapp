@@ -63,7 +63,8 @@ $module = Yii::$app->getModule('vereine');
         <?php endif ?>
 
         <?php if (trim((string)$verein->beschreibung) !== ''): ?>
-            <div style="margin-top:16px" data-uebersetzbar="verein:<?= $verein->id ?>"><?= RichText::output($verein->beschreibung) ?></div>
+            <style <?= Html::nonce() ?>>.verein-text img { max-width: 100%; height: auto; border-radius: 12px; margin: 6px 0; }</style>
+            <div class="verein-text" style="margin-top:16px" data-uebersetzbar="verein:<?= $verein->id ?>"><?= RichText::output($verein->beschreibung) ?></div>
         <?php endif ?>
 
         <?= $this->render('_team', ['verein' => $verein]) ?>

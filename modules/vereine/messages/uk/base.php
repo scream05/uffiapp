@@ -358,4 +358,5 @@ return [
     'Zeile unter dem Knopftext' => 'Рядок під текстом кнопки',
     'z. B. Jetzt Kurs buchen!' => 'напр. Записатися на курс!',
     'z. B. Schwimmen lernen. Vertrauen gewinnen. Gemeinsam wachsen.' => 'напр. Навчитися плавати. Здобути впевненість. Рости разом.',
+    'Bilder kannst du direkt in den Text einfügen. Nur eigene Fotos oder Fotos mit Erlaubnis; bei Personen bitte deren Einverständnis.' => 'Зображення можна вставляти просто в текст. Лише власні фото або фото з дозволом; якщо на фото люди — з їхньої згоди.',
 ];

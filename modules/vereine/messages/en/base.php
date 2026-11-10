@@ -358,4 +358,5 @@ return [
     'Zeile unter dem Knopftext' => 'Line below the button text',
     'z. B. Jetzt Kurs buchen!' => 'e.g. Book a course now!',
     'z. B. Schwimmen lernen. Vertrauen gewinnen. Gemeinsam wachsen.' => 'e.g. Learn to swim. Gain confidence. Grow together.',
+    'Bilder kannst du direkt in den Text einfügen. Nur eigene Fotos oder Fotos mit Erlaubnis; bei Personen bitte deren Einverständnis.' => 'You can insert images directly into the text. Only your own photos or photos with permission; if people are shown, please get their consent.',
 ];
