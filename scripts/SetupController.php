@@ -1192,6 +1192,36 @@ class SetupController extends Controller
         return $fehler ? ExitCode::SOFTWARE : ExitCode::OK;
     }
 
+    /**
+     * Titel- oder Teambild einer Vereinsseite aus einer Datei im Container setzen (ersetzt ein vorhandenes):
+     * setup/verein-bild <verein_id> titelbild|teambild <pfad> ["Bildbeschreibung"]
+     */
+    public function actionVereinBild($id, $art, $pfad, $beschreibung = '')
+    {
+        $verein = \humhub\modules\vereine\models\Verein::findOne((int)$id);
+        if ($verein === null || !in_array($art, ['titelbild', 'teambild'], true) || !is_file($pfad)) {
+            $this->stderr("Verein, Art (titelbild|teambild) oder Datei fehlt\n");
+            return ExitCode::DATAERR;
+        }
+        $mime = (new \finfo(FILEINFO_MIME_TYPE))->file($pfad);
+        if (!in_array($mime, ['image/jpeg', 'image/png', 'image/webp'], true)) {
+            $this->stderr("Kein JPEG/PNG/WebP: $mime\n");
+            return ExitCode::DATAERR;
+        }
+        Yii::$app->user->switchIdentity(User::find()->joinWith('groups')->where(['group.is_admin_group' => 1])->one());
+        $alt = $art === 'titelbild' ? $verein->getTitelbild() : $verein->getTeambild();
+        $data = file_get_contents($pfad);
+        $file = new \humhub\modules\file\models\File(['file_name' => basename($pfad), 'mime_type' => $mime, 'size' => strlen($data),
+            'title' => mb_substr($beschreibung, 0, 250) ?: null]);
+        $file->save();
+        $file->setStoredFileContent($data);
+        $verein->fileManager->attach($file);
+        $verein->updateAttributes([$art . '_guid' => $file->guid]);
+        $alt?->delete();
+        $this->stdout("$art gesetzt: {$file->guid}" . ($alt ? ", altes Bild gelöscht" : '') . "\n");
+        return ExitCode::OK;
+    }
+
     /** Neue Entwürfe dieses Laufs (für eine Benachrichtigung an die Admins) */
     private array $neueEntwuerfe = [];
 
