@@ -63,7 +63,14 @@ $module = Yii::$app->getModule('vereine');
         <?php endif ?>
 
         <?php if (trim((string)$verein->beschreibung) !== ''): ?>
-            <style <?= Html::nonce() ?>>.verein-text img { max-width: 100%; height: auto; border-radius: 12px; margin: 6px 0; }</style>
+            <style <?= Html::nonce() ?>>
+                .verein-text img { max-width: 100%; height: auto; border-radius: 12px; margin: 6px 0; }
+                /* Bild links/rechts im Editor (HumHub float-start/-end): Text daneben, am Handy volle Breite */
+                .verein-text img.float-start { width: 45%; margin: 4px 18px 10px 0; }
+                .verein-text img.float-end { width: 45%; margin: 4px 0 10px 18px; }
+                .verein-text::after { content: ''; display: block; clear: both; }
+                @media (max-width: 575px) { .verein-text img.float-start, .verein-text img.float-end { float: none !important; width: 100%; margin: 6px 0; } }
+            </style>
             <div class="verein-text" style="margin-top:16px" data-uebersetzbar="verein:<?= $verein->id ?>"><?= RichText::output($verein->beschreibung) ?></div>
         <?php endif ?>
 
