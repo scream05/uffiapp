@@ -17,6 +17,11 @@ use yii\db\ActiveRecord;
  * als normalen Eintrag in den gemeinsamen Kalender (Zeiten wie im Kalendermodul bzw. bei den Vereinsterminen).
  *
  * @property int $id
+ * @property string $quelle whatsapp | stadt (Veranstaltungskalender uffenheim.de)
+ * @property string|null $uid
+ * @property string|null $link
+ * @property string|null $bilder JSON [[url, Bildtext], …]
+ * @property string|null $stand
  * @property string $gruppe
  * @property string|null $wa_id
  * @property string|null $absender_name
@@ -43,6 +48,12 @@ class Entwurf extends ActiveRecord
     public const STATUS_OFFEN = 'offen';
     public const STATUS_UEBERNOMMEN = 'uebernommen';
     public const STATUS_ABGELEHNT = 'abgelehnt';
+
+    public const QUELLE_WHATSAPP = 'whatsapp';
+    public const QUELLE_STADT = 'stadt';
+
+    /** Konto, unter dem Termine der Stadt-Website erscheinen (wie beim RSS-Import) */
+    public const STADT_KONTO = 'stadt-uffenheim';
 
     private const TZ = 'Europe/Berlin';
 
@@ -171,16 +182,25 @@ class Entwurf extends ActiveRecord
             return null;
         }
         [$start, $end] = $this->range();
+        $stadt = $this->istStadt();
         $entry = new CalendarEntry($space);
         $entry->time_zone = self::TZ;
-        $entry->content->visibility = $space->getDefaultContentVisibility();
+        $entry->content->visibility = $stadt ? Content::VISIBILITY_PUBLIC : $space->getDefaultContentVisibility();
+        if ($stadt) {
+            // Verfasser wie beim bisherigen Import; die UID verbindet den Termin mit uffenheim.de (spätere Änderungen)
+            $konto = \humhub\modules\user\models\User::findOne(['username' => self::STADT_KONTO]);
+            if ($konto !== null) {
+                $entry->content->created_by = $konto->id;
+            }
+            $entry->uid = $this->uid;
+        }
         $entry->title = $this->titel;
         $entry->location = (string)$this->ort;
         $beschreibung = trim((string)$this->beschreibung);
         if ($this->veranstalter) {
             $beschreibung = "**Veranstalter:** $this->veranstalter\n\n" . $beschreibung;
         }
-        $entry->description = trim($beschreibung . "\n\n*Eingereicht über die WhatsApp-Community.*");
+        $entry->description = $stadt ? $beschreibung : trim($beschreibung . "\n\n*Eingereicht über die WhatsApp-Community.*");
         $entry->all_day = $this->ganztaegig ? 1 : 0;
         if ($this->ganztaegig) {
             $entry->start_datetime = $start->format('Y-m-d H:i:s');
@@ -200,6 +220,11 @@ class Entwurf extends ActiveRecord
             $entry->setType($type);
             $entry->updateAttributes(['color' => $type->color]); // Kalender färbt nach Termin-, nicht Kategoriefarbe
         }
+        if ($stadt) {
+            foreach ($this->getBilder() as [$url, $text]) {
+                self::bildLaden($entry, $url, $text);
+            }
+        }
         // Das zugeordnete Bild (Nummer wie bei der Auswertung: alle Dateien der Einreichung), sonst alle Bilder
         $alle = $this->getMedien();
         $medien = $this->bild !== null && isset($alle[$this->bild]) && $alle[$this->bild]->isBild()
@@ -213,6 +238,46 @@ class Entwurf extends ActiveRecord
         $this->bearbeitet_by = \Yii::$app->user->id;
         $this->save(false);
         return $entry;
+    }
+
+    public function istStadt(): bool
+    {
+        return $this->quelle === self::QUELLE_STADT;
+    }
+
+    /** @return array[] [[url, Bildtext], …] der Detailseite auf uffenheim.de */
+    public function getBilder(): array
+    {
+        $bilder = json_decode((string)$this->bilder, true);
+        return is_array($bilder) ? $bilder : [];
+    }
+
+    /** Bild von uffenheim.de laden und anhängen (nur von dort, nur Rasterbilder) */
+    private static function bildLaden(CalendarEntry $entry, string $url, ?string $text): void
+    {
+        if (!preg_match('#^https://(www\.)?uffenheim\.de/#', $url)) {
+            return;
+        }
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_FOLLOWLOCATION => false, CURLOPT_TIMEOUT => 30,
+            CURLOPT_USERAGENT => 'community.rundumuffni.de RSS-Import']);
+        $data = curl_exec($ch);
+        $ok = $data !== false && curl_getinfo($ch, CURLINFO_HTTP_CODE) === 200;
+        curl_close($ch);
+        $mime = $ok ? (string)(new \finfo(FILEINFO_MIME_TYPE))->buffer($data) : '';
+        if (!in_array($mime, ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], true)) {
+            \Yii::warning("Bild nicht geladen: $url", 'whatsapp');
+            return;
+        }
+        $file = new File([
+            'file_name' => basename((string)parse_url($url, PHP_URL_PATH)),
+            'mime_type' => $mime,
+            'size' => strlen($data),
+            'title' => mb_substr($text ?: 'Bild zu: ' . $entry->title, 0, 250),
+        ]);
+        $file->save();
+        $file->setStoredFileContent($data);
+        $entry->fileManager->attach($file);
     }
 
     public function ablehnen(): void

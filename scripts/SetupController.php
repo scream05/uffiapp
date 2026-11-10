@@ -932,9 +932,11 @@ class SetupController extends Controller
      * Veranstaltungskalender der Stadt als Termine im Space „Veranstaltungen“, Verfasser
      * „Stadt Uffenheim (Website)“: setup/veranstaltungen  (per Cron täglich).
      * Zeiten kommen aus dem Atom-Feed, Ort, Veranstalter und Text von der Detailseite.
-     * Termine werden an der UID erkannt und bei Änderungen aktualisiert. Fehlt ein künftiger Termin
-     * im Feed, wird er gelöscht, sofern noch niemand zugesagt oder kommentiert hat.
-     * Beim ersten Import keine Benachrichtigungen, und nur Termine der nächsten 30 Tage im Stream.
+     * Neue Termine kommen seit 10.11.2026 nicht mehr direkt in den Kalender, sondern als Entwurf in den Termin-Eingang
+     * (Modul whatsapp, Hinweis auf mögliche Doppler); Admins geben sie frei oder lehnen sie ab (abgelehnte kommen nicht wieder).
+     * Termine im Kalender werden an der UID erkannt und bei Änderungen der Stadt aktualisiert, Korrekturen beim
+     * Freigeben bleiben, bis die Stadt den Termin ändert. Fehlt ein künftiger Termin im Feed, wird er gelöscht,
+     * sofern noch niemand zugesagt oder kommentiert hat; offene Entwürfe ebenso.
      * setup/veranstaltungen 1  zeigt die Termine nur an, ohne zu speichern.
      */
     public function actionVeranstaltungen($dryRun = 0)
@@ -980,6 +982,7 @@ class SetupController extends Controller
                 'title' => $title,
                 'start' => date('Y-m-d H:i:s', $start),
                 'end' => date('Y-m-d H:i:s', $end),
+                'ts' => [$start, !empty($m[2]) ? $end : null],
                 'category' => (string)($entry->category['term'] ?? ''),
             ];
         }
@@ -991,8 +994,8 @@ class SetupController extends Controller
 
         $query = fn() => \humhub\modules\calendar\models\CalendarEntry::find()->contentContainer($space)
             ->andWhere(['like', 'calendar_entry.uid', self::EVENT_UID . '%', false]);
-        $firstRun = !$query()->exists();
-        $stats = ['neu' => 0, 'geändert' => 0, 'gelöscht' => 0];
+        $stats = ['eingang' => 0, 'geändert' => 0, 'gelöscht' => 0];
+        $this->neueEntwuerfe = [];
 
         // Gesperrte Termine (EVENT_IGNORE) ganz entfernen, auch vergangene
         if (!$dryRun) {
@@ -1024,51 +1027,35 @@ class SetupController extends Controller
 
             $entry = $query()->andWhere(['calendar_entry.uid' => $uid])->one();
             $isNew = $entry === null;
-            if ($isNew && ($dup = $this->eventDuplicate($space, $ev)) !== null) {
-                // Schon von Hand oder per WhatsApp eingetragen: nicht doppelt anlegen
-                $this->stdout("= schon im Kalender: {$ev['start']} {$ev['title']} (#{$dup->id} {$dup->title})\n");
+            $stand = sha1(json_encode([$ev['title'], $ev['start'], $ev['end'], $ev['location'], $ev['description'],
+                $ev['category'], $images]));
+            $entwurf = \humhub\modules\whatsapp\models\Entwurf::findOne(['uid' => $uid]);
+            if ($isNew) {
+                // Neue Termine erst in den Termin-Eingang (Freigabe durch Admins, oft schon von Hand/WhatsApp eingetragen)
+                if ($this->eventEntwurf($space, $uid, $ev, $images, $stand, $entwurf)) {
+                    $stats[$entwurf === null ? 'eingang' : 'geändert']++;
+                }
                 continue;
             }
-            if ($isNew) {
-                $entry = new \humhub\modules\calendar\models\CalendarEntry($space);
-                $entry->uid = $uid;
-                $entry->time_zone = 'Europe/Berlin';
-                $entry->all_day = 0;
-                $entry->content->visibility = \humhub\modules\content\models\Content::VISIBILITY_PUBLIC;
-                $entry->silentContentCreation = $firstRun;
+            if ($entwurf !== null && $entwurf->stand === $stand) {
+                continue; // Stadt hat nichts geändert: Korrekturen beim Freigeben bleiben
             }
+            // Bereits im Kalender (alter Import oder freigegeben): Änderungen der Stadt übernehmen
             $new = ['title' => mb_substr($ev['title'], 0, 255), 'description' => $ev['description'],
                 'location' => mb_substr($ev['location'], 0, 1000), 'start_datetime' => $ev['start'],
                 'end_datetime' => $ev['end']];
-            if (!$isNew && array_diff_assoc($new, $entry->getAttributes(array_keys($new))) === []) {
+            if (array_diff_assoc($new, $entry->getAttributes(array_keys($new))) === []) {
+                $entwurf?->updateAttributes(['stand' => $stand]);
                 continue;
             }
             $entry->setAttributes($new, false);
-            if ($isNew) {
-                $entry->setDefaults();
-            }
             if (!$entry->save()) {
                 $this->stderr("! {$ev['link']}: " . json_encode($entry->getErrors()) . "\n");
                 continue;
             }
-            $calendarOnly = $isNew && $firstRun && strtotime($ev['start']) > time() + 30 * 86400;
-            if ($calendarOnly) {
-                $entry->content->updateAttributes(['stream_channel' => null]);
-            }
-            if ($isNew) {
-                if ($ev['category'] !== '') {
-                    $type = $this->eventType($space, self::eventGroup($ev['category']));
-                    $entry->setType($type);
-                    // Kalender färbt nach der Farbe des Termins, nicht der Kategorie
-                    $entry->updateAttributes(['color' => $type->color]);
-                }
-                foreach ($images as $url) {
-                    $this->attachImage($entry, $url, 'Bild zu: ' . $entry->title);
-                }
-            }
-            $stats[$isNew ? 'neu' : 'geändert']++;
-            $this->stdout(($isNew ? '+ ' : '~ ') . "{$ev['start']} {$ev['title']}"
-                . ($calendarOnly ? ' (nur Kalender)' : '') . "\n");
+            $entwurf?->updateAttributes(['stand' => $stand]);
+            $stats['geändert']++;
+            $this->stdout("~ {$ev['start']} {$ev['title']}\n");
         }
         if ($dryRun) {
             return ExitCode::OK;
@@ -1089,9 +1076,128 @@ class SetupController extends Controller
                 $this->stdout("- {$entry->start_datetime} {$entry->title}\n");
             }
         }
+        // Offene Entwürfe, die die Stadt entfernt hat oder die vorbei sind
+        foreach (\humhub\modules\whatsapp\models\Entwurf::find()->where(['quelle' => 'stadt', 'status' => 'offen'])->all() as $e) {
+            if (!isset($events[$e->uid]) || $e->start_datum < date('Y-m-d')) {
+                $e->delete();
+                $stats['gelöscht']++;
+                $this->stdout("- Eingang: {$e->start_datum} {$e->titel}\n");
+            }
+        }
+        if ($this->neueEntwuerfe !== []) {
+            \humhub\modules\whatsapp\components\Verarbeitung::benachrichtigen($this->neueEntwuerfe[0], $space);
+        }
         $this->stdout(date('Y-m-d H:i:s') . ': ' . count($events) . ' Termine im Feed, '
             . implode(', ', array_map(fn($k, $v) => "$v $k", array_keys($stats), $stats)) . "\n");
         return ExitCode::OK;
+    }
+
+    /**
+     * Selbsttest Termin-Eingang für Stadt-Termine: setup/eingang-test
+     * Übernimmt einen offenen Entwurf von uffenheim.de als Admin und prüft Verfasser, UID, Zeit, Kategorie, Bilder
+     * und dass der nächste Abgleich nichts überschreibt. Alles in einer Transaktion, die zurückgerollt wird.
+     */
+    public function actionEingangTest()
+    {
+        $entwurf = \humhub\modules\whatsapp\models\Entwurf::find()->where(['quelle' => 'stadt', 'status' => 'offen'])->one();
+        if ($entwurf === null) {
+            $this->stdout("Kein offener Entwurf von uffenheim.de – nichts zu testen\n");
+            return ExitCode::OK;
+        }
+        $admin = User::find()->joinWith('groups')->where(['group.is_admin_group' => 1])->one();
+        Yii::$app->user->switchIdentity($admin);
+        $space = Space::findOne(['url' => 'veranstaltungen']);
+        $fehler = [];
+        $tx = Yii::$app->db->beginTransaction();
+        try {
+            $entwurf->trotzdem = true;
+            $entwurf->titel .= ' (korrigiert)';
+            $entry = $entwurf->uebernehmen($space);
+            if ($entry === null) {
+                $fehler[] = 'nicht übernommen: ' . json_encode($entwurf->getErrors(), JSON_UNESCAPED_UNICODE);
+            } else {
+                $entry->refresh();
+                $pruefe = fn($ok, $text) => $ok ? $this->stdout("ok   $text\n") : $fehler[] = $text;
+                $pruefe($entry->content->createdBy->username === self::RSS_USER, 'Verfasser ' . $entry->content->createdBy->username);
+                $pruefe($entry->uid === $entwurf->uid, "UID $entry->uid");
+                $pruefe($entry->content->visibility == \humhub\modules\content\models\Content::VISIBILITY_PUBLIC, 'öffentlich');
+                $lokal = (new \DateTime($entry->start_datetime, new \DateTimeZone(Yii::$app->timeZone)))
+                    ->setTimezone(new \DateTimeZone('Europe/Berlin'))->format('Y-m-d H:i');
+                $pruefe($lokal === "$entwurf->start_datum $entwurf->start_zeit", "Beginn $lokal (Ortszeit)");
+                $pruefe(!$entwurf->kategorie || $entry->getEventType()?->name === $entwurf->kategorie, 'Kategorie ' . $entry->getEventType()?->name);
+                $n = count($entry->fileManager->find()->all());
+                $pruefe($n === count($entwurf->getBilder()), "$n von " . count($entwurf->getBilder()) . ' Bildern');
+                $pruefe(!str_contains($entry->description, 'WhatsApp'), 'kein WhatsApp-Hinweis');
+                // Eingangsseite mit dem übernommenen und dem offenen Stand rendern (fängt Fehler in der Ansicht)
+                $kontext = new class(['contentContainer' => $space, 'module' => Yii::$app->getModule('whatsapp')]) extends \yii\base\Component {
+                    public $contentContainer;
+                    public $module;
+                };
+                $html = Yii::$app->view->renderFile('@whatsapp/views/eingang/index.php', ['offen' => \humhub\modules\whatsapp\models\Entwurf::find()
+                    ->where(['quelle' => 'stadt'])->all(), 'ohne' => [], 'erledigt' => [$entwurf], 'wartend' => 0, 'usage' => [0, 0, 0]], $kontext);
+                $pruefe(str_contains($html, 'von uffenheim.de') && str_contains($html, 'Termin-Eingang'), 'Eingangsseite rendert');
+                // Nächster Abgleich: gleiche Prüfsumme → Korrektur bleibt
+                $this->actionVeranstaltungen();
+                $entry->refresh();
+                $pruefe(str_ends_with($entry->title, '(korrigiert)'), 'Korrektur bleibt beim Abgleich: ' . $entry->title);
+                $pruefe(\humhub\modules\whatsapp\models\Entwurf::find()->where(['uid' => $entwurf->uid])->count() == 1, 'kein neuer Entwurf');
+            }
+        } finally {
+            $tx->rollBack();
+        }
+        foreach ($fehler as $f) {
+            $this->stderr("FEHLER $f\n");
+        }
+        $this->stdout($fehler ? "Test fehlgeschlagen\n" : "Alles ok (zurückgerollt)\n");
+        return $fehler ? ExitCode::SOFTWARE : ExitCode::OK;
+    }
+
+    /** Neue Entwürfe dieses Laufs (für eine Benachrichtigung an die Admins) */
+    private array $neueEntwuerfe = [];
+
+    /**
+     * Termin der Stadt als Entwurf in den Termin-Eingang (whatsapp-Modul) bzw. offenen Entwurf aktualisieren.
+     * Abgelehnte oder übernommene (auch danach gelöschte) Entwürfe bleiben, wie sie sind. true = gespeichert.
+     */
+    private function eventEntwurf(Space $space, string $uid, array $ev, array $images, string $stand, $entwurf): bool
+    {
+        if ($entwurf !== null && ($entwurf->status !== 'offen' || $entwurf->stand === $stand)) {
+            return false;
+        }
+        $tz = new \DateTimeZone('Europe/Berlin');
+        $start = (new \DateTime('@' . $ev['ts'][0]))->setTimezone($tz);
+        $end = $ev['ts'][1] ? (new \DateTime('@' . $ev['ts'][1]))->setTimezone($tz) : null;
+        $dup = $this->eventDuplicate($space, $ev);
+        $neu = $entwurf === null;
+        $entwurf ??= new \humhub\modules\whatsapp\models\Entwurf([
+            'quelle' => 'stadt', 'uid' => $uid, 'status' => 'offen', 'created_at' => date('Y-m-d H:i:s'),
+            'gruppe' => 'stadt-' . date('Y-m-d'), // ein Lauf = eine Einreichung (Benachrichtigung „und n weitere“)
+        ]);
+        $entwurf->setAttributes([
+            'link' => mb_substr($ev['link'], 0, 500),
+            'titel' => mb_substr($ev['title'], 0, 200),
+            'start_datum' => $start->format('Y-m-d'),
+            'start_zeit' => $start->format('H:i'),
+            'ende_datum' => $end && $end->format('Y-m-d') !== $start->format('Y-m-d') ? $end->format('Y-m-d') : null,
+            'ende_zeit' => $end?->format('H:i'),
+            'ganztaegig' => 0,
+            'ort' => mb_substr($ev['location'], 0, 255) ?: null,
+            'beschreibung' => $ev['description'],
+            'kategorie' => $ev['category'] !== '' ? $this->eventType($space, self::eventGroup($ev['category']))->name : null,
+            'bilder' => json_encode(array_map(fn($u) => [$u, $this->bildtexte[$u] ?? null], $images), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+            'stand' => $stand,
+            'hinweis' => $dup ? mb_substr("Steht vermutlich schon im Kalender: „{$dup->title}“ – dann bitte ablehnen.", 0, 500)
+                : (!$neu ? 'Von der Stadt nach dem Eingang geändert.' : null),
+        ], false);
+        if (!$entwurf->save(false)) {
+            $this->stderr("! Eingang {$ev['link']}: " . json_encode($entwurf->getErrors()) . "\n");
+            return false;
+        }
+        if ($neu) {
+            $this->neueEntwuerfe[] = $entwurf;
+        }
+        $this->stdout(($neu ? '> Eingang: ' : '~ Eingang: ') . "{$ev['start']} {$ev['title']}" . ($dup ? " (Doppler? #{$dup->id})" : '') . "\n");
+        return true;
     }
 
     private static function eventIgnored(string $title): bool

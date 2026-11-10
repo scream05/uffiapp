@@ -35,12 +35,12 @@ class Module extends ContentContainerModule
 
     public function getContentContainerName($container)
     {
-        return 'WhatsApp-Eingang';
+        return 'Termin-Eingang';
     }
 
     public function getContentContainerDescription($container)
     {
-        return 'Von der WhatsApp-Community eingereichte Veranstaltungen prüfen und in den Kalender übernehmen.';
+        return 'Veranstaltungen aus der WhatsApp-Community und von uffenheim.de prüfen und in den Kalender übernehmen.';
     }
 
     public function getNotifications()

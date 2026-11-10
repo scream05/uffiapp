@@ -9,7 +9,7 @@ use Yii;
 use yii\helpers\Html;
 
 /**
- * An Admins: neue Einreichung aus der WhatsApp-Community wartet im Eingang.
+ * An Admins: neue Einreichung aus der WhatsApp-Community oder neuer Termin von uffenheim.de wartet im Eingang.
  * Quelle ist der erste erkannte Termin (Entwurf) oder, wenn nichts erkannt wurde, die Nachricht.
  *
  * @property Entwurf|Nachricht $source
@@ -23,7 +23,7 @@ class NeueEntwuerfe extends BaseNotification
     {
         if ($this->source instanceof Entwurf) {
             $weitere = Entwurf::find()->where(['gruppe' => $this->source->gruppe])->count() - 1;
-            return 'WhatsApp-Community: „' . $this->source->titel . '“'
+            return ($this->source->istStadt() ? 'uffenheim.de' : 'WhatsApp-Community') . ': „' . $this->source->titel . '“'
                 . ($weitere > 0 ? " und $weitere weitere" : '') . ' wartet auf Freigabe.';
         }
         return 'WhatsApp-Community: Einreichung ohne erkannten Termin – bitte ansehen.';

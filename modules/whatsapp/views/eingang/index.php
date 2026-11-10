@@ -16,15 +16,20 @@ $bild = function (Entwurf $e) use ($space) {
     $alle = $e->getMedien();
     $n = isset($alle[$e->bild ?? -1]) && $alle[$e->bild]->isBild() ? $alle[$e->bild]
         : (array_values(array_filter($alle, fn($n) => $n->isBild()))[0] ?? null);
+    if (!$n && ($url = $e->getBilder()[0][0] ?? null)) {
+        return Html::img($url, ['style' => 'width:72px;height:72px;object-fit:cover;border-radius:8px', 'alt' => '', 'referrerpolicy' => 'no-referrer']);
+    }
     return $n ? Html::img($space->createUrl('/whatsapp/eingang/datei', ['id' => $n->id]),
         ['style' => 'width:72px;height:72px;object-fit:cover;border-radius:8px', 'alt' => '']) : '';
 };
 ?>
 <div class="panel panel-default">
-    <div class="panel-heading"><strong>WhatsApp-Eingang</strong> – Termine aus der WhatsApp-Community</div>
+    <div class="panel-heading"><strong>Termin-Eingang</strong> – aus der WhatsApp-Community und von uffenheim.de</div>
     <div class="panel-body">
         <p class="help-block">Beiträge, die an die Termin-Nummer weitergeleitet werden, liest eine KI aus. Bitte Angaben mit dem
-            Plakat vergleichen und übernehmen – erst dann erscheint der Termin im Kalender.
+            Plakat vergleichen und übernehmen – erst dann erscheint der Termin im Kalender. Neue Termine aus dem
+            Veranstaltungskalender von uffenheim.de kommen jeden Morgen dazu; bitte prüfen, ob es sie schon gibt.
+            Bereits übernommene Termine der Stadt werden bei Änderungen auf uffenheim.de automatisch angepasst.
             <?php if ($wartend): ?><br><strong><?= $wartend ?> Nachricht(en)</strong> werden gerade ausgewertet.<?php endif ?>
         </p>
 
@@ -40,7 +45,7 @@ $bild = function (Entwurf $e) use ($space) {
                         $space->createUrl('/whatsapp/eingang/bearbeiten', ['id' => $e->id])) ?><br>
                     <?= $e->start_datum ? Html::encode(Verarbeitung::wann($e)) : '<span class="text-muted">Datum fehlt</span>' ?>
                     <?= $e->ort ? ' · ' . Html::encode($e->ort) : '' ?><br>
-                    <small class="text-muted">von <?= Html::encode($e->absender_name ?: 'unbekannt') ?>,
+                    <small class="text-muted"><?php if ($e->istStadt()): ?><i class="fa fa-globe"></i> von uffenheim.de<?php else: ?><i class="fa fa-whatsapp"></i> von <?= Html::encode($e->absender_name ?: 'unbekannt') ?><?php endif ?>,
                         <?= Yii::$app->formatter->asRelativeTime($e->created_at) ?></small>
                     <?php if ($e->hinweis): ?><br><small class="text-warning"><i class="fa fa-exclamation-triangle"></i> <?= Html::encode($e->hinweis) ?></small><?php endif ?>
                 </div>

@@ -8,7 +8,7 @@ use Yii;
 
 class Events
 {
-    /** Menü „WhatsApp-Eingang (n)“ im Space „Veranstaltungen“, nur für Admins */
+    /** Menü „Termin-Eingang (n)“ (WhatsApp und uffenheim.de) im Space „Veranstaltungen“, nur für Admins */
     public static function onSpaceMenuInit($event)
     {
         try {
@@ -18,9 +18,9 @@ class Events
             }
             $open = Entwurf::find()->where(['status' => Entwurf::STATUS_OFFEN])->count();
             $event->sender->addEntry(new MenuLink([
-                'label' => 'WhatsApp-Eingang' . ($open ? " ($open)" : ''),
+                'label' => 'Termin-Eingang' . ($open ? " ($open)" : ''),
                 'url' => $space->createUrl('/whatsapp/eingang/index'),
-                'icon' => 'whatsapp',
+                'icon' => 'inbox',
                 'isActive' => Yii::$app->controller->module && Yii::$app->controller->module->id === 'whatsapp',
                 'sortOrder' => 95,
             ]));

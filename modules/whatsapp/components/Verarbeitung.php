@@ -322,7 +322,7 @@ class Verarbeitung
     }
 
     /** System-Admins und Admins des Space „Veranstaltungen“ */
-    private static function benachrichtigen(?Entwurf $entwurf, ?Space $space, ?string $gruppe = null): void
+    public static function benachrichtigen(?Entwurf $entwurf, ?Space $space, ?string $gruppe = null): void
     {
         $ids = User::find()->select('user.id')->joinWith('groups')->where(['group.is_admin_group' => 1])
             ->andWhere(['user.status' => User::STATUS_ENABLED])->column();
@@ -354,7 +354,11 @@ class Verarbeitung
         }
         $n = Entwurf::updateAll(['wa_id' => null, 'absender_name' => null],
             ['and', ['<', 'created_at', $frist], ['not', ['status' => Entwurf::STATUS_OFFEN]], ['not', ['wa_id' => null]]]);
-        Entwurf::deleteAll(['and', ['<', 'created_at', $frist], ['status' => Entwurf::STATUS_ABGELEHNT]]);
+        Entwurf::deleteAll(['and', ['<', 'created_at', $frist], ['status' => Entwurf::STATUS_ABGELEHNT],
+            ['quelle' => Entwurf::QUELLE_WHATSAPP]]);
+        // Abgelehnte Termine der Stadt merken, solange sie im Feed stehen können (sonst kämen sie wieder); vergangene weg
+        Entwurf::deleteAll(['and', ['quelle' => Entwurf::QUELLE_STADT], ['status' => Entwurf::STATUS_ABGELEHNT],
+            ['<', 'start_datum', date('Y-m-d', strtotime('-7 days'))]]);
         if ($alt || $n) {
             $log('- ' . count($alt) . " alte Nachrichten gelöscht, $n Entwürfe anonymisiert");
         }

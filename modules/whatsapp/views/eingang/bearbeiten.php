@@ -17,7 +17,7 @@ foreach ($typen as $t) {
 }
 ?>
 <div class="panel panel-default">
-    <div class="panel-heading"><strong>Termin aus der WhatsApp-Community prüfen</strong></div>
+    <div class="panel-heading"><strong>Termin <?= $entwurf->istStadt() ? 'von uffenheim.de' : 'aus der WhatsApp-Community' ?> prüfen</strong></div>
     <div class="panel-body">
         <div class="row">
             <div class="col-md-5" style="margin-bottom:14px">
@@ -33,13 +33,22 @@ foreach ($typen as $t) {
                         <div class="text-muted" style="white-space:pre-line;margin-bottom:8px"><?= Html::encode($n->text) ?></div>
                     <?php endif ?>
                 <?php endforeach ?>
+                <?php if ($entwurf->istStadt()): ?>
+                    <?php foreach ($entwurf->getBilder() as [$url, $text]): ?>
+                        <?= Html::img($url, ['style' => 'max-width:100%;border-radius:8px;margin-bottom:8px', 'alt' => $text ?: 'Bild der Veranstaltung', 'referrerpolicy' => 'no-referrer']) ?>
+                    <?php endforeach ?>
+                    <p><?= Html::a('<i class="fa fa-external-link"></i> Auf uffenheim.de ansehen', $entwurf->link, ['target' => '_blank', 'rel' => 'noopener']) ?></p>
+                    <small class="text-muted">Aus dem Veranstaltungskalender der Stadt, <?= Yii::$app->formatter->asDatetime($entwurf->created_at, 'short') ?>.
+                        Erscheint nach dem Übernehmen als „Stadt Uffenheim (Website)“; Änderungen der Stadt werden danach automatisch nachgezogen.</small>
+                <?php else: ?>
                 <small class="text-muted">Eingereicht von <?= Html::encode($entwurf->absender_name ?: 'unbekannt') ?>
                     <?= $entwurf->wa_id ? '(+' . Html::encode($entwurf->wa_id) . ')' : '' ?>,
                     <?= Yii::$app->formatter->asDatetime($entwurf->created_at, 'short') ?></small>
+                <?php endif ?>
             </div>
             <div class="col-md-7">
                 <?php if ($entwurf->hinweis): ?>
-                    <div class="alert alert-info"><strong>Hinweis der KI:</strong> <?= Html::encode($entwurf->hinweis) ?></div>
+                    <div class="alert alert-info"><strong><?= $entwurf->istStadt() ? 'Hinweis:' : 'Hinweis der KI:' ?></strong> <?= Html::encode($entwurf->hinweis) ?></div>
                 <?php endif ?>
 
                 <?php $f = ActiveForm::begin(['id' => 'entwurf-form']) ?>
@@ -70,7 +79,8 @@ foreach ($typen as $t) {
                 <?= $f->field($entwurf, 'beschreibung')->widget(RichTextField::class, [
                     'exclude' => ['mention', 'oembed', 'upload'],
                     'pluginOptions' => ['maxHeight' => '300px'],
-                ])->hint('Das Plakat wird als Bild angehängt. Unter dem Text steht automatisch „Eingereicht über die WhatsApp-Community“.') ?>
+                ])->hint($entwurf->istStadt() ? 'Die Bilder von uffenheim.de werden angehängt.'
+                    : 'Das Plakat wird als Bild angehängt. Unter dem Text steht automatisch „Eingereicht über die WhatsApp-Community“.') ?>
 
                 <button type="submit" class="btn btn-primary"><i class="fa fa-check"></i> In den Kalender übernehmen</button>
                 <?= Html::a('Zurück', $space->createUrl('/whatsapp/eingang/index'), ['class' => 'btn btn-link']) ?>
