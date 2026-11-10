@@ -60,7 +60,21 @@ class Dienst
             $doppelt->delete(); // neuer Versuch, z. B. weil die erste Mail nicht ankam
         }
         Yii::$app->cache->set($cacheKey, $anzahl + 1, 3600);
-        return self::anmelden($a);
+        try {
+            if (self::anmelden($a)) {
+                return true;
+            }
+        } catch (\Throwable $e) {
+            // Ohne Bestätigungsmail ist die Anmeldung wertlos: nicht halb gespeichert liegen lassen
+            Yii::error($e, 'kurse');
+            if (!$a->isNewRecord) {
+                $a->delete();
+            }
+            $a->setIsNewRecord(true);
+            $a->id = null;
+            $hinweis = 'Die Anmeldung konnte gerade nicht gespeichert werden (technischer Fehler). Bitte versuche es in ein paar Minuten noch einmal.';
+        }
+        return false;
     }
 
     /** Von Hand eingetragen (Kursverwalter): sofort Platz bzw. Warteliste, Mail nur wenn Adresse vorhanden */
