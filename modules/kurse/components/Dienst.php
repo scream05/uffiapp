@@ -31,6 +31,38 @@ class Dienst
         return true;
     }
 
+    /** Höchstens so viele Anmeldungen je IP-Adresse und Stunde */
+    public const MAX_PRO_STUNDE = 10;
+
+    /**
+     * Anmeldeformular der Eltern (Space-Seite und eigene Vereinsseite): Sperre gegen Massenanmeldungen, Prüfung,
+     * Doppelt-Prüfung, Speichern und Bestätigungsmail. Bei false stehen die Fehler im Modell oder in $hinweis.
+     */
+    public static function formularAnmelden(Anmeldung $a, ?string &$hinweis = null): bool
+    {
+        $cacheKey = 'kurse-anmeldung-ip-' . md5((string)Yii::$app->request->userIP);
+        $anzahl = (int)Yii::$app->cache->get($cacheKey);
+        if ($anzahl >= self::MAX_PRO_STUNDE) {
+            $hinweis = 'Zu viele Anmeldungen in kurzer Zeit. Bitte versuche es später noch einmal.';
+            return false;
+        }
+        if (!$a->validate()) {
+            return false;
+        }
+        $doppelt = Anmeldung::find()->where(['kurs_id' => $a->kurs_id, 'kind_geburtsdatum' => $a->kind_geburtsdatum])
+            ->andWhere(['kind_vorname' => $a->kind_vorname, 'kind_nachname' => $a->kind_nachname])
+            ->andWhere(['!=', 'status', Anmeldung::STATUS_STORNIERT])->one();
+        if ($doppelt && $doppelt->status !== Anmeldung::STATUS_UNBESTAETIGT) {
+            $a->addError('kind_vorname', 'Dieses Kind ist für diesen Kurs schon angemeldet. Den Stand findest du über den Link in deiner Bestätigungsmail.');
+            return false;
+        }
+        if ($doppelt) {
+            $doppelt->delete(); // neuer Versuch, z. B. weil die erste Mail nicht ankam
+        }
+        Yii::$app->cache->set($cacheKey, $anzahl + 1, 3600);
+        return self::anmelden($a);
+    }
+
     /** Von Hand eingetragen (Kursverwalter): sofort Platz bzw. Warteliste, Mail nur wenn Adresse vorhanden */
     public static function vonHand(Anmeldung $a, bool $mail): bool
     {
@@ -244,7 +276,7 @@ class Dienst
 
     public static function mailBestaetigen(Anmeldung $a): bool
     {
-        $link = $a->kurs->createUrl('/kurse/anmeldung/bestaetigen', ['t' => $a->token], true);
+        $link = $a->kurs->elternUrl('bestaetigen', ['t' => $a->token], true);
         $text = self::anrede($a) . "\n\n"
             . 'du hast ' . $a->getKindName() . ' für folgenden Kurs angemeldet:' . "\n\n" . self::kursBlock($a->kurs) . "\n\n"
             . 'Bitte bestätige die Anmeldung über diesen Link. Erst dann wird ein Platz (oder ein Platz auf der Warteliste) vergeben – '

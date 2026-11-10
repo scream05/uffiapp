@@ -228,7 +228,7 @@ class Kurs extends ActiveRecord
         }
         $jetzt = date('Y-m-d H:i:s');
         if ($this->anmeldung_ab && $jetzt < $this->anmeldung_ab) {
-            return 'Die Anmeldung startet am ' . Yii::$app->formatter->asDatetime($this->anmeldung_ab, 'php:d.m.Y \u\m H:i') . ' Uhr.';
+            return 'Die Anmeldung startet am ' . date('d.m.Y \u\m H:i', strtotime($this->anmeldung_ab)) . ' Uhr.';
         }
         if ($this->anmeldung_bis && $jetzt > $this->anmeldung_bis) {
             return 'Die Anmeldefrist ist abgelaufen.';
@@ -350,6 +350,29 @@ class Kurs extends ActiveRecord
     {
         $space = Yii::$app->getModule('kurse')->getSpace();
         return $space ? $space->createUrl('/kurse/kurs/view', ['id' => $this->id], $scheme) : Url::home($scheme);
+    }
+
+    /** Eigene Kursseite des Vereins (/kurse/<slug>), falls eingerichtet */
+    public function getSeite(): ?KursVerein
+    {
+        $kv = KursVerein::fuer((int)$this->verein_id);
+        return $kv && $kv->hatSeite() ? $kv : null;
+    }
+
+    /**
+     * Adresse für Eltern: auf der eigenen Seite des Vereins, sonst im Space.
+     * @param string $was kurs, anmelden, datenschutz, bestaetigen, status
+     */
+    public function elternUrl(string $was, array $params = [], bool $scheme = false): string
+    {
+        if ($seite = $this->getSeite()) {
+            return $seite->seiteUrl($was, in_array($was, ['kurs', 'anmelden', 'datenschutz'], true) ? ['id' => $this->id] + $params : $params, $scheme);
+        }
+        $routen = ['kurs' => ['/kurse/kurs/view', 'id'], 'anmelden' => ['/kurse/anmeldung/create', 'kurs'],
+            'datenschutz' => ['/kurse/kurs/datenschutz', 'id'], 'bestaetigen' => ['/kurse/anmeldung/bestaetigen', null],
+            'status' => ['/kurse/anmeldung/status', null]];
+        [$route, $idParam] = $routen[$was];
+        return $this->createUrl($route, $idParam ? [$idParam => $this->id] + $params : $params, $scheme);
     }
 
     public function createUrl(string $route, array $params = [], bool $scheme = false): string

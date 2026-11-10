@@ -22,9 +22,6 @@ use yii\web\NotFoundHttpException;
  */
 class AnmeldungController extends ContentContainerController
 {
-    /** Höchstens so viele Anmeldungen je IP-Adresse und Stunde */
-    private const MAX_PRO_STUNDE = 10;
-
     protected function getAccessRules()
     {
         return [['login' => ['hand', 'bezahlt', 'platz', 'abmelden', 'notiz']]];
@@ -57,24 +54,11 @@ class AnmeldungController extends ContentContainerController
             $a->telefon = $u->profile->mobile ?? null;
         }
         if ($a->load(Yii::$app->request->post())) {
-            $cacheKey = 'kurse-anmeldung-ip-' . md5((string)Yii::$app->request->userIP);
-            $anzahl = (int)Yii::$app->cache->get($cacheKey);
-            if ($anzahl >= self::MAX_PRO_STUNDE) {
-                $this->view->error('Zu viele Anmeldungen in kurzer Zeit. Bitte versuche es später noch einmal.');
-            } elseif ($a->validate()) {
-                $doppelt = Anmeldung::find()->where(['kurs_id' => $kurs->id, 'kind_geburtsdatum' => $a->kind_geburtsdatum])
-                    ->andWhere(['kind_vorname' => $a->kind_vorname, 'kind_nachname' => $a->kind_nachname])
-                    ->andWhere(['!=', 'status', Anmeldung::STATUS_STORNIERT])->one();
-                if ($doppelt && $doppelt->status !== Anmeldung::STATUS_UNBESTAETIGT) {
-                    $a->addError('kind_vorname', 'Dieses Kind ist für diesen Kurs schon angemeldet. Den Stand findest du über den Link in deiner Bestätigungsmail.');
-                } else {
-                    if ($doppelt) {
-                        $doppelt->delete(); // neuer Versuch, z. B. weil die erste Mail nicht ankam
-                    }
-                    Yii::$app->cache->set($cacheKey, $anzahl + 1, 3600);
-                    Dienst::anmelden($a);
-                    return $this->render('gesendet', ['a' => $a]);
-                }
+            if (Dienst::formularAnmelden($a, $hinweis)) {
+                return $this->render('gesendet', ['a' => $a]);
+            }
+            if ($hinweis) {
+                $this->view->error($hinweis);
             }
         }
         return $this->render('create', ['a' => $a, 'kurs' => $kurs]);

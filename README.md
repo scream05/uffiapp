@@ -49,4 +49,4 @@ Formular-PDFs der Stadt bzw. des Landkreises für den KI-Assistenten
 
 GNU Affero General Public License v3.0 (`LICENSE`), © Bürgerliste Uffenheim e. V.
 Mitgelieferte Fremdbibliotheken behalten ihre Lizenz (Leaflet: BSD-2-Clause, bacon/bacon-qr-code: BSD-2-Clause,
-Nunito Sans: SIL Open Font License).
+Nunito Sans: SIL Open Font License, Open Sans in `modules/kurse/resources/fonts`: SIL Open Font License).

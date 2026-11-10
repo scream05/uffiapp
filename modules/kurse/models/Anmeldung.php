@@ -244,6 +244,6 @@ class Anmeldung extends ActiveRecord
 
     public function getStatusUrl(bool $scheme = true): string
     {
-        return $this->kurs->createUrl('/kurse/anmeldung/status', ['t' => $this->token], $scheme);
+        return $this->kurs->elternUrl('status', ['t' => $this->token], $scheme);
     }
 }

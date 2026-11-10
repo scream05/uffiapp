@@ -233,4 +233,54 @@ class KurseController extends Controller
         $this->stdout('Kursseiten öffentlich: ' . ($module->isOeffentlich() ? 'ja' : 'nein (nur Admins und Kursverwalter)') . "\n");
         return ExitCode::OK;
     }
+
+    /**
+     * Eigene Kursseite eines Vereins einrichten oder anzeigen:
+     *   kurse/seite <verein_id>                         Stand anzeigen
+     *   kurse/seite <verein_id> <slug> [0|1] [#farbe]   Adresse /kurse/<slug>, 0 = Vorschau, 1 = für alle
+     *   kurse/seite <verein_id> -                       eigene Seite entfernen
+     */
+    public function actionSeite($vereinId, $slug = null, $aktiv = null, $farbe = null)
+    {
+        $kv = \humhub\modules\kurse\models\KursVerein::findOne((int)$vereinId);
+        if (!$kv) {
+            $this->stderr("Verein $vereinId ist nicht für das Kursmodul freigeschaltet.\n");
+            return ExitCode::DATAERR;
+        }
+        if ($slug === '-') {
+            $kv->slug = null;
+            $kv->seite_aktiv = false;
+        } elseif ($slug !== null) {
+            if (!\humhub\modules\kurse\models\KursVerein::gueltigerSlug($slug)) {
+                $this->stderr("Ungültige Adresse „{$slug}“ (a–z, 0–9, Bindestrich, 3–60 Zeichen; nicht: " . implode(', ', \humhub\modules\kurse\models\KursVerein::RESERVIERT) . ")\n");
+                return ExitCode::DATAERR;
+            }
+            $kv->slug = $slug;
+        }
+        if ($aktiv !== null) {
+            $kv->seite_aktiv = (bool)$aktiv;
+        }
+        if ($farbe !== null) {
+            if ($farbe !== '-' && !preg_match('/^#[0-9a-fA-F]{6}$/', $farbe)) {
+                $this->stderr("Farbe bitte als #rrggbb\n");
+                return ExitCode::DATAERR;
+            }
+            $kv->farbe = $farbe === '-' ? null : strtolower($farbe);
+        }
+        if (!$kv->save(false)) {
+            $this->stderr("Speichern fehlgeschlagen\n");
+            return ExitCode::SOFTWARE;
+        }
+        \humhub\modules\kurse\models\KursVerein::cacheLeeren();
+        if (!$kv->hatSeite()) {
+            $this->stdout("Verein $vereinId: keine eigene Kursseite\n");
+        } else {
+            $this->stdout("Verein $vereinId: " . $kv->seiteUrl('', [], true) . "\n"
+                . 'Status: ' . ($kv->seite_aktiv ? 'für alle sichtbar' : 'Vorschau (nur Admins/Kursverwalter)') . ' · Farbe ' . $kv->getFarbe() . "\n");
+            if (!$kv->seite_aktiv) {
+                $this->stdout('Vorschau-Link: ' . $kv->seiteUrl('', ['vorschau' => $kv->vorschauSchluessel()], true) . "\n");
+            }
+        }
+        return ExitCode::OK;
+    }
 }
