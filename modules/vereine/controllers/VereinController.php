@@ -23,7 +23,9 @@ use yii\web\NotFoundHttpException;
  */
 class VereinController extends ContentContainerController
 {
-    use VerwaltungTrait;
+    use VerwaltungTrait {
+        saveImages as private saveImagesVerzeichnis;
+    }
 
     protected function getAccessRules()
     {
@@ -209,6 +211,25 @@ class VereinController extends ContentContainerController
         unset($credits[$file->guid]);
         $verein->updateAttributes(['bildnachweise' => $credits ? json_encode($credits, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : null]);
         $file->delete();
+    }
+
+    /** Logo und Galerie wie im Verzeichnis, dazu Titel- und Teambild der Vereinsseite (je ein Bild, ersetzbar) */
+    protected function saveImages($verein): void
+    {
+        $this->saveImagesVerzeichnis($verein);
+        $request = Yii::$app->request;
+        foreach (['titelbild' => $verein->getTitelbild(), 'teambild' => $verein->getTeambild()] as $art => $alt) {
+            $neu = array_values(array_filter((array)$request->post($art . 'List', [])));
+            if ($alt && ($neu !== [] || $request->post($art . 'Entfernen'))) {
+                $this->bildLoeschen($verein, $alt);
+                $verein->updateAttributes([$art . '_guid' => null]);
+            }
+            $datei = $neu !== [] ? File::findOne(['guid' => (string)$neu[0]]) : null;
+            if ($datei && str_starts_with((string)$datei->mime_type, 'image/')) {
+                $verein->fileManager->attach([$datei->guid]);
+                $verein->updateAttributes([$art . '_guid' => $datei->guid]);
+            }
+        }
     }
 
     /** Eigenes Logo: Quellenangabe (aus der Recherche übernommenes Logo) entfällt */

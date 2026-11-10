@@ -1152,6 +1152,46 @@ class SetupController extends Controller
         return $fehler ? ExitCode::SOFTWARE : ExitCode::OK;
     }
 
+    /**
+     * Selbsttest Vereinsseite als Homepage: setup/vereinsseite-test <verein_id>
+     * Team-Eingabe (Zeilen „Name (Funktion)“), Stichwörter, Speichern und Wiederanzeige im Formular; wird zurückgerollt.
+     */
+    public function actionVereinsseiteTest($id)
+    {
+        $verein = \humhub\modules\vereine\models\Verein::findOne((int)$id);
+        $admin = User::find()->joinWith('groups')->where(['group.is_admin_group' => 1])->one();
+        Yii::$app->user->switchIdentity($admin);
+        $fehler = [];
+        $pruefe = function ($ok, $text) use (&$fehler) {
+            $ok ? $this->stdout("ok   $text\n") : $fehler[] = $text;
+        };
+        $tx = Yii::$app->db->beginTransaction();
+        try {
+            $vorher = $verein->getTeamList();
+            $verein->teamRows = [['titel' => 'Team A', 'personen' => "Erika Probe (Trainerin C)\n\n- Max Probe – Helfer\nOhne Funktion"], ['titel' => '', 'personen' => '']];
+            $verein->stichwoerter = 'eins, zwei,, drei';
+            $pruefe($verein->save(), 'speichern ' . json_encode($verein->getErrors(), JSON_UNESCAPED_UNICODE));
+            $verein->refresh();
+            $verein->afterFind();
+            $team = $verein->getTeamList();
+            $pruefe(count($team) === 1 && count($team[0]['mitglieder']) === 3, 'ein Team mit 3 Personen');
+            $pruefe(($team[0]['mitglieder'][1] ?? []) === ['name' => 'Max Probe', 'funktion' => 'Helfer'], 'Zeile „Name – Funktion“');
+            $pruefe(($team[0]['mitglieder'][2]['funktion'] ?? null) === '', 'Zeile ohne Funktion');
+            $pruefe(str_contains($verein->teamRows[0]['personen'], 'Erika Probe (Trainerin C)'), 'Formular zeigt Zeilen wieder an');
+            $pruefe($verein->getStichwortList() === ['eins', 'zwei', 'drei'], 'Stichwörter');
+            // Ansichten brauchen eine Web-Sitzung (Nonce): Anzeige per Gast-Abruf prüfen, Bearbeiten im Browser
+            $this->stdout("     Ansicht: curl …/vereine/verein/view?id=$verein->id, Bearbeiten nur im Browser\n");
+            $this->stdout('     vorher ' . count($vorher) . " Teams (bleiben nach Rollback)\n");
+        } finally {
+            $tx->rollBack();
+        }
+        foreach ($fehler as $f) {
+            $this->stderr("FEHLER $f\n");
+        }
+        $this->stdout($fehler ? "Test fehlgeschlagen\n" : "Alles ok (zurückgerollt)\n");
+        return $fehler ? ExitCode::SOFTWARE : ExitCode::OK;
+    }
+
     /** Neue Entwürfe dieses Laufs (für eine Benachrichtigung an die Admins) */
     private array $neueEntwuerfe = [];
 

@@ -133,6 +133,76 @@ $logo = $isNew ? null : $verein->getLogo();
             <p class="help-block"><?= Yii::t('VereineModule.base', 'Bis zu {n} Bilder, z. B. Vereinsheim, Training, Feste. Nur eigene Fotos oder Fotos mit Erlaubnis; bei Personen bitte deren Einverständnis.', ['n' => Verein::MAX_BILDER]) ?></p>
         </div>
 
+        <?php if (!$isNew): ?>
+        <?php
+        $titelbild = $verein->getTitelbild();
+        $teambild = $verein->getTeambild();
+        $teamRows = array_values($verein->teamRows);
+        for ($i = count($teamRows); $i < min(Verein::MAX_TEAMS, max(2, count($teamRows) + 1)); $i++) {
+            $teamRows[] = ['titel' => '', 'personen' => ''];
+        }
+        $bildFeld = function (string $art, $bild, string $label, string $hinweis) {
+            ob_start(); ?>
+            <div class="form-group">
+                <label><?= $label ?></label>
+                <?php if ($bild): ?>
+                    <div style="margin-bottom:8px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+                        <?= Html::img($bild->getUrl(), ['alt' => '', 'style' => 'height:90px;max-width:220px;object-fit:cover;border-radius:8px']) ?>
+                        <label style="font-weight:normal"><?= Html::checkbox($art . 'Entfernen', false) ?> <?= Yii::t('VereineModule.base', 'Bild entfernen') ?></label>
+                    </div>
+                <?php endif ?>
+                <?= UploadButton::widget([
+                    'id' => "verein-$art",
+                    'submitName' => $art . 'List[]',
+                    'label' => $bild ? Yii::t('VereineModule.base', 'Anderes Bild hochladen') : Yii::t('VereineModule.base', 'Bild hochladen'),
+                    'tooltip' => false,
+                    'cssButtonClass' => 'btn-light',
+                    'progress' => "#verein-$art-progress",
+                    'preview' => "#verein-$art-preview",
+                    'max' => 1,
+                ]) ?>
+                <?= UploadProgress::widget(['id' => "verein-$art-progress"]) ?>
+                <?= FilePreview::widget(['id' => "verein-$art-preview", 'edit' => true, 'options' => ['style' => 'margin-top:10px']]) ?>
+                <p class="help-block"><?= $hinweis ?></p>
+            </div>
+            <?php return ob_get_clean();
+        };
+        ?>
+        <details class="verein-homepage-form" style="margin:6px 0 18px;padding:12px 14px;border:1px solid var(--bs-border-color, #ddd);border-radius:10px"<?= $verein->hatTitelbereich() || $verein->getTeamList() ? ' open' : '' ?>>
+            <summary style="cursor:pointer"><strong><?= Yii::t('VereineModule.base', 'Vereinsseite als Homepage gestalten') ?></strong>
+                <span class="text-muted"><?= Yii::t('VereineModule.base', '(optional: Titelbild, Slogan, Knopf, Team)') ?></span></summary>
+            <div style="margin-top:12px">
+                <?= $bildFeld('titelbild', $titelbild, Yii::t('VereineModule.base', 'Titelbild'),
+                    Yii::t('VereineModule.base', 'Breites Bild (Querformat), erscheint ganz oben. Nur eigene Fotos oder Fotos mit Erlaubnis; bei Personen bitte deren Einverständnis.')) ?>
+                <?= $form->field($verein, 'slogan')->textInput(['maxlength' => 150, 'placeholder' => Yii::t('VereineModule.base', 'z. B. Schwimmen lernen. Vertrauen gewinnen. Gemeinsam wachsen.')]) ?>
+                <?= $form->field($verein, 'untertitel')->textInput(['maxlength' => 255]) ?>
+                <?= $form->field($verein, 'stichwoerter')->textInput(['maxlength' => 255])->hint(Yii::t('VereineModule.base', 'Mit Komma trennen, höchstens {n}.', ['n' => Verein::MAX_STICHWOERTER])) ?>
+                <div class="row">
+                    <div class="col-sm-5"><?= $form->field($verein, 'knopf_text')->textInput(['maxlength' => 60, 'placeholder' => Yii::t('VereineModule.base', 'z. B. Jetzt Kurs buchen!')]) ?></div>
+                    <div class="col-sm-7"><?= $form->field($verein, 'knopf_untertext')->textInput(['maxlength' => 150]) ?></div>
+                </div>
+                <p class="help-block" style="margin-top:-8px"><?= Yii::t('VereineModule.base', 'Der Knopf springt zu euren Kursen auf dieser Seite, ohne Kurse zum Kontakt. Leer lassen = kein Knopf.') ?></p>
+
+                <h4 style="margin-top:18px"><?= Yii::t('VereineModule.base', 'Unser Team') ?></h4>
+                <?= $bildFeld('teambild', $teambild, Yii::t('VereineModule.base', 'Teamfoto'),
+                    Yii::t('VereineModule.base', 'Nur mit Einverständnis aller, die darauf zu sehen sind (bei Kindern und Jugendlichen der Eltern).')) ?>
+                <?= $form->field($verein, 'team_text')->textarea(['rows' => 4, 'maxlength' => 3000]) ?>
+                <p class="help-block"><?= Yii::t('VereineModule.base', 'Je Team ein Titel und eine Zeile pro Person, z. B. „Anna Muster (Trainerin C)“. Namen nur mit Einverständnis der Personen, bei Minderjährigen der Eltern.') ?></p>
+                <div class="row">
+                    <?php foreach ($teamRows as $i => $row): ?>
+                        <div class="col-sm-6" style="margin-bottom:10px">
+                            <?= Html::textInput("Verein[teamRows][$i][titel]", $row['titel'], ['class' => 'form-control', 'style' => 'margin-bottom:6px',
+                                'placeholder' => Yii::t('VereineModule.base', 'Titel, z. B. Team Montag'), 'aria-label' => Yii::t('VereineModule.base', 'Titel des Teams')]) ?>
+                            <?= Html::textarea("Verein[teamRows][$i][personen]", $row['personen'], ['class' => 'form-control', 'rows' => 5,
+                                'placeholder' => Yii::t('VereineModule.base', 'Name (Funktion)'), 'aria-label' => Yii::t('VereineModule.base', 'Personen im Team')]) ?>
+                        </div>
+                    <?php endforeach ?>
+                </div>
+                <?= Html::error($verein, 'teamRows', ['class' => 'text-danger']) ?>
+            </div>
+        </details>
+        <?php endif ?>
+
         <?php if ($isNew && !Module::canManageAll()): ?>
             <div class="form-group">
                 <label for="verein-nachricht"><?= Yii::t('VereineModule.base', 'Deine Funktion im Verein') ?></label>

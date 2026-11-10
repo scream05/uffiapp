@@ -24,6 +24,10 @@ $module = Yii::$app->getModule('vereine');
 <div class="panel panel-default">
     <div class="panel-body">
         <p><?= Html::a('<i class="fa fa-arrow-left"></i> ' . Yii::t('VereineModule.base', 'Vereinsverzeichnis'), $space->createUrl('/vereine/verein/index')) ?></p>
+        <?php $titelbild = $verein->getTitelbild(); ?>
+        <?php if ($titelbild): ?>
+            <?= Html::img($titelbild->getUrl(), ['alt' => '', 'class' => 'verein-titelbild']) ?>
+        <?php endif ?>
         <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
             <?= $this->render('_logo', ['verein' => $verein, 'size' => 72]) ?>
             <div style="flex:1;min-width:200px">
@@ -31,6 +35,7 @@ $module = Yii::$app->getModule('vereine');
                 <span class="text-muted"><?= Html::encode($module->kategorieLabel($verein->kategorie)) ?> · <?= Html::encode($module->ortLabel($verein->ortsteil)) ?></span>
             </div>
         </div>
+        <?= $this->render('_titelbereich', ['verein' => $verein]) ?>
 
         <?php if ($canManage): ?>
             <div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:6px">
@@ -61,6 +66,8 @@ $module = Yii::$app->getModule('vereine');
             <div style="margin-top:16px" data-uebersetzbar="verein:<?= $verein->id ?>"><?= RichText::output($verein->beschreibung) ?></div>
         <?php endif ?>
 
+        <?= $this->render('_team', ['verein' => $verein]) ?>
+
         <?php $gallery = $verein->getGallery(); $credits = $verein->getBildnachweise(); ?>
         <?php if ($gallery): ?>
             <div class="verein-galerie" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-top:16px">
@@ -84,7 +91,7 @@ $module = Yii::$app->getModule('vereine');
 
         <?php $ap = $verein->getAnsprechpartnerList(); $social = $verein->getSocialList(); ?>
         <?php if ($verein->treffpunkt || $website || $verein->email || $verein->telefon || $ap || $social): ?>
-            <h2 style="font-size:1.1em;margin-top:20px"><?= Yii::t('VereineModule.base', 'Kontakt') ?></h2>
+            <h2 id="verein-kontakt" style="font-size:1.1em;margin-top:20px"><?= Yii::t('VereineModule.base', 'Kontakt') ?></h2>
             <ul class="list-unstyled" style="line-height:1.9">
                 <?php if ($verein->treffpunkt): ?><li><i class="fa fa-map-marker fa-fw"></i> <?= Html::encode($verein->treffpunkt) ?></li><?php endif ?>
                 <?php if ($website): ?><li><i class="fa fa-globe fa-fw"></i> <?= Html::a(Html::encode(preg_replace('#^https?://(www\.)?|/$#', '', $website)), $website, ['target' => '_blank', 'rel' => 'noopener nofollow']) ?></li><?php endif ?>
@@ -111,7 +118,7 @@ $module = Yii::$app->getModule('vereine');
 </div>
 
 <?php if (Yii::$app->hasModule('kurse') && Yii::$app->getModule('kurse') !== null): ?>
-    <?= \humhub\modules\kurse\widgets\VereinKurse::widget(['verein' => $verein]) ?>
+    <div id="verein-kurse"><?= \humhub\modules\kurse\widgets\VereinKurse::widget(['verein' => $verein]) ?></div>
 <?php endif ?>
 
 <?php $quellen = $verein->getQuellenList(); ?>

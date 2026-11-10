@@ -39,7 +39,16 @@ use yii\helpers\Url;
  * @property string|null $bfv_name Vereinsname bei der Spielquelle
  * @property string $spiele_quelle bfv | dbb | bvv | bbv (components/Spielquellen.php)
  * @property string|null $ergebnisse_url Ergebnisse/Tabellen bei einer Quelle ohne Abruf (nur Link), z. B. RWK-Onlinemelder
- * @property string|null $ergebnisse_text wo, z. B. „beim Schützengau Uffenheim“
+ * @property string|null $ergebnisse_text
+ * @property string|null $titelbild_guid Titelbereich der Vereinsseite (seit 10.11.2026)
+ * @property string|null $slogan
+ * @property string|null $untertitel
+ * @property string|null $stichwoerter komma-getrennt
+ * @property string|null $knopf_text
+ * @property string|null $knopf_untertext
+ * @property string|null $team_text
+ * @property string|null $team JSON [{titel, mitglieder: [{name, funktion}]}]
+ * @property string|null $teambild_guid wo, z. B. „beim Schützengau Uffenheim“
  */
 class Verein extends ActiveRecord implements ViewableInterface
 {
@@ -50,10 +59,15 @@ class Verein extends ActiveRecord implements ViewableInterface
     public const MAX_ANSPRECHPARTNER = 8;
     public const MAX_SOCIAL = 5;
     public const MAX_BILDER = 8;
+    public const MAX_TEAMS = 4;
+    public const MAX_TEAM_PERSONEN = 20;
+    public const MAX_STICHWOERTER = 6;
 
     /** Formularzeilen für Ansprechpartner und Social-Media-Links (werden als JSON gespeichert) */
     public array $apRows = [];
     public array $socialRows = [];
+    /** Formular: je Team Titel und Personen als Text, eine Zeile „Name (Funktion)“ */
+    public array $teamRows = [];
 
     public static function tableName()
     {
@@ -65,6 +79,8 @@ class Verein extends ActiveRecord implements ViewableInterface
         parent::afterFind();
         $this->apRows = $this->getAnsprechpartnerList();
         $this->socialRows = $this->getSocialList();
+        $this->teamRows = array_map(fn($t) => ['titel' => $t['titel'] ?? '', 'personen' => implode("\n", array_map(
+            fn($p) => $p['name'] . (($p['funktion'] ?? '') !== '' ? " ({$p['funktion']})" : ''), $t['mitglieder'] ?? []))], $this->getTeamList());
     }
 
     public function rules()
@@ -84,6 +100,15 @@ class Verein extends ActiveRecord implements ViewableInterface
             ['website', 'string', 'max' => 255],
             ['email', 'email', 'enableIDN' => true, 'message' => Yii::t('VereineModule.base', 'Bitte eine gültige E-Mail-Adresse angeben.')],
             ['telefon', 'match', 'pattern' => '/^[0-9 +\/()-]{5,50}$/', 'message' => Yii::t('VereineModule.base', 'Bitte nur Ziffern, Leerzeichen und + / - ( ).')],
+            [['slogan', 'untertitel', 'stichwoerter', 'knopf_text', 'knopf_untertext', 'team_text'], 'trim'],
+            ['slogan', 'string', 'max' => 150],
+            [['untertitel', 'stichwoerter'], 'string', 'max' => 255],
+            ['knopf_text', 'string', 'max' => 60],
+            ['knopf_untertext', 'string', 'max' => 150],
+            ['team_text', 'string', 'max' => 3000],
+            [['slogan', 'untertitel', 'stichwoerter', 'knopf_text', 'knopf_untertext', 'team_text'], 'default', 'value' => null],
+            ['teamRows', 'safe'],
+            ['teamRows', 'validateTeam'],
             [['apRows', 'socialRows'], 'safe'],
             ['apRows', 'validateAnsprechpartner'],
             ['socialRows', 'validateSocial'],
@@ -103,6 +128,13 @@ class Verein extends ActiveRecord implements ViewableInterface
             'telefon' => Yii::t('VereineModule.base', 'Telefon des Vereins'),
             'apRows' => Yii::t('VereineModule.base', 'Ansprechpartner'),
             'socialRows' => Yii::t('VereineModule.base', 'Social Media'),
+            'slogan' => Yii::t('VereineModule.base', 'Slogan'),
+            'untertitel' => Yii::t('VereineModule.base', 'Unterzeile'),
+            'stichwoerter' => Yii::t('VereineModule.base', 'Stichwörter'),
+            'knopf_text' => Yii::t('VereineModule.base', 'Text auf dem Knopf'),
+            'knopf_untertext' => Yii::t('VereineModule.base', 'Zeile unter dem Knopftext'),
+            'team_text' => Yii::t('VereineModule.base', 'Text zum Team'),
+            'teamRows' => Yii::t('VereineModule.base', 'Team'),
         ];
     }
 
@@ -125,6 +157,34 @@ class Verein extends ActiveRecord implements ViewableInterface
         }
         $this->apRows = $rows;
         $this->ansprechpartner = $rows ? json_encode($rows, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : null;
+    }
+
+    /** Teams aus dem Formular: Zeilen „Name (Funktion)“ bzw. „Name – Funktion“ */
+    public function validateTeam()
+    {
+        $teams = [];
+        foreach (array_slice((array)$this->teamRows, 0, self::MAX_TEAMS) as $row) {
+            $titel = mb_substr(trim((string)($row['titel'] ?? '')), 0, 100);
+            $mitglieder = [];
+            foreach (preg_split('/\R/u', (string)($row['personen'] ?? '')) as $zeile) {
+                $zeile = trim(preg_replace('/\s+/u', ' ', $zeile), " \t-–•*");
+                if ($zeile === '') {
+                    continue;
+                }
+                if (preg_match('/^(.+?)\s*\((.+)\)$/u', $zeile, $m) || preg_match('/^(.+?)\s+[–-]\s+(.+)$/u', $zeile, $m)) {
+                    $mitglieder[] = ['name' => mb_substr($m[1], 0, 100), 'funktion' => mb_substr($m[2], 0, 100)];
+                } else {
+                    $mitglieder[] = ['name' => mb_substr($zeile, 0, 100), 'funktion' => ''];
+                }
+            }
+            if (count($mitglieder) > self::MAX_TEAM_PERSONEN) {
+                $this->addError('teamRows', Yii::t('VereineModule.base', 'Höchstens {n} Personen je Team.', ['n' => self::MAX_TEAM_PERSONEN]));
+            }
+            if ($titel !== '' || $mitglieder) {
+                $teams[] = ['titel' => $titel, 'mitglieder' => array_slice($mitglieder, 0, self::MAX_TEAM_PERSONEN)];
+            }
+        }
+        $this->team = $teams ? json_encode($teams, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : null;
     }
 
     public function validateSocial()
@@ -170,6 +230,23 @@ class Verein extends ActiveRecord implements ViewableInterface
     public function getSocialList(): array
     {
         return self::jsonList($this->social);
+    }
+
+    public function getTeamList(): array
+    {
+        return self::jsonList($this->team);
+    }
+
+    /** @return string[] Stichwörter des Titelbereichs */
+    public function getStichwortList(): array
+    {
+        return array_slice(array_values(array_filter(array_map('trim', explode(',', (string)$this->stichwoerter)))), 0, self::MAX_STICHWOERTER);
+    }
+
+    /** Hat die Seite einen Titelbereich (Bild oder Slogan)? */
+    public function hatTitelbereich(): bool
+    {
+        return $this->getTitelbild() !== null || trim((string)$this->slogan) !== '';
     }
 
     public function getQuellenList(): array
@@ -313,24 +390,39 @@ class Verein extends ActiveRecord implements ViewableInterface
         return array_values(array_filter($this->fileManager->findAll(), fn($f) => str_starts_with((string)$f->mime_type, 'image/')));
     }
 
-    public function getLogo(): ?File
+    private function bild(?string $guid): ?File
     {
-        if ($this->logo_guid === null) {
+        if ($guid === null) {
             return null;
         }
         foreach ($this->images() as $file) {
-            if ($file->guid === $this->logo_guid) {
+            if ($file->guid === $guid) {
                 return $file;
             }
         }
         return null;
     }
 
-    /** @return File[] Bilder ohne Logo */
+    public function getLogo(): ?File
+    {
+        return $this->bild($this->logo_guid);
+    }
+
+    public function getTitelbild(): ?File
+    {
+        return $this->bild($this->titelbild_guid);
+    }
+
+    public function getTeambild(): ?File
+    {
+        return $this->bild($this->teambild_guid);
+    }
+
+    /** @return File[] Bilder ohne Logo, Titel- und Teambild */
     public function getGallery(): array
     {
-        $logo = $this->getLogo();
-        return array_values(array_filter($this->images(), fn($f) => $f->guid !== $logo?->guid));
+        $ohne = array_filter([$this->logo_guid, $this->titelbild_guid, $this->teambild_guid]);
+        return array_values(array_filter($this->images(), fn($f) => !in_array($f->guid, $ohne, true)));
     }
 
     /** @return CalendarEntry[] */
