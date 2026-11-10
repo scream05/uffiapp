@@ -3696,16 +3696,19 @@ class SetupController extends Controller
                 . '<tr><th>1</th><td></td><td><a href="/ergebnisse/erwachsene/mittelfranken/team-501">VSG Test / SB Uffenheim</a></td><td>1</td><td>1</td><td>0</td><td>3</td><td>3:0</td><td>Max</td><td>75:40</td><td>1,8</td></tr>'
                 . '<tr><th>2</th><td></td><td><a href="/ergebnisse/erwachsene/mittelfranken/team-502">TV Gegner</a></td><td>1</td><td>0</td><td>1</td><td>0</td><td>0:3</td><td>0</td><td>40:75</td><td>0,5</td></tr></tbody></table>';
             $morgenDe = date('d.m.Y', strtotime('+1 day'));
+            // relative Daten: Uffi zeigt nur Ergebnisse der letzten 8 Tage (feste Daten ließen den Test altern)
+            $vorDe = date('d.m.Y', strtotime('-3 days'));
+            $pokalDe = date('d.m.Y', strtotime('-5 days'));
             foreach ($Q::BVV_BEREICHE as $bereich) {
                 $antworten[$Q::BVV . "/ergebnisse/$bereich"] = $bereich === 'erwachsene/mittelfranken'
                     ? '<a href="/ergebnisse/erwachsene/mittelfranken/wettbewerb-1">x</a><a href="/ergebnisse/erwachsene/mittelfranken/wettbewerb-2">x</a><a href="/ergebnisse/erwachsene/mittelfranken/wettbewerb-3">x</a>' : '<html></html>';
             }
             $antworten[$Q::BVV . '/ergebnisse/erwachsene/mittelfranken/wettbewerb-1'] = $vbLiga('Bezirksklasse 2 Frauen',
-                $vbBlock(11, '24.10.2026', 'VSG Test / SB Uffenheim', 'TV Gegner', [25, 25, 25], [20, 7, 20])
-                . $vbBlock(11, '24.10.2026', 'VSG Test / SB Uffenheim', 'TV Gegner', [25, 25, 25], [20, 7, 20]) // „Aktuelle“ und „Alle“: doppelt
+                $vbBlock(11, $vorDe, 'VSG Test / SB Uffenheim', 'TV Gegner', [25, 25, 25], [20, 7, 20])
+                . $vbBlock(11, $vorDe, 'VSG Test / SB Uffenheim', 'TV Gegner', [25, 25, 25], [20, 7, 20]) // „Aktuelle“ und „Alle“: doppelt
                 . $vbBlock(12, $morgenDe, 'TV Gegner', 'VSG Test / SB Uffenheim', [], []), $vbTab);
             $antworten[$Q::BVV . '/ergebnisse/erwachsene/mittelfranken/wettbewerb-2'] = $vbLiga('Bezirkspokal Vorrunde Frauen',
-                $vbBlock(13, '21.10.2026', 'VSG Test/SB Uffenheim', 'TV Pokal', [25, 25, 25], [17, 22, 21]));
+                $vbBlock(13, $pokalDe, 'VSG Test/SB Uffenheim', 'TV Pokal', [25, 25, 25], [17, 22, 21]));
             $antworten[$Q::BVV . '/ergebnisse/erwachsene/mittelfranken/wettbewerb-3'] = $vbLiga('Landesliga Frauen', $vbBlock(14, '01.10.2026', 'Fremd A', 'Fremd B', [25], [1]));
             $antworten[$Q::BVV . '/ergebnisse/erwachsene/mittelfranken/spiel-12'] = '<h3><svg></svg> Halle </h3> <div> <p><strong>Halle Test</strong><br> Weg 2<br> 91438 Bad Windsheim </p></div>'
                 . '<h3>Spieler</h3><p>Erika Muster</p>';
