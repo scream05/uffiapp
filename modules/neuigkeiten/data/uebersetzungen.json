@@ -1,4 +1,31 @@
 {
+    "aktivitaeten-deutsch": {
+        "en": {
+            "titel": "Recent activities in proper English",
+            "text": "In the recent activities, it used to say “created a new post” or “created a new event”. Now it says, for example, “New from Stadt Uffenheim: Event …”.",
+            "quelle": "350e8c9bb8c1f033b2fb7885966cafbd61102cea"
+        },
+        "uk": {
+            "titel": "Останні активності правильною німецькою",
+            "text": "У списку останніх активностей було написано «hat ein neues Beitrag erstellt» або «hat ein neues Termin erstellt». Тепер там, наприклад, написано: «Нове від Stadt Uffenheim: подія …».",
+            "quelle": "350e8c9bb8c1f033b2fb7885966cafbd61102cea"
+        },
+        "ar": {
+            "titel": "آخر الأنشطة بالألمانية الصحيحة",
+            "text": "في قسم آخر الأنشطة كان مكتوبًا: «أنشأ مساهمة جديدة» أو «أنشأ موعدًا جديدًا». الآن صار يظهر هناك مثلًا: «جديد من Stadt Uffenheim: موعد …».",
+            "quelle": "350e8c9bb8c1f033b2fb7885966cafbd61102cea"
+        },
+        "tr": {
+            "titel": "Son aktiviteler düzgün Almanca ile",
+            "text": "Son aktivitelerde \"hat ein neues Beitrag erstellt\" ya da \"hat ein neues Termin erstellt\" yazıyordu. Artık orada örneğin \"Stadt Uffenheim’dan yeni: Etkinlik …\" yazıyor.",
+            "quelle": "350e8c9bb8c1f033b2fb7885966cafbd61102cea"
+        },
+        "ru": {
+            "titel": "Последние активности на правильном немецком",
+            "text": "В последних активностях было написано «hat ein neues Beitrag erstellt» или «hat ein neues Termin erstellt». Теперь там, например, написано: «Новое от Stadt Uffenheim: событие …».",
+            "quelle": "350e8c9bb8c1f033b2fb7885966cafbd61102cea"
+        }
+    },
     "ki-openai": {
         "en": {
             "titel": "Uffi now replies with ChatGPT",

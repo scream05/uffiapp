@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'aktivitaeten-deutsch', 'datum' => '2026-11-10', 'art' => 'behoben', 'popup' => false,
+        'titel' => 'Letzte Aktivitäten in richtigem Deutsch',
+        'text' => 'Bei den letzten Aktivitäten stand „hat ein neues Beitrag erstellt“ oder „hat ein neues Termin erstellt“. Jetzt steht dort zum Beispiel „Neu von Stadt Uffenheim: Termin …“.'],
     ['id' => 'ki-openai', 'datum' => '2026-11-09', 'art' => 'besser', 'popup' => false,
         'titel' => 'Uffi antwortet jetzt mit ChatGPT',
         'text' => 'Uffi, das Übersetzen und das Auslesen von WhatsApp-Plakaten nutzen jetzt die KI von OpenAI (ChatGPT) statt Claude. Für dich ändert sich nichts. Was dabei mit deinen Angaben passiert, steht in der Datenschutzerklärung.'],
