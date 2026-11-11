@@ -67,6 +67,7 @@ class SeiteController extends Controller
             return $this->redirect($kurs->elternUrl('kurs'));
         }
         $a = new Anmeldung(['kurs_id' => $kurs->id, 'scenario' => Anmeldung::SCENARIO_ELTERN]);
+        $a->zahlart = $kurs->vorbelegteZahlart();
         $a->populateRelation('kurs', $kurs);
         if (!Yii::$app->user->isGuest && !Yii::$app->request->isPost) {
             $u = Yii::$app->user->identity;

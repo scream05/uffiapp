@@ -253,6 +253,13 @@ class Kurs extends ActiveRecord
         return $p === null ? null : (float)$p;
     }
 
+    /** Gibt es nur eine Zahlart, ist sie im Anmeldeformular schon gewählt */
+    public function vorbelegteZahlart(): ?string
+    {
+        $z = $this->hatPreis() ? $this->zahlarten() : [];
+        return count($z) === 1 ? array_key_first($z) : null;
+    }
+
     /** @return array<string,string> erlaubte Zahlarten */
     public function zahlarten(): array
     {

@@ -46,6 +46,7 @@ class AnmeldungController extends ContentContainerController
             return $this->redirect($kurs->getUrl());
         }
         $a = new Anmeldung(['kurs_id' => $kurs->id, 'scenario' => Anmeldung::SCENARIO_ELTERN]);
+        $a->zahlart = $kurs->vorbelegteZahlart();
         $a->populateRelation('kurs', $kurs);
         if (!Yii::$app->user->isGuest && !Yii::$app->request->isPost) {
             $u = Yii::$app->user->identity;
@@ -99,6 +100,7 @@ class AnmeldungController extends ContentContainerController
             throw new ForbiddenHttpException();
         }
         $a = new Anmeldung(['kurs_id' => $kurs->id, 'scenario' => Anmeldung::SCENARIO_HAND]);
+        $a->zahlart = $kurs->vorbelegteZahlart();
         $a->populateRelation('kurs', $kurs);
         if ($a->load(Yii::$app->request->post()) && Dienst::vonHand($a, (bool)Yii::$app->request->post('mail'))) {
             $this->view->success($a->getKindName() . ': ' . $a->getStatusText() . '.');
