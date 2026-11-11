@@ -2,6 +2,7 @@
 
 namespace humhub\modules\statistik\components;
 
+use humhub\helpers\DeviceDetectorHelper;
 use humhub\modules\statistik\Module;
 use Yii;
 use yii\web\Response;
@@ -58,8 +59,24 @@ class Erfassung
         $besucher = substr(hash('sha256', self::salz($tag) . '|'
             . ($user->isGuest ? $req->userIP . '|' . $ua : 'konto|' . $user->id)), 0, 16);
 
-        // Besuch fortsetzen, wenn der letzte Aufruf weniger als 30 Minuten zurückliegt
         $db = $app->db;
+        // Massenabruf eines Gasts (Programm mit Browserkennung): nicht zählen und seine Aufrufe des Tages löschen
+        if ($user->isGuest) {
+            $sperre = Yii::getAlias('@runtime/statistik') . "/massen-$tag";
+            if (is_file($sperre) && in_array($besucher, file($sperre, FILE_IGNORE_NEW_LINES) ?: [], true)) {
+                return;
+            }
+            $kurz = (int)$db->createCommand('SELECT COUNT(*) FROM statistik_aufruf WHERE besucher = :b AND tag = :t AND zeit >= :z',
+                [':b' => $besucher, ':t' => $tag, ':z' => date('Y-m-d H:i:s', $jetzt - $modul->massenMinuten * 60)])->queryScalar();
+            if ($kurz >= $modul->massenAufrufe) {
+                // Für den Rest des Tages merken (Datei neben dem Tages-Salz, wird mit ihm gelöscht)
+                file_put_contents($sperre, $besucher . "\n", FILE_APPEND | LOCK_EX);
+                $db->createCommand()->delete('statistik_aufruf', ['besucher' => $besucher, 'tag' => $tag])->execute();
+                return;
+            }
+        }
+
+        // Besuch fortsetzen, wenn der letzte Aufruf weniger als 30 Minuten zurückliegt
         $letzter = $db->createCommand('SELECT besuch, zeit FROM statistik_aufruf WHERE besucher = :b AND tag = :t ORDER BY id DESC LIMIT 1',
             [':b' => $besucher, ':t' => $tag])->queryOne();
         $neu = !$letzter || strtotime($letzter['zeit']) < $jetzt - $modul->besuchPauseMinuten * 60;
@@ -72,7 +89,8 @@ class Erfassung
             'besuch' => $neu ? bin2hex(random_bytes(8)) : $letzter['besuch'],
             'neuer_besuch' => $neu ? 1 : 0,
             'angemeldet' => $user->isGuest ? 0 : 1,
-            'geraet' => self::geraet($ua),
+            // App an ihren Kopfzeilen erkennen (wie HumHub selbst), die Browserkennung enthält „HumHub“ nicht
+            'geraet' => DeviceDetectorHelper::isAppRequest() ? 'App' : self::geraet($ua),
             'browser' => self::browser($ua),
             'system' => self::system($ua),
             'herkunft' => $neu ? self::herkunft() : null,
@@ -97,8 +115,8 @@ class Erfassung
                 fwrite($f, bin2hex(random_bytes(32)));
                 fclose($f);
                 chmod($datei, 0600);
-                foreach (glob("$dir/salz-*") ?: [] as $alt) {
-                    if ($alt !== $datei) {
+                foreach (array_merge(glob("$dir/salz-*") ?: [], glob("$dir/massen-*") ?: []) as $alt) {
+                    if ($alt !== $datei && $alt !== "$dir/massen-$tag") {
                         @unlink($alt);
                     }
                 }

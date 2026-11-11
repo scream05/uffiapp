@@ -13,6 +13,13 @@ class Module extends \humhub\components\Module
     /** Aufrufe von Admins mitzählen? Standard nein: Pflege und Tests verfälschen sonst die Zahlen */
     public bool $adminsZaehlen = false;
 
+    /**
+     * Massenabrufe: Ein Gast mit mehr als so vielen Aufrufen in {@see $massenMinuten} Minuten ist ein Programm
+     * (z. B. Scraper mit Handy-Browserkennung) – er wird für den ganzen Tag aus der Statistik genommen
+     */
+    public int $massenAufrufe = 30;
+    public int $massenMinuten = 3;
+
     /** Browser mit „Do Not Track“ oder „Global Privacy Control“ werden nicht gezählt */
     public bool $dntBeachten = true;
 
