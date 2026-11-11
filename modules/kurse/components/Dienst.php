@@ -31,35 +31,101 @@ class Dienst
         return true;
     }
 
-    /** Höchstens so viele Anmeldungen je IP-Adresse und Stunde */
+    /** Höchstens so viele Anmeldungen je Anschluss (IP-Adresse, bei IPv6 das /64-Netz) und Stunde */
     public const MAX_PRO_STUNDE = 10;
+    /** Höchstens so viele Anmeldungen je E-Mail-Adresse und Tag (jede löst eine Mail an diese Adresse aus) */
+    public const MAX_PRO_ADRESSE = 4;
+    /** Höchstens so viele Anmeldungen insgesamt je Stunde – darüber ist es kein normaler Betrieb mehr */
+    public const MAX_GESAMT_STUNDE = 60;
+
+    /** Anschluss für die Zählung: IPv4-Adresse bzw. bei IPv6 das /64-Netz (ein Anschluss hat dort beliebig viele Adressen) */
+    private static function anschluss(): string
+    {
+        // Konsole (Selbsttest) hat keine IP-Adresse
+        $ip = Yii::$app->request instanceof \yii\web\Request ? (string)Yii::$app->request->userIP : 'konsole';
+        if (str_contains($ip, ':') && ($bin = @inet_pton($ip)) !== false) {
+            return bin2hex(substr($bin, 0, 8)) . '::/64';
+        }
+        return $ip;
+    }
+
+    /** Zähler im Cache um eins erhöhen; false, wenn die Grenze schon erreicht war (dann wird nicht gezählt) */
+    private static function zaehlen(string $key, int $max, int $sekunden): bool
+    {
+        $n = (int)Yii::$app->cache->get($key);
+        if ($n >= $max) {
+            return false;
+        }
+        Yii::$app->cache->set($key, $n + 1, $sekunden);
+        return true;
+    }
+
+    /** Gleiches Kind im selben Kurs (nicht abgemeldet), neueste zuerst */
+    private static function gleichesKind(Anmeldung $a): array
+    {
+        return Anmeldung::find()->where(['kurs_id' => $a->kurs_id, 'kind_geburtsdatum' => $a->kind_geburtsdatum])
+            ->andWhere(['kind_vorname' => $a->kind_vorname, 'kind_nachname' => $a->kind_nachname])
+            ->andWhere(['!=', 'status', Anmeldung::STATUS_STORNIERT])->orderBy(['id' => SORT_DESC])->all();
+    }
 
     /**
-     * Anmeldeformular der Eltern (Space-Seite und eigene Vereinsseite): Sperre gegen Massenanmeldungen, Prüfung,
+     * Anmeldeformular der Eltern (Space-Seite und eigene Vereinsseite): Sperren gegen Massenanmeldungen, Prüfung,
      * Doppelt-Prüfung, Speichern und Bestätigungsmail. Bei false stehen die Fehler im Modell oder in $hinweis.
+     *
+     * Bei true zeigt die Seite immer dasselbe („Wir haben dir eine Mail geschickt“) – auch wenn das Kind schon
+     * angemeldet ist. Sonst könnte jeder am Formular ablesen, ob ein bestimmtes Kind im Kurs ist. Was wirklich
+     * passiert ist, steht nur in der Mail an die jeweilige Adresse.
      */
     public static function formularAnmelden(Anmeldung $a, ?string &$hinweis = null): bool
     {
-        $cacheKey = 'kurse-anmeldung-ip-' . md5((string)Yii::$app->request->userIP);
-        $anzahl = (int)Yii::$app->cache->get($cacheKey);
-        if ($anzahl >= self::MAX_PRO_STUNDE) {
-            $hinweis = 'Zu viele Anmeldungen in kurzer Zeit. Bitte versuche es später noch einmal.';
-            return false;
-        }
         if (!$a->validate()) {
             return false;
         }
-        $doppelt = Anmeldung::find()->where(['kurs_id' => $a->kurs_id, 'kind_geburtsdatum' => $a->kind_geburtsdatum])
-            ->andWhere(['kind_vorname' => $a->kind_vorname, 'kind_nachname' => $a->kind_nachname])
-            ->andWhere(['!=', 'status', Anmeldung::STATUS_STORNIERT])->one();
-        if ($doppelt && $doppelt->status !== Anmeldung::STATUS_UNBESTAETIGT) {
-            $a->addError('kind_vorname', 'Dieses Kind ist für diesen Kurs schon angemeldet. Den Stand findest du über den Link in deiner Bestätigungsmail.');
+        // Erst zählen, dann prüfen: auch Versuche mit schon angemeldeten Kindern zählen mit
+        $std = date('YmdH');
+        if (!self::zaehlen('kurse-anmeldung-ip-' . md5(self::anschluss()), self::MAX_PRO_STUNDE, 3600)) {
+            $hinweis = 'Zu viele Anmeldungen in kurzer Zeit. Bitte versuche es später noch einmal.';
             return false;
         }
-        if ($doppelt) {
-            $doppelt->delete(); // neuer Versuch, z. B. weil die erste Mail nicht ankam
+        if (!self::zaehlen('kurse-anmeldung-adr-' . md5(mb_strtolower((string)$a->email)), self::MAX_PRO_ADRESSE, 86400)) {
+            $hinweis = 'Für diese E-Mail-Adresse wurden heute schon mehrere Anmeldungen abgeschickt. Bitte schau in dein Postfach (auch im Spam-Ordner) '
+                . 'oder melde dich direkt beim Verein: ' . $a->kurs->kontakt_email;
+            return false;
         }
-        Yii::$app->cache->set($cacheKey, $anzahl + 1, 3600);
+        if (!self::zaehlen("kurse-anmeldung-gesamt-$std", self::MAX_GESAMT_STUNDE, 3700)) {
+            if (Yii::$app->cache->add("kurse-anmeldung-gesamt-warnung-$std", 1, 3700)) {
+                Yii::warning('Kursanmeldung: mehr als ' . self::MAX_GESAMT_STUNDE . ' Anmeldungen in einer Stunde – weitere werden bis zur vollen Stunde abgewiesen', 'kurse');
+            }
+            $hinweis = 'Gerade gehen ungewöhnlich viele Anmeldungen ein. Bitte versuche es in einer Stunde noch einmal oder melde dich direkt beim Verein: '
+                . $a->kurs->kontakt_email;
+            return false;
+        }
+
+        $gleicheAdresse = fn(Anmeldung $d) => mb_strtolower((string)$d->email) === mb_strtolower((string)$a->email);
+        $vorhanden = self::gleichesKind($a);
+        $bestaetigt = array_values(array_filter($vorhanden, fn(Anmeldung $d) => $d->status !== Anmeldung::STATUS_UNBESTAETIGT));
+        if ($bestaetigt) {
+            // Kind ist schon angemeldet: nichts Neues anlegen. Dieselbe Adresse bekommt ihren Link noch einmal,
+            // bei einer anderen Adresse erfährt nur die ursprüngliche davon (höchstens einmal am Tag).
+            $d = $bestaetigt[0];
+            try {
+                if ($gleicheAdresse($d)) {
+                    self::mailSchonAngemeldet($d);
+                } elseif ($d->email && Yii::$app->cache->add('kurse-doppelt-hinweis-' . $d->id, 1, 86400)) {
+                    self::mailWeitererVersuch($d);
+                }
+            } catch (\Throwable $e) {
+                Yii::error($e, 'kurse');
+            }
+            return true;
+        }
+        foreach ($vorhanden as $d) {
+            // Neuer Versuch mit derselben Adresse (z. B. weil die erste Mail nicht ankam): alten Versuch ersetzen.
+            // Unbestätigte Anmeldungen mit ANDERER Adresse bleiben stehen – wer zuerst bestätigt, bekommt den Platz.
+            if ($gleicheAdresse($d)) {
+                $d->delete();
+            }
+        }
         try {
             if (self::anmelden($a)) {
                 return true;
@@ -98,7 +164,26 @@ class Dienst
         if ($a->status !== Anmeldung::STATUS_UNBESTAETIGT) {
             return $a->status !== Anmeldung::STATUS_STORNIERT;
         }
-        return self::einordnen($a, true, false);
+        foreach (self::gleichesKind($a) as $d) {
+            if ($d->id !== $a->id && $d->status !== Anmeldung::STATUS_UNBESTAETIGT) {
+                // Für dieses Kind wurde inzwischen eine andere Anmeldung bestätigt: diese hier zählt nicht
+                $a->status = Anmeldung::STATUS_STORNIERT;
+                $a->storniert_am = date('Y-m-d H:i:s');
+                $a->storniert_von = 'doppelt';
+                $a->save(false);
+                return false;
+            }
+        }
+        $ok = self::einordnen($a, true, false);
+        if ($ok) {
+            // Übrige unbestätigte Versuche für dasselbe Kind sind damit erledigt
+            foreach (self::gleichesKind($a) as $d) {
+                if ($d->id !== $a->id && $d->status === Anmeldung::STATUS_UNBESTAETIGT) {
+                    $d->delete();
+                }
+            }
+        }
+        return $ok;
     }
 
     private static function einordnen(Anmeldung $a, bool $mail, bool $trotzdemWarteliste): bool
@@ -299,6 +384,27 @@ class Dienst
             . 'Wenn du das nicht warst, kannst du diese Mail einfach ignorieren.' . "\n\n"
             . 'Viele Grüße' . "\n" . $a->kurs->verein->name;
         return self::senden($a, 'Bitte bestätige die Anmeldung: ' . $a->kurs->titel, $text, [$link, 'Anmeldung bestätigen']);
+    }
+
+    /** Erneute Anmeldung mit derselben Adresse, obwohl das Kind schon angemeldet ist: Link noch einmal schicken */
+    public static function mailSchonAngemeldet(Anmeldung $a): bool
+    {
+        $text = self::anrede($a) . "\n\n"
+            . $a->getKindName() . ' ist für diesen Kurs bereits angemeldet (' . $a->getStatusText() . '):' . "\n\n" . self::kursBlock($a->kurs) . "\n\n"
+            . 'Du musst nichts weiter tun – eine zweite Anmeldung haben wir nicht angelegt.' . "\n\n" . self::fuss($a);
+        return self::senden($a, 'Schon angemeldet: ' . $a->kurs->titel, $text);
+    }
+
+    /** Jemand hat dasselbe Kind mit einer anderen E-Mail-Adresse angemeldet: nur die ursprüngliche Adresse erfährt davon */
+    public static function mailWeitererVersuch(Anmeldung $a): bool
+    {
+        $text = self::anrede($a) . "\n\n"
+            . 'für ' . $a->getKindName() . ' wurde gerade noch einmal eine Anmeldung zu diesem Kurs abgeschickt, mit einer anderen E-Mail-Adresse:' . "\n\n"
+            . self::kursBlock($a->kurs) . "\n\n"
+            . 'Deine Anmeldung besteht unverändert (' . $a->getStatusText() . '), eine zweite haben wir nicht angelegt. '
+            . 'War das zum Beispiel der andere Elternteil, ist nichts weiter zu tun. Kommt dir das merkwürdig vor, antworte bitte auf diese Mail.'
+            . "\n\n" . self::fuss($a);
+        return self::senden($a, 'Weitere Anmeldung für ' . $a->kind_vorname . ': ' . $a->kurs->titel, $text);
     }
 
     public static function mailZusage(Anmeldung $a, bool $nachgerueckt): bool

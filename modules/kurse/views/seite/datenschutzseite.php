@@ -69,7 +69,10 @@ $modul = Yii::$app->getModule('kurse');
         <p><strong>Wie lange:</strong> Nicht bestätigte Anmeldungen werden nach <?= (int)$modul->unbestaetigtStunden ?> Stunden automatisch gelöscht.
             Alle Angaben zu Kind und Erziehungsberechtigten werden etwa <?= round($modul->loeschenNachTagen / 30) ?> Monate nach Kursende automatisch gelöscht;
             übrig bleiben nur Anmeldenummer, Status, Betrag und Zahlungsvermerk ohne Namen. Für die Buchhaltung des Vereins gelten dessen eigene Aufbewahrungspflichten.
-            Um Missbrauch zu verhindern, wird kurzzeitig gezählt, wie viele Anmeldungen von einer IP-Adresse kommen (höchstens eine Stunde, Art. 6 Abs. 1 lit. f DSGVO).</p>
+            Um Missbrauch zu verhindern, wird kurzzeitig gezählt, wie viele Anmeldungen von einem Anschluss (IP-Adresse, höchstens eine Stunde)
+            und für eine E-Mail-Adresse (nur als Prüfsumme, höchstens einen Tag) kommen (Art. 6 Abs. 1 lit. f DSGVO).
+            Wird ein Kind, das schon angemeldet ist, mit einer anderen E-Mail-Adresse noch einmal angemeldet, legen wir keine zweite Anmeldung an
+            und informieren die Adresse der bestehenden Anmeldung darüber.</p>
 
         <h2>6. E-Mail-Versand</h2>
         <p>Die E-Mails zur Kursanmeldung werden über Google Workspace der Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland, verschickt.

@@ -34,7 +34,7 @@ use Yii;
  * @property string|null $bestaetigt_am
  * @property string|null $platz_am
  * @property string|null $storniert_am
- * @property string|null $storniert_von eltern | verein | absage
+ * @property string|null $storniert_von eltern | verein | absage | voll | doppelt (bei der Bestätigung gab es schon eine bestätigte Anmeldung für das Kind)
  * @property string|null $erinnerung_am
  * @property string|null $zahlungserinnerung_am
  * @property string|null $anonymisiert_am
@@ -84,6 +84,9 @@ class Anmeldung extends ActiveRecord
             [['kind_geburtsdatum', 'email', 'telefon'], 'required', 'on' => self::SCENARIO_ELTERN],
             [['kind_vorname', 'kind_nachname'], 'string', 'max' => 100],
             ['eltern_name', 'string', 'max' => 150],
+            // Namen stehen in den Mails („Hallo …,“): nur Buchstaben und übliche Zeichen, keine Links oder Werbetexte
+            [['kind_vorname', 'kind_nachname', 'eltern_name'], 'match', 'pattern' => '/^\p{L}[\p{L} .,\'’&\/-]*$/u',
+                'message' => 'Bitte nur den Namen angeben (Buchstaben, Leerzeichen, Bindestrich).'],
             ['email', 'email'],
             ['email', 'string', 'max' => 150],
             [['telefon', 'notfall_telefon'], 'string', 'max' => 50],

@@ -75,7 +75,7 @@ echo $this->render('_stil');
                                 <?php if ($a->status === Anmeldung::STATUS_PLATZ): ?><?= $knopf($a, 'bezahlt', '<i class="fa fa-check"></i> bezahlt', 'btn-light') ?><?php endif ?>
                             <?php endif ?>
                         <?php elseif ($a->status === Anmeldung::STATUS_STORNIERT): ?>
-                            <span class="text-muted"><?= Html::encode(['eltern' => 'von Eltern abgemeldet', 'verein' => 'vom Verein abgemeldet', 'absage' => 'Kurs abgesagt', 'voll' => 'kein Platz mehr frei'][$a->storniert_von] ?? '') ?>
+                            <span class="text-muted"><?= Html::encode(['eltern' => 'von Eltern abgemeldet', 'verein' => 'vom Verein abgemeldet', 'absage' => 'Kurs abgesagt', 'voll' => 'kein Platz mehr frei', 'doppelt' => 'doppelte Anmeldung'][$a->storniert_von] ?? '') ?>
                                 <?= $a->storniert_am ? date('d.m.', strtotime($a->storniert_am)) : '' ?></span>
                         <?php endif ?>
                     </div>

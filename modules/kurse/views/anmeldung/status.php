@@ -21,6 +21,8 @@ $farbe = [Anmeldung::STATUS_PLATZ => 'success', Anmeldung::STATUS_WARTELISTE => 
             <p>Wird ein Platz frei, rückt dein Kind automatisch nach und du bekommst eine Mail.</p>
         <?php elseif ($a->status === Anmeldung::STATUS_STORNIERT && $a->storniert_von === 'voll'): ?>
             <p>Kurs und Warteliste waren bei deiner Bestätigung leider schon voll.</p>
+        <?php elseif ($a->status === Anmeldung::STATUS_STORNIERT && $a->storniert_von === 'doppelt'): ?>
+            <p>Für dieses Kind gab es bei deiner Bestätigung schon eine andere bestätigte Anmeldung zu diesem Kurs. Diese hier zählt deshalb nicht.</p>
         <?php endif ?>
 
         <dl class="kurs-fakten" style="display:grid;grid-template-columns:max-content 1fr;gap:4px 14px">

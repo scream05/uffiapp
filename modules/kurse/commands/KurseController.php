@@ -184,6 +184,61 @@ class KurseController extends Controller
         $kurs->save();
         $pruefe(Dienst::nachruecken($kurs) === [], 'Nachrücken ohne Warteliste: nichts');
 
+        // Formular der Eltern: Missbrauchsschutz (Namen, Doppelte ohne Auskunft, Grenze je Adresse)
+        $cache = Yii::$app->cache;
+        $adr = fn(string $wer) => "selbsttest-$wer@example.invalid";
+        $aufraeumen = function () use ($cache, $adr) {
+            $cache->delete('kurse-anmeldung-ip-' . md5('konsole'));
+            foreach (['a', 'b', 'c'] as $w) {
+                $cache->delete('kurse-anmeldung-adr-' . md5($adr($w)));
+            }
+        };
+        $aufraeumen();
+        $formular = function (string $wer, string $vorname = 'Fritz') use ($neu, $alt6, $adr) {
+            $f = $neu($vorname, $alt6);
+            $f->email = $adr($wer);
+            $hinweis = null;
+            return [Dienst::formularAnmelden($f, $hinweis), $f, $hinweis];
+        };
+        $fritz = fn() => Anmeldung::find()->where(['kurs_id' => $kurs->id, 'kind_vorname' => 'Fritz'])->andWhere(['!=', 'status', 'storniert']);
+        $link = $neu('Fritz', $alt6);
+        $link->eltern_name = 'https://boese.example Gewinn';
+        $pruefe(!$link->validate() && $link->hasErrors('eltern_name'), 'Name mit Link abgelehnt');
+        $okName = $neu('Anne-Marie', $alt6);
+        $okName->setAttributes(['kind_nachname' => "O'Neil-Müller", 'eltern_name' => 'Dr. Jörg & Ana von Thun']);
+        $pruefe($okName->validate(), 'Übliche Namen (Bindestrich, Apostroph, Dr., &) gehen');
+        [$ok] = $formular('a');
+        $pruefe($ok && (int)$fritz()->count() === 1, 'Formular: Fritz angemeldet (unbestätigt)');
+        [$ok] = $formular('a');
+        $pruefe($ok && (int)$fritz()->count() === 1, 'gleiche Adresse noch einmal: alter Versuch ersetzt');
+        $erste = $fritz()->one();
+        [$ok, $zweite] = $formular('b');
+        $pruefe($ok && (int)$fritz()->count() === 2 && Anmeldung::findOne($erste->id) !== null,
+            'andere Adresse: eigener Versuch, der erste bleibt stehen (kein Verdrängen)');
+        $pruefe(Dienst::bestaetigen($zweite) && Anmeldung::findOne($erste->id) === null && (int)$fritz()->count() === 1,
+            'wer zuerst bestätigt, gilt; der andere Versuch ist erledigt');
+        $vorher = count(glob(Yii::getAlias(Yii::$app->mailer->fileTransportPath) . '/*.eml'));
+        [$ok, , $hinweis] = $formular('c');
+        $pruefe($ok && $hinweis === null && (int)$fritz()->count() === 1, 'schon angemeldet, andere Adresse: gleiche Antwort wie sonst, nichts angelegt');
+        $nachher = count(glob(Yii::getAlias(Yii::$app->mailer->fileTransportPath) . '/*.eml'));
+        $pruefe($nachher === $vorher + 1, 'dabei genau eine Mail – an die ursprüngliche Adresse');
+        [$ok] = $formular('c');
+        $pruefe($ok && count(glob(Yii::getAlias(Yii::$app->mailer->fileTransportPath) . '/*.eml')) === $nachher, 'zweiter Versuch am selben Tag: keine weitere Mail');
+        [$ok] = $formular('b');
+        $pruefe($ok && (int)$fritz()->count() === 1, 'schon angemeldet, gleiche Adresse: Link kommt noch einmal, nichts angelegt');
+        $spaet = $neu('Fritz', $alt6);
+        $spaet->email = $adr('a');
+        Dienst::anmelden($spaet);
+        $pruefe(!Dienst::bestaetigen($spaet) && $spaet->status === 'storniert' && $spaet->storniert_von === 'doppelt', 'späte Bestätigung eines Doppelten zählt nicht');
+        $aufraeumen();
+        $n = 0;
+        for ($i = 0; $i < 6; $i++) {
+            [$ok, , $hinweis] = $formular('a', 'Kind' . chr(65 + $i));
+            $n += $ok ? 1 : 0;
+        }
+        $pruefe($n === Dienst::MAX_PRO_ADRESSE && $hinweis !== null, 'höchstens ' . Dienst::MAX_PRO_ADRESSE . ' Anmeldungen je E-Mail-Adresse und Tag');
+        $aufraeumen();
+
         $mails = glob(Yii::getAlias(Yii::$app->mailer->fileTransportPath) . '/*.eml');
         $this->stdout('Mails als Datei: ' . count($mails) . ' in ' . Yii::getAlias(Yii::$app->mailer->fileTransportPath) . "\n");
         $this->stdout("Token Anna: {$a['Anna']->token}\nToken Dora: {$a['Dora']->token}\nToken Carl: {$a['Carl']->token}\n");
