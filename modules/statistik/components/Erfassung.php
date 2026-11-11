@@ -51,6 +51,10 @@ class Erfassung
         if ($ua === '' || preg_match(self::BOTS, $ua)) {
             return;
         }
+        // Weder Browser noch Betriebssystem erkennbar: Programm (Link-Vorschau, Überwachung, Feed-Leser), kein Mensch
+        if (self::browser($ua) === 'Andere' && self::system($ua) === 'Andere') {
+            return;
+        }
         $user = $app->user;
         if (!$modul->adminsZaehlen && !$user->isGuest && $user->isAdmin()) {
             return;
@@ -160,7 +164,8 @@ class Erfassung
             $pfad = preg_replace('#^/u/[^/]+#', '/u/*', $pfad);
         }
         $id = Yii::$app->request->get('id');
-        if (is_scalar($id) && preg_match('/^\d{1,10}$/', (string)$id)) {
+        // Nachrichten: keine Gesprächsnummer speichern
+        if (is_scalar($id) && !str_starts_with($pfad, '/mail/') && preg_match('/^\d{1,10}$/', (string)$id)) {
             $pfad .= '?id=' . $id;
         }
         return mb_substr($pfad, 0, 255);

@@ -115,7 +115,7 @@ $csv = Url::to(['/statistik/admin/csv'] + Yii::$app->request->get());
         <div class="st-kacheln">
             <div class="st-kachel"><div class="st-k-titel"><?= $t('Seitenaufrufe') ?></div>
                 <div class="st-k-wert"><?= $zahl($k['aufrufe']) ?></div><?= $delta($k['aufrufe'], $vorher['aufrufe']) ?></div>
-            <div class="st-kachel"><div class="st-k-titel"><?= $t('Eindeutige Besucher') ?> <sup>1</sup></div>
+            <div class="st-kachel"><div class="st-k-titel"><?= $bericht->tage() > 1 ? $t('Besucher (je Tag gezählt)') : $t('Eindeutige Besucher') ?> <sup>1</sup></div>
                 <div class="st-k-wert"><?= $zahl($k['besucher']) ?></div><?= $delta($k['besucher'], $vorher['besucher']) ?></div>
             <div class="st-kachel"><div class="st-k-titel"><?= $t('Besuche') ?> <sup>2</sup></div>
                 <div class="st-k-wert"><?= $zahl($k['besuche']) ?></div><?= $delta($k['besuche'], $vorher['besuche']) ?></div>

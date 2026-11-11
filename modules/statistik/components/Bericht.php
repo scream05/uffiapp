@@ -117,7 +117,9 @@ class Bericht
     {
         $konten = (new Query())->from('statistik_konto_tag')->where(['between', 'tag', $this->von, $this->bis])
             ->select(['n' => 'COUNT(*)'])->groupBy('tag')->indexBy('tag')->column();
-        $gaeste = $this->q()->andWhere(['angemeldet' => 0])->select(['n' => 'COUNT(DISTINCT besucher)'])->groupBy('tag')->indexBy('tag')->column();
+        // Gäste: Besucher, die am Tag nie angemeldet waren (wer sich angemeldet hat, steht schon bei den Konten)
+        $gaeste = (new Query())->from(['b' => $this->q()->select(['tag', 'besucher'])->groupBy(['tag', 'besucher'])->having('MAX(angemeldet) = 0')])
+            ->select(['n' => 'COUNT(*)', 'tag'])->groupBy('tag')->indexBy('tag')->column();
         $starts = $this->q()->andWhere(['start' => 1])->select(['n' => 'COUNT(*)'])->groupBy('tag')->indexBy('tag')->column();
         $proTag = fn(string $tabelle) => self::hatTabelle($tabelle) ? (new Query())->from($tabelle)
             ->where(['between', 'created_at', "$this->von 00:00:00", "$this->bis 23:59:59"])
@@ -262,7 +264,16 @@ class Bericht
             '/user/auth/login' => $t('Anmeldung'), '/user/registration' => $t('Registrierung'),
             '/spaces' => $t('Space-Verzeichnis'), '/people' => $t('Personen'), '/u/*' => $t('Profilseiten (zusammengefasst)'),
             '/calendar/global' => $t('Kalender'), '/search' => $t('Suche'), '/mail/mail/index' => $t('Nachrichten'),
-            '/notification/overview' => $t('Benachrichtigungen'), '/ki-assistent' => 'Uffi',
+            '/notification/overview' => $t('Benachrichtigungen'), '/ki-assistent' => 'Uffi', '/ki-assistent/chat' => 'Uffi',
+            '/eilmeldung/index' => $t('Eilmeldungen'), '/uebersicht/einstellungen/index' => $t('Startseite einrichten'),
+            '/user/account/edit' => $t('Profil bearbeiten'), '/user/account/edit-settings' => $t('Kontoeinstellungen'),
+            '/user/account/change-password' => $t('Passwort ändern'), '/user/account/delete' => $t('Konto löschen'),
+            '/user/auth/password' => $t('Passwort vergessen'), '/user/auth/register' => $t('Registrierung'),
+            '/legal/page/view' => $t('Impressum, Datenschutz, Nutzungsbedingungen'), '/legal/page/confirm' => $t('Bestätigung der Nutzungsbedingungen'),
+            '/calendar' => $t('Kalender'), '/neuigkeiten/index' => $t('Neuigkeiten'),
+            '/abfuhr/einstellungen/index' => $t('Abfuhr-Erinnerung einstellen'), '/abfuhr/einstellungen' => $t('Abfuhr-Erinnerung einstellen'),
+            '/hilfe/app' => $t('Hilfe: App'), '/hilfe/regeln' => $t('Hilfe: Regeln'), '/hilfe/leichte-sprache' => $t('Leichte Sprache'),
+            '/hilfe/barrierefreiheit' => $t('Barrierefreiheit'), '/u/*/home' => $t('Profilseiten (zusammengefasst)'),
         ];
         if (isset($fest[$p])) {
             return $fest[$p];

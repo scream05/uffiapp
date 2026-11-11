@@ -4134,6 +4134,16 @@ class SetupController extends Controller
             $t = $b->appTage();
             $pruef(count($t) === 30 && $t[0]['label'] !== '' && $t[0]['konten'] >= 1, 'Tageswerte: 30 Zeilen, heute ' . json_encode($t[0], JSON_UNESCAPED_UNICODE));
             $pruef(\humhub\modules\statistik\components\Bericht::fuer('365')->app()['mau'] >= 3, '12 Monate: Kennzahlen gehen');
+            // Querprüfung: alle Darstellungen ergeben dieselbe Gesamtzahl an Aufrufen
+            $k = $b->kennzahlen();
+            [$std, $wt] = $b->zeitmuster();
+            $pruef(array_sum(array_column($b->verlauf(), 'aufrufe')) === $k['aufrufe'], 'Verlauf = Seitenaufrufe (' . $k['aufrufe'] . ')');
+            $pruef(array_sum(array_column($std, 'n')) === $k['aufrufe'] && array_sum(array_column($wt, 'n')) === $k['aufrufe'], 'Uhrzeit und Wochentag = Seitenaufrufe');
+            $pruef(array_sum(array_column($b->bereiche(), 'aufrufe')) == $k['aufrufe'], 'Bereiche = Seitenaufrufe');
+            $pruef(array_sum(array_column($b->herkunft(1000), 'anzahl')) == $k['besuche'], 'Herkunft = Besuche (' . $k['besuche'] . ')');
+            $pruef(array_sum(array_column($b->seiten(100000, true), 'aufrufe')) == $k['besuche'], 'Einstiegsseiten = Besuche');
+            $gast = array_sum(array_column($t, 'gaeste'));
+            $pruef($gast <= $k['besucher'] - $k['angemeldet'] + 0, "Gäste ohne Doppelte ($gast ≤ " . ($k['besucher'] - $k['angemeldet']) . ')');
             // Seite rendern
             $c = new \humhub\modules\statistik\controllers\AdminController('admin', Yii::$app->getModule('statistik'));
             $html = '';
