@@ -8,8 +8,6 @@
  */
 
 use humhub\helpers\Html;
-use humhub\modules\kurse\Module;
-use yii\helpers\Url;
 
 /** @var \humhub\modules\kurse\controllers\SeiteController $c */
 $c = $this->context;
@@ -19,8 +17,6 @@ $farbe = $seite->getFarbe();
 [, $res] = Yii::$app->assetManager->publish(Yii::getAlias('@kurse/resources'));
 $logo = $verein->getLogo();
 $website = trim((string)$verein->website);
-$verwalten = Module::kannVerwalten($verein->id);
-$space = Yii::$app->getModule('kurse')->getSpace();
 $flash = array_filter(['ok' => Yii::$app->session->getFlash('kurse-ok'), 'info' => Yii::$app->session->getFlash('kurse-info')]);
 ?>
 <!DOCTYPE html>
@@ -111,10 +107,12 @@ $flash = array_filter(['ok' => Yii::$app->session->getFlash('kurse-ok'), 'info' 
         legend { font-size: 1.2em; font-weight: 700; color: var(--f-dunkel); margin: 18px 0 10px; padding: 0; }
 
         /* Fuß */
-        .fuss { background: var(--f-dunkel); color: rgba(255,255,255,.85); font-size: .88em; padding: 30px 0 36px; margin-top: 0; }
-        .fuss a { color: #fff; }
-        .fuss .breite { display: flex; flex-wrap: wrap; gap: 10px 26px; justify-content: space-between; }
-        .fuss ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 18px; }
+        /* Schlanke Fußzeile: nur Pflichtlinks (Impressum, Datenschutz, AGPL-Quellcode) */
+        .fuss { border-top: 1px solid var(--linie); font-size: .82em; padding: 16px 0 22px; }
+        .fuss ul { list-style: none; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 0; }
+        .fuss li + li::before { content: '·'; color: var(--grau); margin: 0 10px; }
+        .fuss a { color: var(--grau); text-decoration: none; }
+        .fuss a:hover { color: var(--f-dunkel); text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -145,22 +143,11 @@ $flash = array_filter(['ok' => Yii::$app->session->getFlash('kurse-ok'), 'info' 
     <?= $content ?>
 </main>
 <footer class="fuss">
-    <div class="breite">
-        <div>
-            <strong><?= Html::encode($verein->name) ?></strong><br>
-            Kursanmeldung über <a href="<?= Html::encode(Url::home(true)) ?>">Rund um Uffni</a>, die Bürgerplattform der Bürgerliste Uffenheim e. V.
-        </div>
-        <ul>
-            <li><?= Html::a('Impressum', ['/legal/page/view', 'pageKey' => 'imprint']) ?></li>
-            <li><?= Html::a('Datenschutz', ['/legal/page/view', 'pageKey' => 'privacy']) ?></li>
-            <li><a href="https://github.com/scream05/uffiapp" rel="noopener">Quellcode (AGPL)</a></li>
-            <?php if ($verwalten && $space): ?>
-                <li><?= Html::a('Kurse verwalten', $space->createUrl('/kurse/kurs/index')) ?></li>
-            <?php elseif (Yii::$app->user->isGuest): ?>
-                <li><?= Html::a('Anmelden für Kursleitung', ['/user/auth/login']) ?></li>
-            <?php endif ?>
-        </ul>
-    </div>
+    <ul class="breite">
+        <li><?= Html::a('Impressum', ['/legal/page/view', 'pageKey' => 'imprint']) ?></li>
+        <li><?= Html::a('Datenschutz', ['/legal/page/view', 'pageKey' => 'privacy']) ?></li>
+        <li><a href="https://github.com/scream05/uffiapp" rel="noopener">Quellcode</a></li>
+    </ul>
 </footer>
 </body>
 </html>
