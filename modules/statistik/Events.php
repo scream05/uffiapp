@@ -57,6 +57,17 @@ class Events
         }
     }
 
+    /** Kontolöschung: Tage, an denen das Konto aktiv war, sofort löschen (der Fremdschlüssel greift erst beim endgültigen Löschen) */
+    public static function onUserLoeschen($event)
+    {
+        try {
+            $user = $event->user ?? $event->sender;
+            Yii::$app->db->createCommand()->delete('statistik_konto_tag', ['user_id' => $user->id])->execute();
+        } catch (\Throwable $e) {
+            Yii::error($e, 'statistik');
+        }
+    }
+
     /** Täglich: Rohdaten nach Ablauf der Aufbewahrung löschen */
     public static function onCronDaily($event)
     {

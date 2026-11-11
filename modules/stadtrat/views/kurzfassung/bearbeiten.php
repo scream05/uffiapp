@@ -11,6 +11,8 @@ use humhub\modules\stadtrat\components\Ris;
 /** @var bool $hatAudio */
 $t = fn($x, $p = []) => Yii::t('StadtratModule.base', $x, $p);
 $hatText = $k->kurz !== null;
+// Name des eingestellten KI-Anbieters (umschaltbar) – nicht fest „Claude“ schreiben
+$ki = Yii::$app->getModule('ki-assistent')?->getAnbieterName() ?? 'KI';
 // data-params: Mit data-confirm schickt yii.js das Formular nach der Rückfrage selbst ab, ohne Namen/Wert des Knopfs –
 // „tun“ kommt dann nur als verstecktes Feld aus data-params an
 $knopf = fn($tun, $label, $klasse = 'btn-light btn-default', $extra = []) => Html::button($label, ['type' => 'submit', 'name' => 'tun', 'value' => $tun,
@@ -31,13 +33,13 @@ $knopf = fn($tun, $label, $klasse = 'btn-light btn-default', $extra = []) => Htm
     <div class="panel-body">
         <p><?= $t('Stand:') ?> <strong><?= $k->istFreigegeben() ? $t('veröffentlicht am {zeit}', ['zeit' => date('j.n.Y, G:i', strtotime($k->freigegeben_am))]) : ($hatText ? $t('Entwurf – noch nicht öffentlich') : $t('noch kein Entwurf')) ?></strong></p>
         <?php if ($laeuft): ?>
-            <div class="alert alert-info"><i class="fa fa-spinner fa-spin"></i> <?= $k->arbeit === 'entwurf' ? $t('Claude schreibt den Entwurf (etwa 1–2 Minuten) …') : $t('Audio wird erzeugt und geprüft (etwa 1–3 Minuten) …') ?> <?= $t('Die Seite lädt sich selbst neu.') ?></div>
+            <div class="alert alert-info"><i class="fa fa-spinner fa-spin"></i> <?= $k->arbeit === 'entwurf' ? $t('{ki} schreibt den Entwurf (etwa 1–2 Minuten) …', ['ki' => $ki]) : $t('Audio wird erzeugt und geprüft (etwa 1–3 Minuten) …') ?> <?= $t('Die Seite lädt sich selbst neu.') ?></div>
         <?php endif ?>
         <?php if ($k->fehler): ?><div class="alert alert-danger"><?= Html::encode($k->fehler) ?></div><?php endif ?>
 
         <h2>1. <?= $t('Niederschrift') ?></h2>
         <?= Html::beginForm(['bearbeiten', 'id' => $s->id], 'post', ['enctype' => 'multipart/form-data', 'id' => 'sr-pdf-form']) ?>
-        <p class="text-muted small"><?= $hatPdf ? $t('Niederschrift ist hochgeladen (nicht öffentlich).') : $t('Niederschrift der öffentlichen Sitzung als PDF. Sie bleibt intern und wird nur an Claude geschickt.') ?></p>
+        <p class="text-muted small"><?= $hatPdf ? $t('Niederschrift ist hochgeladen (nicht öffentlich).') : $t('Niederschrift der öffentlichen Sitzung als PDF. Sie wird nicht veröffentlicht und geht für den Entwurf an {ki}. Der Vorlesetext geht später für die Aufnahme an Google (Gemini).', ['ki' => $ki]) ?></p>
         <?php if (!$k->istFreigegeben()): ?>
             <div class="sr-knoepfe">
                 <input type="file" name="pdf" accept="application/pdf" <?= $laeuft ? 'disabled' : '' ?>>

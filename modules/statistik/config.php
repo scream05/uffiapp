@@ -13,6 +13,7 @@ return [
         ['class' => Application::class, 'event' => Application::EVENT_AFTER_REQUEST, 'callback' => [Events::class, 'onAfterRequest']],
         ['class' => AdminMenu::class, 'event' => AdminMenu::EVENT_INIT, 'callback' => [Events::class, 'onAdminMenuInit']],
         ['class' => CronController::class, 'event' => CronController::EVENT_ON_DAILY_RUN, 'callback' => [Events::class, 'onCronDaily']],
+        ['class' => \humhub\modules\user\models\User::class, 'event' => 'beforeSoftDelete', 'callback' => [Events::class, 'onUserLoeschen']],
         ['class' => \humhub\modules\web\pwa\controllers\ManifestController::class, 'event' => \yii\base\Controller::EVENT_AFTER_ACTION, 'callback' => [Events::class, 'onManifest']],
     ],
 ];

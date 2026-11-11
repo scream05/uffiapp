@@ -3555,7 +3555,9 @@ class SetupController extends Controller
             $bed ? $ok++ : $fehl++;
             $this->stdout(($bed ? '  ok   ' : '  FEHL ') . $was . "\n");
         };
-        $konto = function (string $name) {
+        // Zufällig je Lauf – ein festes Passwort stünde im öffentlichen Repo (mit behalten=1 bleiben die Konten aktiv)
+        $passwort = 'T' . bin2hex(random_bytes(12)) . '!7';
+        $konto = function (string $name) use ($passwort) {
             $u = new User(['scenario' => 'editAdmin']);
             $u->username = $name;
             $u->email = "$name@example.invalid";
@@ -3567,7 +3569,7 @@ class SetupController extends Controller
             $u->profile->save(false);
             $pw = new \humhub\modules\user\models\Password();
             $pw->user_id = $u->id;
-            $pw->setPassword('Gutschein-Test-2026!');
+            $pw->setPassword($passwort);
             $pw->save(false);
             return $u;
         };
@@ -3649,7 +3651,7 @@ class SetupController extends Controller
             $D::thekeErneuern($b);
             $b->refresh();
             $u->updateAttributes(['status' => 'aktiv', 'pause_grund' => null]);
-            $this->stdout("Behalten. Konten gs-test-verwalter / gs-test-kunde, Passwort Gutschein-Test-2026!\n"
+            $this->stdout("Behalten. Konten gs-test-verwalter / gs-test-kunde, Passwort $passwort\n"
                 . "Gutschein {$u->id}, Theken-Link " . $D::thekeUrl($b) . "\nAbräumen: setup/gutschein-test-aufraeumen\n");
         } else {
             $this->actionGutscheinTestAufraeumen(true);
@@ -4170,6 +4172,64 @@ class SetupController extends Controller
                 'Admin-Seite rendert mit App-Kennzahlen (' . strlen($html) . ' Zeichen)');
         } finally {
             $tx->rollBack();
+        }
+        $this->stdout("\n$ok ok, $fehler Fehler\n");
+        return $fehler ? 1 : 0;
+    }
+
+    /**
+     * Kontolöschung (Selbstlöschung = softDelete): bleibt wirklich nichts Persönliches übrig?
+     * Testkonto in einer Transaktion anlegen, löschen, prüfen, zurückrollen.
+     *   scripts/run-setup.sh kontoloeschung-test
+     */
+    public function actionKontoloeschungTest()
+    {
+        $ok = $fehler = 0;
+        $pruef = function ($bed, $text) use (&$ok, &$fehler) {
+            $bed ? $ok++ : $fehler++;
+            $this->stdout(($bed ? '  ok  ' : '  FEHLER ') . $text . "\n");
+        };
+        $db = Yii::$app->db;
+        $tx = $db->beginTransaction();
+        try {
+            $name = 'loeschtest-' . bin2hex(random_bytes(4));
+            $u = new User(['scenario' => 'editAdmin']);
+            $u->username = $name;
+            $u->email = "$name@example.invalid";
+            $u->status = User::STATUS_ENABLED;
+            $u->save() || throw new \Exception(json_encode($u->getErrors()));
+            $u->profile->scenario = 'editAdmin';
+            $u->profile->firstname = 'Vorname';
+            $u->profile->lastname = 'Nachname';
+            $u->profile->save(false);
+            $cc = $u->contentcontainer_id;
+            foreach (['wochenblick' => 'aktiv', 'legal' => 'zustimmung', 'calendar' => 'x', 'abfuhr' => 'gebiet'] as $modul => $n) {
+                $db->createCommand()->insert('contentcontainer_setting', ['module_id' => $modul, 'contentcontainer_id' => $cc, 'name' => "test-$n", 'value' => '1'])->execute();
+            }
+            $db->createCommand()->insert('statistik_konto_tag', ['tag' => date('Y-m-d'), 'user_id' => $u->id])->execute();
+            $pruef(Yii::$app->getModule('user')->softDeleteKeepProfileFields === [], 'Einstellung: Kern behält keine Profilfelder');
+
+            $u->softDelete();
+
+            $p = (new \yii\db\Query())->from('profile')->where(['user_id' => $u->id])->one();
+            $pruef($p && (string)$p['firstname'] === '' && (string)$p['lastname'] === '', 'Vor- und Nachname geleert');
+            $rest = array_filter($p ?: [], fn($v, $k) => $k !== 'user_id' && $v !== '' && $v !== null, ARRAY_FILTER_USE_BOTH);
+            $pruef(!$rest, 'Profil ganz leer' . ($rest ? ' – übrig: ' . implode(', ', array_keys($rest)) : ''));
+            $row = (new \yii\db\Query())->from('user')->where(['id' => $u->id])->one();
+            $pruef($row['email'] === null && $row['username'] === 'deleted-' . $u->id && (int)$row['status'] === User::STATUS_SOFT_DELETED, 'Konto: Mailadresse weg, Name „deleted-<Nr>“');
+            $n = (int)(new \yii\db\Query())->from('contentcontainer_setting')->where(['contentcontainer_id' => $cc])->count();
+            $pruef($n === 0, "Einstellungen des Kontos gelöscht (übrig: $n)");
+            $n = (int)(new \yii\db\Query())->from('statistik_konto_tag')->where(['user_id' => $u->id])->count();
+            $pruef($n === 0, "Statistik „aktive Konten“ gelöscht (übrig: $n)");
+            $n = (int)(new \yii\db\Query())->from('user_password')->where(['user_id' => $u->id])->count()
+                + (int)(new \yii\db\Query())->from('group_user')->where(['user_id' => $u->id])->count();
+            $pruef($n === 0, 'Passwort und Gruppen gelöscht');
+        } catch (\Throwable $e) {
+            $fehler++;
+            $this->stdout('  FEHLER ' . get_class($e) . ': ' . $e->getMessage() . "\n");
+        } finally {
+            $tx->rollBack();
+            Yii::$app->cache->flush();
         }
         $this->stdout("\n$ok ok, $fehler Fehler\n");
         return $fehler ? 1 : 0;

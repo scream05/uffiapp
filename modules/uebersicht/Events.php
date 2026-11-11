@@ -12,16 +12,15 @@ use yii\helpers\Url;
 
 class Events
 {
-    /** Module dieses Projekts, deren Benutzereinstellungen beim Löschen eines Kontos mit gelöscht werden */
-    public const EIGENE_MODULE = ['abfuhr', 'designwahl', 'uebersicht', 'ki-assistent', 'vereine', 'maengelmelder',
-        'mitteilungsblatt', 'notdienst', 'whatsapp', 'facebook', 'neuigkeiten'];
-
+    /**
+     * Kontolöschung: ALLE Einstellungen des Kontos löschen – eigene Module (Abfuhr, Design, Wochenüberblick, Uffi …)
+     * und die des Kerns (Zustimmungszeitpunkte, Kalender, Mail-Zusammenfassung). HumHub lässt sie sonst stehen.
+     */
     public static function onUserLoeschen($event)
     {
         try {
             $user = $event->user ?? $event->sender;
-            \humhub\modules\content\models\ContentContainerSetting::deleteAll([
-                'contentcontainer_id' => $user->contentcontainer_id, 'module_id' => self::EIGENE_MODULE]);
+            \humhub\modules\content\models\ContentContainerSetting::deleteAll(['contentcontainer_id' => $user->contentcontainer_id]);
             Yii::$app->cache->flush(); // Einstellungen liegen auch im Cache
         } catch (\Throwable $e) {
             Yii::error($e);
