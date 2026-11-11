@@ -233,9 +233,10 @@ class Bericht
     /** Aufrufe nach Uhrzeit (0–23) bzw. Wochentag (Mo–So) */
     public function zeitmuster(): array
     {
-        $std = $this->q()->select(['k' => 'HOUR(zeit)', 'n' => 'COUNT(*)'])->groupBy('k')->indexBy('k')->column();
+        // column() liefert die ERSTE Spalte – deshalb n zuerst, k nur als Schlüssel
+        $std = $this->q()->select(['n' => 'COUNT(*)', 'k' => 'HOUR(zeit)'])->groupBy('k')->indexBy('k')->column();
         // WEEKDAY: 0 = Montag
-        $wt = $this->q()->select(['k' => 'WEEKDAY(zeit)', 'n' => 'COUNT(*)'])->groupBy('k')->indexBy('k')->column();
+        $wt = $this->q()->select(['n' => 'COUNT(*)', 'k' => 'WEEKDAY(zeit)'])->groupBy('k')->indexBy('k')->column();
         $stunden = [];
         for ($h = 0; $h < 24; $h++) {
             $stunden[] = ['label' => sprintf('%02d', $h), 'titel' => sprintf('%02d:00–%02d:59 Uhr', $h, $h), 'n' => (int)($std[$h] ?? 0)];

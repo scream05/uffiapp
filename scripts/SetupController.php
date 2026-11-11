@@ -4153,6 +4153,9 @@ class SetupController extends Controller
             } finally {
                 Yii::$app->set('request', $konsole);
             }
+            if (getenv('STATISTIK_HTML')) {
+                file_put_contents(getenv('STATISTIK_HTML'), $html);
+            }
             $pruef(str_contains($html, 'Monatlich aktive Konten') && str_contains($html, 'Starts vom Startbildschirm') && str_contains($html, 'Tageswerte'),
                 'Admin-Seite rendert mit App-Kennzahlen (' . strlen($html) . ' Zeichen)');
         } finally {
