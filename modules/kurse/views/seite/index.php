@@ -118,7 +118,7 @@ $social = $verein->getSocialList();
 
 <section class="abschnitt" id="kurse">
     <div class="breite">
-        <h2>Aktuelle Kurse</h2>
+        <h2>Unsere Kurse</h2>
         <?php if ($kurse): ?>
             <p class="grau">Die Anmeldung geht ohne Konto: Du bekommst eine Mail zum Bestätigen. Plätze werden in der Reihenfolge der Bestätigungen vergeben.</p>
             <?php $erstes = true; foreach ($jahre as $jahr => $liste): ?>
