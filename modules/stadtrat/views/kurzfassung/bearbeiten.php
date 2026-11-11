@@ -36,7 +36,7 @@ $knopf = fn($tun, $label, $klasse = 'btn-light btn-default', $extra = []) => Htm
         <?php if ($k->fehler): ?><div class="alert alert-danger"><?= Html::encode($k->fehler) ?></div><?php endif ?>
 
         <h2>1. <?= $t('Niederschrift') ?></h2>
-        <?= Html::beginForm(['bearbeiten', 'id' => $s->id], 'post', ['enctype' => 'multipart/form-data']) ?>
+        <?= Html::beginForm(['bearbeiten', 'id' => $s->id], 'post', ['enctype' => 'multipart/form-data', 'id' => 'sr-pdf-form']) ?>
         <p class="text-muted small"><?= $hatPdf ? $t('Niederschrift ist hochgeladen (nicht öffentlich).') : $t('Niederschrift der öffentlichen Sitzung als PDF. Sie bleibt intern und wird nur an Claude geschickt.') ?></p>
         <?php if (!$k->istFreigegeben()): ?>
             <div class="sr-knoepfe">
@@ -47,6 +47,37 @@ $knopf = fn($tun, $label, $klasse = 'btn-light btn-default', $extra = []) => Htm
             </div>
         <?php endif ?>
         <?= Html::endForm() ?>
+        <script <?= Html::nonce() ?>>
+            // Hochladen per fetch statt Formular-Navigation: Die HumHub-App (WebView) schickt
+            // multipart-Formulare nicht ab – Klick auf „Hochladen“ blieb dort ohne Reaktion
+            (function () {
+                var form = document.getElementById('sr-pdf-form');
+                var knopf = form && form.querySelector('button[value="hochladen"]');
+                if (!knopf || !window.fetch || !window.FormData) return;
+                knopf.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    var feld = form.querySelector('input[type="file"]');
+                    if (!feld.files || !feld.files.length) {
+                        alert(<?= json_encode($t('Bitte zuerst die PDF-Datei auswählen.')) ?>);
+                        return;
+                    }
+                    var daten = new FormData(form);
+                    daten.set('tun', 'hochladen');
+                    form.querySelectorAll('button').forEach(function (b) { b.disabled = true; });
+                    knopf.innerHTML = '<i class="fa fa-spinner fa-spin"></i> ' + <?= json_encode($t('Wird hochgeladen …')) ?>;
+                    fetch(form.action, {method: 'POST', body: daten, credentials: 'same-origin', headers: {'X-Requested-With': 'XMLHttpRequest'}})
+                        .then(function (r) { return r.json(); })
+                        .then(function (j) {
+                            if (j.fehler) alert(j.fehler);
+                            window.location.reload();
+                        })
+                        .catch(function () {
+                            alert(<?= json_encode($t('Hochladen fehlgeschlagen. Bitte Verbindung prüfen und noch einmal versuchen.')) ?>);
+                            window.location.reload();
+                        });
+                });
+            })();
+        </script>
 
         <?php if ($hatText): ?>
             <?= Html::beginForm(['bearbeiten', 'id' => $s->id], 'post') ?>

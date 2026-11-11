@@ -74,6 +74,9 @@ class KurzfassungController extends ContentContainerController
                 };
                 if ($fehler !== null) {
                     Yii::warning('Niederschrift-Upload abgelehnt: ' . $fehler . ' (' . ($datei ? $datei->name . ', ' . $datei->type . ', ' . $datei->size . ' B, Fehler ' . $datei->error : 'keine Datei') . ', ' . Yii::$app->request->userAgent . ')', 'stadtrat');
+                    if ($req->isAjax) {
+                        return $this->asJson(['fehler' => Yii::t('StadtratModule.base', $fehler)]);
+                    }
                     $this->view->error(Yii::t('StadtratModule.base', $fehler));
                     return $this->redirect(['bearbeiten', 'id' => $s->id]);
                 }
@@ -112,6 +115,9 @@ class KurzfassungController extends ContentContainerController
                 Yii::$app->cache->delete('ki-assistent-context-aktuell');
             } elseif ($tun === 'speichern') {
                 $this->view->saved();
+            }
+            if ($req->isAjax) {
+                return $this->asJson(['ok' => true]);
             }
             return $this->redirect(['bearbeiten', 'id' => $s->id]);
         }
