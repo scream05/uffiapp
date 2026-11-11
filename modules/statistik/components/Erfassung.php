@@ -107,7 +107,14 @@ class Erfassung
             'browser' => self::browser($ua),
             'system' => self::system($ua),
             'herkunft' => $neu ? self::herkunft() : null,
+            // Start über das Symbol auf dem Startbildschirm (start_url im Manifest, siehe Events::onManifest)
+            'start' => $req->get('quelle') === Module::START_QUELLE ? 1 : 0,
         ])->execute();
+        if (!$user->isGuest) {
+            // Aktive Konten je Tag (für täglich/wöchentlich/monatlich aktive Konten): nur Konto-Nr. und Datum
+            $db->createCommand('INSERT IGNORE INTO statistik_konto_tag (tag, user_id) VALUES (:t, :u)',
+                [':t' => $tag, ':u' => $user->id])->execute();
+        }
     }
 
     /**

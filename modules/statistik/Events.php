@@ -4,6 +4,7 @@ namespace humhub\modules\statistik;
 
 use humhub\helpers\ControllerHelper;
 use humhub\modules\statistik\components\Erfassung;
+use humhub\modules\statistik\Module;
 use humhub\modules\ui\menu\MenuLink;
 use Yii;
 
@@ -37,13 +38,33 @@ class Events
         }
     }
 
+    /**
+     * Manifest der Web-App: Start vom Startbildschirm mit Kennzeichen öffnen, damit die Statistik diese Starts zählen kann.
+     * Direkt /dashboard statt / – die Weiterleitung von / würde das Kennzeichen verlieren.
+     */
+    public static function onManifest($event)
+    {
+        try {
+            $res = $event->result;
+            if ($res instanceof \yii\web\Response && is_array($res->data) && isset($res->data['start_url'])) {
+                // id und scope fest auf „/“: so bleibt die installierte App dieselbe wie vorher (ohne id wäre es die start_url)
+                $res->data['id'] = '/';
+                $res->data['scope'] = '/';
+                $res->data['start_url'] = '/dashboard?quelle=' . Module::START_QUELLE;
+            }
+        } catch (\Throwable $e) {
+            Yii::error($e, 'statistik');
+        }
+    }
+
     /** Täglich: Rohdaten nach Ablauf der Aufbewahrung löschen */
     public static function onCronDaily($event)
     {
         try {
             $monate = Yii::$app->getModule('statistik')->aufbewahrungMonate;
-            Yii::$app->db->createCommand()->delete('statistik_aufruf',
-                ['<', 'tag', date('Y-m-d', strtotime("-$monate months"))])->execute();
+            $grenze = date('Y-m-d', strtotime("-$monate months"));
+            Yii::$app->db->createCommand()->delete('statistik_aufruf', ['<', 'tag', $grenze])->execute();
+            Yii::$app->db->createCommand()->delete('statistik_konto_tag', ['<', 'tag', $grenze])->execute();
         } catch (\Throwable $e) {
             Yii::error($e, 'statistik');
         }

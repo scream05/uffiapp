@@ -11,6 +11,8 @@ use yii\helpers\Url;
  * @var array $k
  * @var array $vorher
  * @var array $konten
+ * @var array $app
+ * @var array $appTage
  * @var int $jetzt
  * @var array $verlauf
  * @var array $seiten
@@ -125,14 +127,39 @@ $csv = Url::to(['/statistik/admin/csv'] + Yii::$app->request->get());
                 <div class="st-k-wert"><?= $zahl($k['angemeldet']) ?></div>
                 <span class="st-k-zusatz"><?= $k['besucher'] ? round($k['angemeldet'] / $k['besucher'] * 100) : 0 ?> % <?= $t('der Besucher') ?></span></div>
         </div>
+        <h4 class="st-h"><?= $t('App-Kennzahlen') ?> <span class="st-k-zusatz"><?= $t('Stand {datum}', ['datum' => $datum($bericht->bis)]) ?></span></h4>
         <div class="st-kacheln st-kacheln-konten">
-            <div class="st-kachel"><div class="st-k-titel"><?= $t('Konten mit Anmeldung im Zeitraum') ?> <sup>4</sup></div>
-                <div class="st-k-wert"><?= $zahl($konten['aktiv']) ?></div></div>
-            <div class="st-kachel"><div class="st-k-titel"><?= $t('Neue Registrierungen') ?></div>
-                <div class="st-k-wert"><?= $zahl($konten['neu']) ?></div></div>
-            <div class="st-kachel"><div class="st-k-titel"><?= $t('Aktive Konten insgesamt') ?></div>
-                <div class="st-k-wert"><?= $zahl($konten['gesamt']) ?></div></div>
+            <div class="st-kachel"><div class="st-k-titel"><?= $t('Täglich aktive Konten') ?> <sup>4</sup></div>
+                <div class="st-k-wert"><?= $zahl($app['dau']) ?></div>
+                <?php if ($app['dauSchnitt'] !== null): ?><span class="st-k-zusatz"><?= $t('Ø {n} im Zeitraum', ['n' => Yii::$app->formatter->asDecimal($app['dauSchnitt'], 1)]) ?></span><?php endif ?></div>
+            <div class="st-kachel"><div class="st-k-titel"><?= $t('Wöchentlich aktive Konten') ?></div>
+                <div class="st-k-wert"><?= $zahl($app['wau']) ?></div><span class="st-k-zusatz"><?= $t('letzte 7 Tage') ?></span></div>
+            <div class="st-kachel"><div class="st-k-titel"><?= $t('Monatlich aktive Konten') ?></div>
+                <div class="st-k-wert"><?= $zahl($app['mau']) ?></div><span class="st-k-zusatz"><?= $t('letzte 30 Tage') ?></span></div>
+            <div class="st-kachel"><div class="st-k-titel"><?= $t('Bindung') ?> <sup>5</sup></div>
+                <div class="st-k-wert"><?= $app['bindung'] === null ? '–' : $app['bindung'] . ' %' ?></div><span class="st-k-zusatz"><?= $t('täglich ÷ monatlich') ?></span></div>
+            <div class="st-kachel"><div class="st-k-titel"><?= $t('Neue Konten') ?></div>
+                <div class="st-k-wert"><?= $zahl($app['neueKonten']) ?></div><span class="st-k-zusatz"><?= $t('{n} insgesamt', ['n' => $zahl($konten['gesamt'])]) ?></span></div>
+            <div class="st-kachel"><div class="st-k-titel"><?= $t('Neue Push-Geräte') ?> <sup>6</sup></div>
+                <div class="st-k-wert"><?= $zahl($app['neueGeraete']) ?></div><span class="st-k-zusatz"><?= $t('{n} insgesamt', ['n' => $zahl($app['geraete'])]) ?></span></div>
+            <div class="st-kachel"><div class="st-k-titel"><?= $t('Starts vom Startbildschirm') ?> <sup>7</sup></div>
+                <div class="st-k-wert"><?= $zahl($app['starts']) ?></div></div>
         </div>
+        <?php if ($appTage): ?>
+            <details class="st-tabelle">
+                <summary><?= $t('Tageswerte') ?></summary>
+                <table class="table table-condensed">
+                    <thead><tr><th><?= $t('Tag') ?></th><th class="text-right"><?= $t('Aktive Konten') ?></th><th class="text-right"><?= $t('Gäste') ?></th>
+                        <th class="text-right"><?= $t('Neue Konten') ?></th><th class="text-right"><?= $t('Neue Push-Geräte') ?></th><th class="text-right"><?= $t('Starts Startbildschirm') ?></th></tr></thead>
+                    <tbody>
+                    <?php foreach ($appTage as $d): ?>
+                        <tr><td><?= Html::encode($d['label']) ?></td><td class="text-right"><?= $zahl($d['konten']) ?></td><td class="text-right"><?= $zahl($d['gaeste']) ?></td>
+                            <td class="text-right"><?= $zahl($d['neu']) ?></td><td class="text-right"><?= $zahl($d['geraete']) ?></td><td class="text-right"><?= $zahl($d['starts']) ?></td></tr>
+                    <?php endforeach ?>
+                    </tbody>
+                </table>
+            </details>
+        <?php endif ?>
 
         <h4 class="st-h"><?= $t('Verlauf') ?>
             <span class="st-legende"><span class="st-l st-l-a"></span><?= $t('Seitenaufrufe') ?><span class="st-l st-l-b"></span><?= $t('Besucher') ?></span></h4>
@@ -216,7 +243,10 @@ $csv = Url::to(['/statistik/admin/csv'] + Yii::$app->request->get());
             <p><sup>1</sup> <?= $t('Besucher werden je Tag gezählt: Wer an drei Tagen kommt, zählt im Zeitraum dreimal. Ohne Cookies ist mehr nicht möglich – und auch nicht gewollt.') ?>
                <sup>2</sup> <?= $t('Ein Besuch endet nach {n} Minuten ohne Aufruf.', ['n' => $modul->besuchPauseMinuten]) ?>
                <sup>3</sup> <?= $t('Anteil der Besuche mit nur einer Seite.') ?>
-               <sup>4</sup> <?= $t('Letzte Anmeldung laut HumHub; wer dauerhaft angemeldet bleibt, erscheint hier nicht erneut.') ?></p>
+               <sup>4</sup> <?= $t('Konten mit mindestens einem Seitenaufruf am Tag (ohne Admins), erfasst seit {seit}. Wöchentliche und monatliche Werte sind erst 7 bzw. 30 Tage danach vollständig.', ['seit' => $app['seit'] ? $datum($app['seit']) : $datum(date('Y-m-d'))]) ?>
+               <sup>5</sup> <?= $t('Durchschnittlich täglich aktive Konten der letzten 30 Tage geteilt durch die monatlich aktiven: Wie viel Prozent der Monatsnutzer kommen an einem typischen Tag?') ?>
+               <sup>6</sup> <?= $t('Geräte, die Push-Benachrichtigungen angemeldet haben – HumHub-App oder Browser. Geräte, die sich abmelden oder ungültig werden, fallen heraus.') ?>
+               <sup>7</sup> <?= $t('Öffnen über das Symbol auf dem Startbildschirm (Web-App). Gezählt seit 11.11.2026; auf dem iPhone nur bei Symbolen, die danach angelegt wurden.') ?></p>
             <p><i class="fa fa-shield"></i> <?= $t('Datenschutz: Gezählt wird auf unserem Server, ohne Cookies und ohne externe Dienste. IP-Adressen werden nicht gespeichert, sondern nur mit einem täglich wechselnden Zufallswert zu einer nicht umkehrbaren Prüfsumme verrechnet. Nicht gezählt werden Bots, Admins und Browser mit „Do Not Track“. Rohdaten werden nach {n} Monaten gelöscht.', ['n' => $modul->aufbewahrungMonate]) ?></p>
         </div>
     </div>

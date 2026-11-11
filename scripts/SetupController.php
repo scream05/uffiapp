@@ -4103,4 +4103,62 @@ class SetupController extends Controller
         $this->stdout("\n$ok ok, $fehler Fehler\n");
         return $fehler ? 1 : 0;
     }
+
+    /**
+     * Statistik: App-Kennzahlen rechnen und Admin-Seite rendern (ohne Browser), mit Testdaten in einer Transaktion (Rollback)
+     */
+    public function actionStatistikTest()
+    {
+        $ok = $fehler = 0;
+        $pruef = function ($bed, $text) use (&$ok, &$fehler) {
+            $bed ? $ok++ : $fehler++;
+            $this->stdout(($bed ? '  ok  ' : '  FEHLER ') . $text . "\n");
+        };
+        $db = Yii::$app->db;
+        $tx = $db->beginTransaction();
+        try {
+            $heute = date('Y-m-d');
+            $ids = (new \yii\db\Query())->from('user')->select('id')->where(['status' => 1])->limit(3)->column();
+            foreach ($ids as $i => $id) {
+                // Konto 1: heute, Konto 2: vor 3 Tagen, Konto 3: vor 20 Tagen
+                $tag = date('Y-m-d', strtotime(['-0 days', '-3 days', '-20 days'][$i]));
+                $db->createCommand('INSERT IGNORE INTO statistik_konto_tag (tag, user_id) VALUES (:t, :u)', [':t' => $tag, ':u' => $id])->execute();
+            }
+            $b = \humhub\modules\statistik\components\Bericht::fuer('30');
+            $a = $b->app();
+            $pruef($a['dau'] >= 1, "täglich aktiv: {$a['dau']}");
+            $pruef($a['wau'] >= 2 && $a['wau'] >= $a['dau'], "wöchentlich aktiv: {$a['wau']}");
+            $pruef($a['mau'] >= 3 && $a['mau'] >= $a['wau'], "monatlich aktiv: {$a['mau']}");
+            $pruef($a['bindung'] !== null && $a['bindung'] <= 100, "Bindung: {$a['bindung']} %");
+            $pruef($a['geraete'] >= 0 && $a['neueKonten'] >= 0, "Konten neu {$a['neueKonten']}, Push-Geräte {$a['geraete']} (neu {$a['neueGeraete']}), Starts {$a['starts']}");
+            $t = $b->appTage();
+            $pruef(count($t) === 30 && $t[0]['label'] !== '' && $t[0]['konten'] >= 1, 'Tageswerte: 30 Zeilen, heute ' . json_encode($t[0], JSON_UNESCAPED_UNICODE));
+            $pruef(\humhub\modules\statistik\components\Bericht::fuer('365')->app()['mau'] >= 3, '12 Monate: Kennzahlen gehen');
+            // Seite rendern
+            $c = new \humhub\modules\statistik\controllers\AdminController('admin', Yii::$app->getModule('statistik'));
+            $html = '';
+            $konsole = Yii::$app->request;
+            try {
+                Yii::$app->set('request', new \yii\web\Request(['scriptUrl' => '/index.php', 'baseUrl' => '', 'hostInfo' => 'https://community.rundumuffni.de',
+                    'enableCookieValidation' => false, 'enableCsrfValidation' => false]));
+                $html = Yii::$app->view->renderFile('@statistik/views/admin/index.php', [
+                    'bericht' => $b, 'zeitraum' => '30', 'k' => $b->kennzahlen(), 'vorher' => $b->vorher()->kennzahlen(),
+                    'konten' => $b->konten(), 'app' => $a, 'appTage' => $t, 'jetzt' => 0, 'verlauf' => $b->verlauf(),
+                    'seiten' => $b->seiten(), 'einstieg' => $b->seiten(10, true), 'bereiche' => $b->bereiche(), 'herkunft' => $b->herkunft(),
+                    'geraete' => $b->verteilung('geraet'), 'browser' => $b->verteilung('browser'), 'systeme' => $b->verteilung('system'),
+                    'zeitmuster' => $b->zeitmuster(), 'modul' => Yii::$app->getModule('statistik'),
+                ], $c);
+            } catch (\Throwable $e) {
+                $this->stdout('  ' . get_class($e) . ': ' . $e->getMessage() . ' (' . $e->getFile() . ':' . $e->getLine() . ")\n");
+            } finally {
+                Yii::$app->set('request', $konsole);
+            }
+            $pruef(str_contains($html, 'Monatlich aktive Konten') && str_contains($html, 'Starts vom Startbildschirm') && str_contains($html, 'Tageswerte'),
+                'Admin-Seite rendert mit App-Kennzahlen (' . strlen($html) . ' Zeichen)');
+        } finally {
+            $tx->rollBack();
+        }
+        $this->stdout("\n$ok ok, $fehler Fehler\n");
+        return $fehler ? 1 : 0;
+    }
 }

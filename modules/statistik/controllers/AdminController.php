@@ -21,6 +21,8 @@ class AdminController extends Controller
             'k' => $bericht->kennzahlen(),
             'vorher' => $bericht->vorher()->kennzahlen(),
             'konten' => $bericht->konten(),
+            'app' => $bericht->app(),
+            'appTage' => $bericht->tage() <= 92 ? $bericht->appTage() : [],
             'jetzt' => Bericht::jetztAktiv(),
             'verlauf' => $bericht->verlauf(),
             'seiten' => $bericht->seiten(),

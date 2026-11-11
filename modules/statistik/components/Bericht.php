@@ -79,6 +79,68 @@ class Bericht
         ];
     }
 
+    /**
+     * App-Kennzahlen wie im App Store, bezogen auf den letzten Tag des Zeitraums:
+     * täglich/wöchentlich/monatlich aktive Konten (statistik_konto_tag), Bindung (Ø täglich ÷ monatlich),
+     * neue Konten, neue Push-Geräte (App oder Browser), Starts vom Startbildschirm.
+     */
+    public function app(): array
+    {
+        $bis = $this->bis;
+        $ab = fn(int $tage) => date('Y-m-d', strtotime("$bis -" . ($tage - 1) . ' days'));
+        $aktiv = fn(string $von) => (int)(new Query())->from('statistik_konto_tag')
+            ->where(['between', 'tag', $von, $bis])->count('DISTINCT user_id');
+        $tageMitDaten = (int)(new Query())->from('statistik_konto_tag')->where(['between', 'tag', $ab(30), $bis])->count('DISTINCT tag');
+        $summe30 = (int)(new Query())->from('statistik_konto_tag')->where(['between', 'tag', $ab(30), $bis])->count();
+        $mau = $aktiv($ab(30));
+        $starts = $this->q()->andWhere(['start' => 1])->select(['n' => 'COUNT(*)', 'geraete' => 'COUNT(DISTINCT besucher)'])->one();
+        return [
+            'dau' => $aktiv($bis),
+            'wau' => $aktiv($ab(7)),
+            'mau' => $mau,
+            // Ø täglich aktive Konten der letzten 30 Tage (nur Tage mit Erfassung) im Verhältnis zu den monatlich aktiven
+            'bindung' => $mau && $tageMitDaten ? round($summe30 / $tageMitDaten / $mau * 100) : null,
+            'dauSchnitt' => $this->tage() > 1 ? round((int)(new Query())->from('statistik_konto_tag')
+                    ->where(['between', 'tag', $this->von, $bis])->count() / $this->tage(), 1) : null,
+            'neueKonten' => (int)(new Query())->from('user')->where(['between', 'created_at', "$this->von 00:00:00", "$bis 23:59:59"])->count(),
+            'neueGeraete' => self::hatTabelle('fcmpush_user') ? (int)(new Query())->from('fcmpush_user')
+                ->where(['between', 'created_at', "$this->von 00:00:00", "$bis 23:59:59"])->count() : 0,
+            'geraete' => self::hatTabelle('fcmpush_user') ? (int)(new Query())->from('fcmpush_user')->count() : 0,
+            'starts' => (int)$starts['n'],
+            'startGeraete' => (int)$starts['geraete'],
+            'seit' => (new Query())->from('statistik_konto_tag')->min('tag'),
+        ];
+    }
+
+    /** Tageswerte der App-Kennzahlen (neueste zuerst): aktive Konten, Gäste, neue Konten, neue Push-Geräte, Starts */
+    public function appTage(): array
+    {
+        $konten = (new Query())->from('statistik_konto_tag')->where(['between', 'tag', $this->von, $this->bis])
+            ->select(['n' => 'COUNT(*)'])->groupBy('tag')->indexBy('tag')->column();
+        $gaeste = $this->q()->andWhere(['angemeldet' => 0])->select(['n' => 'COUNT(DISTINCT besucher)'])->groupBy('tag')->indexBy('tag')->column();
+        $starts = $this->q()->andWhere(['start' => 1])->select(['n' => 'COUNT(*)'])->groupBy('tag')->indexBy('tag')->column();
+        $proTag = fn(string $tabelle) => self::hatTabelle($tabelle) ? (new Query())->from($tabelle)
+            ->where(['between', 'created_at', "$this->von 00:00:00", "$this->bis 23:59:59"])
+            ->select(['n' => 'COUNT(*)', 'd' => 'DATE(created_at)'])->groupBy('d')->indexBy('d')->column() : [];
+        $neu = $proTag('user');
+        $geraete = $proTag('fcmpush_user');
+        $wt = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+        $z = [];
+        for ($t = strtotime($this->bis); $t >= strtotime($this->von); $t = strtotime('-1 day', $t)) {
+            $d = date('Y-m-d', $t);
+            $z[] = ['label' => $wt[date('w', $t)] . ', ' . date('d.m.Y', $t), 'konten' => (int)($konten[$d] ?? 0),
+                'gaeste' => (int)($gaeste[$d] ?? 0), 'neu' => (int)($neu[$d] ?? 0), 'geraete' => (int)($geraete[$d] ?? 0),
+                'starts' => (int)($starts[$d] ?? 0)];
+        }
+        return $z;
+    }
+
+    private static function hatTabelle(string $name): bool
+    {
+        static $da = [];
+        return $da[$name] ??= Yii::$app->db->schema->getTableSchema($name) !== null;
+    }
+
     /** Wer in den letzten 5 Minuten eine Seite aufgerufen hat */
     public static function jetztAktiv(): int
     {

@@ -7,6 +7,9 @@ class Module extends \humhub\components\Module
     /** Rohdaten (ein Eintrag je Seitenaufruf) so viele Monate behalten, danach löschen (Vorjahresvergleich möglich) */
     public int $aufbewahrungMonate = 14;
 
+    /** Kennzeichen in der start_url des Manifests: Aufruf kommt vom Symbol auf dem Startbildschirm */
+    public const START_QUELLE = 'startbildschirm';
+
     /** Pause, ab der ein neuer Besuch beginnt (wie Matomo/Plausible) */
     public int $besuchPauseMinuten = 30;
 

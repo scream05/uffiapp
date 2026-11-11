@@ -6,6 +6,7 @@ class uninstall extends Migration
 {
     public function up()
     {
+        $this->dropTable('statistik_konto_tag');
         $this->dropTable('statistik_aufruf');
     }
 
