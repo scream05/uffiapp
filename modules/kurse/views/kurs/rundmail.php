@@ -1,5 +1,5 @@
 <?php
-/** @var \humhub\modules\kurse\models\Kurs $kurs @var string $betreff @var string $nachricht @var string $an */
+/** @var \humhub\modules\kurse\models\Kurs $kurs @var string $betreff @var string $nachricht @var string $an @var int[] $anzahl */
 
 use humhub\helpers\Html;
 ?>
@@ -10,7 +10,11 @@ use humhub\helpers\Html;
         <?= Html::beginForm() ?>
         <div class="mb-3">
             <label class="form-label">An</label>
-            <?= Html::radioList('an', $an, ['platz' => 'alle Teilnehmer', 'alle' => 'Teilnehmer und Warteliste'], ['class' => 'd-flex gap-3']) ?>
+            <?= Html::radioList('an', $an, [
+                'platz' => "alle Teilnehmer ({$anzahl['platz']})",
+                'warteliste' => "nur Warteliste ({$anzahl['warteliste']})",
+                'alle' => "Teilnehmer und Warteliste ({$anzahl['alle']})",
+            ], ['class' => 'd-flex flex-wrap gap-3']) ?>
         </div>
         <div class="mb-3">
             <label class="form-label" for="betreff">Betreff</label>

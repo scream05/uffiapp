@@ -229,7 +229,7 @@ class KursController extends ContentContainerController
             if ($betreff === '' || $nachricht === '') {
                 $this->view->error('Bitte Betreff und Nachricht ausfüllen.');
             } else {
-                $status = $an === 'alle' ? [Anmeldung::STATUS_PLATZ, Anmeldung::STATUS_WARTELISTE] : [Anmeldung::STATUS_PLATZ];
+                $status = self::rundmailStatus($an);
                 $n = 0;
                 foreach (Anmeldung::find()->where(['kurs_id' => $kurs->id, 'status' => $status])->andWhere(['not', ['email' => null]])->all() as $a) {
                     $n += Dienst::mailRundmail($a, $betreff, $nachricht) ? 1 : 0;
@@ -238,7 +238,22 @@ class KursController extends ContentContainerController
                 return $this->redirect($kurs->createUrl('/kurse/kurs/teilnehmer', ['id' => $kurs->id]));
             }
         }
-        return $this->render('rundmail', ['kurs' => $kurs, 'betreff' => $betreff, 'nachricht' => $nachricht, 'an' => $an]);
+        $anzahl = [];
+        foreach (['platz', 'warteliste', 'alle'] as $wer) {
+            $anzahl[$wer] = (int)Anmeldung::find()->where(['kurs_id' => $kurs->id, 'status' => self::rundmailStatus($wer)])
+                ->andWhere(['not', ['email' => null]])->count();
+        }
+        return $this->render('rundmail', ['kurs' => $kurs, 'betreff' => $betreff, 'nachricht' => $nachricht, 'an' => $an, 'anzahl' => $anzahl]);
+    }
+
+    /** Empfänger der Rundmail: platz = Teilnehmer, warteliste = nur Warteliste, alle = beides */
+    private static function rundmailStatus($an): array
+    {
+        return match ($an) {
+            'warteliste' => [Anmeldung::STATUS_WARTELISTE],
+            'alle' => [Anmeldung::STATUS_PLATZ, Anmeldung::STATUS_WARTELISTE],
+            default => [Anmeldung::STATUS_PLATZ],
+        };
     }
 
     /** Admin: Verein für das Kursmodul freischalten oder sperren */
