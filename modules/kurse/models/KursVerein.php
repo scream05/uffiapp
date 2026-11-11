@@ -14,6 +14,7 @@ use yii\helpers\Url;
  * @property string|null $slug Adresse der eigenen Kursseite
  * @property bool $seite_aktiv false = nur Vorschau für Admins/Kursverwalter
  * @property string|null $farbe Hauptfarbe der Seite (#rrggbb)
+ * @property string|null $impressum_url Impressum des Vereins für die eigene Seite (leer = Impressum der Plattform)
  */
 class KursVerein extends ActiveRecord
 {

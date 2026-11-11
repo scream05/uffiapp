@@ -283,4 +283,30 @@ class KurseController extends Controller
         }
         return ExitCode::OK;
     }
+
+    /**
+     * Impressum-Link der eigenen Kursseite:
+     *   kurse/impressum <verein_id>          Stand anzeigen
+     *   kurse/impressum <verein_id> <url>    Impressum des Vereins verlinken
+     *   kurse/impressum <verein_id> -        wieder das Impressum der Plattform
+     */
+    public function actionImpressum($vereinId, $url = null)
+    {
+        $kv = \humhub\modules\kurse\models\KursVerein::findOne((int)$vereinId);
+        if (!$kv) {
+            $this->stderr("Verein $vereinId ist nicht für das Kursmodul freigeschaltet.\n");
+            return ExitCode::DATAERR;
+        }
+        if ($url !== null) {
+            if ($url !== '-' && !preg_match('#^https://[^\s"<>]+$#', $url)) {
+                $this->stderr("Bitte eine https-Adresse angeben\n");
+                return ExitCode::DATAERR;
+            }
+            $kv->impressum_url = $url === '-' ? null : $url;
+            $kv->save(false);
+            \humhub\modules\kurse\models\KursVerein::cacheLeeren();
+        }
+        $this->stdout("Verein $vereinId Impressum: " . ($kv->impressum_url ?: 'Impressum der Plattform') . "\n");
+        return ExitCode::OK;
+    }
 }

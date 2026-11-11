@@ -144,7 +144,9 @@ $flash = array_filter(['ok' => Yii::$app->session->getFlash('kurse-ok'), 'info' 
 </main>
 <footer class="fuss">
     <ul class="breite">
-        <li><?= Html::a('Impressum', ['/legal/page/view', 'pageKey' => 'imprint']) ?></li>
+        <li><?= $seite->impressum_url
+                ? Html::a('Impressum', $seite->impressum_url, ['rel' => 'noopener'])
+                : Html::a('Impressum', ['/legal/page/view', 'pageKey' => 'imprint']) ?></li>
         <li><?= Html::a('Datenschutz', ['/legal/page/view', 'pageKey' => 'privacy']) ?></li>
         <li><a href="https://github.com/scream05/uffiapp" rel="noopener">Quellcode</a></li>
     </ul>
