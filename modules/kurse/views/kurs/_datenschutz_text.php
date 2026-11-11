@@ -2,6 +2,7 @@
 /**
  * Text der Datenschutzhinweise zur Kursanmeldung (Space-Seite und eigene Vereinsseite)
  * @var \humhub\modules\kurse\models\Kurs $kurs
+ * @var string|null $allgemeinUrl Datenschutzseite der eigenen Kursseite (sonst Datenschutzerklärung der Plattform)
  */
 
 use humhub\helpers\Html;
@@ -26,4 +27,8 @@ $verein = Html::encode($kurs->verein->name);
 <p><strong>Deine Rechte:</strong> Auskunft, Berichtigung, Löschung, Einschränkung, Datenübertragbarkeit und Widerspruch;
     außerdem kannst du dich bei einer Datenschutz-Aufsichtsbehörde beschweren (in Bayern für Vereine: Bayerisches Landesamt für Datenschutzaufsicht).
     Wende dich dazu an den Verein unter der oben genannten Adresse. Abmelden kannst du dich jederzeit über den Link in deiner Bestätigungsmail.</p>
-<p class="small text-muted">Allgemeine Hinweise zur Plattform: <?= Html::a('Datenschutzerklärung', ['/legal/page/view', 'pageKey' => 'privacy']) ?>.</p>
+<?php if (!empty($allgemeinUrl)): ?>
+    <p class="small text-muted">Weitere Hinweise (Seitenaufruf, Cookies, E-Mail-Versand): <?= Html::a('Datenschutz', $allgemeinUrl) ?>.</p>
+<?php else: ?>
+    <p class="small text-muted">Allgemeine Hinweise zur Plattform: <?= Html::a('Datenschutzerklärung', ['/legal/page/view', 'pageKey' => 'privacy']) ?>.</p>
+<?php endif ?>

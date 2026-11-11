@@ -20,6 +20,7 @@ class Events
                 "kurse/$s/kurs/<id:\\d+>" => 'kurse/seite/kurs',
                 "kurse/$s/kurs/<id:\\d+>/anmelden" => 'kurse/seite/anmelden',
                 "kurse/$s/kurs/<id:\\d+>/datenschutz" => 'kurse/seite/datenschutz',
+                "kurse/$s/datenschutz" => 'kurse/seite/datenschutzseite',
                 "kurse/$s/bestaetigen" => 'kurse/seite/bestaetigen',
                 "kurse/$s/anmeldung" => 'kurse/seite/status',
             ], false);

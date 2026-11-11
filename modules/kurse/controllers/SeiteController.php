@@ -83,6 +83,13 @@ class SeiteController extends Controller
         return $this->render('anmelden', ['a' => $a, 'kurs' => $kurs, 'hinweis' => $hinweis]);
     }
 
+    /** Datenschutzhinweise der ganzen Kursseite (Fußzeile) */
+    public function actionDatenschutzseite($slug)
+    {
+        $this->ladeSeite($slug);
+        return $this->render('datenschutzseite');
+    }
+
     public function actionDatenschutz($slug, $id)
     {
         $this->ladeSeite($slug, false);

@@ -107,7 +107,7 @@ $flash = array_filter(['ok' => Yii::$app->session->getFlash('kurse-ok'), 'info' 
         legend { font-size: 1.2em; font-weight: 700; color: var(--f-dunkel); margin: 18px 0 10px; padding: 0; }
 
         /* Fuß */
-        /* Schlanke Fußzeile: nur Pflichtlinks (Impressum, Datenschutz, AGPL-Quellcode) */
+        /* Schlanke Fußzeile: nur Impressum und Datenschutz (Nutzerwunsch 11.11.2026) */
         .fuss { border-top: 1px solid var(--linie); font-size: .82em; padding: 16px 0 22px; }
         .fuss ul { list-style: none; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 0; }
         .fuss li + li::before { content: '·'; color: var(--grau); margin: 0 10px; }
@@ -147,8 +147,7 @@ $flash = array_filter(['ok' => Yii::$app->session->getFlash('kurse-ok'), 'info' 
         <li><?= $seite->impressum_url
                 ? Html::a('Impressum', $seite->impressum_url, ['rel' => 'noopener'])
                 : Html::a('Impressum', ['/legal/page/view', 'pageKey' => 'imprint']) ?></li>
-        <li><?= Html::a('Datenschutz', ['/legal/page/view', 'pageKey' => 'privacy']) ?></li>
-        <li><a href="https://github.com/scream05/uffiapp" rel="noopener">Quellcode</a></li>
+        <li><?= Html::a('Datenschutz', $seite->seiteUrl('datenschutzseite')) ?></li>
     </ul>
 </footer>
 </body>
