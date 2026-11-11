@@ -73,6 +73,11 @@ class Erfassung
             if ($kurz >= $modul->massenAufrufe) {
                 // Für den Rest des Tages merken (Datei neben dem Tages-Salz, wird mit ihm gelöscht)
                 file_put_contents($sperre, $besucher . "\n", FILE_APPEND | LOCK_EX);
+                // Einmal festhalten, wer das war (Sicherheit, Art. 6 Abs. 1 lit. f DSGVO; Log-Tabelle wird regelmäßig geleert)
+                $pfade = $db->createCommand('SELECT pfad FROM statistik_aufruf WHERE besucher = :b AND tag = :t ORDER BY id LIMIT 15',
+                    [':b' => $besucher, ':t' => $tag])->queryColumn();
+                Yii::warning('Massenabruf erkannt: ' . $kurz . ' Aufrufe in ' . $modul->massenMinuten . ' Min. von IP ' . $req->userIP
+                    . ', Browserkennung „' . $ua . '“, zuletzt ' . self::pfad() . '; erste Seiten: ' . implode(', ', $pfade), 'statistik-massenabruf');
                 $db->createCommand()->delete('statistik_aufruf', ['besucher' => $besucher, 'tag' => $tag])->execute();
                 return;
             }
