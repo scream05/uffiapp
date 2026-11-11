@@ -18,7 +18,9 @@ use yii\web\Response;
 class Erfassung
 {
     private const BOTS = '/bot|crawl|spider|slurp|curl|wget|python|java\/|go-http|headless|lighthouse|preview|monitor|uptime|'
-        . 'facebookexternalhit|whatsapp|telegram|discord|scrapy|http-?client|okhttp|axios|libwww|feed|rss|php\/|perl|ruby/i';
+        . 'facebookexternalhit|whatsapp|telegram|discord|scrapy|http-?client|okhttp|axios|libwww|feed|rss|php\/|perl|ruby|'
+        // Eigene Tests (Playwright, curl usw.) hängen „UffiTest“ an die Browserkennung an
+        . 'uffitest/i';
 
     public static function erfassen(): void
     {
