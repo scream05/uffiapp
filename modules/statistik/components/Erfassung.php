@@ -62,6 +62,12 @@ class Erfassung
             . ($user->isGuest ? $req->userIP . '|' . $ua : 'konto|' . $user->id)), 0, 16);
 
         $db = $app->db;
+        if (!$user->isGuest) {
+            // Wer sich heute erst als Gast umgesehen und dann angemeldet hat, ist derselbe Besucher:
+            // Gast-Aufrufe mit gleicher IP und Browserkennung dem Konto zuordnen (sonst zählt die Person doppelt)
+            $gast = substr(hash('sha256', self::salz($tag) . '|' . $req->userIP . '|' . $ua), 0, 16);
+            $db->createCommand()->update('statistik_aufruf', ['besucher' => $besucher], ['besucher' => $gast, 'tag' => $tag])->execute();
+        }
         // Massenabruf eines Gasts (Programm mit Browserkennung): nicht zählen und seine Aufrufe des Tages löschen
         if ($user->isGuest) {
             $sperre = Yii::getAlias('@runtime/statistik') . "/massen-$tag";
