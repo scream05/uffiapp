@@ -64,9 +64,17 @@ class KurzfassungController extends ContentContainerController
             $user = Yii::$app->user->getIdentity();
             if ($tun === 'hochladen') {
                 $datei = UploadedFile::getInstanceByName('pdf');
-                if ($datei === null || $datei->error !== UPLOAD_ERR_OK || strtolower($datei->extension) !== 'pdf'
-                    || !str_starts_with((string)file_get_contents($datei->tempName, false, null, 0, 5), '%PDF')) {
-                    $this->view->error(Yii::t('StadtratModule.base', 'Bitte eine PDF-Datei wählen.'));
+                // Nur am Inhalt prüfen, nicht an der Endung: Handys liefern Dateien aus Mail/Cloud/WhatsApp oft ohne „.pdf“ im Namen
+                $fehler = match (true) {
+                    $datei === null || $datei->error === UPLOAD_ERR_NO_FILE => 'Bitte zuerst die PDF-Datei auswählen.',
+                    in_array($datei->error, [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE], true) => 'Die Datei ist zu groß (höchstens 20 MB).',
+                    $datei->error !== UPLOAD_ERR_OK => 'Die Datei kam nicht vollständig an. Bitte noch einmal versuchen.',
+                    !str_contains((string)file_get_contents($datei->tempName, false, null, 0, 1024), '%PDF-') => 'Das ist keine PDF-Datei. Bitte die Niederschrift als PDF wählen.',
+                    default => null,
+                };
+                if ($fehler !== null) {
+                    Yii::warning('Niederschrift-Upload abgelehnt: ' . $fehler . ' (' . ($datei ? $datei->name . ', ' . $datei->type . ', ' . $datei->size . ' B, Fehler ' . $datei->error : 'keine Datei') . ', ' . Yii::$app->request->userAgent . ')', 'stadtrat');
+                    $this->view->error(Yii::t('StadtratModule.base', $fehler));
                     return $this->redirect(['bearbeiten', 'id' => $s->id]);
                 }
                 Erklaert::speichernPdf($s->id, $datei->tempName);

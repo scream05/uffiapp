@@ -40,7 +40,7 @@ $knopf = fn($tun, $label, $klasse = 'btn-light btn-default', $extra = []) => Htm
         <p class="text-muted small"><?= $hatPdf ? $t('Niederschrift ist hochgeladen (nicht öffentlich).') : $t('Niederschrift der öffentlichen Sitzung als PDF. Sie bleibt intern und wird nur an Claude geschickt.') ?></p>
         <?php if (!$k->istFreigegeben()): ?>
             <div class="sr-knoepfe">
-                <input type="file" name="pdf" accept="application/pdf,.pdf" <?= $laeuft ? 'disabled' : '' ?>>
+                <input type="file" name="pdf" accept="application/pdf" <?= $laeuft ? 'disabled' : '' ?>>
                 <?= $knopf('hochladen', $hatPdf ? $t('Neue Niederschrift hochladen und Entwurf erstellen') : $t('Hochladen und Entwurf erstellen'), 'btn-primary') ?>
                 <?php if ($hatPdf): ?><?= $knopf('entwurf', $hatText ? $t('Entwurf neu erstellen (überschreibt die Texte)') : $t('Entwurf erstellen'), 'btn-light btn-default',
                     $hatText ? ['data-confirm' => $t('Deine Änderungen an den Texten gehen verloren. Fortfahren?')] : []) ?><?php endif ?>
