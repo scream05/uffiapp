@@ -20,7 +20,14 @@ if (Module::kannVerwalten($verein->id)) {
     $entwuerfe = Kurs::find()->where(['verein_id' => $verein->id, 'status' => Kurs::STATUS_ENTWURF])
         ->andWhere(['>=', 'COALESCE(ende, beginn)', date('Y-m-d')])->orderBy(['beginn' => SORT_ASC])->all();
     $kurse = array_merge($kurse, $entwuerfe);
+    usort($kurse, fn($a, $b) => strcmp($a->beginn . $a->zeit_von, $b->beginn . $b->zeit_von));
 }
+// Kurse nach Jahr des ersten Kurstags gruppieren; laufende Kurse aus dem Vorjahr zählen zum aktuellen Jahr
+$jahre = [];
+foreach ($kurse as $kurs) {
+    $jahre[max((int)date('Y'), (int)substr($kurs->beginn, 0, 4))][] = $kurs;
+}
+ksort($jahre);
 $titelbild = $verein->getTitelbild();
 $stichwoerter = $verein->getStichwortList();
 $knopf = trim((string)$verein->knopf_text) ?: 'Kurse ansehen';
@@ -57,6 +64,17 @@ $social = $verein->getSocialList();
     .kurs-eckdaten li { display: flex; gap: 8px; margin: 4px 0; }
     .kurs-karte .knopf { align-self: flex-start; }
     .leer { text-align: center; padding: 34px 22px; }
+    .kurs-jahr { margin: 0 0 14px; }
+    .kurs-jahr > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 12px; padding: 12px 18px;
+        border-radius: 14px; background: var(--f-hell); color: var(--f-dunkel); font-weight: 700; user-select: none; }
+    .kurs-jahr > summary::-webkit-details-marker { display: none; }
+    .kurs-jahr > summary::after { content: ''; margin-left: auto; width: 10px; height: 10px; border-right: 2.5px solid currentColor;
+        border-bottom: 2.5px solid currentColor; transform: rotate(45deg); transition: transform .2s; margin-top: -4px; }
+    .kurs-jahr[open] > summary::after { transform: rotate(-135deg); margin-top: 4px; }
+    .kurs-jahr > summary:hover { background: color-mix(in srgb, var(--f) 20%, #fff); }
+    .kurs-jahr-zahl { font-size: 1.25em; }
+    .kurs-jahr-anzahl { font-weight: 400; color: var(--grau); font-size: .95em; }
+    .kurs-jahr > .kurs-liste { margin-top: 16px; }
 
     .vorstellung { font-size: 1.02em; }
     .vorstellung::after { content: ''; display: block; clear: both; }
@@ -103,9 +121,16 @@ $social = $verein->getSocialList();
         <h2>Aktuelle Kurse</h2>
         <?php if ($kurse): ?>
             <p class="grau">Die Anmeldung geht ohne Konto: Du bekommst eine Mail zum Bestätigen. Plätze werden in der Reihenfolge der Bestätigungen vergeben.</p>
-            <div class="kurs-liste">
-                <?php foreach ($kurse as $kurs): ?><?= $this->render('_karte', ['kurs' => $kurs]) ?><?php endforeach ?>
-            </div>
+            <?php $erstes = true; foreach ($jahre as $jahr => $liste): ?>
+                <?php // Aktuelles Jahr offen; gibt es dort keine Kurse, ist das nächste Jahr mit Kursen offen ?>
+                <details class="kurs-jahr"<?= $erstes ? ' open' : '' ?>>
+                    <summary><span class="kurs-jahr-zahl"><?= $jahr ?></span>
+                        <span class="kurs-jahr-anzahl"><?= count($liste) === 1 ? '1 Kurs' : count($liste) . ' Kurse' ?></span></summary>
+                    <div class="kurs-liste">
+                        <?php foreach ($liste as $kurs): ?><?= $this->render('_karte', ['kurs' => $kurs]) ?><?php endforeach ?>
+                    </div>
+                </details>
+            <?php $erstes = false; endforeach ?>
         <?php else: ?>
             <div class="karte leer">
                 <p><strong>Gerade sind keine Kurse ausgeschrieben.</strong></p>
