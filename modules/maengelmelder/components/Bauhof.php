@@ -525,7 +525,8 @@ class Bauhof
 
     private static function text(Mitarbeiter $m, BauhofNachricht $n): void
     {
-        $t = mb_strtolower(trim((string)$n->text, " \t\n\r!.?"));
+        // Führenden „/“ entfernen, damit Telegram-Befehle (/aufträge, /hilfe …) wie der getippte Text wirken
+        $t = mb_strtolower(trim((string)$n->text, " \t\n\r!.?/"));
         $gruss = in_array($t, ['hilfe', '', 'help', 'info', 'hallo', 'hi', 'moin', 'servus', 'start'], true);
         $erste = !BauhofNachricht::find()->where(['mitarbeiter_id' => $m->id, 'richtung' => BauhofNachricht::EIN])
             ->andWhere(['<', 'id', $n->id])->exists();

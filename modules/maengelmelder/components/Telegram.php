@@ -115,6 +115,15 @@ class Telegram
         return [$data, $mime];
     }
 
+    /** Befehlsmenü des Bots setzen (erscheint im Telegram-Eingabefeld als „/"-Menü). Nur a-z0-9_ erlaubt. */
+    public static function setzeBefehle(): array
+    {
+        return self::http('setMyCommands', ['commands' => json_encode([
+            ['command' => 'auftraege', 'description' => 'Meine offenen Aufträge zeigen'],
+            ['command' => 'hilfe', 'description' => 'Hilfe anzeigen'],
+        ], JSON_UNESCAPED_UNICODE)]);
+    }
+
     public static function getMe(): array
     {
         return self::http('getMe')['result'] ?? [];

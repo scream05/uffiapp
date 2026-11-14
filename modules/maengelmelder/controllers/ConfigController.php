@@ -37,7 +37,8 @@ class ConfigController extends Controller
                 $secret = $m->telegramZugang('webhook_secret') ?? throw new \RuntimeException('webhook_secret fehlt in secrets/telegram.json');
                 $url = Url::to(['/maengelmelder/telegram/index'], true);
                 Telegram::setzeWebhook($url, $secret);
-                $this->view->success('Telegram-Webhook eingerichtet: ' . $url);
+                Telegram::setzeBefehle();
+                $this->view->success('Telegram-Webhook und Befehlsmenü eingerichtet: ' . $url);
             } catch (\Throwable $e) {
                 $this->view->error('Webhook fehlgeschlagen: ' . $e->getMessage());
             }
