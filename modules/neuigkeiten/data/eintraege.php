@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'gastmeldung-wieder', 'datum' => '2026-11-14', 'art' => 'behoben', 'popup' => false,
+        'titel' => 'Mängel melden ohne Konto geht wieder',
+        'text' => 'Wer ohne Anmeldung einen Mangel melden wollte, bekam seit Ende Oktober nur eine Fehlermeldung. Das ist behoben – Meldungen ohne Konto kommen wieder beim Bauhof an.'],
     ['id' => 'aktivitaeten-ausgeblendet', 'datum' => '2026-11-10', 'art' => 'besser', 'popup' => false,
         'titel' => 'Kasten „Letzte Aktivitäten“ ausgeblendet',
         'text' => 'Der Kasten „Letzte Aktivitäten“ rechts in der Übersicht und in den Spaces ist nicht mehr zu sehen. Was neu ist, findest du wie gewohnt direkt in den Beiträgen.'],

@@ -1,4 +1,31 @@
 {
+    "gastmeldung-wieder": {
+        "en": {
+            "titel": "Report defects without an account again",
+            "text": "If you wanted to report a defect without logging in, you've been getting an error message since the end of October. That's fixed now – reports without an account are reaching the public works department again.",
+            "quelle": "eb580b0454554c93442f4d1ff5348f9017103678"
+        },
+        "uk": {
+            "titel": "Повідомлення про недоліки без облікового запису знову працює",
+            "text": "Якщо ти хотів зареєструвати недолік без реєстрації, то з кінця жовтня отримував тільки повідомлення про помилку. Це відремонтовано – повідомлення без облікового запису знову надходять до дорожного управління.",
+            "quelle": "eb580b0454554c93442f4d1ff5348f9017103678"
+        },
+        "ar": {
+            "titel": "الإبلاغ عن الأعطال بدون حساب أصبح ممكناً مجدداً",
+            "text": "من أراد الإبلاغ عن عطل بدون تسجيل، كان يتلقى منذ نهاية تشرين الأول رسالة خطأ فقط. تم حل هذه المشكلة الآن – الإبلاغات بدون حساب تصل مجدداً إلى دائرة الطرق والمباني.",
+            "quelle": "eb580b0454554c93442f4d1ff5348f9017103678"
+        },
+        "tr": {
+            "titel": "Hesapsız eksiklikleri bildirmek tekrar çalışıyor",
+            "text": "Ekim sonundan beri kayıt olmadan bir eksikliği bildirmek isteyenler yalnızca bir hata mesajı alıyordu. Bu sorun giderildi – hesapsız bildirimler artık Bauhof'a ulaşıyor.",
+            "quelle": "eb580b0454554c93442f4d1ff5348f9017103678"
+        },
+        "ru": {
+            "titel": "Мангели можно сообщать без аккаунта",
+            "text": "С конца октября те, кто хотел сообщить о недостатке без регистрации, получали только сообщение об ошибке. Это исправлено – сообщения без аккаунта снова поступают в дорожное управление.",
+            "quelle": "eb580b0454554c93442f4d1ff5348f9017103678"
+        }
+    },
     "aktivitaeten-ausgeblendet": {
         "en": {
             "titel": "“Latest Activities” box hidden",

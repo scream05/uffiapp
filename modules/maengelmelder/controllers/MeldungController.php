@@ -151,7 +151,9 @@ class MeldungController extends ContentContainerController
             $post = new Post($space);
             $post->message = Mangel::message($space, $data['kategorie'], mb_substr($data['beschreibung'], 0, 3000), $lat, $lng);
             $post->content->visibility = Content::VISIBILITY_PRIVATE;
-            $post->content->setState(Content::STATE_DRAFT);
+            if (!$post->content->getStateService()->set(Content::STATE_DRAFT)) {
+                throw new \RuntimeException('Entwurfsstatus nicht setzbar');
+            }
             if (!$post->save()) {
                 throw new \RuntimeException(json_encode($post->getErrors()));
             }
