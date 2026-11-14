@@ -56,6 +56,9 @@ class Module extends \humhub\components\Module
     ];
 
     /** EU-Regionen für Claude über AWS Bedrock */
+    /** Standardmodell auf Bedrock, wenn in der Administration keins eingetragen ist (Vorsatz eu.anthropic. ergänzt Claude.php) */
+    public const BEDROCK_STANDARDMODELL = 'claude-haiku-4-5-20251001-v1:0';
+
     public const BEDROCK_REGIONEN = [
         'eu-central-1' => 'Frankfurt', 'eu-west-1' => 'Irland', 'eu-north-1' => 'Stockholm',
         'eu-west-3' => 'Paris', 'eu-south-1' => 'Mailand', 'eu-central-2' => 'Zürich',
@@ -105,8 +108,9 @@ class Module extends \humhub\components\Module
         if ($anbieter === 'openai') {
             return ($stufe === 'stark' ? getenv('OPENAI_MODEL_STARK') : null) ?: getenv('OPENAI_MODEL') ?: 'gpt-5.4';
         }
-        if ($anbieter === 'bedrock' && $claudeModell === null && ($m = trim((string)$this->settings->get('bedrock-modell'))) !== '') {
-            return $m;
+        if ($anbieter === 'bedrock' && $claudeModell === null) {
+            // Eigener Standard: die neuesten Claude-Modelle sind auf Bedrock nicht in jedem Konto freigeschaltet
+            return trim((string)$this->settings->get('bedrock-modell')) ?: getenv('BEDROCK_MODEL') ?: self::BEDROCK_STANDARDMODELL;
         }
         return $claudeModell ?: getenv('CLAUDE_MODEL') ?: 'claude-haiku-5-5';
     }

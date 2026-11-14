@@ -14,7 +14,7 @@ $aktiv = $modul->getAnbieter();
 $standard = $modul->getAnbieterStandard();
 $gewaehlt = (string)$modul->settings->get('anbieter') !== '';
 $bedrockModell = (string)$modul->settings->get('bedrock-modell');
-$claudeStandard = getenv('CLAUDE_MODEL') ?: 'claude-haiku-5-5';
+$claudeStandard = getenv('BEDROCK_MODEL') ?: Module::BEDROCK_STANDARDMODELL;
 
 $this->registerJs('
 $(".ki-testen").on("click", function () {
@@ -103,7 +103,7 @@ $(".ki-testen").on("click", function () {
                 <p class="help-block"><?= $t('Leer lassen für das Standardmodell ({modell}). Der Vorsatz wird automatisch ergänzt (API-Schlüssel: „anthropic.“, IAM-Zugangsschlüssel: EU-Profil „eu.anthropic.“). Welche Modelle freigeschaltet sind, steht in der AWS-Konsole unter Bedrock → Model access.', ['modell' => $claudeStandard]) ?></p>
             </div>
         </div>
-        <p class="help-block"><?= $t('Region und Modell bitte erst speichern und dann testen.') ?></p>
+        <p class="help-block"><?= $t('Beim Speichern läuft eine kurze Testanfrage. Antwortet der gewählte Anbieter nicht, wird nichts geändert.') ?></p>
 
         <div class="alert alert-warning" style="margin-top:15px">
             <?= $t('Datenschutz: Bei einem Wechsel gehen die Anfragen an einen anderen Dienstleister. Datenschutzerklärung und Auftragsverarbeitungsvertrag müssen den gewählten Anbieter abdecken.') ?>
