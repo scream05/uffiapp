@@ -64,6 +64,8 @@ $(".ki-testen").on("click", function () {
                     <td>
                         <?php if ($key): ?>
                             <span class="text-success"><i class="fa fa-check"></i> <?= $t('vorhanden') ?></span>
+                            <?php if ($id === 'bedrock'): ?><br><small class="text-muted"><?= $modul->getBedrockAnmeldung() === 'iam'
+                                ? $t('IAM-Zugangsschlüssel') : $t('API-Schlüssel') ?></small><?php endif ?>
                         <?php else: ?>
                             <span class="text-danger"><i class="fa fa-times"></i> <?= $t('fehlt') ?></span>
                             <br><code><?= Html::encode($modul->getApiKeyDatei($id)) ?></code>
@@ -98,7 +100,7 @@ $(".ki-testen").on("click", function () {
                 <label for="bedrock_modell"><?= $t('Modell') ?></label>
                 <?= Html::textInput('bedrock_modell', $bedrockModell, ['class' => 'form-control', 'id' => 'bedrock_modell',
                     'placeholder' => $claudeStandard, 'maxlength' => 80]) ?>
-                <p class="help-block"><?= $t('Leer lassen für das Standardmodell ({modell}). Der Vorsatz „anthropic.“ wird automatisch ergänzt. Welche Modelle freigeschaltet sind, steht in der AWS-Konsole unter Bedrock → Model access.', ['modell' => $claudeStandard]) ?></p>
+                <p class="help-block"><?= $t('Leer lassen für das Standardmodell ({modell}). Der Vorsatz wird automatisch ergänzt (API-Schlüssel: „anthropic.“, IAM-Zugangsschlüssel: EU-Profil „eu.anthropic.“). Welche Modelle freigeschaltet sind, steht in der AWS-Konsole unter Bedrock → Model access.', ['modell' => $claudeStandard]) ?></p>
             </div>
         </div>
         <p class="help-block"><?= $t('Region und Modell bitte erst speichern und dann testen.') ?></p>

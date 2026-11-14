@@ -2,6 +2,7 @@
 
 namespace humhub\modules\kiAssistent\components;
 
+use Anthropic\Bedrock\Client as BedrockRuntime;
 use Anthropic\Bedrock\MantleClient;
 use Anthropic\Client;
 use Anthropic\Core\Exceptions\APIConnectionException;
@@ -22,11 +23,16 @@ class Claude implements KiModell
 {
     private Client|MantleClient $client;
 
+    /** bedrock-runtime kennt die automatische Cache-Marke (oberstes cacheControl) nicht, nur Marken an Blöcken */
+    private bool $runtime = false;
+
     /**
      * @param int|null $timeout Sekunden für lange Antworten (Standard-Client bricht sonst nach 60 s ohne Daten ab)
-     * @param string|null $bedrockRegion AWS-Region: Claude über AWS Bedrock (Mantle, API-Schlüssel von Bedrock) statt direkt bei Anthropic
+     * @param string|null $bedrockRegion AWS-Region: Claude über AWS Bedrock (Mantle) statt direkt bei Anthropic
+     * @param array|null $awsIam IAM-Zugangsschlüssel für Bedrock (access_key_id, secret_access_key): AWS-Signatur statt API-Schlüssel
      */
-    public function __construct(string $apiKey, private string $model, ?int $timeout = null, private ?string $bedrockRegion = null)
+    public function __construct(string $apiKey, private string $model, ?int $timeout = null, private ?string $bedrockRegion = null,
+                                ?array $awsIam = null)
     {
         $optionen = null;
         if ($timeout !== null) {
@@ -34,8 +40,17 @@ class Claude implements KiModell
                 \Symfony\Component\HttpClient\HttpClient::create(['timeout' => $timeout, 'max_duration' => $timeout + 300]));
             $optionen = ['transporter' => $http, 'streamingTransporter' => $http];
         }
+        if ($bedrockRegion !== null && $awsIam !== null) {
+            // IAM-Zugangsschlüssel: bedrock-runtime (InvokeModel, AWS-Signatur) über ein EU-Inferenzprofil
+            // (claude-haiku-5-5 → eu.anthropic.claude-haiku-5-5); vollständige IDs (eu./global./anthropic.…) bleiben unverändert
+            $this->model = preg_match('/^(eu|global|us|apac|jp)\.|^anthropic\./', $model) ? $model : 'eu.anthropic.' . $model;
+            $this->client = BedrockRuntime::withCredentials($awsIam['access_key_id'], $awsIam['secret_access_key'],
+                $bedrockRegion, requestOptions: $optionen);
+            $this->runtime = true;
+            return;
+        }
         if ($bedrockRegion !== null) {
-            // Bedrock-Modellnamen tragen den Vorsatz „anthropic.“ (claude-haiku-5-5 → anthropic.claude-haiku-5-5)
+            // Bedrock-API-Schlüssel: Mantle (Messages-API); Modellnamen tragen den Vorsatz „anthropic.“
             $this->model = str_starts_with($model, 'anthropic.') ? $model : 'anthropic.' . $model;
             $this->client = new MantleClient(apiKey: $apiKey, awsRegion: $bedrockRegion, requestOptions: $optionen);
             return;
@@ -85,6 +100,12 @@ class Claude implements KiModell
             // low statt medium (26.10.2026): ki-test gleich gut, etwas weniger Denken
             'outputConfig' => ['effort' => 'low'],
         ];
+        if ($this->runtime) {
+            unset($params['cacheControl']); // die 1-Stunden-Marke am System-Prompt bleibt
+        }
+        if (!self::kannEffort($this->model)) {
+            unset($params['outputConfig']);
+        }
         try {
             if ($onText === null) {
                 $message = $this->client->messages->create(...$params);
@@ -113,6 +134,13 @@ class Claude implements KiModell
         $in = $u->inputTokens + (int)round(1.25 * ((int)$u->cacheCreationInputTokens - $stunde) + 2 * $stunde
                 + 0.1 * (int)$u->cacheReadInputTokens);
         return [$message, $in, $u->outputTokens];
+    }
+
+    /** „effort“ kennen erst Claude Opus 4.5 und neuere Modelle (Haiku 4.5, Sonnet 4.5 und älter: HTTP 400) */
+    private static function kannEffort(string $model): bool
+    {
+        return !preg_match('/claude-(haiku-[34]|sonnet-4-5|sonnet-4-|sonnet-4$|opus-4-[01]|3)/', $model)
+            || preg_match('/claude-sonnet-4-6/', $model);
     }
 
     /** System-Prompt als Text-Blöcke, Cache-Marke (1 Stunde) hinter dem letzten festen Teil */

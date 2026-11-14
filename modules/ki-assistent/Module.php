@@ -116,16 +116,51 @@ class Module extends \humhub\components\Module
     {
         return match ($anbieter ?? $this->getAnbieter()) {
             'openai' => 'secrets/openai_api_key',
-            'bedrock' => 'secrets/bedrock_api_key',
+            'bedrock' => $this->getBedrockIam() !== null ? 'secrets/bedrock_iam.json' : 'secrets/bedrock_api_key',
             default => 'secrets/anthropic_api_key',
         };
     }
 
-    /** API-Schlüssel des Anbieters als Docker-Secret (secrets/openai_api_key, secrets/anthropic_api_key bzw. secrets/bedrock_api_key auf dem Host) */
+    /**
+     * API-Schlüssel des Anbieters als Docker-Secret (secrets/openai_api_key, secrets/anthropic_api_key bzw. secrets/bedrock_api_key
+     * auf dem Host). Bei Bedrock mit IAM-Zugangsschlüssel: die Access Key ID (nur als „eingerichtet“-Zeichen).
+     */
     public function getApiKey(?string $anbieter = null): ?string
     {
-        $key = @file_get_contents('/run/secrets/' . basename($this->getApiKeyDatei($anbieter)));
+        $anbieter ??= $this->getAnbieter();
+        if ($anbieter === 'bedrock' && ($iam = $this->getBedrockIam()) !== null) {
+            return $iam['access_key_id'];
+        }
+        $datei = match ($anbieter) {
+            'openai' => 'openai_api_key',
+            'bedrock' => 'bedrock_api_key',
+            default => 'anthropic_api_key',
+        };
+        $key = @file_get_contents('/run/secrets/' . $datei);
         return $key !== false && trim($key) !== '' ? trim($key) : null;
+    }
+
+    /**
+     * IAM-Zugangsschlüssel für Bedrock (AWS-Signatur SigV4) aus secrets/bedrock_iam.json:
+     * {"access_key_id": "AKIA…", "secret_access_key": "…"}. Hat Vorrang vor dem Bedrock-API-Schlüssel, den
+     * Organisationsrichtlinien (SCP auf bedrock:CallWithBearerToken) sperren können.
+     * @return array{access_key_id: string, secret_access_key: string}|null
+     */
+    public function getBedrockIam(): ?array
+    {
+        $j = json_decode((string)@file_get_contents('/run/secrets/bedrock_iam'), true);
+        $id = trim((string)($j['access_key_id'] ?? ''));
+        $geheim = trim((string)($j['secret_access_key'] ?? ''));
+        return $id !== '' && $geheim !== '' ? ['access_key_id' => $id, 'secret_access_key' => $geheim] : null;
+    }
+
+    /** Anmeldeart bei Bedrock: „iam“, „api“ oder null (nicht eingerichtet) */
+    public function getBedrockAnmeldung(): ?string
+    {
+        if ($this->getBedrockIam() !== null) {
+            return 'iam';
+        }
+        return $this->getApiKey('bedrock') !== null ? 'api' : null;
     }
 
     /**
@@ -143,7 +178,7 @@ class Module extends \humhub\components\Module
         }
         require_once __DIR__ . '/vendor/autoload.php';
         return new components\Claude($key, $this->getModel($stufe, $claudeModell, $anbieter), $timeout,
-            $anbieter === 'bedrock' ? $this->getBedrockRegion() : null);
+            $anbieter === 'bedrock' ? $this->getBedrockRegion() : null, $anbieter === 'bedrock' ? $this->getBedrockIam() : null);
     }
 
     /** Administration → KI-Anbieter (auch „Konfigurieren“ in der Modulliste) */
