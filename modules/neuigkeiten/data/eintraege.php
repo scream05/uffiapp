@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'app-anmeldung-wieder', 'datum' => '2026-11-14', 'art' => 'behoben', 'popup' => false,
+        'titel' => 'Anmeldung über die HumHub-App geht wieder',
+        'text' => 'Wer sich über die offizielle HumHub-App anmeldet, bekam zuletzt nur einen weißen Bildschirm oder die Meldung, die Adresse werde nicht akzeptiert. Das ist behoben – die App verbindet sich wieder mit Rund um Uffni.'],
     ['id' => 'maengel-stadtgebiet', 'datum' => '2026-11-14', 'art' => 'besser', 'popup' => false,
         'titel' => 'Mängel nur im Stadtgebiet',
         'text' => 'Die Karte beim Mangel melden zeigt jetzt die Grenze von Uffenheim mit allen Ortsteilen als gestrichelte Linie. Orte außerhalb sind grau und lassen sich nicht mehr auswählen.'],

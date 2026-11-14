@@ -70,6 +70,8 @@ services:
       - HUMHUB_CONFIG__COMPONENTS__DB__USERNAME=${DB_USER}
       - HUMHUB_CONFIG__COMPONENTS__DB__PASSWORD=${DB_PASSWORD}
       - HUMHUB_DOCKER__MERCURE_ENABLE=true
+      # Zugriffslog nach stdout (docker logs), für Fehlersuche – z. B. Anfragen der HumHub-App
+      - HUMHUB_DOCKER__ACCESS_LOG=true
       # TLS terminiert der Nginx Proxy Manager im LAN: dessen X-Forwarded-* Headern vertrauen
       - 'HUMHUB_WEB_CONFIG__COMPONENTS__REQUEST__TRUSTED_HOSTS=["192.168.178.0/24"]'
       - HUMHUB_WEB_CONFIG__COMPONENTS__REQUEST__SECURE_PORT=443

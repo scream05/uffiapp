@@ -1,4 +1,31 @@
 {
+    "app-anmeldung-wieder": {
+        "en": {
+            "titel": "Logging in via the HumHub app works again",
+            "text": "If you logged in via the official HumHub app, you may recently have seen only a white screen or a message saying the address wasn’t accepted. That’s fixed now – the app connects to Rund um Uffni again.",
+            "quelle": "148e4cc287129074703d4d4e6621fc2c7cfeed21"
+        },
+        "uk": {
+            "titel": "Вхід через застосунок HumHub знову працює",
+            "text": "Ті, хто входить через офіційний застосунок HumHub, останнім часом бачили лише білий екран або повідомлення, що адреса не приймається. Це виправлено — тепер застосунок знову підключається до Rund um Uffni.",
+            "quelle": "148e4cc287129074703d4d4e6621fc2c7cfeed21"
+        },
+        "ar": {
+            "titel": "تسجيل الدخول عبر تطبيق HumHub صار يشتغل من جديد",
+            "text": "أي شخص كان يسجّل الدخول عبر تطبيق HumHub الرسمي، كان يظهر له مؤخرًا فقط شاشة بيضاء أو رسالة تقول إن العنوان غير مقبول. تم إصلاح هذا الآن – التطبيق صار يتصل من جديد بـ Rund um Uffni.",
+            "quelle": "148e4cc287129074703d4d4e6621fc2c7cfeed21"
+        },
+        "tr": {
+            "titel": "HumHub uygulaması üzerinden giriş yine çalışıyor",
+            "text": "Resmi HumHub uygulaması üzerinden giriş yapmaya çalışanlar son zamanlarda sadece beyaz bir ekran ya da adresin kabul edilmediğine dair bir mesaj görüyordu. Bu sorun giderildi – uygulama artık yeniden Rund um Uffni’ye bağlanıyor.",
+            "quelle": "148e4cc287129074703d4d4e6621fc2c7cfeed21"
+        },
+        "ru": {
+            "titel": "Вход через приложение HumHub снова работает",
+            "text": "У тех, кто входил через официальное приложение HumHub, в последнее время появлялся только белый экран или сообщение, что адрес не принимается. Это исправлено — приложение снова подключается к Rund um Uffni.",
+            "quelle": "148e4cc287129074703d4d4e6621fc2c7cfeed21"
+        }
+    },
     "maengel-stadtgebiet": {
         "en": {
             "titel": "Issues only within the town area",

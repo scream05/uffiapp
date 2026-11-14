@@ -126,6 +126,30 @@ class Erfassung
      * nicht in den Sicherungen (sonst ließen sich Konto-ID bzw. IP-Adresse mit dem Salz des Tages zurückrechnen) und
      * nicht im Cache (cache/flush-all läuft stündlich). Dateien früherer Tage werden gelöscht.
      */
+    /** Besucher-Kennung des aktuellen Zugriffs (angemeldet: je Konto, sonst je IP+Browserkennung), wie in erfassen() */
+    public static function besucherId(?string $tag = null): string
+    {
+        $tag ??= date('Y-m-d');
+        $req = Yii::$app->request;
+        $user = Yii::$app->user;
+        return substr(hash('sha256', self::salz($tag) . '|'
+            . ($user->isGuest ? $req->userIP . '|' . (string)$req->userAgent : 'konto|' . $user->id)), 0, 16);
+    }
+
+    /**
+     * Start vom Startbildschirm nachträglich kennzeichnen: markiert den jüngsten heutigen Aufruf dieses Besuchers
+     * als Start (start=1). Wird vom Client nach einem Standalone-Start per Beacon ausgelöst (statt über das Manifest,
+     * das sonst die HumHub-App-Anmeldung bricht). Zählt selbst nicht als Aufruf (Antwort ist kein HTML).
+     */
+    public static function markiereStart(): void
+    {
+        $tag = date('Y-m-d');
+        Yii::$app->db->createCommand(
+            'UPDATE statistik_aufruf SET start = 1 WHERE besucher = :b AND tag = :t AND start = 0 ORDER BY id DESC LIMIT 1',
+            [':b' => self::besucherId($tag), ':t' => $tag]
+        )->execute();
+    }
+
     private static function salz(string $tag): string
     {
         $dir = Yii::getAlias('@runtime/statistik');
