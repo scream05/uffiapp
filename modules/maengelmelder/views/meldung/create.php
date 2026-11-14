@@ -246,6 +246,19 @@ maengelReady(function () {
     var bounds = L.latLngBounds([<?= $module->bounds['south'] ?>, <?= $module->bounds['west'] ?>], [<?= $module->bounds['north'] ?>, <?= $module->bounds['east'] ?>]);
     var map = L.map(el, {maxBounds: bounds.pad(0.2)}).setView([<?= $module->centerLat ?>, <?= $module->centerLng ?>], 15);
     maengelTiles(map);
+    // Nur im Stadtgebiet (Gemeindegrenze aus OpenStreetMap): außerhalb grau, Grenze gestrichelt, Punkte dort abgelehnt
+    var gebiet = <?= json_encode($module->getStadtgebiet()) ?>;
+    function imGebiet(ll) {
+        var innen = false;
+        for (var i = 0, j = gebiet.length - 1; i < gebiet.length; j = i++) {
+            var a = gebiet[i], b = gebiet[j];
+            if ((a[0] > ll.lat) !== (b[0] > ll.lat) && ll.lng < (b[1] - a[1]) * (ll.lat - a[0]) / (b[0] - a[0]) + a[1]) innen = !innen;
+        }
+        return innen;
+    }
+    L.polygon([[[-85, -180], [-85, 180], [85, 180], [85, -180]], gebiet],
+        {interactive: false, stroke: false, fillColor: '#555', fillOpacity: 0.3}).addTo(map);
+    L.polyline(gebiet, {interactive: false, color: '#c00', weight: 2, dashArray: '6 6', opacity: 0.8}).addTo(map);
     var marker = null;
     // Schon gemeldet? Offene Meldungen in der Nähe anzeigen, damit man sich anschließen kann statt doppelt zu melden
     var nahe = document.getElementById('maengel-nahe'), naheLayer = L.layerGroup().addTo(map), naheTimer = null;
@@ -376,7 +389,11 @@ maengelReady(function () {
         f.submit();
     });
     function setPoint(ll, pan) {
-        if (!bounds.contains(ll)) { coords.textContent = t.ausserhalb; return; }
+        if (!imGebiet(ll)) {
+            coords.textContent = t.ausserhalb;
+            if (marker) { map.removeLayer(marker); marker = null; lat.value = ''; lng.value = ''; }
+            return;
+        }
         if (!marker) {
             marker = L.marker(ll, {draggable: true}).addTo(map);
             marker.on('dragend', function () { setPoint(marker.getLatLng(), false); });
@@ -428,7 +445,7 @@ maengelReady(function () {
     function locateTreffer(p) {
         locateBtn.disabled = false;
         var ll = L.latLng(p.coords.latitude, p.coords.longitude);
-        if (!bounds.contains(ll)) {
+        if (!imGebiet(ll)) {
             coords.textContent = t.standortAusserhalb;
             return;
         }

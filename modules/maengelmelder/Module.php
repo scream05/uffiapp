@@ -14,8 +14,10 @@ class Module extends ContentContainerModule
     public float $centerLat = 49.5455;
     public float $centerLng = 10.2293;
 
-    /** Meldungen nur in diesem Bereich (Stadtgebiet mit Ortsteilen, großzügig) */
-    public array $bounds = ['south' => 49.45, 'west' => 10.08, 'north' => 49.64, 'east' => 10.40];
+    /** Rechteck um das Stadtgebiet (Kartenausschnitt, Vorprüfung); maßgeblich ist die Gemeindegrenze in data/stadtgebiet.json */
+    public array $bounds = ['south' => 49.47, 'west' => 10.13, 'north' => 49.565, 'east' => 10.30];
+
+    private ?array $stadtgebiet = null;
 
     /** Umkreis in Metern, in dem beim Melden offene Meldungen angezeigt werden */
     public int $nearRadius = 75;
@@ -154,9 +156,28 @@ class Module extends ContentContainerModule
         return \humhub\modules\user\models\User::findOne(['username' => $this->gastKonto, 'status' => \humhub\modules\user\models\User::STATUS_ENABLED]);
     }
 
+    /** Liegt der Punkt im Stadtgebiet von Uffenheim (Gemeindegrenze mit allen Ortsteilen)? */
     public function inBounds(float $lat, float $lng): bool
     {
-        return $lat >= $this->bounds['south'] && $lat <= $this->bounds['north']
-            && $lng >= $this->bounds['west'] && $lng <= $this->bounds['east'];
+        if ($lat < $this->bounds['south'] || $lat > $this->bounds['north']
+            || $lng < $this->bounds['west'] || $lng > $this->bounds['east']) {
+            return false;
+        }
+        $ring = $this->getStadtgebiet();
+        $innen = false;
+        for ($i = 0, $j = count($ring) - 1; $i < count($ring); $j = $i++) {
+            [$aLat, $aLng] = $ring[$i];
+            [$bLat, $bLng] = $ring[$j];
+            if (($aLat > $lat) !== ($bLat > $lat) && $lng < ($bLng - $aLng) * ($lat - $aLat) / ($bLat - $aLat) + $aLng) {
+                $innen = !$innen;
+            }
+        }
+        return $innen;
+    }
+
+    /** Gemeindegrenze als Liste [lat, lng] (OpenStreetMap, ODbL) */
+    public function getStadtgebiet(): array
+    {
+        return $this->stadtgebiet ??= json_decode(file_get_contents(__DIR__ . '/data/stadtgebiet.json'), true)['ring'];
     }
 }

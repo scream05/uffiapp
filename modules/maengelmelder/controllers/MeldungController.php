@@ -378,7 +378,7 @@ class MeldungController extends ContentContainerController
         if ($hit === false) {
             return $this->asJson(['fehler' => Yii::t('MaengelmelderModule.base', 'Die Suche ist gerade belegt. Bitte gleich noch einmal versuchen.')]);
         }
-        if ($hit === null) {
+        if ($hit === null || !$this->module->inBounds((float)$hit[0], (float)$hit[1])) {
             return $this->asJson(['fehler' => Yii::t('MaengelmelderModule.base', 'Diese Adresse haben wir in Uffenheim nicht gefunden. Bitte anders schreiben oder den Ort in der Karte markieren.')]);
         }
         return $this->asJson(['lat' => $hit[0], 'lng' => $hit[1], 'name' => $hit[2]]);

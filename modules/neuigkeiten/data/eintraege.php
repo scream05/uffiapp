@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'maengel-stadtgebiet', 'datum' => '2026-11-14', 'art' => 'besser', 'popup' => false,
+        'titel' => 'Mängel nur im Stadtgebiet',
+        'text' => 'Die Karte beim Mangel melden zeigt jetzt die Grenze von Uffenheim mit allen Ortsteilen als gestrichelte Linie. Orte außerhalb sind grau und lassen sich nicht mehr auswählen.'],
     ['id' => 'gastmeldung-wieder', 'datum' => '2026-11-14', 'art' => 'behoben', 'popup' => false,
         'titel' => 'Mängel melden ohne Konto geht wieder',
         'text' => 'Wer ohne Anmeldung einen Mangel melden wollte, bekam seit Ende Oktober nur eine Fehlermeldung. Das ist behoben – Meldungen ohne Konto kommen wieder beim Bauhof an.'],

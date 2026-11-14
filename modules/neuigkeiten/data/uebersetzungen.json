@@ -1,4 +1,31 @@
 {
+    "maengel-stadtgebiet": {
+        "en": {
+            "titel": "Issues only within the town area",
+            "text": "The map when reporting an issue now shows the boundary of Uffenheim, including all its districts, as a dashed line. Places outside it are grayed out and can no longer be selected.",
+            "quelle": "442f59712fcf53fa27bb306824057b6c161da46f"
+        },
+        "uk": {
+            "titel": "Проблеми лише в межах міста",
+            "text": "Карта під час повідомлення про проблему тепер показує межу Uffenheim з усіма районами у вигляді пунктирної лінії. Місця за межами позначені сірим і їх більше не можна вибрати.",
+            "quelle": "442f59712fcf53fa27bb306824057b6c161da46f"
+        },
+        "ar": {
+            "titel": "العيوب فقط داخل منطقة المدينة",
+            "text": "الخريطة عند الإبلاغ عن عيب بتعرض الآن حدود Uffenheim مع كل الأحياء التابعة لها كخط متقطع. الأماكن خارجها صارت باللون الرمادي وما عاد ممكن تختارها.",
+            "quelle": "442f59712fcf53fa27bb306824057b6c161da46f"
+        },
+        "tr": {
+            "titel": "Eksikler yalnızca şehir sınırları içinde",
+            "text": "Eksik bildirme sırasındaki harita artık Uffenheim sınırını tüm mahalleleriyle birlikte kesik çizgi olarak gösteriyor. Bunun dışındaki yerler gri görünüyor ve artık seçilemiyor.",
+            "quelle": "442f59712fcf53fa27bb306824057b6c161da46f"
+        },
+        "ru": {
+            "titel": "Недочёты только в черте города",
+            "text": "Карта при сообщении о недочёте теперь показывает границу Uffenheim со всеми районами в виде пунктирной линии. Места за пределами этой зоны выделены серым цветом, и их больше нельзя выбрать.",
+            "quelle": "442f59712fcf53fa27bb306824057b6c161da46f"
+        }
+    },
     "gastmeldung-wieder": {
         "en": {
             "titel": "Report defects without an account again",
