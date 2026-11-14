@@ -26,11 +26,30 @@ class Events
                 'label' => 'Uffi',
                 'url' => Url::to(['/ki-assistent/chat']),
                 'icon' => 'comments',
-                'isActive' => Yii::$app->controller->module && Yii::$app->controller->module->id === 'ki-assistent',
+                'isActive' => Yii::$app->controller->module && Yii::$app->controller->module->id === 'ki-assistent'
+                    && Yii::$app->controller->id !== 'admin',
                 'sortOrder' => 900,
             ]));
         } catch (\Throwable $e) {
             Yii::error($e);
+        }
+    }
+
+    /** Administration → KI-Anbieter */
+    public static function onAdminMenuInit($event)
+    {
+        try {
+            $event->sender->addEntry(new MenuLink([
+                'id' => 'ki-anbieter',
+                'label' => Yii::t('KiAssistentModule.base', 'KI-Anbieter'),
+                'url' => ['/ki-assistent/admin/index'],
+                'icon' => 'magic',
+                'sortOrder' => 160,
+                'isActive' => \humhub\helpers\ControllerHelper::isActivePath('ki-assistent', 'admin'),
+                'isVisible' => Yii::$app->user->isAdmin(),
+            ]));
+        } catch (\Throwable $e) {
+            Yii::error($e, 'ki-assistent');
         }
     }
 

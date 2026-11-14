@@ -2,6 +2,7 @@
 
 namespace humhub\modules\kiAssistent\components;
 
+use Anthropic\Bedrock\MantleClient;
 use Anthropic\Client;
 use Anthropic\Core\Exceptions\APIConnectionException;
 use Anthropic\Core\Exceptions\APIStatusException;
@@ -19,23 +20,32 @@ require_once __DIR__ . '/../vendor/autoload.php';
  */
 class Claude implements KiModell
 {
-    private Client $client;
+    private Client|MantleClient $client;
 
-    /** @param int|null $timeout Sekunden für lange Antworten (Standard-Client bricht sonst nach 60 s ohne Daten ab) */
-    public function __construct(string $apiKey, private string $model, ?int $timeout = null)
+    /**
+     * @param int|null $timeout Sekunden für lange Antworten (Standard-Client bricht sonst nach 60 s ohne Daten ab)
+     * @param string|null $bedrockRegion AWS-Region: Claude über AWS Bedrock (Mantle, API-Schlüssel von Bedrock) statt direkt bei Anthropic
+     */
+    public function __construct(string $apiKey, private string $model, ?int $timeout = null, private ?string $bedrockRegion = null)
     {
-        if ($timeout === null) {
-            $this->client = new Client(apiKey: $apiKey);
+        $optionen = null;
+        if ($timeout !== null) {
+            $http = new \Symfony\Component\HttpClient\Psr18Client(
+                \Symfony\Component\HttpClient\HttpClient::create(['timeout' => $timeout, 'max_duration' => $timeout + 300]));
+            $optionen = ['transporter' => $http, 'streamingTransporter' => $http];
+        }
+        if ($bedrockRegion !== null) {
+            // Bedrock-Modellnamen tragen den Vorsatz „anthropic.“ (claude-haiku-5-5 → anthropic.claude-haiku-5-5)
+            $this->model = str_starts_with($model, 'anthropic.') ? $model : 'anthropic.' . $model;
+            $this->client = new MantleClient(apiKey: $apiKey, awsRegion: $bedrockRegion, requestOptions: $optionen);
             return;
         }
-        $http = new \Symfony\Component\HttpClient\Psr18Client(
-            \Symfony\Component\HttpClient\HttpClient::create(['timeout' => $timeout, 'max_duration' => $timeout + 300]));
-        $this->client = new Client(apiKey: $apiKey, requestOptions: ['transporter' => $http, 'streamingTransporter' => $http]);
+        $this->client = new Client(apiKey: $apiKey, requestOptions: $optionen);
     }
 
     public function name(): string
     {
-        return 'Claude';
+        return $this->bedrockRegion !== null ? 'Claude (Bedrock)' : 'Claude';
     }
 
     /**

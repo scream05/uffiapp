@@ -48,57 +48,108 @@ class Module extends \humhub\components\Module
     /** Bereiche, die man bei Terminland auswählen kann */
     public array $terminlandAemter = ['Einwohnermeldeamt', 'Passamt', 'Standesamt', 'Gewerbeamt', 'Ordnungsamt', 'Fundsachen'];
 
-    /** KI-Anbieter: „openai“ oder „claude“, per KI_ANBIETER in compose.yml umschaltbar */
+    /** Wählbare KI-Anbieter (Schlüssel → Anzeigename) */
+    public const ANBIETER = [
+        'claude' => 'Claude (Anthropic)',
+        'bedrock' => 'Claude (Anthropic, über AWS Bedrock)',
+        'openai' => 'ChatGPT (OpenAI)',
+    ];
+
+    /** EU-Regionen für Claude über AWS Bedrock */
+    public const BEDROCK_REGIONEN = [
+        'eu-central-1' => 'Frankfurt', 'eu-west-1' => 'Irland', 'eu-north-1' => 'Stockholm',
+        'eu-west-3' => 'Paris', 'eu-south-1' => 'Mailand', 'eu-central-2' => 'Zürich',
+    ];
+
+    /**
+     * KI-Anbieter: „claude“ (Anthropic direkt), „bedrock“ (Claude über AWS Bedrock) oder „openai“.
+     * Die Auswahl unter Administration → KI-Anbieter hat Vorrang vor KI_ANBIETER aus compose.yml/.env.
+     */
     public function getAnbieter(): string
     {
-        return getenv('KI_ANBIETER') === 'openai' ? 'openai' : 'claude';
+        $wahl = (string)$this->settings->get('anbieter');
+        if (isset(self::ANBIETER[$wahl])) {
+            return $wahl;
+        }
+        return isset(self::ANBIETER[getenv('KI_ANBIETER')]) ? getenv('KI_ANBIETER') : 'claude';
+    }
+
+    /** Anbieter laut compose.yml/.env (gilt, solange in der Administration nichts gewählt ist) */
+    public function getAnbieterStandard(): string
+    {
+        return isset(self::ANBIETER[getenv('KI_ANBIETER')]) ? getenv('KI_ANBIETER') : 'claude';
     }
 
     /** Anzeigename des Anbieters für Hinweise („ChatGPT (OpenAI)“) */
-    public function getAnbieterName(): string
+    public function getAnbieterName(?string $anbieter = null): string
     {
-        return $this->getAnbieter() === 'openai' ? 'ChatGPT (OpenAI)' : 'Claude (Anthropic)';
+        return self::ANBIETER[$anbieter ?? $this->getAnbieter()];
+    }
+
+    /** AWS-Region für Bedrock: Auswahl in der Administration, sonst BEDROCK_REGION, sonst Frankfurt */
+    public function getBedrockRegion(): string
+    {
+        $wahl = (string)$this->settings->get('bedrock-region');
+        return isset(self::BEDROCK_REGIONEN[$wahl]) ? $wahl : (getenv('BEDROCK_REGION') ?: 'eu-central-1');
     }
 
     /**
-     * Modell des Anbieters, per CLAUDE_MODEL/OPENAI_MODEL in compose.yml änderbar.
+     * Modell des Anbieters, per CLAUDE_MODEL/OPENAI_MODEL in compose.yml änderbar; für Bedrock zusätzlich
+     * in der Administration (dort sind nicht immer dieselben Modelle freigeschaltet wie bei Anthropic).
      * @param string $stufe standard (Uffi, Übersetzen, Auslesen) oder stark (lange, anspruchsvolle Texte)
      * @param string|null $claudeModell abweichendes Claude-Modell (z. B. aus der Konfiguration eines Moduls)
      */
-    public function getModel(string $stufe = 'standard', ?string $claudeModell = null): string
+    public function getModel(string $stufe = 'standard', ?string $claudeModell = null, ?string $anbieter = null): string
     {
-        if ($this->getAnbieter() === 'openai') {
+        $anbieter ??= $this->getAnbieter();
+        if ($anbieter === 'openai') {
             return ($stufe === 'stark' ? getenv('OPENAI_MODEL_STARK') : null) ?: getenv('OPENAI_MODEL') ?: 'gpt-5.4';
+        }
+        if ($anbieter === 'bedrock' && $claudeModell === null && ($m = trim((string)$this->settings->get('bedrock-modell'))) !== '') {
+            return $m;
         }
         return $claudeModell ?: getenv('CLAUDE_MODEL') ?: 'claude-haiku-5-5';
     }
 
     /** Pfad des Schlüssels auf dem Host (für Fehlermeldungen) */
-    public function getApiKeyDatei(): string
+    public function getApiKeyDatei(?string $anbieter = null): string
     {
-        return $this->getAnbieter() === 'openai' ? 'secrets/openai_api_key' : 'secrets/anthropic_api_key';
+        return match ($anbieter ?? $this->getAnbieter()) {
+            'openai' => 'secrets/openai_api_key',
+            'bedrock' => 'secrets/bedrock_api_key',
+            default => 'secrets/anthropic_api_key',
+        };
     }
 
-    /** API-Schlüssel des Anbieters als Docker-Secret (secrets/openai_api_key bzw. secrets/anthropic_api_key auf dem Host) */
-    public function getApiKey(): ?string
+    /** API-Schlüssel des Anbieters als Docker-Secret (secrets/openai_api_key, secrets/anthropic_api_key bzw. secrets/bedrock_api_key auf dem Host) */
+    public function getApiKey(?string $anbieter = null): ?string
     {
-        $key = @file_get_contents('/run/secrets/' . basename($this->getApiKeyDatei()));
+        $key = @file_get_contents('/run/secrets/' . basename($this->getApiKeyDatei($anbieter)));
         return $key !== false && trim($key) !== '' ? trim($key) : null;
     }
 
     /**
      * KI-Client des eingestellten Anbieters.
      * @param int|null $timeout Sekunden für lange Antworten (Stadtrat)
+     * @param string|null $anbieter abweichender Anbieter (Verbindungstest in der Administration)
      */
-    public function ki(string $stufe = 'standard', ?string $claudeModell = null, ?int $timeout = null): components\KiModell
+    public function ki(string $stufe = 'standard', ?string $claudeModell = null, ?int $timeout = null, ?string $anbieter = null): components\KiModell
     {
-        $key = $this->getApiKey() ?? throw new \RuntimeException('Kein KI-Schlüssel (' . $this->getApiKeyDatei() . ')');
-        if ($this->getAnbieter() === 'openai') {
-            return new components\OpenAi($key, $this->getModel($stufe), getenv('OPENAI_REASONING') === false ? 'low' : (getenv('OPENAI_REASONING') === 'aus' ? '' : getenv('OPENAI_REASONING')), $timeout ?? 300,
+        $anbieter ??= $this->getAnbieter();
+        $key = $this->getApiKey($anbieter) ?? throw new \RuntimeException('Kein KI-Schlüssel (' . $this->getApiKeyDatei($anbieter) . ')');
+        if ($anbieter === 'openai') {
+            return new components\OpenAi($key, $this->getModel($stufe, null, $anbieter), getenv('OPENAI_REASONING') === false ? 'low' : (getenv('OPENAI_REASONING') === 'aus' ? '' : getenv('OPENAI_REASONING')), $timeout ?? 300,
                 getenv('OPENAI_BASE_URL') ?: 'https://api.openai.com/v1');
         }
         require_once __DIR__ . '/vendor/autoload.php';
-        return new components\Claude($key, $this->getModel($stufe, $claudeModell), $timeout);
+        return new components\Claude($key, $this->getModel($stufe, $claudeModell, $anbieter), $timeout,
+            $anbieter === 'bedrock' ? $this->getBedrockRegion() : null);
+    }
+
+    /** Administration → KI-Anbieter (auch „Konfigurieren“ in der Modulliste) */
+    public function getConfigUrl()
+    {
+        return \yii\helpers\Url::to(['/ki-assistent/admin/index']);
     }
 
     /**

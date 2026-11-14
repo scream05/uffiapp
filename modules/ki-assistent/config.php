@@ -10,6 +10,7 @@ return [
     'namespace' => 'humhub\modules\kiAssistent',
     'events' => [
         ['class' => TopMenu::class, 'event' => TopMenu::EVENT_INIT, 'callback' => [Events::class, 'onTopMenuInit']],
+        ['class' => \humhub\modules\admin\widgets\AdminMenu::class, 'event' => \humhub\modules\admin\widgets\AdminMenu::EVENT_INIT, 'callback' => [Events::class, 'onAdminMenuInit']],
         ['class' => LayoutAddons::class, 'event' => LayoutAddons::EVENT_BEFORE_RUN, 'callback' => [Events::class, 'onLayoutAddons']],
         // Täglicher HumHub-Cron: Bewertungen nach 180 Tagen löschen
         ['class' => 'humhub\commands\CronController', 'event' => 'daily', 'callback' => [Events::class, 'onCronDaily']],
