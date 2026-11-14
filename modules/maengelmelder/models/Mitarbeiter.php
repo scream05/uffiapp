@@ -16,6 +16,8 @@ use humhub\components\ActiveRecord;
  * @property int|null $aktuell_content_id
  * @property string|null $letzte_eingang_at
  * @property string|null $benachrichtigt_at
+ * @property string|null $telegram_chat_id
+ * @property string|null $telegram_link_token
  * @property string $created_at
  */
 class Mitarbeiter extends ActiveRecord
@@ -73,10 +75,45 @@ class Mitarbeiter extends ActiveRecord
         return str_starts_with($this->telefon, '49') ? '+49 ' . substr($this->telefon, 2, 3) . ' ' . substr($this->telefon, 5) : '+' . $this->telefon;
     }
 
-    /** Freie Nachrichten nur innerhalb von 24 Std. nach der letzten Nachricht des Mitarbeiters (Puffer 1 Std.) */
+    /**
+     * Freie Nachrichten nur innerhalb von 24 Std. nach der letzten Nachricht des Mitarbeiters (Puffer 1 Std.).
+     * Über Telegram gibt es kein solches Fenster – wer verbunden ist, ist immer erreichbar.
+     */
     public function isFensterOffen(): bool
     {
+        if ($this->istTelegram()) {
+            return true;
+        }
         return $this->letzte_eingang_at !== null && strtotime($this->letzte_eingang_at) > time() - 23 * 3600;
+    }
+
+    /** Läuft dieser Mitarbeiter aktuell über Telegram (Kanal auf Telegram und verbunden)? */
+    public function istTelegram(): bool
+    {
+        return \Yii::$app->getModule('maengelmelder')->bauhofKanal() === 'telegram' && $this->verbunden();
+    }
+
+    /** Mit Telegram verbunden (chat_id liegt vor)? */
+    public function verbunden(): bool
+    {
+        return $this->telegram_chat_id !== null && $this->telegram_chat_id !== '';
+    }
+
+    /** Der passende Bote für diesen Mitarbeiter: Telegram wenn Kanal=Telegram und verbunden, sonst WhatsApp. */
+    public function bote(): \humhub\modules\maengelmelder\boten\Bote
+    {
+        return $this->istTelegram()
+            ? new \humhub\modules\maengelmelder\boten\TelegramBote()
+            : new \humhub\modules\maengelmelder\boten\WhatsAppBote();
+    }
+
+    /** Einmal-Code für den persönlichen Verbinden-Link erzeugen (oder den vorhandenen zurückgeben) */
+    public function linkToken(): string
+    {
+        if (!$this->telegram_link_token) {
+            $this->updateAttributes(['telegram_link_token' => \Yii::$app->security->generateRandomString(24)]);
+        }
+        return $this->telegram_link_token;
     }
 
     public function getFensterBis(): ?int

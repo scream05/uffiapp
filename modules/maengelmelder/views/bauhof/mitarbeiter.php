@@ -18,7 +18,7 @@ $fmt = Yii::$app->formatter;
 
         <?php if ($liste): ?>
             <table class="table table-sm align-middle">
-                <thead><tr><th>Name</th><th>Handynummer</th><th>Offene Aufträge</th><th>Letzte Nachricht</th><th></th></tr></thead>
+                <thead><tr><th>Name</th><th>Handynummer</th><th>Offene Aufträge</th><th>Letzte Nachricht</th><?php if ($module->telegramAktiv()): ?><th>Telegram</th><?php endif ?><th></th></tr></thead>
                 <tbody>
                 <?php foreach ($liste as $m): ?>
                     <tr class="<?= $m->aktiv ? '' : 'text-muted' ?>">
@@ -28,6 +28,22 @@ $fmt = Yii::$app->formatter;
                         <td><?= (int)($offen[$m->id] ?? 0) ?></td>
                         <td><small><?= $m->letzte_eingang_at ? $fmt->asRelativeTime($m->letzte_eingang_at) : 'noch nie' ?>
                                 <?= $m->isFensterOffen() ? ' <span class="text-success" title="Freie Nachrichten möglich">●</span>' : '' ?></small></td>
+                        <?php if ($module->telegramAktiv()): ?>
+                            <td>
+                                <?php if ($m->verbunden()): ?>
+                                    <span class="text-success"><i class="fa fa-check"></i> verbunden</span>
+                                    <?= Html::beginForm($space->createUrl('/maengelmelder/bauhof/telegram-trennen', ['id' => $m->id]), 'post', ['class' => 'd-inline bauhof-tg-trennen']) ?>
+                                    <button class="btn btn-sm btn-link text-danger p-0" title="Verbindung trennen">trennen</button>
+                                    <?= Html::endForm() ?>
+                                <?php elseif ($botName): ?>
+                                    <?php $link = 'https://t.me/' . $botName . '?start=' . $m->linkToken(); ?>
+                                    <a href="<?= Html::encode($link) ?>" target="_blank" rel="noopener">Verbinden-Link</a>
+                                    <button type="button" class="btn btn-sm btn-link p-0 bauhof-tg-copy" data-link="<?= Html::encode($link) ?>" title="Link kopieren"><i class="fa fa-copy"></i></button>
+                                <?php else: ?>
+                                    <span class="text-muted" title="Bot-Name nicht abrufbar">–</span>
+                                <?php endif ?>
+                            </td>
+                        <?php endif ?>
                         <td class="text-end text-nowrap">
                             <?= Html::a('<i class="fa fa-comments"></i>', $space->createUrl('/maengelmelder/bauhof/chat', ['id' => $m->id]), ['class' => 'btn btn-sm btn-light', 'title' => 'Nachrichten']) ?>
                             <?= Html::a('<i class="fa fa-pencil"></i>', $space->createUrl('/maengelmelder/bauhof/mitarbeiter', ['id' => $m->id]), ['class' => 'btn btn-sm btn-light', 'title' => 'Bearbeiten']) ?>
@@ -85,5 +101,13 @@ $fmt = Yii::$app->formatter;
 <script <?= Html::nonce() ?>>
 $('.bauhof-ma-loeschen').on('submit', function (e) {
     if (!confirm('Mitarbeiter wirklich löschen? Seine Nummer wird entfernt; Fotos und Nachrichten bleiben bei den Meldungen.')) e.preventDefault();
+});
+$('.bauhof-tg-trennen').on('submit', function (e) {
+    if (!confirm('Telegram-Verbindung dieses Mitarbeiters trennen? Er muss sich dann neu verbinden.')) e.preventDefault();
+});
+$('.bauhof-tg-copy').on('click', function () {
+    var link = $(this).data('link');
+    if (navigator.clipboard) { navigator.clipboard.writeText(link); }
+    $(this).find('i').removeClass('fa-copy').addClass('fa-check');
 });
 </script>

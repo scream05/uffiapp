@@ -145,6 +145,44 @@ class Module extends ContentContainerModule
         return $this->buergerInfoAktiv() && (bool)$this->settings->get('buergerInfoWhatsapp');
     }
 
+    /**
+     * Über welchen Kanal der Bauhof seine Mitarbeiter erreicht: 'whatsapp' (Standard) oder 'telegram'.
+     * Beim Umschalten auf Telegram bekommen nur verbundene Mitarbeiter Telegram, die übrigen weiter WhatsApp
+     * (sanfter Übergang). Siehe Mitarbeiter::bote().
+     */
+    public function bauhofKanal(): string
+    {
+        return $this->settings->get('bauhofKanal') === 'telegram' ? 'telegram' : 'whatsapp';
+    }
+
+    /**
+     * Telegram-Zugang als Docker-Secret (secrets/telegram.json auf dem Host): token, webhook_secret.
+     * Den Token liefert @BotFather beim Anlegen des Bots.
+     */
+    public function getTelegramZugang(): array
+    {
+        $json = json_decode((string)@file_get_contents('/run/secrets/telegram'), true);
+        return is_array($json) ? array_map(fn($v) => trim((string)$v), $json) : [];
+    }
+
+    public function telegramZugang(string $key): ?string
+    {
+        $value = $this->getTelegramZugang()[$key] ?? '';
+        return $value !== '' ? $value : null;
+    }
+
+    /** Telegram einsatzbereit (Token hinterlegt)? */
+    public function telegramAktiv(): bool
+    {
+        return $this->telegramZugang('token') !== null;
+    }
+
+    /** Admin-Konfiguration (Administration → Module → Mängelmelder → Konfigurieren) */
+    public function getConfigUrl()
+    {
+        return \yii\helpers\Url::to(['/maengelmelder/config/index']);
+    }
+
     /** Gastmeldungen eingeschaltet und Systemkonto vorhanden? */
     public function gastMeldungenAktiv(): bool
     {

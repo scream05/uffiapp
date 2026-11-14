@@ -143,7 +143,7 @@ class Bauhof
         try {
             if ($ortNeu && $m->isFensterOffen()) {
                 $teil = self::neueAusgehende($m, $id, 'teil', null, null);
-                $teil->wamid = Api::sendeStandort($m->telefon, $neu->lat, $neu->lng, "Auftrag Nr. $id – neuer Ort", $neu->adresse);
+                $teil->wamid = $m->bote()->standort($m, $neu->lat, $neu->lng, "Auftrag Nr. $id – neuer Ort", $neu->adresse);
                 $teil->zustellung = 'gesendet';
                 $teil->save(false);
             }
@@ -216,14 +216,14 @@ class Bauhof
                 continue;
             }
             $teil = self::neueAusgehende($m, $id, 'teil', null, null);
-            $teil->wamid = Api::sendeBild($m->telefon, Api::hochladen($data, $file->mime_type, $file->file_name),
+            $teil->wamid = $m->bote()->foto($m, $data, $file->mime_type, $file->file_name,
                 $i === 0 ? "Auftrag Nr. $id – Foto der Meldung" : '');
             $teil->zustellung = 'gesendet';
             $teil->save(false);
         }
         if ($mangel->lat) {
             $teil = self::neueAusgehende($m, $id, 'teil', null, null);
-            $teil->wamid = Api::sendeStandort($m->telefon, $mangel->lat, $mangel->lng, "Auftrag Nr. $id", $mangel->adresse);
+            $teil->wamid = $m->bote()->standort($m, $mangel->lat, $mangel->lng, "Auftrag Nr. $id", $mangel->adresse);
             $teil->zustellung = 'gesendet';
             $teil->save(false);
         }
@@ -235,7 +235,7 @@ class Bauhof
             . ($auftrag->hinweis ? "\n\n💬 Hinweis: " . $auftrag->hinweis : '')
             . "\n\nFotos und Text zu diesem Auftrag am besten als Antwort auf diese Nachricht schicken.";
         $log = self::neueAusgehende($m, $id, 'auftrag', $text, null);
-        $log->wamid = Api::sendeKnoepfe($m->telefon, $text, self::statusKnoepfe($id, $status->status));
+        $log->wamid = $m->bote()->knoepfe($m, $text, self::statusKnoepfe($id, $status->status));
         $log->zustellung = 'gesendet';
         $log->save(false);
         $m->updateAttributes(['aktuell_content_id' => $id]);
@@ -251,7 +251,7 @@ class Bauhof
         $log = self::neueAusgehende($m, $contentId, $typ, $text, $user);
         try {
             if ($m->isFensterOffen()) {
-                $log->wamid = Api::sendeText($m->telefon, self::chatText($log));
+                $log->wamid = $m->bote()->text($m, self::chatText($log));
                 $log->zustellung = 'gesendet';
             } else {
                 // Eine Vorlage genügt für mehrere wartende Nachrichten
@@ -418,7 +418,7 @@ class Bauhof
         }
         $n->updateAttributes(['verarbeitet' => 1]);
         try {
-            Api::gelesen($n->wamid);
+            $m->bote()->gelesen($n->wamid);
         } catch (\Throwable $e) {
         }
         try {
@@ -430,7 +430,7 @@ class Bauhof
                 self::datei($m, $n);
             } else {
                 $n->updateAttributes(['gelesen_at' => date('Y-m-d H:i:s')]);
-                self::antwort('sendeText', $m->telefon, 'Das kann ich leider nicht verarbeiten – bitte Text oder Foto schicken.');
+                self::antwort($m, 'text', 'Das kann ich leider nicht verarbeiten – bitte Text oder Foto schicken.');
             }
         } catch (\Throwable $e) {
             Yii::error("Bauhof-Nachricht $id: " . $e->getMessage(), 'maengelmelder');
@@ -449,12 +449,12 @@ class Bauhof
                     self::sendeDetails($m, $mangel);
                     self::wartendeSenden($m);
                 } else {
-                    self::antwort('sendeText', $m->telefon, "Auftrag Nr. $id ist dir nicht (mehr) zugewiesen.");
+                    self::antwort($m, 'text', "Auftrag Nr. $id ist dir nicht (mehr) zugewiesen.");
                 }
                 return;
             case 'm':
                 if (!self::wartendeSenden($m)) {
-                    self::antwort('sendeText', $m->telefon, 'Keine neuen Nachrichten.');
+                    self::antwort($m, 'text', 'Keine neuen Nachrichten.');
                 }
                 return;
             case 'l':
@@ -463,7 +463,7 @@ class Bauhof
             case 's':
                 $neu = (string)($teile[2] ?? '');
                 if (!$mangel || !isset(MaengelStatus::STATUSES[$neu])) {
-                    self::antwort('sendeText', $m->telefon, "Auftrag Nr. $id ist dir nicht (mehr) zugewiesen.");
+                    self::antwort($m, 'text', "Auftrag Nr. $id ist dir nicht (mehr) zugewiesen.");
                     return;
                 }
                 $n->updateAttributes(['content_id' => $id]);
@@ -473,9 +473,9 @@ class Bauhof
                 }
                 $text = "✅ Auftrag Nr. $id: Status „" . self::STATUS_KURZ[$neu] . '“ gespeichert.';
                 if ($neu === 'erledigt') {
-                    self::antwort('sendeText', $m->telefon, "$text Danke! Schick gern noch ein Foto vom Ergebnis.");
+                    self::antwort($m, 'text', "$text Danke! Schick gern noch ein Foto vom Ergebnis.");
                 } else {
-                    self::antwort('sendeKnoepfe', $m->telefon, $text, self::statusKnoepfe($id, $neu));
+                    self::antwort($m, 'knoepfe', $text, self::statusKnoepfe($id, $neu));
                 }
                 return;
             case 'x':
@@ -487,7 +487,7 @@ class Bauhof
                             $zeilen["s:$id:$key"] = [$label, ''];
                         }
                     }
-                    self::antwort('sendeListe', $m->telefon, "Neuer Status für Auftrag Nr. $id:", 'Status wählen', $zeilen);
+                    self::antwort($m, 'liste', "Neuer Status für Auftrag Nr. $id:", 'Status wählen', $zeilen);
                 }
                 return;
             case 'z':
@@ -500,12 +500,12 @@ class Bauhof
                         $o->updateAttributes(['content_id' => $id, 'zustellung' => null]);
                     }
                     $m->updateAttributes(['aktuell_content_id' => $id]);
-                    self::antwort('sendeText', $m->telefon, '📎 ' . (count($offen) === 1 ? 'Gespeichert' : count($offen) . ' Nachrichten gespeichert') . " bei Auftrag Nr. $id.");
+                    self::antwort($m, 'text', '📎 ' . (count($offen) === 1 ? 'Gespeichert' : count($offen) . ' Nachrichten gespeichert') . " bei Auftrag Nr. $id.");
                 } else {
                     foreach ($offen as $o) {
                         $o->updateAttributes(['zustellung' => null]);
                     }
-                    self::antwort('sendeText', $m->telefon, '📎 Gespeichert (ohne Auftrag). Der Bauhof sieht es trotzdem.');
+                    self::antwort($m, 'text', '📎 Gespeichert (ohne Auftrag). Der Bauhof sieht es trotzdem.');
                 }
                 if ($offen) {
                     self::benachrichtigen($m, end($offen), $teile[0] === 'z' && $mangel ? "hat ein Foto zu Auftrag Nr. $id geschickt" : 'hat ein Foto geschickt');
@@ -516,7 +516,7 @@ class Bauhof
                 $fragen = BauhofNachricht::find()->where(['mitarbeiter_id' => $m->id, 'richtung' => BauhofNachricht::EIN,
                     'zustellung' => 'frage'])->all();
                 $anzahl = self::inTermine($fragen);
-                self::antwort('sendeText', $m->telefon, $anzahl
+                self::antwort($m, 'text', $anzahl
                     ? '🗓️ Danke! ' . ($anzahl === 1 ? 'Das Plakat geht' : "Die $anzahl Bilder gehen") . ' in den Termin-Eingang – du bekommst gleich Bescheid, was erkannt wurde.'
                     : 'Dazu habe ich kein offenes Foto mehr gefunden.');
                 return;
@@ -530,7 +530,7 @@ class Bauhof
         $erste = !BauhofNachricht::find()->where(['mitarbeiter_id' => $m->id, 'richtung' => BauhofNachricht::EIN])
             ->andWhere(['<', 'id', $n->id])->exists();
         if ($erste || $gruss) {
-            self::antwort('sendeText', $m->telefon, ($erste ? "Hallo {$m->name}! Diese Nummer ist jetzt mit dem Bauhof verbunden. 👷\n\n" : '') . self::HILFE);
+            self::antwort($m, 'text', ($erste ? "Hallo {$m->name}! Diese Nummer ist jetzt mit dem Bauhof verbunden. 👷\n\n" : '') . self::HILFE);
             self::wartendeSenden($m);
             if ($gruss) {
                 $n->updateAttributes(['gelesen_at' => date('Y-m-d H:i:s')]);
@@ -552,7 +552,7 @@ class Bauhof
 
     private static function datei(Mitarbeiter $m, BauhofNachricht $n): void
     {
-        [$data, $mime] = Api::medium((string)$n->media_id);
+        [$data, $mime] = $m->bote()->medium((string)$n->media_id);
         $mime = (new \finfo(FILEINFO_MIME_TYPE))->buffer($data) ?: $mime;
         $file = new File([
             'file_name' => ($n->typ === 'image' ? 'foto' : 'datei') . '-' . $n->id . '.' . (explode('/', $mime)[1] ?? 'bin'),
@@ -591,12 +591,12 @@ class Bauhof
             }
             $zeilen['t'] = ['🗓️ Veranstaltung', 'Plakat/Termin für den Kalender'];
             $zeilen['n'] = ['Keinem Auftrag', 'Nur an den Bauhof'];
-            self::antwort('sendeListe', $m->telefon, $frage, 'Auswählen', $zeilen, $n->wamid);
+            self::antwort($m, 'liste', $frage, 'Auswählen', $zeilen, $n->wamid);
         } else {
             $knoepfe = $id ? ["z:$id" => "📷 Auftrag Nr. $id"] : [];
             $knoepfe['t'] = '🗓️ Veranstaltung';
             $knoepfe['n'] = $id ? 'Keinem Auftrag' : 'An den Bauhof';
-            self::antwort('sendeKnoepfe', $m->telefon, $frage, $knoepfe, $n->wamid);
+            self::antwort($m, 'knoepfe', $frage, $knoepfe, $n->wamid);
         }
     }
 
@@ -608,7 +608,7 @@ class Bauhof
             'content_id' => $id, 'typ' => ['image', 'document']])->andWhere(['<', 'id', $n->id])
             ->andWhere(['>', 'created_at', date('Y-m-d H:i:s', strtotime($n->created_at) - 120)])->exists();
         if (!$kurzVorher) {
-            self::antwort('sendeText', $m->telefon, "📷 Gespeichert bei Auftrag Nr. $id.");
+            self::antwort($m, 'text', "📷 Gespeichert bei Auftrag Nr. $id.");
         }
         self::benachrichtigen($m, $n, "hat ein Foto zu Auftrag Nr. $id geschickt");
     }
@@ -683,7 +683,7 @@ class Bauhof
     {
         $offen = $m->getOffeneAuftraege();
         if ($offen === []) {
-            self::antwort('sendeText', $m->telefon, 'Du hast gerade keine offenen Aufträge. 👍');
+            self::antwort($m, 'text', 'Du hast gerade keine offenen Aufträge. 👍');
             return;
         }
         $zeilen = [];
@@ -692,7 +692,7 @@ class Bauhof
                 $zeilen['d:' . $a->content_id] = ["Nr. {$a->content_id} {$mg->kategorie}", $mg->getOrt()];
             }
         }
-        self::antwort('sendeListe', $m->telefon, 'Deine offenen Aufträge (' . count($offen) . '):', 'Auftrag wählen', $zeilen);
+        self::antwort($m, 'liste', 'Deine offenen Aufträge (' . count($offen) . '):', 'Auftrag wählen', $zeilen);
     }
 
     /** Vorgemerkte Chat-Nachrichten schicken, sobald das Fenster offen ist; @return int Anzahl */
@@ -714,7 +714,7 @@ class Bauhof
                     $w->save(false);
                     continue;
                 }
-                $w->wamid = Api::sendeText($m->telefon, self::chatText($w));
+                $w->wamid = $m->bote()->text($m, self::chatText($w));
                 $w->zustellung = 'gesendet';
             } catch (\Throwable $e) {
                 $w->zustellung = 'fehler';
@@ -727,11 +727,14 @@ class Bauhof
 
     // ------------------------------------------------------------------ Hilfsfunktionen
 
-    /** Antwort an den Mitarbeiter; ein Sendefehler darf Zuordnung und Benachrichtigung nicht verhindern */
-    private static function antwort(string $methode, ...$args): ?string
+    /**
+     * Antwort an den Mitarbeiter über seinen Kanal (text|knoepfe|liste); ein Sendefehler darf Zuordnung und
+     * Benachrichtigung nicht verhindern.
+     */
+    private static function antwort(Mitarbeiter $m, string $methode, ...$args): ?string
     {
         try {
-            return Api::$methode(...$args);
+            return $m->bote()->$methode($m, ...$args);
         } catch (\Throwable $e) {
             Yii::warning("Bauhof-Antwort ($methode): " . $e->getMessage(), 'maengelmelder');
             return null;

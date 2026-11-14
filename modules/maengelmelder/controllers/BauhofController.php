@@ -316,7 +316,21 @@ class BauhofController extends ContentContainerController
                 ->where(['richtung' => BauhofNachricht::EIN, 'gelesen_at' => null])
                 ->andWhere(['or', ['zustellung' => null], ['not', ['zustellung' => 'frage']]])->groupBy('mitarbeiter_id')->indexBy('mitarbeiter_id')->column(),
             'module' => $this->module,
+            'botName' => $this->botName(),
         ]);
+    }
+
+    /** Telegram-Bot-Name für die Verbinden-Links (nur wenn Telegram eingerichtet), sonst null */
+    private function botName(): ?string
+    {
+        if (!$this->module->telegramAktiv()) {
+            return null;
+        }
+        try {
+            return \humhub\modules\maengelmelder\components\Telegram::botName();
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 
     /** Mitarbeiter löschen: Nummer weg, Verlauf und Fotos bleiben bei den Meldungen (ohne Namen) */
@@ -325,6 +339,15 @@ class BauhofController extends ContentContainerController
         $m = Mitarbeiter::findOne((int)$id) ?? throw new NotFoundHttpException();
         $m->delete();
         $this->view->success('Mitarbeiter gelöscht.');
+        return $this->redirect($this->zu('mitarbeiter', []));
+    }
+
+    /** Telegram-Verbindung eines Mitarbeiters trennen (chat_id und Code zurücksetzen) */
+    public function actionTelegramTrennen($id)
+    {
+        $m = Mitarbeiter::findOne((int)$id) ?? throw new NotFoundHttpException();
+        $m->updateAttributes(['telegram_chat_id' => null, 'telegram_link_token' => null]);
+        $this->view->success('Telegram-Verbindung getrennt.');
         return $this->redirect($this->zu('mitarbeiter', []));
     }
 

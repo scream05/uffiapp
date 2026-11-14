@@ -62,6 +62,7 @@ services:
       - tankerkoenig_api_key
       - whatsapp
       - facebook
+      - telegram
     environment:
       - HUMHUB_DEBUG=${HUMHUB_DEBUG:-false}
       - SERVER_NAME=${SERVER_NAME}
@@ -188,3 +189,6 @@ secrets:
   # Facebook-Seite der Stadt (Modul facebook): page_id, token (Seiten- oder Systemnutzer-Token)
   facebook:
     file: ./secrets/facebook.json
+  # Telegram Bot API (Bauhof-Kanal, Alternative zu WhatsApp): token (von @BotFather), webhook_secret
+  telegram:
+    file: ./secrets/telegram.json
