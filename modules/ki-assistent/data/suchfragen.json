@@ -1,0 +1,288 @@
+[
+  {
+    "quelle": "leistung/wohnsitz-anmeldung",
+    "fragen": {
+      "de": "Ich bin neu nach Uffenheim gezogen. Wie melde ich meinen Wohnsitz an?",
+      "en": "I just moved to Uffenheim. How do I register my address?",
+      "uk": "Я щойно переїхав до Уффенгайма. Як зареєструвати місце проживання?",
+      "ru": "Я недавно переехал в Уффенхайм. Как зарегистрироваться по месту жительства?",
+      "tr": "Uffenheim'a yeni taşındım. İkametimi nasıl kaydettiririm?",
+      "ar": "انتقلت حديثاً إلى أوفنهايم. كيف أسجّل عنوان سكني؟"
+    }
+  },
+  {
+    "quelle": "leistung/wohnsitz-abmeldung",
+    "fragen": {
+      "de": "Ich ziehe ins Ausland. Muss ich mich bei der Stadt abmelden?",
+      "en": "I am moving abroad. Do I have to deregister with the town?",
+      "uk": "Я переїжджаю за кордон. Чи потрібно знятися з реєстрації в місті?",
+      "ru": "Я переезжаю за границу. Нужно ли сняться с регистрации в городе?",
+      "tr": "Yurt dışına taşınıyorum. Belediyeden kaydımı sildirmem gerekiyor mu?",
+      "ar": "سأنتقل للعيش خارج ألمانيا. هل يجب أن ألغي تسجيل سكني لدى البلدية؟"
+    }
+  },
+  {
+    "quelle": "leistung/personalausweis-beantragung-63118",
+    "fragen": {
+      "de": "Was brauche ich, um einen neuen Personalausweis zu beantragen?",
+      "en": "What do I need to apply for a new identity card?",
+      "uk": "Що потрібно, щоб подати заяву на нове посвідчення особи?",
+      "ru": "Что нужно, чтобы подать заявление на новое удостоверение личности?",
+      "tr": "Yeni kimlik kartı başvurusu için neler gerekiyor?",
+      "ar": "ما الذي أحتاجه لطلب بطاقة هوية جديدة؟"
+    }
+  },
+  {
+    "quelle": "leistung/reisepass-beantragung",
+    "fragen": {
+      "de": "Was kostet ein Reisepass und wie lange dauert es?",
+      "en": "How much does a passport cost and how long does it take?",
+      "uk": "Скільки коштує закордонний паспорт і як довго його виготовляють?",
+      "ru": "Сколько стоит загранпаспорт и как долго его оформляют?",
+      "tr": "Pasaport ne kadar tutuyor ve ne kadar sürede çıkıyor?",
+      "ar": "كم يكلف جواز السفر وكم يستغرق إصداره؟"
+    }
+  },
+  {
+    "quelle": "leistung/hundesteuer",
+    "fragen": {
+      "de": "Ich habe mir einen Hund angeschafft. Wo muss ich ihn anmelden?",
+      "en": "I got a dog. Where do I have to register it?",
+      "uk": "Я завів собаку. Де її потрібно зареєструвати?",
+      "ru": "Я завёл собаку. Где её нужно зарегистрировать?",
+      "tr": "Bir köpek aldım. Onu nereye kaydettirmem gerekiyor?",
+      "ar": "اقتنيت كلباً. أين يجب أن أسجّله؟"
+    }
+  },
+  {
+    "quelle": "leistung/geburtsurkunde-beantragung",
+    "fragen": {
+      "de": "Wie bekomme ich eine Geburtsurkunde für mein Kind?",
+      "en": "How do I get a birth certificate for my child?",
+      "uk": "Як отримати свідоцтво про народження дитини?",
+      "ru": "Как получить свидетельство о рождении ребёнка?",
+      "tr": "Çocuğum için doğum belgesini nasıl alırım?",
+      "ar": "كيف أحصل على شهادة ميلاد لطفلي؟"
+    }
+  },
+  {
+    "quelle": "leistung/eheschliessung-anmeldung",
+    "fragen": {
+      "de": "Wir wollen heiraten. Wie melden wir die Eheschließung an?",
+      "en": "We want to get married. How do we register the marriage?",
+      "uk": "Ми хочемо одружитися. Як подати заяву на реєстрацію шлюбу?",
+      "ru": "Мы хотим пожениться. Как подать заявление на регистрацию брака?",
+      "tr": "Evlenmek istiyoruz. Evlilik başvurusunu nasıl yaparız?",
+      "ar": "نريد أن نتزوج. كيف نسجّل طلب عقد الزواج؟"
+    }
+  },
+  {
+    "quelle": "leistung/gewerbeanzeige-gewerbeanmeldung",
+    "fragen": {
+      "de": "Ich möchte ein Geschäft eröffnen. Wie melde ich ein Gewerbe an?",
+      "en": "I want to open a shop. How do I register a business?",
+      "uk": "Я хочу відкрити магазин. Як зареєструвати підприємницьку діяльність?",
+      "ru": "Я хочу открыть магазин. Как зарегистрировать предпринимательскую деятельность?",
+      "tr": "Bir dükkân açmak istiyorum. İşletmemi nasıl kaydettiririm?",
+      "ar": "أريد أن أفتح محلاً. كيف أسجّل نشاطاً تجارياً؟"
+    }
+  },
+  {
+    "quelle": "leistung/fuehrungszeugnis-beantragung",
+    "fragen": {
+      "de": "Wo beantrage ich ein Führungszeugnis für meinen neuen Arbeitgeber?",
+      "en": "Where do I apply for a certificate of good conduct for my new employer?",
+      "uk": "Де подати заяву на довідку про несудимість для нового роботодавця?",
+      "ru": "Где подать заявление на справку об отсутствии судимости для нового работодателя?",
+      "tr": "Yeni işverenim için sabıka kaydı belgesine nereden başvururum?",
+      "ar": "أين أطلب شهادة حسن السيرة والسلوك لصاحب عملي الجديد؟"
+    }
+  },
+  {
+    "quelle": "leistung/fundsachen",
+    "fragen": {
+      "de": "Ich habe meinen Geldbeutel verloren. Gibt es ein Fundbüro?",
+      "en": "I lost my wallet. Is there a lost property office?",
+      "uk": "Я загубив гаманець. Чи є бюро знахідок?",
+      "ru": "Я потерял кошелёк. Есть ли бюро находок?",
+      "tr": "Cüzdanımı kaybettim. Kayıp eşya bürosu var mı?",
+      "ar": "فقدت محفظتي. هل يوجد مكتب للمفقودات؟"
+    }
+  },
+  {
+    "quelle": "leistung/kommunale-kindertageseinrichtung-anmeldung|kinderbetreuung|kindertageseinrichtungen",
+    "fragen": {
+      "de": "Wie melde ich mein Kind im Kindergarten an?",
+      "en": "How do I enrol my child in kindergarten?",
+      "uk": "Як записати дитину до дитячого садка?",
+      "ru": "Как записать ребёнка в детский сад?",
+      "tr": "Çocuğumu anaokuluna nasıl kaydettiririm?",
+      "ar": "كيف أسجّل طفلي في روضة الأطفال؟"
+    }
+  },
+  {
+    "quelle": "schulen-bildungseinrichtungen|lebenslagen/schulen",
+    "fragen": {
+      "de": "Welche Schulen gibt es in Uffenheim?",
+      "en": "Which schools are there in Uffenheim?",
+      "uk": "Які школи є в Уффенгаймі?",
+      "ru": "Какие школы есть в Уффенхайме?",
+      "tr": "Uffenheim'da hangi okullar var?",
+      "ar": "ما المدارس الموجودة في أوفنهايم؟"
+    }
+  },
+  {
+    "quelle": "abfallwirtschaft/sperrmuell",
+    "fragen": {
+      "de": "Wie werde ich ein altes Sofa und einen kaputten Schrank los?",
+      "en": "How do I get rid of an old sofa and a broken wardrobe?",
+      "uk": "Як позбутися старого дивана та зламаної шафи?",
+      "ru": "Как избавиться от старого дивана и сломанного шкафа?",
+      "tr": "Eski bir kanepeyi ve kırık bir dolabı nasıl attırabilirim?",
+      "ar": "كيف أتخلص من أريكة قديمة وخزانة مكسورة؟"
+    }
+  },
+  {
+    "quelle": "abfallwirtschaft/abfallgefaesse-und-gebuehren",
+    "fragen": {
+      "de": "Was kostet eine größere Restmülltonne im Jahr?",
+      "en": "How much does a larger residual waste bin cost per year?",
+      "uk": "Скільки коштує більший бак для залишкових відходів на рік?",
+      "ru": "Сколько стоит в год мусорный бак большего размера для остаточных отходов?",
+      "tr": "Daha büyük bir çöp bidonu yıllık ne kadar tutuyor?",
+      "ar": "كم تكلفة حاوية نفايات أكبر في السنة؟"
+    }
+  },
+  {
+    "quelle": "abfallwirtschaft/problemmuell|mobile-abfall-sammlungen",
+    "fragen": {
+      "de": "Wo kann ich alte Farben, Lacke und Batterien abgeben?",
+      "en": "Where can I dispose of old paint, varnish and batteries?",
+      "uk": "Куди можна здати стару фарбу, лак і батарейки?",
+      "ru": "Куда можно сдать старую краску, лак и батарейки?",
+      "tr": "Eski boya, vernik ve pilleri nereye teslim edebilirim?",
+      "ar": "أين يمكنني تسليم الدهانات القديمة والبطاريات؟"
+    }
+  },
+  {
+    "quelle": "kinderbetreuung-bildung/stadtbuecherei",
+    "fragen": {
+      "de": "Wann hat die Stadtbücherei geöffnet und was kostet das Ausleihen?",
+      "en": "When is the town library open and what does borrowing cost?",
+      "uk": "Коли працює міська бібліотека і скільки коштує користування?",
+      "ru": "Когда работает городская библиотека и сколько стоит пользование?",
+      "tr": "Şehir kütüphanesi ne zaman açık ve kitap ödünç almak ne kadar?",
+      "ar": "متى تفتح مكتبة المدينة وكم تكلفة استعارة الكتب؟"
+    }
+  },
+  {
+    "quelle": "sport-freizeiteinrichtungen/hallenbad",
+    "fragen": {
+      "de": "Wo kann ich im Winter schwimmen gehen?",
+      "en": "Where can I go swimming in winter?",
+      "uk": "Де можна поплавати взимку?",
+      "ru": "Где можно поплавать зимой?",
+      "tr": "Kışın nerede yüzmeye gidebilirim?",
+      "ar": "أين يمكنني السباحة في الشتاء؟"
+    }
+  },
+  {
+    "quelle": "gesundheit-soziales/aerzte-therapeuten",
+    "fragen": {
+      "de": "Welche Hausärzte gibt es in Uffenheim?",
+      "en": "Which family doctors are there in Uffenheim?",
+      "uk": "Які сімейні лікарі є в Уффенгаймі?",
+      "ru": "Какие семейные врачи есть в Уффенхайме?",
+      "tr": "Uffenheim'da hangi aile hekimleri var?",
+      "ar": "من هم أطباء الأسرة في أوفنهايم؟"
+    }
+  },
+  {
+    "quelle": "integration/integrationslotsinnen|infos-fuer-gefluechtete",
+    "fragen": {
+      "de": "Wer hilft Zugewanderten und Geflüchteten bei Behördengängen?",
+      "en": "Who helps immigrants and refugees with dealing with the authorities?",
+      "uk": "Хто допомагає мігрантам і біженцям у спілкуванні з установами?",
+      "ru": "Кто помогает мигрантам и беженцам в общении с ведомствами?",
+      "tr": "Göçmenlere ve mültecilere resmî işlemlerde kim yardımcı oluyor?",
+      "ar": "من يساعد المهاجرين واللاجئين في المعاملات لدى الدوائر الرسمية؟"
+    }
+  },
+  {
+    "quelle": "zulassungsstelle",
+    "fragen": {
+      "de": "Wo kann ich mein Auto zulassen?",
+      "en": "Where can I register my car?",
+      "uk": "Де можна зареєструвати автомобіль?",
+      "ru": "Где можно поставить автомобиль на учёт?",
+      "tr": "Arabamı nerede tescil ettirebilirim?",
+      "ar": "أين يمكنني تسجيل سيارتي؟"
+    }
+  },
+  {
+    "quelle": "nea-mobil|oeffentliche-verkehrsmittel",
+    "fragen": {
+      "de": "Wie komme ich ohne Auto mit Bus oder Bahn nach Würzburg?",
+      "en": "How do I get to Würzburg by bus or train without a car?",
+      "uk": "Як дістатися до Вюрцбурга автобусом або потягом без авто?",
+      "ru": "Как добраться до Вюрцбурга на автобусе или поезде без машины?",
+      "tr": "Arabam olmadan otobüs veya trenle Würzburg'a nasıl giderim?",
+      "ar": "كيف أصل إلى فورتسبورغ بالحافلة أو القطار بدون سيارة؟"
+    }
+  },
+  {
+    "quelle": "friedhof|bestattung",
+    "fragen": {
+      "de": "Was kostet ein Grab auf dem Friedhof?",
+      "en": "How much does a grave in the cemetery cost?",
+      "uk": "Скільки коштує місце на кладовищі?",
+      "ru": "Сколько стоит место на кладбище?",
+      "tr": "Mezarlıkta bir mezar yeri ne kadar tutuyor?",
+      "ar": "كم تكلفة القبر في المقبرة؟"
+    }
+  },
+  {
+    "quelle": "tourismus/stadtfuehrungen",
+    "fragen": {
+      "de": "Kann man eine Führung durch die Altstadt buchen?",
+      "en": "Can you book a guided tour of the old town?",
+      "uk": "Чи можна замовити екскурсію старим містом?",
+      "ru": "Можно ли заказать экскурсию по старому городу?",
+      "tr": "Eski şehirde rehberli tur ayırtılabilir mi?",
+      "ar": "هل يمكن حجز جولة مع مرشد في البلدة القديمة؟"
+    }
+  },
+  {
+    "quelle": "ver-und-entsorgung/wasser-abwasser|leistung/abwasser|wasser",
+    "fragen": {
+      "de": "An wen wende ich mich bei einem Wasserrohrbruch oder Fragen zur Wasserrechnung?",
+      "en": "Who do I contact about a burst water pipe or questions about my water bill?",
+      "uk": "До кого звертатися у разі прориву водопроводу або з питаннями щодо рахунку за воду?",
+      "ru": "К кому обращаться при прорыве водопровода или по вопросам счёта за воду?",
+      "tr": "Su borusu patlarsa veya su faturasıyla ilgili sorularım olursa kime başvururum?",
+      "ar": "بمن أتصل عند انفجار أنبوب المياه أو للاستفسار عن فاتورة المياه؟"
+    }
+  },
+  {
+    "quelle": "vereine/imkerverein",
+    "fragen": {
+      "de": "Ich interessiere mich für Bienen. Gibt es dafür einen Verein?",
+      "en": "I am interested in bees. Is there a club for that?",
+      "uk": "Я цікавлюся бджолами. Чи є для цього якесь товариство?",
+      "ru": "Я интересуюсь пчёлами. Есть ли для этого какое-нибудь общество?",
+      "tr": "Arılarla ilgileniyorum. Bunun için bir dernek var mı?",
+      "ar": "أنا مهتم بالنحل. هل توجد جمعية لذلك؟"
+    }
+  },
+  {
+    "quelle": "hilfe/app",
+    "fragen": {
+      "de": "Wie installiere ich die Community als App auf meinem Handy?",
+      "en": "How do I install the community as an app on my phone?",
+      "uk": "Як встановити спільноту як застосунок на телефон?",
+      "ru": "Как установить сообщество как приложение на телефон?",
+      "tr": "Topluluğu telefonuma uygulama olarak nasıl kurarım?",
+      "ar": "كيف أثبّت المنصة كتطبيق على هاتفي؟"
+    }
+  }
+]

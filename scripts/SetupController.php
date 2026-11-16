@@ -1535,6 +1535,58 @@ class SetupController extends Controller
         return ExitCode::OK;
     }
 
+    /**
+     * Suche im Stadtwissen prüfen, ohne Uffi zu fragen: setup/ki-suche-test [Sprache, z. B. tr] [1 = jede Frage zeigen]
+     * [1 = Frage unverändert suchen, ohne Übersetzung ins Deutsche]
+     * modules/ki-assistent/data/suchfragen.json: je Eintrag „quelle“ (Muster auf den Pfad der erwarteten Seite in wissen/)
+     * und dieselbe Frage in allen Sprachen. Je Sprache: wie oft die erwartete Seite im Prompt stünde („geladen“), nur als
+     * Link genannt würde oder fehlt. Deutsche Fragen kosten nichts, fremdsprachige je eine kurze Übersetzung (Testzähler).
+     */
+    public function actionKiSucheTest($sprache = null, $zeigen = 0, $roh = 0)
+    {
+        Yii::$app->user->switchIdentity(User::findOne(['username' => 'admin']));
+        $module = Yii::$app->getModule('ki-assistent');
+        $tests = json_decode(file_get_contents($module->getBasePath() . '/data/suchfragen.json'), true);
+        $embed = fn($q) => \humhub\modules\kiAssistent\components\Embeddings::suche($q);
+        $stat = [];
+        foreach ($tests as $nr => $t) {
+            foreach ($t['fragen'] as $lang => $frage) {
+                if ($sprache !== null && $sprache !== '' && $sprache !== $lang) {
+                    continue;
+                }
+                $suchtext = $roh ? $frage : \humhub\modules\kiAssistent\components\Suchfrage::deutsch($frage);
+                $a = \humhub\modules\kiAssistent\components\Wissen::auswahl($suchtext, $embed);
+                $passt = fn($rel) => (bool)preg_match('~' . $t['quelle'] . '~', $rel);
+                $platz = null;
+                foreach ($a['rang'] as $rel => $p) {
+                    if ($passt($rel)) {
+                        $platz = $p;
+                        break;
+                    }
+                }
+                $geladen = array_filter($a['geladen'], $passt) !== [];
+                $stat[$lang] ??= ['n' => 0, 'geladen' => 0, 'link' => 0, 'fehlt' => 0, 'stichwort' => 0];
+                $stat[$lang]['n']++;
+                $stat[$lang][$geladen ? 'geladen' : ($platz !== null ? 'link' : 'fehlt')]++;
+                $stat[$lang]['stichwort'] += $a['verfahren'] === 'stichwort' ? 1 : 0;
+                if ($zeigen || !$geladen) {
+                    $this->stdout(sprintf("%2d %s %s %s%s\n", $nr + 1, $lang, $geladen ? '✓' : ($platz !== null ? "○ nur Link (Seite auf Platz $platz)" : '✗ fehlt'),
+                        $frage, $suchtext !== $frage ? "\n      gesucht mit: $suchtext" : ''));
+                }
+            }
+        }
+        $this->stdout("\nSprache  geladen  nur Link  fehlt\n");
+        foreach ($stat as $lang => $s) {
+            $this->stdout(sprintf("%-7s  %2d/%-2d    %2d        %2d%s\n", $lang, $s['geladen'], $s['n'], $s['link'], $s['fehlt'],
+                $s['stichwort'] ? "   ({$s['stichwort']}× nur Stichwortsuche, Embedding-Dienst prüfen)" : ''));
+        }
+        // Gegenprobe ohne Aufruf: welche der Testfragen (fast alle deutsch) gelten als fremdsprachig und würden übersetzt
+        $fremd = array_filter(array_column(json_decode(file_get_contents($module->getBasePath() . '/data/testfragen.json'), true), 'frage'),
+            fn($f) => \humhub\modules\kiAssistent\components\Suchfrage::fremd($f));
+        $this->stdout("\nAls fremdsprachig erkannt aus testfragen.json (" . count($fremd) . "):\n" . implode('', array_map(fn($f) => "  $f\n", $fremd)));
+        return ExitCode::OK;
+    }
+
     /** Menüpunkt „Termin im Rathaus“ (Link zur Online-Terminbuchung der Stadt) im Space „Rathaus Uffenheim“: setup/rathaus-termin */
     public function actionRathausTermin()
     {

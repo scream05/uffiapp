@@ -1,4 +1,31 @@
 {
+    "uffi-sprachen-suche": {
+        "en": {
+            "titel": "Uffi finds more in other languages",
+            "text": "If you ask Uffi in Ukrainian, Russian, Turkish, or Arabic, you’ll now much more often get the right information from the town hall and the district office. Until now, Uffi usually found the right pages only for questions in German or English.",
+            "quelle": "830a44a8776ff8ab0ad5b1422dd7062b46f97fa2"
+        },
+        "uk": {
+            "titel": "Uffi знаходить більше іншими мовами",
+            "text": "Якщо запитати Uffi українською, російською, турецькою або арабською, тепер ти значно частіше отримаєш потрібну інформацію з Rathaus і від Landratsamt. Раніше Uffi знаходив правильні сторінки майже лише для запитань німецькою або англійською.",
+            "quelle": "830a44a8776ff8ab0ad5b1422dd7062b46f97fa2"
+        },
+        "ar": {
+            "titel": "Uffi يجد الآن المزيد بلغات أخرى",
+            "text": "إذا سألت Uffi بالأوكرانية أو الروسية أو التركية أو العربية، فستحصل الآن في كثير من الأحيان على المعلومة المناسبة من Rathaus وLandratsamt. حتى الآن، كان Uffi يجد الصفحات الصحيحة تقريبًا فقط عند طرح الأسئلة بالألمانية أو الإنجليزية.",
+            "quelle": "830a44a8776ff8ab0ad5b1422dd7062b46f97fa2"
+        },
+        "tr": {
+            "titel": "Uffi artık diğer dillerde daha fazlasını buluyor",
+            "text": "Uffi’ye Ukraynaca, Rusça, Türkçe ya da Arapça soru sorarsan, artık belediyeden ve kaymakamlıktan çok daha sık doğru bilgiyi alırsın. Uffi şimdiye kadar doğru sayfaları neredeyse sadece Almanca ya da İngilizce sorularda buluyordu.",
+            "quelle": "830a44a8776ff8ab0ad5b1422dd7062b46f97fa2"
+        },
+        "ru": {
+            "titel": "Uffi находит больше на других языках",
+            "text": "Если спрашиваешь Uffi на украинском, русском, турецком или арабском, теперь ты гораздо чаще получаешь подходящую информацию из Rathaus и Landratsamt. Раньше Uffi находил нужные страницы почти только по вопросам на немецком или английском.",
+            "quelle": "830a44a8776ff8ab0ad5b1422dd7062b46f97fa2"
+        }
+    },
     "app-anmeldung-wieder": {
         "en": {
             "titel": "Logging in via the HumHub app works again",

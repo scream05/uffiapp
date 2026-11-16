@@ -126,20 +126,46 @@ class Wissen
         if ($chunks === []) {
             return '';
         }
-        $ranked = null;
+        [$selected, $related] = self::ranken($chunks, $question, $suche);
+        return self::build($chunks, $selected, $related, $immer);
+    }
+
+    /**
+     * Was die Suche zu einer Frage findet, ohne den Prompt zu bauen (Suchtest setup/ki-suche-test).
+     * @return array ['geladen' => Seiten (rel), deren Inhalt im Prompt stünde, 'rang' => [rel => Platz der Seite unter
+     *   allen Treffern, ab 1], 'verfahren' => 'kombiniert'|'stichwort']
+     */
+    public static function auswahl(string $question, ?callable $suche = null): array
+    {
+        $chunks = self::visible(self::chunks());
+        if ($chunks === []) {
+            return ['geladen' => [], 'rang' => [], 'verfahren' => 'stichwort'];
+        }
+        [$selected, $related, $verfahren] = self::ranken($chunks, $question, $suche);
+        $rang = [];
+        foreach ($related as $i) {
+            $rang[$chunks[$i]['rel']] ??= count($rang) + 1;
+        }
+        return ['geladen' => array_keys(self::waehlen($chunks, $selected)[0]), 'rang' => $rang, 'verfahren' => $verfahren];
+    }
+
+    /** @return array [ausgewählte Abschnitt-Indizes, weitere Treffer, 'kombiniert'|'stichwort'] */
+    private static function ranken(array $chunks, string $question, ?callable $suche): array
+    {
         if ($suche !== null && trim($question) !== '') {
             try {
                 [$stand, $rang] = $suche($question);
                 if ($stand !== self::stand()) {
                     throw new \RuntimeException("Embedding-Dienst hat einen anderen Stand des Index ($stand)");
                 }
-                $ranked = self::rankHybrid($chunks, $question, $rang);
+                if (($ranked = self::rankHybrid($chunks, $question, $rang)) !== null) {
+                    return [...$ranked, 'kombiniert'];
+                }
             } catch (\Throwable $e) {
                 \Yii::warning('KI-Assistent: Suche nach Bedeutung nicht möglich, Stichwortsuche: ' . $e->getMessage(), 'ki-assistent');
             }
         }
-        [$selected, $related] = $ranked ?? self::rankByKeywords($chunks, $question);
-        return self::build($chunks, $selected, $related, $immer);
+        return [...self::rankByKeywords($chunks, $question), 'stichwort'];
     }
 
     /** Nur die Seiten mit „immer: ja“ (ändern sich höchstens mit dem nächtlichen Abgleich: fester Teil des Prompts) */
@@ -240,6 +266,20 @@ class Wissen
         return $out;
     }
 
+    /**
+     * Anteil der Wörter eines Textes (ohne Stoppwörter), die im Stadtwissen vorkommen; null, wenn kein Wort übrig bleibt.
+     * Daran erkennt Suchfrage fremdsprachige Fragen in lateinischer Schrift.
+     */
+    public static function anteilBekannt(string $text): ?float
+    {
+        $terms = array_unique(self::terms($text));
+        if ($terms === []) {
+            return null;
+        }
+        $woerter = self::stichwortIndex()['woerter'];
+        return count(array_filter($terms, fn($t) => isset($woerter[$t]))) / count($terms);
+    }
+
     /** @return array [ausgewählte Abschnitt-Indizes, weitere Treffer] nach BM25 */
     private static function rankByKeywords(array $chunks, string $question): array
     {
@@ -286,15 +326,18 @@ class Wissen
         return [array_keys(array_filter($scored, fn($score) => $score >= 0.4 * $best)), array_keys($scored)];
     }
 
-    private static function build(array $chunks, array $selected, array $related, bool $immer = true): string
+    /**
+     * Abschnitte auswählen (beste zuerst), bis das Budget erschöpft ist; kurze Seiten ganz, damit z. B. Unterlagen und
+     * Kosten beisammen bleiben.
+     * @return array [rel => [Abschnitt-Index => true], rel => alle Abschnitt-Indizes der Seite]
+     */
+    private static function waehlen(array $chunks, array $selected): array
     {
         $byPage = [];
         foreach ($chunks as $i => $c) {
             $byPage[$c['rel']][] = $i;
         }
         $pageLen = fn($rel) => array_sum(array_map(fn($i) => mb_strlen($chunks[$i]['text']), $byPage[$rel]));
-
-        // Abschnitte auswählen (beste zuerst); kurze Seiten ganz, damit z. B. Unterlagen und Kosten beisammen bleiben
         $budget = self::BUDGET;
         $take = [];
         foreach (array_slice($selected, 0, self::MAX_CHUNKS) as $i) {
@@ -310,6 +353,12 @@ class Wissen
                 $take[$rel][$j] = true;
             }
         }
+        return [$take, $byPage];
+    }
+
+    private static function build(array $chunks, array $selected, array $related, bool $immer = true): string
+    {
+        [$take, $byPage] = self::waehlen($chunks, $selected);
 
         $out = [];
         foreach ($byPage as $rel => $ids) {

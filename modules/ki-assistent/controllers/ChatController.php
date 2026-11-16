@@ -9,6 +9,7 @@ use humhub\modules\kiAssistent\components\Context;
 use humhub\modules\kiAssistent\components\Formulare;
 use humhub\modules\kiAssistent\components\KiModell;
 use humhub\modules\kiAssistent\components\Embeddings;
+use humhub\modules\kiAssistent\components\Suchfrage;
 use humhub\modules\kiAssistent\components\Wissen;
 use humhub\modules\kiAssistent\models\Feedback;
 use humhub\modules\kiAssistent\Module;
@@ -321,6 +322,6 @@ TXT;
         $sprachen = ['de' => 'Deutsch', 'en' => 'Englisch', 'uk' => 'Ukrainisch', 'ar' => 'Arabisch', 'tr' => 'Türkisch', 'ru' => 'Russisch'];
         $prompt = str_replace('{SPRACHE}', $sprachen[substr(Yii::$app->language, 0, 2)] ?? 'Deutsch', $prompt);
         return [str_replace('{FORMULARE}', Formulare::catalog(), $prompt) . "\n" . Context::stabil() . "\n\n" . Wissen::immer(),
-            Context::aktuell() . "\n\n" . Wissen::forQuestion($question, $embed, false)];
+            Context::aktuell() . "\n\n" . Wissen::forQuestion(Suchfrage::deutsch($question), $embed, false)];
     }
 }

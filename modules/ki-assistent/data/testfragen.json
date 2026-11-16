@@ -409,5 +409,11 @@
       "27\\.( ?12\\.| ?Dezember)",
       "X-?Mas"
     ]
+  },
+  {
+    "frage": "Arabamı nerede tescil ettirebilirim?",
+    "erwartet": [
+      "Zulassungsstelle"
+    ]
   }
 ]

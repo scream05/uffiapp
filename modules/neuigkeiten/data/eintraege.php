@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'uffi-sprachen-suche', 'datum' => '2026-11-16', 'art' => 'besser', 'popup' => false,
+        'titel' => 'Uffi findet mehr in anderen Sprachen',
+        'text' => 'Wer Uffi auf Ukrainisch, Russisch, Türkisch oder Arabisch fragt, bekommt jetzt deutlich öfter die passende Auskunft aus dem Rathaus und vom Landratsamt. Bisher fand Uffi die richtigen Seiten fast nur bei Fragen auf Deutsch oder Englisch.'],
     ['id' => 'app-anmeldung-wieder', 'datum' => '2026-11-14', 'art' => 'behoben', 'popup' => false,
         'titel' => 'Anmeldung über die HumHub-App geht wieder',
         'text' => 'Wer sich über die offizielle HumHub-App anmeldet, bekam zuletzt nur einen weißen Bildschirm oder die Meldung, die Adresse werde nicht akzeptiert. Das ist behoben – die App verbindet sich wieder mit Rund um Uffni.'],
