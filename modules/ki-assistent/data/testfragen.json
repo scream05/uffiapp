@@ -452,5 +452,19 @@
     "erwartet": [
       "Express"
     ]
+  },
+  {
+    "frage": "Was stand 2019 im Mitteilungsblatt zum Hallenbad?",
+    "erwartet": [
+      "2019",
+      "mitteilungsblatt\\/index\\/lesen"
+    ]
+  },
+  {
+    "frage": "Wann wurde das Hallenbad nach der Sanierung wieder eröffnet?",
+    "erwartet": [
+      "11\\.11\\.2024|November 2024",
+      "mitteilungsblatt\\/index\\/lesen"
+    ]
   }
 ]

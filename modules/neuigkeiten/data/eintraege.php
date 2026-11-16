@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'uffi-archiv', 'datum' => '2026-11-16', 'art' => 'neu', 'popup' => false,
+        'titel' => 'Uffi kennt das Mitteilungsblatt ab 2017',
+        'text' => 'Du kannst Uffi jetzt auch nach Früherem fragen, zum Beispiel „Wann wurde das Hallenbad wieder eröffnet?“. Er sucht dann in den Mitteilungsblättern seit 2017, nennt Ausgabe und Datum und verlinkt die Seite.'],
     ['id' => 'uffi-nachsuche', 'datum' => '2026-11-16', 'art' => 'besser', 'popup' => false,
         'titel' => 'Uffi sucht noch einmal nach',
         'text' => 'Findet Uffi beim ersten Mal nichts Passendes, sucht er jetzt selbst mit anderen Begriffen weiter, bevor er antwortet. Das hilft vor allem bei Nachfragen wie „Und was kostet das?“ und bei locker formulierten Fragen.'],

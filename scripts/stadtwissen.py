@@ -128,8 +128,10 @@ SATZUNG_HINWEIS = ('Text automatisch aus dem PDF der Stadt erzeugt, bei eingesca
 # Suchindex für den KI-Assistenten: Seiten in Abschnitte zerlegt (an „## “-Überschriften, bei Satzungen je Paragraf),
 # je Abschnitt ein Embedding für die Suche nach Bedeutung, berechnet vom lokalen Dienst „embeddings“ (compose.yml);
 # nur neue/geänderte Abschnitte werden berechnet
-EMBED_URL = 'http://127.0.0.1:8095/embed'
+EMBED_URL = os.environ.get('EMBED_URL', 'http://127.0.0.1:8095/embed')
 INDEX_FILE = os.path.join(ROOT, '.abschnitte.json')
+# Archiv des Mitteilungsblatts (ältere Ausgaben): eigener Index, den Uffi nur über die Nachsuche erreicht
+ARCHIV_FILE = os.path.join(ROOT, '.archiv.json')
 # Kleine Abschnitte werden bis etwa CHUNK_TARGET Zeichen zusammengefasst, große ab CHUNK_MAX geteilt
 CHUNK_TARGET = 1800
 CHUNK_MAX = 3000
@@ -1202,32 +1204,105 @@ MB_MONATE = 12
 MONATE = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember']
 
 
+MB_SQL = "SELECT JSON_OBJECT('id', id, 'jahr', jahr, 'nr', nr, 'nr_bis', nr_bis, 'datum', datum, 'seiten', seiten) FROM mb_ausgabe "
+# Archiv: Ausgaben ab diesem Jahr, soweit sie älter als MB_MONATE sind
+MB_ARCHIV_AB = 2017
+
+
+def mb_seiten(a, vorspann):
+    """Seiten einer Ausgabe als [(rel, titel, url, text)]; Text per pdftotext aus der Ablage. {datum} im Vorspann = Erscheinungstag."""
+    pdf = os.path.join(MB_DIR, f"{a['jahr']:04d}-{a['nr']:02d}.pdf")
+    if not os.path.exists(pdf):
+        return []
+    j, m, t = (int(x) for x in a['datum'][:10].split('-'))
+    nummer = f"{a['nr']}–{a['nr_bis']}" if a.get('nr_bis') else a['nr']
+    ausgabe = f"Mitteilungsblatt Nr. {nummer}/{a['jahr']} vom {t}. {MONATE[m - 1]} {j}"
+    found = []
+    for seite in range(1, a['seiten'] + 1):
+        text = subprocess.run(['pdftotext', '-q', '-f', str(seite), '-l', str(seite), pdf, '-'],
+                              capture_output=True, text=True).stdout
+        text = re.sub(r'(\w)-\n(?=[a-zäöüß])', r'\1', text.replace('\f', ''))  # Silbentrennung am Zeilenende
+        text = re.sub(r'[ \t]+', ' ', text)
+        text = re.sub(r'\n{3,}', '\n\n', text).strip()
+        if len(text) < 150:  # nur Anzeigen/Bilder
+            continue
+        found.append((f"community/mitteilungsblatt/{a['jahr']:04d}-{a['nr']:02d}/seite-{seite:02d}.md",
+                      f'{ausgabe}, Seite {seite}',
+                      f"https://community.rundumuffni.de/mitteilungsblatt/index/lesen?id={a['id']}&seite={seite}",
+                      vorspann.format(datum=f'{t:02d}.{m:02d}.{j}') + ' Text automatisch aus dem PDF '
+                      f"gelesen (Spalten und Anzeigen können vermischt sein).\n\n{text}"))
+    return found
+
+
+def update_archiv(nur_text=False):
+    """Archiv des Mitteilungsblatts (.archiv.json, Aufbau wie .abschnitte.json): Ausgaben ab MB_ARCHIV_AB, die älter als
+    MB_MONATE sind. Nicht als Markdown-Dateien und nicht im Hauptindex, damit Altes die normale Suche nicht verdrängt;
+    Uffi erreicht es nur über die Nachsuche (stadtwissen_suchen mit archiv). Neu gebaut wird nur, wenn eine Ausgabe
+    dazukommt (alle 14 Tage rutscht eine aus dem Hauptindex hierher) oder Vektoren fehlen; vorhandene Vektoren bleiben.
+    nur_text: ohne Embeddings (dann findet die Nachsuche per Stichwort). Liefert (Abschnitte, neu berechnete Vektoren)."""
+    model = None if nur_text else embed_model()
+    ausgaben = db_json(MB_SQL + f"WHERE jahr >= {MB_ARCHIV_AB} AND datum <= CURDATE() - INTERVAL {MB_MONATE} MONTH ORDER BY jahr, nr")
+    stand = [[a['id'], a['seiten']] for a in ausgaben]
+    alt = json.load(open(ARCHIV_FILE)) if os.path.exists(ARCHIV_FILE) else {}
+    fehlt = sum(1 for c in alt.get('abschnitte', []) if not c.get('vec'))
+    if alt.get('ausgaben') == stand and (fehlt == 0 or model is None):
+        return len(alt['abschnitte']), 0
+    # Zwischenstand eines abgebrochenen Laufs mitnutzen (das erste Berechnen dauert Stunden)
+    teil = ARCHIV_FILE + '.teil'
+    if os.path.exists(teil) and time.time() - os.path.getmtime(teil) < 7200:
+        return len(alt.get('abschnitte', [])), 0  # ein anderer Lauf rechnet gerade (Zwischenstand jünger als 2 Stunden)
+    old = {c['hash']: c['vec'] for c in alt.get('abschnitte', []) if c.get('vec')}
+    if os.path.exists(teil):
+        old.update(json.load(open(teil)))
+    entries, todo = [], []
+    for a in ausgaben:
+        for rel, titel, url, body in mb_seiten(a, 'Archiv: Amtsblatt der Stadt Uffenheim, erschienen am {datum} – alte Ausgabe, '
+                                                  'Angaben wie Gebühren, Fristen, Öffnungszeiten und Ansprechpartner können überholt sein.'):
+            for nr, (label, text) in enumerate(chunks(body)):
+                embed_text = f'{titel}\n{label}\n{text}'[:6000]
+                # Hash ohne Modellnamen wäre nach einem Modellwechsel falsch; mit dem Modell des Hauptindex, falls bekannt
+                digest = hashlib.sha256(f"{model or alt.get('modell')}\n{embed_text}".encode()).hexdigest()[:16]
+                entry = {'rel': rel.replace('community/', 'archiv/', 1), 'titel': titel, 'quelle': url, 'immer': False,
+                         'nr': nr, 'abschnitt': label, 'text': text, 'hash': digest, 'vec': old.get(digest)}
+                entries.append(entry)
+                if not entry['vec'] and model:
+                    todo.append((entry, embed_text))
+
+    def speichern():
+        tmp = ARCHIV_FILE + '.tmp'
+        with open(tmp, 'w') as f:
+            json.dump({'modell': model or alt.get('modell'), 'ausgaben': stand, 'abschnitte': entries}, f, ensure_ascii=False,
+                      separators=(',', ':'))
+        os.replace(tmp, ARCHIV_FILE)
+
+    if not os.path.exists(ARCHIV_FILE) or alt.get('ausgaben') != stand:
+        speichern()  # gleich mit Text (Stichwortsuche), Vektoren folgen
+    for i in range(0, len(todo), 4):
+        batch = todo[i:i + 4]
+        used, vectors = embed_batch([t for _, t in batch])
+        if used != model:
+            raise RuntimeError(f'Embedding-Dienst hat das Modell gewechselt ({model} → {used})')
+        for (entry, _), vec in zip(batch, vectors):
+            entry['vec'] = vec
+        if i % 200 == 0:
+            with open(teil + '.tmp', 'w') as f:
+                json.dump({e['hash']: e['vec'] for e in entries if e['vec']}, f)
+            os.replace(teil + '.tmp', teil)
+            print(f'{datetime.now():%H:%M:%S} Archiv: {i + len(batch)}/{len(todo)} Vektoren', flush=True)
+    if todo:
+        speichern()
+    if os.path.exists(teil):
+        os.remove(teil)
+    return len(entries), len(todo)
+
+
 def community_mitteilungsblatt():
     """Mitteilungsblatt (Modul mitteilungsblatt) je Seite als [(rel, titel, url, text)]. Text per pdftotext aus der Ablage
     (bessere Lesereihenfolge als der Suchtext in der Datenbank). Enthält Namen (Geburtstage, Vereinsberichte), daher
     wie community/ nicht im Git."""
     found = []
-    for a in db_json("SELECT JSON_OBJECT('id', id, 'jahr', jahr, 'nr', nr, 'nr_bis', nr_bis, 'datum', datum, 'seiten', seiten) FROM mb_ausgabe "
-                     f"WHERE datum > CURDATE() - INTERVAL {MB_MONATE} MONTH ORDER BY jahr, nr"):
-        pdf = os.path.join(MB_DIR, f"{a['jahr']:04d}-{a['nr']:02d}.pdf")
-        if not os.path.exists(pdf):
-            continue
-        j, m, t = (int(x) for x in a['datum'][:10].split('-'))
-        nummer = f"{a['nr']}–{a['nr_bis']}" if a.get('nr_bis') else a['nr']
-        ausgabe = f"Mitteilungsblatt Nr. {nummer}/{a['jahr']} vom {t}. {MONATE[m - 1]} {j}"
-        for seite in range(1, a['seiten'] + 1):
-            text = subprocess.run(['pdftotext', '-q', '-f', str(seite), '-l', str(seite), pdf, '-'],
-                                  capture_output=True, text=True).stdout
-            text = re.sub(r'(\w)-\n(?=[a-zäöüß])', r'\1', text.replace('\f', ''))  # Silbentrennung am Zeilenende
-            text = re.sub(r'[ \t]+', ' ', text)
-            text = re.sub(r'\n{3,}', '\n\n', text).strip()
-            if len(text) < 150:  # nur Anzeigen/Bilder
-                continue
-            found.append((f"community/mitteilungsblatt/{a['jahr']:04d}-{a['nr']:02d}/seite-{seite:02d}.md",
-                          f'{ausgabe}, Seite {seite}',
-                          f"https://community.rundumuffni.de/mitteilungsblatt/index/lesen?id={a['id']}&seite={seite}",
-                          f"Amtsblatt der Stadt Uffenheim, erschienen am {t:02d}.{m:02d}.{j}. Text automatisch aus dem PDF "
-                          f"gelesen (Spalten und Anzeigen können vermischt sein).\n\n{text}"))
+    for a in db_json(MB_SQL + f"WHERE datum > CURDATE() - INTERVAL {MB_MONATE} MONTH ORDER BY jahr, nr"):
+        found += mb_seiten(a, 'Amtsblatt der Stadt Uffenheim, erschienen am {datum}.')
     # Terminliste der Stadt (vom Modul beim Abruf gespeichert): Redaktionsschluss und Erscheinungstage
     tage = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag']
     zeilen = []
@@ -1310,11 +1385,19 @@ def vereine_only():
 
 
 if __name__ == '__main__':
+    if '--archiv' in sys.argv or '--archiv-text' in sys.argv:
+        # Archiv des Mitteilungsblatts allein (einmalig beim Einrichten; --archiv-text = ohne Embeddings)
+        n, neu = update_archiv(nur_text='--archiv-text' in sys.argv)
+        print(f'{datetime.now():%Y-%m-%d %H:%M:%S}: Archiv Mitteilungsblatt: {n} Abschnitte, {neu} Embeddings berechnet')
+        sys.exit(0)
     try:
         if '--nur-vereine' in sys.argv or '--nur-community' in sys.argv:
             vereine_only()
         else:
             main()
+            n, neu = update_archiv()
+            if neu:
+                print(f'{datetime.now():%Y-%m-%d %H:%M:%S}: Archiv Mitteilungsblatt: {n} Abschnitte, {neu} Embeddings berechnet')
     except Exception as e:
         print(f'{datetime.now():%Y-%m-%d %H:%M:%S}: FEHLER {e}', file=sys.stderr)
         if '--nur-vereine' not in sys.argv and '--nur-community' not in sys.argv:

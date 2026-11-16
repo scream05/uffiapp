@@ -11,14 +11,17 @@ class Embeddings
 {
     public const URL = 'http://embeddings:8000/suche';
 
-    /** @return array [Stand des Index (Änderungszeit), Abschnitt-Positionen nach Ähnlichkeit, beste zuerst] */
-    public static function suche(string $text): array
+    /**
+     * @param bool $archiv im Archiv des Mitteilungsblatts suchen (wissen/.archiv.json) statt im Stadtwissen
+     * @return array [Stand des Index (Änderungszeit), Abschnitt-Positionen nach Ähnlichkeit, beste zuerst]
+     */
+    public static function suche(string $text, bool $archiv = false): array
     {
         $ch = curl_init(self::URL);
         curl_setopt_array($ch, [
             CURLOPT_POST => true,
             CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-            CURLOPT_POSTFIELDS => json_encode(['frage' => $text], JSON_UNESCAPED_UNICODE),
+            CURLOPT_POSTFIELDS => json_encode(['frage' => $text] + ($archiv ? ['archiv' => true] : []), JSON_UNESCAPED_UNICODE),
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_CONNECTTIMEOUT => 2,
             // Antwortet sonst in ~0,1 s; hängt der Dienst, lieber gleich die Stichwortsuche als den Nutzer warten lassen

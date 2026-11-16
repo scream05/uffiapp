@@ -2,6 +2,8 @@
 POST /suche {"frage": "..."} -> {"modell", "stand", "rang"}: Abschnitte des Stadtwissens (wissen/.abschnitte.json, ohne
 „immer“-Seiten) nach Ähnlichkeit zur Frage, beste zuerst, als Positionen im Index; „stand“ = Änderungszeit der Datei,
 damit der KI-Assistent prüfen kann, dass er denselben Index gelesen hat. Die Vektoren liegen dafür einmal im Speicher.
+Mit "archiv": true wird stattdessen im Archiv des Mitteilungsblatts gesucht (wissen/.archiv.json, gleicher Aufbau;
+solange dort Vektoren fehlen, ist „rang“ leer oder unvollständig und der KI-Assistent sucht per Stichwort).
 
 Nur im Docker-Netz und auf 127.0.0.1 erreichbar (compose.yml). Das Modell wird beim ersten Start nach /cache geladen."""
 import base64
@@ -19,16 +21,19 @@ lock = threading.Lock()  # ein Rechenauftrag zur Zeit, sonst wächst der Speiche
 DIM = len(next(iter(model.query_embed(['Uffenheim']))))
 
 INDEX = os.environ.get('WISSEN_INDEX', '/srv/wissen/.abschnitte.json')
+ARCHIV = os.path.join(os.path.dirname(INDEX), '.archiv.json')
 index_lock = threading.Lock()
-index = {'stand': None, 'modell': None, 'ids': np.zeros(0, dtype=np.int64), 'matrix': np.zeros((0, DIM))}
+indexe = {}  # Datei → {'stand', 'modell', 'ids', 'matrix'}
 
 
-def load_index():
+def load_index(datei=INDEX):
     """Index neu lesen, wenn sich die Datei geändert hat (nächtlicher Abgleich ersetzt sie in einem Schritt)"""
-    stand = int(os.stat(INDEX).st_mtime)
+    stand = int(os.stat(datei).st_mtime)
     with index_lock:
+        index = indexe.setdefault(datei, {'stand': None, 'modell': None, 'ids': np.zeros(0, dtype=np.int64),
+                                          'matrix': np.zeros((0, DIM))})
         if index['stand'] != stand:
-            with open(INDEX, encoding='utf-8') as f:
+            with open(datei, encoding='utf-8') as f:
                 data = json.load(f)
             ids, vecs = [], []
             for i, c in enumerate(data.get('abschnitte') or []):
@@ -64,13 +69,16 @@ class Handler(BaseHTTPRequestHandler):
 
     def suche(self):
         try:
-            frage = str(json.loads(self.rfile.read(int(self.headers.get('Content-Length', 0))))['frage'])[:4000]
+            req = json.loads(self.rfile.read(int(self.headers.get('Content-Length', 0))))
+            frage = str(req['frage'])[:4000]
         except (ValueError, KeyError, TypeError):
             return self.reply(400, {'fehler': 'erwartet {"frage": "..."}'})
         try:
-            idx = load_index()
+            idx = load_index(ARCHIV if req.get('archiv') else INDEX)
         except (OSError, ValueError) as e:
             return self.reply(503, {'fehler': f'Index nicht lesbar: {e}'})
+        if len(idx['ids']) == 0:  # noch keine Vektoren (Archiv im Aufbau): Stichwortsuche
+            return self.reply(200, {'modell': MODEL, 'stand': idx['stand'], 'rang': []})
         if idx['modell'] != MODEL:
             return self.reply(409, {'fehler': f"Index mit anderem Modell berechnet ({idx['modell']})"})
         with lock:

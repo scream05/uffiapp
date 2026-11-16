@@ -37,23 +37,38 @@ class Wissen
      */
     public static function chunks(): array
     {
-        static $memo = [null, null];
+        static $memos = [];
+        $datei = self::datei();
+        $memo = $memos[$datei] ?? [null, null];
         $stand = self::stand();
         if ($stand === false || $memo[0] !== $stand) {
-            $abschnitte = $stand === false ? null : \Yii::$app->cache->getOrSet(['ki-assistent-abschnitte', $stand], function () {
-                $index = @json_decode((string)@file_get_contents(self::DIR . '/.abschnitte.json'), true);
+            $abschnitte = $stand === false ? null : \Yii::$app->cache->getOrSet(['ki-assistent-abschnitte', $stand, self::$archiv], function () use ($datei) {
+                $index = @json_decode((string)@file_get_contents($datei), true);
                 return is_array($index['abschnitte'] ?? null) && $index['abschnitte'] !== []
                     ? array_map(fn($c) => array_diff_key($c, ['vec' => 0, 'hash' => 0]), $index['abschnitte']) : null;
             }, 2 * 86400);
-            $memo = [$stand, $abschnitte ?? array_map(fn($p) => $p + ['nr' => 0, 'abschnitt' => ''], self::pages())];
+            // Ohne Index gilt jede Seite als ein Abschnitt; das Archiv gibt es nur als Index
+            $memo = $memos[$datei] = [$stand, $abschnitte ?? (self::$archiv ? [] : array_map(fn($p) => $p + ['nr' => 0, 'abschnitt' => ''], self::pages()))];
         }
         return $memo[1];
     }
 
-    /** Änderungszeit von .abschnitte.json (= Stand des Index, ändert sich mit dem nächtlichen Abgleich) oder false */
+    /**
+     * true, solange im Archiv des Mitteilungsblatts gesucht wird (wissen/.archiv.json, Aufbau wie .abschnitte.json, ältere
+     * Ausgaben, siehe scripts/stadtwissen.py update_archiv): chunks(), stand() und der Stichwort-Index lesen dann diesen
+     * Index. Nur nachsuchen() schaltet um – die erste Suche zu einer Frage sieht das Archiv nie.
+     */
+    private static bool $archiv = false;
+
+    private static function datei(): string
+    {
+        return self::DIR . (self::$archiv ? '/.archiv.json' : '/.abschnitte.json');
+    }
+
+    /** Änderungszeit des Index (= sein Stand, ändert sich mit dem nächtlichen Abgleich) oder false */
     private static function stand(): int|false
     {
-        $file = self::DIR . '/.abschnitte.json';
+        $file = self::datei();
         clearstatcache(true, $file);
         return @filemtime($file);
     }
@@ -125,6 +140,7 @@ class Wissen
      */
     public static function forQuestion(string $question, ?callable $suche = null, bool $immer = true): string
     {
+        self::$ausArchiv = [];
         self::$imPrompt = []; // je Frage neu (Testläufe stellen mehrere Fragen in einem Prozess)
         $chunks = self::visible(self::chunks());
         if ($chunks === []) {
@@ -157,29 +173,45 @@ class Wissen
 
     /** Abschnitte, die forQuestion() in dieser Anfrage schon in den Prompt gelegt hat (Index => true) */
     private static array $imPrompt = [];
+    /** Abschnitte des Archivs, die eine Nachsuche in dieser Anfrage schon geliefert hat */
+    private static array $ausArchiv = [];
 
     /**
      * Nachsuche für das Werkzeug stadtwissen_suchen: die passendsten Abschnitte zu den Suchbegriffen, ohne die, die
      * schon im Prompt stehen (und ohne die „immer“-Seiten).
+     * @param bool $archiv statt im Stadtwissen im Archiv des Mitteilungsblatts suchen (ältere Ausgaben)
      * @return array [Text für die KI (leer = nichts Neues gefunden), Zahl der Seiten]
      */
-    public static function nachsuchen(string $suchbegriffe, ?callable $suche = null): array
+    public static function nachsuchen(string $suchbegriffe, ?callable $suche = null, bool $archiv = false): array
     {
-        $chunks = self::visible(self::chunks());
-        if ($chunks === [] || trim($suchbegriffe) === '') {
-            return ['', 0];
+        self::$archiv = $archiv;
+        try {
+            $chunks = self::visible(self::chunks());
+            if ($chunks === [] || trim($suchbegriffe) === '') {
+                return ['', 0];
+            }
+            $schon = $archiv ? self::$ausArchiv : self::$imPrompt;
+            [$selected] = self::ranken($chunks, $suchbegriffe, $suche);
+            $selected = array_values(array_filter($selected, fn($i) => !isset($schon[$i]) && !$chunks[$i]['immer']));
+            [$take, $byPage] = self::waehlen($chunks, $selected, self::NACHSUCHE_CHUNKS, self::NACHSUCHE_BUDGET);
+            $out = [];
+            foreach ($take as $rel => $ids) {
+                $ids = array_keys($ids);
+                sort($ids);
+                $out[] = self::render($chunks, $ids, count($ids) === count($byPage[$rel]));
+                $schon += array_fill_keys($ids, true); // eine zweite Nachsuche liefert Neues
+            }
+            $archiv ? self::$ausArchiv = $schon : self::$imPrompt = $schon;
+            return [implode("\n\n", $out), count($out)];
+        } finally {
+            self::$archiv = false;
         }
-        [$selected] = self::ranken($chunks, $suchbegriffe, $suche);
-        $selected = array_values(array_filter($selected, fn($i) => !isset(self::$imPrompt[$i]) && !$chunks[$i]['immer']));
-        [$take, $byPage] = self::waehlen($chunks, $selected, self::NACHSUCHE_CHUNKS, self::NACHSUCHE_BUDGET);
-        $out = [];
-        foreach ($take as $rel => $ids) {
-            $ids = array_keys($ids);
-            sort($ids);
-            $out[] = self::render($chunks, $ids, count($ids) === count($byPage[$rel]));
-            self::$imPrompt += array_fill_keys($ids, true); // eine zweite Nachsuche liefert Neues
-        }
-        return [implode("\n\n", $out), count($out)];
+    }
+
+    /** Gibt es das Archiv des Mitteilungsblatts (dann bietet stadtwissen_suchen die Suche darin an)? */
+    public static function hatArchiv(): bool
+    {
+        return is_file(self::DIR . '/.archiv.json');
     }
 
     /** @return array [ausgewählte Abschnitt-Indizes, weitere Treffer, 'kombiniert'|'stichwort'] */
@@ -250,10 +282,11 @@ class Wissen
      */
     private static function stichwortIndex(): array
     {
-        static $memo = [null, null];
+        static $memos = [];
+        $datei = self::datei();
         $stand = self::stand();
-        if ($stand !== false && $memo[0] === $stand) {
-            return $memo[1];
+        if ($stand !== false && ($memos[$datei][0] ?? null) === $stand) {
+            return $memos[$datei][1];
         }
         $bauen = function () {
             $woerter = $len = $titel = [];
@@ -273,8 +306,8 @@ class Wissen
             return ['woerter' => $woerter, 'sortiert' => $sortiert, 'len' => $len, 'titel' => $titel];
         };
         // Ohne Index (Abgleich noch nicht gelaufen) jedes Mal neu, das kommt nur ausnahmsweise vor
-        $daten = $stand === false ? $bauen() : \Yii::$app->cache->getOrSet(['ki-assistent-stichworte', 3, $stand], $bauen, 2 * 86400);
-        $memo = [$stand, $daten];
+        $daten = $stand === false ? $bauen() : \Yii::$app->cache->getOrSet(['ki-assistent-stichworte', 3, $stand, self::$archiv], $bauen, 2 * 86400);
+        $memos[$datei] = [$stand, $daten];
         return $daten;
     }
 

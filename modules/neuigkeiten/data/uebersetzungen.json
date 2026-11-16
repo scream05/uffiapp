@@ -1,4 +1,31 @@
 {
+    "uffi-archiv": {
+        "en": {
+            "titel": "Uffi knows the community newsletter from 2017 onwards",
+            "text": "You can now also ask Uffi about things from the past, for example “When did the indoor pool reopen?”. It then searches the community newsletters from 2017 onwards, tells you the issue and date, and links the page.",
+            "quelle": "e1c1ea8bd09a1f501654bf544ca8b288d9e4926a"
+        },
+        "uk": {
+            "titel": "Uffi знає офіційний бюлетень від 2017 року",
+            "text": "Тепер ти можеш питати Uffi і про те, що було раніше, наприклад: «Коли знову відкрили критий басейн?». Тоді він шукає у випусках офіційного бюлетеня від 2017 року, називає номер і дату та дає посилання на сторінку.",
+            "quelle": "e1c1ea8bd09a1f501654bf544ca8b288d9e4926a"
+        },
+        "ar": {
+            "titel": "Uffi يعرف النشرة الرسمية (Mitteilungsblatt) منذ 2017",
+            "text": "يمكنك الآن أن تسأل Uffi أيضًا عن أمور سابقة، مثل: «متى أُعيد افتتاح المسبح الداخلي؟». عندها يبحث في أعداد النشرة الرسمية منذ 2017، ويذكر العدد والتاريخ ويضع رابط الصفحة.",
+            "quelle": "e1c1ea8bd09a1f501654bf544ca8b288d9e4926a"
+        },
+        "tr": {
+            "titel": "Uffi artık 2017’den itibaren çıkan duyuru bültenlerini biliyor",
+            "text": "Artık Uffi’ye geçmişte olan şeyleri de sorabilirsin, mesela „Kapalı yüzme havuzu ne zaman yeniden açıldı?“. Sonra 2017’den bu yana çıkan duyuru bültenlerinde arama yapar, sayı ve tarihi söyler ve sayfayı bağlantılar.",
+            "quelle": "e1c1ea8bd09a1f501654bf544ca8b288d9e4926a"
+        },
+        "ru": {
+            "titel": "Uffi знает Mitteilungsblatt с 2017 года",
+            "text": "Теперь ты можешь спрашивать Uffi и о том, что было раньше, например: «Когда снова открыли крытый бассейн?». Тогда он ищет в выпусках Mitteilungsblatt с 2017 года, называет выпуск и дату и дает ссылку на страницу.",
+            "quelle": "e1c1ea8bd09a1f501654bf544ca8b288d9e4926a"
+        }
+    },
     "uffi-nachsuche": {
         "en": {
             "titel": "Uffi takes another look",
