@@ -15,6 +15,9 @@ class Wissen
     /** Höchstens so viele Zeichen an passenden Abschnitten pro Frage */
     private const BUDGET = 36000;
     private const MAX_CHUNKS = 14;
+    /** Nachsuche (Werkzeug stadtwissen_suchen): weniger Abschnitte und Zeichen als bei der ersten Suche */
+    private const NACHSUCHE_CHUNKS = 8;
+    private const NACHSUCHE_BUDGET = 18000;
     /** Seiten bis zu dieser Länge kommen ganz mit, wenn ein Abschnitt passt (z. B. Leistung: Unterlagen + Kosten) */
     private const WHOLE_PAGE = 5000;
     /** Kombinierte Suche: so viele der besten Abschnitte je Verfahren zählen, Glättung der Rangfusion */
@@ -122,6 +125,7 @@ class Wissen
      */
     public static function forQuestion(string $question, ?callable $suche = null, bool $immer = true): string
     {
+        self::$imPrompt = []; // je Frage neu (Testläufe stellen mehrere Fragen in einem Prozess)
         $chunks = self::visible(self::chunks());
         if ($chunks === []) {
             return '';
@@ -133,7 +137,7 @@ class Wissen
     /**
      * Was die Suche zu einer Frage findet, ohne den Prompt zu bauen (Suchtest setup/ki-suche-test).
      * @return array ['geladen' => Seiten (rel), deren Inhalt im Prompt stünde, 'rang' => [rel => Platz der Seite unter
-     *   allen Treffern, ab 1], 'verfahren' => 'kombiniert'|'stichwort']
+     *   allen Treffern, ab 1], 'verfahren' => 'kombiniert'|'stichwort', 'abschnitte' => Seite je ausgewähltem Abschnitt]
      */
     public static function auswahl(string $question, ?callable $suche = null): array
     {
@@ -146,7 +150,36 @@ class Wissen
         foreach ($related as $i) {
             $rang[$chunks[$i]['rel']] ??= count($rang) + 1;
         }
-        return ['geladen' => array_keys(self::waehlen($chunks, $selected)[0]), 'rang' => $rang, 'verfahren' => $verfahren];
+        return ['geladen' => array_keys(self::waehlen($chunks, $selected)[0]), 'rang' => $rang, 'verfahren' => $verfahren,
+            // Seite je ausgewähltem Abschnitt, bester zuerst (wie viele Abschnitte braucht es bis zur richtigen Seite?)
+            'abschnitte' => array_map(fn($i) => $chunks[$i]['rel'], array_slice($selected, 0, self::MAX_CHUNKS))];
+    }
+
+    /** Abschnitte, die forQuestion() in dieser Anfrage schon in den Prompt gelegt hat (Index => true) */
+    private static array $imPrompt = [];
+
+    /**
+     * Nachsuche für das Werkzeug stadtwissen_suchen: die passendsten Abschnitte zu den Suchbegriffen, ohne die, die
+     * schon im Prompt stehen (und ohne die „immer“-Seiten).
+     * @return array [Text für die KI (leer = nichts Neues gefunden), Zahl der Seiten]
+     */
+    public static function nachsuchen(string $suchbegriffe, ?callable $suche = null): array
+    {
+        $chunks = self::visible(self::chunks());
+        if ($chunks === [] || trim($suchbegriffe) === '') {
+            return ['', 0];
+        }
+        [$selected] = self::ranken($chunks, $suchbegriffe, $suche);
+        $selected = array_values(array_filter($selected, fn($i) => !isset(self::$imPrompt[$i]) && !$chunks[$i]['immer']));
+        [$take, $byPage] = self::waehlen($chunks, $selected, self::NACHSUCHE_CHUNKS, self::NACHSUCHE_BUDGET);
+        $out = [];
+        foreach ($take as $rel => $ids) {
+            $ids = array_keys($ids);
+            sort($ids);
+            $out[] = self::render($chunks, $ids, count($ids) === count($byPage[$rel]));
+            self::$imPrompt += array_fill_keys($ids, true); // eine zweite Nachsuche liefert Neues
+        }
+        return [implode("\n\n", $out), count($out)];
     }
 
     /** @return array [ausgewählte Abschnitt-Indizes, weitere Treffer, 'kombiniert'|'stichwort'] */
@@ -225,19 +258,22 @@ class Wissen
         $bauen = function () {
             $woerter = $len = $titel = [];
             foreach (self::chunks() as $i => $c) {
-                $counts = array_count_values(self::terms($c['titel'] . ' ' . $c['abschnitt'] . ' ' . $c['text']));
+                // Dateiname der Seite (= letzter Teil der Adresse, z. B. „stellenausschreibungen“) zählt wie der Titel:
+                // manche Seiten tragen als Titel nur die erste Überschrift ihres Inhalts
+                $name = preg_replace('/\.md$/', '', str_replace('-', ' ', basename($c['rel'])));
+                $counts = array_count_values(self::terms($c['titel'] . ' ' . $name . ' ' . $c['abschnitt'] . ' ' . $c['text']));
                 foreach ($counts as $w => $n) {
                     $woerter[(string)$w][$i] = $n;
                 }
                 $len[$i] = array_sum($counts);
-                $titel[$i] = array_values(array_unique(self::terms($c['titel'] . ' ' . $c['abschnitt'])));
+                $titel[$i] = array_values(array_unique(self::terms($c['titel'] . ' ' . $name . ' ' . $c['abschnitt'])));
             }
             $sortiert = array_map('strval', array_keys($woerter));
             sort($sortiert, SORT_STRING);
             return ['woerter' => $woerter, 'sortiert' => $sortiert, 'len' => $len, 'titel' => $titel];
         };
         // Ohne Index (Abgleich noch nicht gelaufen) jedes Mal neu, das kommt nur ausnahmsweise vor
-        $daten = $stand === false ? $bauen() : \Yii::$app->cache->getOrSet(['ki-assistent-stichworte', 2, $stand], $bauen, 2 * 86400);
+        $daten = $stand === false ? $bauen() : \Yii::$app->cache->getOrSet(['ki-assistent-stichworte', 3, $stand], $bauen, 2 * 86400);
         $memo = [$stand, $daten];
         return $daten;
     }
@@ -331,16 +367,15 @@ class Wissen
      * Kosten beisammen bleiben.
      * @return array [rel => [Abschnitt-Index => true], rel => alle Abschnitt-Indizes der Seite]
      */
-    private static function waehlen(array $chunks, array $selected): array
+    private static function waehlen(array $chunks, array $selected, int $max = self::MAX_CHUNKS, int $budget = self::BUDGET): array
     {
         $byPage = [];
         foreach ($chunks as $i => $c) {
             $byPage[$c['rel']][] = $i;
         }
         $pageLen = fn($rel) => array_sum(array_map(fn($i) => mb_strlen($chunks[$i]['text']), $byPage[$rel]));
-        $budget = self::BUDGET;
         $take = [];
-        foreach (array_slice($selected, 0, self::MAX_CHUNKS) as $i) {
+        foreach (array_slice($selected, 0, $max) as $i) {
             $rel = $chunks[$i]['rel'];
             $add = $pageLen($rel) <= self::WHOLE_PAGE ? $byPage[$rel] : [$i];
             $add = array_filter($add, fn($j) => !isset($take[$rel][$j]));
@@ -360,6 +395,10 @@ class Wissen
     {
         [$take, $byPage] = self::waehlen($chunks, $selected);
 
+        // merken, was schon im Prompt steht: die Nachsuche (stadtwissen_suchen) liefert es nicht noch einmal
+        foreach ($take as $ids) {
+            self::$imPrompt += $ids;
+        }
         $out = [];
         foreach ($byPage as $rel => $ids) {
             if ($immer && $chunks[$ids[0]]['immer']) {

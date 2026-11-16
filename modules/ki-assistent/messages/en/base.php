@@ -87,6 +87,7 @@ return [
     'Verbindungsfehler' => 'Connection error',
     'Uffi überlegt …' => 'Uffi is thinking …',
     'Uffi sucht im Verzeichnis …' => 'Uffi is searching the directory …',
+    'Uffi sucht noch einmal nach …' => 'Uffi is searching again …',
     'Uffi bereitet die Aktion vor …' => 'Uffi is preparing the action …',
     'Uffi fragen – zum Verschieben ziehen' => 'Ask Uffi – drag to move',
     'Uffi, den KI-Assistenten, öffnen' => 'Open Uffi, the AI assistant',

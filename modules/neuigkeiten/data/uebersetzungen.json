@@ -1,4 +1,31 @@
 {
+    "uffi-nachsuche": {
+        "en": {
+            "titel": "Uffi takes another look",
+            "text": "If Uffi doesn’t find anything suitable on the first try, he now keeps searching on his own with different terms before replying. This helps especially with follow-up questions like “And how much does that cost?” and with casually worded questions.",
+            "quelle": "fcf952bd0af325cea70ba2d620578e331c35d649"
+        },
+        "uk": {
+            "titel": "Uffi шукає ще раз",
+            "text": "Якщо Uffi з першого разу не знаходить нічого підхожого, тепер він сам продовжує пошук з іншими словами, перш ніж відповісти. Це особливо допомагає з уточненнями на кшталт «А скільки це коштує?» і з невимушено сформульованими запитаннями.",
+            "quelle": "fcf952bd0af325cea70ba2d620578e331c35d649"
+        },
+        "ar": {
+            "titel": "Uffi يبحث مرة أخرى",
+            "text": "إذا لم يجد Uffi شيئًا مناسبًا من المرة الأولى، فإنه يواصل الآن البحث بنفسه بكلمات أخرى قبل أن يجيب. يفيد ذلك خصوصًا في الأسئلة اللاحقة مثل «وكم يكلّف ذلك؟» وفي الأسئلة المصاغة بأسلوب عفوي.",
+            "quelle": "fcf952bd0af325cea70ba2d620578e331c35d649"
+        },
+        "tr": {
+            "titel": "Uffi bir kez daha arama yapıyor",
+            "text": "Uffi ilk seferde uygun bir şey bulamazsa, artık cevap vermeden önce başka terimlerle kendi kendine aramaya devam ediyor. Bu özellikle “Peki bunun ücreti ne kadar?” gibi ek sorularda ve daha rahat ifade edilmiş sorularda yardımcı oluyor.",
+            "quelle": "fcf952bd0af325cea70ba2d620578e331c35d649"
+        },
+        "ru": {
+            "titel": "Uffi ищет ещё раз",
+            "text": "Если Uffi с первого раза не находит ничего подходящего, теперь он сам продолжает поиск по другим словам, прежде чем ответить. Это особенно помогает при уточнениях вроде «А сколько это стоит?» и при вопросах, сформулированных неформально.",
+            "quelle": "fcf952bd0af325cea70ba2d620578e331c35d649"
+        }
+    },
     "uffi-sprachen-suche": {
         "en": {
             "titel": "Uffi finds more in other languages",

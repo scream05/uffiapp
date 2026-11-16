@@ -255,6 +255,14 @@ def page_markdown(path, html_text):
     md = p.markdown()
     m = re.match(r'# (.+)\n?', md)
     title = m.group(1).strip() if m else path.rsplit('/', 1)[-1]
+    # Seiten mit mehreren Hauptüberschriften (Stellenausschreibungen: je Stelle eine): Die erste ist dann oft nicht der
+    # Seitentitel. Dort gilt der Titel aus dem Kopf der Seite („Uffenheim: Stellenausschreibungen“), die Überschrift bleibt.
+    if m and len(re.findall(r'^# ', md, re.M)) > 1:
+        t = re.search(r'<title>(.*?)</title>', html_text, re.S)
+        name = clean(t.group(1)).split(': ', 1)[-1].strip() if t else ''
+        gleich = lambda x: re.sub(r'\W+', '', x.replace('&', 'und')).lower()
+        if name and gleich(name) != gleich(title):
+            return name, md
     return title, (md[m.end():].strip() if m else md)
 
 

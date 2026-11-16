@@ -125,7 +125,7 @@
     "karte": "link"
   },
   {
-    "frage": "Trag mir bitte die Kirchweih in Reusch in meinen Kalender ein.",
+    "frage": "Trag mir bitte die 5. Uffenheimer Sommernacht in meinen Kalender ein.",
     "karte": "termin"
   },
   {
@@ -169,10 +169,10 @@
   {
     "frage": "Wann erscheint das Mitteilungsblatt im Dezember 2026 und wann ist jeweils Redaktionsschluss?",
     "erwartet": [
-      "4\\. ?Dezember|04\\.12\\.",
+      "\\b4\\. ?Dezember|\\b0?4\\.12\\.",
       "18\\. ?Dezember|18\\.12\\.",
       "24\\. ?November|24\\.11\\.",
-      "7\\. ?Dezember|07\\.12\\."
+      "\\b7\\. ?Dezember|\\b0?7\\.12\\."
     ]
   },
   {
@@ -255,7 +255,7 @@
   {
     "frage": "When is the next paper bin collection in Uffenheim?",
     "erwartet": [
-      "[Pp]aper",
+      "[Pp]ap(er|ier)",
       "\\d{1,2}"
     ],
     "nicht": [
@@ -339,8 +339,7 @@
   {
     "frage": "Was ist in letzter Zeit neu auf der Plattform?",
     "erwartet": [
-      "Vorschl",
-      "Sprit",
+      "\\d{1,2}\\.\\d{1,2}\\.",
       "neuigkeiten\\/index"
     ]
   },
@@ -414,6 +413,44 @@
     "frage": "Arabamı nerede tescil ettirebilirim?",
     "erwartet": [
       "Zulassungsstelle"
+    ]
+  },
+  {
+    "frage": "ab wann darf ich samstags rasenmähen",
+    "erwartet": [
+      "\\d{1,2}([:.]\\d{2})? ?Uhr"
+    ]
+  },
+  {
+    "frage": "kühlschrank kaputt wohin damit",
+    "erwartet": [
+      "Sperrmüll|Wertstoffhof"
+    ]
+  },
+  {
+    "frage": "Sucht die Stadt gerade Personal?",
+    "erwartet": [
+      "stellenausschreibungen"
+    ]
+  },
+  {
+    "vorher": [
+      "Wie melde ich meinen Hund an?",
+      "Was kostet das im Jahr?"
+    ],
+    "frage": "Und für den zweiten?",
+    "erwartet": [
+      "\\d+([.,]\\d+)? ?(€|Euro|EUR)"
+    ]
+  },
+  {
+    "vorher": [
+      "Was brauche ich für einen neuen Reisepass?",
+      "Und wie lange dauert das?"
+    ],
+    "frage": "Geht das auch schneller?",
+    "erwartet": [
+      "Express"
     ]
   }
 ]

@@ -87,6 +87,7 @@ return [
     'Verbindungsfehler' => 'Помилка з’єднання',
     'Uffi überlegt …' => 'Уффі думає …',
     'Uffi sucht im Verzeichnis …' => 'Уффі шукає в довіднику …',
+    'Uffi sucht noch einmal nach …' => 'Уффі шукає ще раз …',
     'Uffi bereitet die Aktion vor …' => 'Уффі готує дію …',
     'Uffi fragen – zum Verschieben ziehen' => 'Запитати Uffi – перетягни, щоб перемістити',
     'Uffi, den KI-Assistenten, öffnen' => 'Відкрити Uffi, ШІ-асистента',

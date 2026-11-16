@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'uffi-nachsuche', 'datum' => '2026-11-16', 'art' => 'besser', 'popup' => false,
+        'titel' => 'Uffi sucht noch einmal nach',
+        'text' => 'Findet Uffi beim ersten Mal nichts Passendes, sucht er jetzt selbst mit anderen Begriffen weiter, bevor er antwortet. Das hilft vor allem bei Nachfragen wie „Und was kostet das?“ und bei locker formulierten Fragen.'],
     ['id' => 'uffi-sprachen-suche', 'datum' => '2026-11-16', 'art' => 'besser', 'popup' => false,
         'titel' => 'Uffi findet mehr in anderen Sprachen',
         'text' => 'Wer Uffi auf Ukrainisch, Russisch, Türkisch oder Arabisch fragt, bekommt jetzt deutlich öfter die passende Auskunft aus dem Rathaus und vom Landratsamt. Bisher fand Uffi die richtigen Seiten fast nur bei Fragen auf Deutsch oder Englisch.'],

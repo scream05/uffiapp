@@ -284,5 +284,265 @@
       "tr": "Topluluğu telefonuma uygulama olarak nasıl kurarım?",
       "ar": "كيف أثبّت المنصة كتطبيق على هاتفي؟"
     }
+  },
+  {
+    "quelle": "leistung/personalausweis-beantragung-63118",
+    "fragen": {
+      "schwer": "wo krieg ich nen neuen perso her und was kostet der"
+    }
+  },
+  {
+    "quelle": "leistung/personalausweis-anzeige-des-verlustes",
+    "fragen": {
+      "schwer": "Mein Ausweis ist weg, was muss ich jetzt machen?"
+    }
+  },
+  {
+    "quelle": "geraete-und-maschinenlaermschutz",
+    "fragen": {
+      "schwer": "ab wann darf ich samstags rasenmähen"
+    }
+  },
+  {
+    "quelle": "abfallwirtschaft/sperrmuell",
+    "fragen": {
+      "schwer": "kühlschrank kaputt wohin damit"
+    }
+  },
+  {
+    "quelle": "reinhaltung-der-oeffentlichen-strassen|strassenreinigung",
+    "fragen": {
+      "schwer": "Muss ich im Winter vor meinem Haus Schnee schippen?"
+    }
+  },
+  {
+    "quelle": "abwasser-und-wasser/.*(bgs-was|wasserabgabe)",
+    "fragen": {
+      "schwer": "was zahl ich fürs wasser pro kubikmeter"
+    }
+  },
+  {
+    "quelle": "baedergebuehrensatzung|sport-freizeiteinrichtungen/hallenbad",
+    "fragen": {
+      "schwer": "Was kostet der Eintritt ins Hallenbad für Kinder?"
+    }
+  },
+  {
+    "quelle": "friedhof/",
+    "fragen": {
+      "schwer": "Wie lange bleibt ein Grab bestehen, bevor es aufgelöst wird?"
+    }
+  },
+  {
+    "quelle": "stellplatzsatzung",
+    "fragen": {
+      "schwer": "Wie viele Parkplätze muss ich nachweisen, wenn ich ein Zweifamilienhaus baue?"
+    }
+  },
+  {
+    "quelle": "plakatieren",
+    "fragen": {
+      "schwer": "Darf ich Plakate für unser Vereinsfest an Laternen hängen?"
+    }
+  },
+  {
+    "quelle": "autowaschanlagen",
+    "fragen": {
+      "schwer": "Darf ich sonntags mein Auto in der Waschanlage waschen?"
+    }
+  },
+  {
+    "quelle": "verkaufsoffene",
+    "fragen": {
+      "schwer": "An welchen Sonntagen haben die Geschäfte dieses Jahr auf?"
+    }
+  },
+  {
+    "quelle": "sondernutzung",
+    "fragen": {
+      "schwer": "Ich will Tische vor mein Café auf den Gehweg stellen. Brauche ich eine Erlaubnis?"
+    }
+  },
+  {
+    "quelle": "wespen-und-hornissenberatung",
+    "fragen": {
+      "schwer": "Wespennest im Rollladenkasten, wer hilft?"
+    }
+  },
+  {
+    "quelle": "alten-und-pflegeheime|wohnen-pflege",
+    "fragen": {
+      "schwer": "Oma kann nicht mehr allein wohnen, wo gibt es einen Heimplatz?"
+    }
+  },
+  {
+    "quelle": "gymnasien|schulen-bildungseinrichtungen|lebenslagen/schulen",
+    "fragen": {
+      "schwer": "Wo kann meine Tochter Abitur machen?"
+    }
+  },
+  {
+    "quelle": "ver-und-entsorgung/strom-gas",
+    "fragen": {
+      "schwer": "Der Strom ist weg, wen rufe ich an?"
+    }
+  },
+  {
+    "quelle": "service/vermietungen|stadthalle",
+    "fragen": {
+      "schwer": "Wir suchen einen Raum für eine Geburtstagsfeier mit 80 Leuten"
+    }
+  },
+  {
+    "quelle": "stellenausschreibungen",
+    "fragen": {
+      "schwer": "Sucht die Stadt gerade Personal?"
+    }
+  },
+  {
+    "quelle": "e-bike-ladestationen",
+    "fragen": {
+      "schwer": "Wo lade ich mein Elektroauto?"
+    }
+  },
+  {
+    "quelle": "tiergesundheit",
+    "fragen": {
+      "schwer": "Mein Hund hat nachts etwas Giftiges gefressen"
+    }
+  },
+  {
+    "quelle": "richtigen-zahnarzt-finden|notrufe-und-notdienste|im-notfall",
+    "fragen": {
+      "schwer": "Ich habe Zahnschmerzen am Wochenende"
+    }
+  },
+  {
+    "quelle": "nachbarschaftshilfe|soziale-angebote",
+    "fragen": {
+      "schwer": "Meine Nachbarin ist 85 und schafft das Einkaufen nicht mehr"
+    }
+  },
+  {
+    "quelle": "jugendteff|jugendarbeit",
+    "fragen": {
+      "schwer": "Was können Jugendliche hier abends machen?"
+    }
+  },
+  {
+    "quelle": "egletons|partnerschaftsbrunnen|geschichte-der-stadt",
+    "fragen": {
+      "schwer": "Mit welcher Stadt in Frankreich ist Uffenheim befreundet?"
+    }
+  },
+  {
+    "quelle": "feuerwehr/.*kostenersatz|feuerwehreinsatz",
+    "fragen": {
+      "schwer": "Was kostet es, wenn die Feuerwehr wegen eines Fehlalarms ausrückt?"
+    }
+  },
+  {
+    "quelle": "hebesatzsatzung",
+    "fragen": {
+      "schwer": "Wie hoch ist der Hebesatz für die Gewerbesteuer?"
+    }
+  },
+  {
+    "quelle": "kinderhort",
+    "fragen": {
+      "schwer": "Was kostet der Hort im Monat?"
+    }
+  },
+  {
+    "quelle": "sportlerehrung",
+    "fragen": {
+      "schwer": "Wer bekommt bei der Sportlerehrung eine Auszeichnung?"
+    }
+  },
+  {
+    "quelle": "rentensprechtag",
+    "fragen": {
+      "schwer": "Kann ich im Rathaus etwas zu meiner Rente fragen?"
+    }
+  },
+  {
+    "quelle": "buecherbus",
+    "fragen": {
+      "schwer": "Kommt ein Bus mit Büchern in die Dörfer?"
+    }
+  },
+  {
+    "quelle": "ferienprogramm|kommunale-ferienangebote",
+    "fragen": {
+      "schwer": "Was gibt es in den Sommerferien für Kinder und wie meldet man sich an?"
+    }
+  },
+  {
+    "quelle": "stadtrat-und-seine-ausschuesse",
+    "fragen": {
+      "schwer": "Wie viele Stadträte gibt es und welche Ausschüsse?"
+    }
+  },
+  {
+    "quelle": "baugenehmigung",
+    "fragen": {
+      "schwer": "Wo reiche ich meinen Bauantrag ein?"
+    }
+  },
+  {
+    "quelle": "ehrenamtskarte",
+    "fragen": {
+      "schwer": "Ich bin ehrenamtlich aktiv – gibt es dafür Vergünstigungen?"
+    }
+  },
+  {
+    "quelle": "leistung/reisepass",
+    "fragen": {
+      "folge": [
+        "Was brauche ich für einen neuen Reisepass?",
+        "Und wie lange dauert das?",
+        "Geht das auch schneller?"
+      ]
+    }
+  },
+  {
+    "quelle": "hundesteuer",
+    "fragen": {
+      "folge": [
+        "Wie melde ich meinen Hund an?",
+        "Was kostet das im Jahr?",
+        "Und für den zweiten?"
+      ]
+    }
+  },
+  {
+    "quelle": "baedergebuehrensatzung|sport-freizeiteinrichtungen/hallenbad",
+    "fragen": {
+      "folge": [
+        "Wann hat das Hallenbad offen?",
+        "Und was kostet der Eintritt?",
+        "Gibt es eine Ermäßigung für Schüler?"
+      ]
+    }
+  },
+  {
+    "quelle": "abfallwirtschaft/(sperrmuell|problemmuell|annahmestellen)",
+    "fragen": {
+      "folge": [
+        "Wie melde ich Sperrmüll an?",
+        "Was wird nicht mitgenommen?",
+        "Und wohin dann damit?"
+      ]
+    }
+  },
+  {
+    "quelle": "leistung/eheschliessung",
+    "fragen": {
+      "folge": [
+        "Wir wollen heiraten, was müssen wir tun?",
+        "Welche Unterlagen brauchen wir?",
+        "Mein Partner ist Ausländer, ändert das etwas?"
+      ]
+    }
   }
 ]

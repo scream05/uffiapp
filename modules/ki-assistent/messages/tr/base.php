@@ -87,6 +87,7 @@ return [
     'Verbindungsfehler' => 'Bağlantı hatası',
     'Uffi überlegt …' => 'Uffi düşünüyor …',
     'Uffi sucht im Verzeichnis …' => 'Uffi rehberde arıyor …',
+    'Uffi sucht noch einmal nach …' => 'Uffi bir kez daha arıyor …',
     'Uffi bereitet die Aktion vor …' => 'Uffi işlemi hazırlıyor …',
     'Uffi fragen – zum Verschieben ziehen' => 'Uffi\'ye sor – taşımak için sürükle',
     'Uffi, den KI-Assistenten, öffnen' => 'Yapay zekâ asistanı Uffi\'yi aç',

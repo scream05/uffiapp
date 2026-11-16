@@ -1488,12 +1488,18 @@ class SetupController extends Controller
                 continue;
             }
             $run++;
-            $history = [['role' => 'user', 'text' => $t['frage']]];
+            $history = [];
             $start = microtime(true);
+            \humhub\modules\kiAssistent\components\Aktionen::$aufrufe = [];
             try {
-                [$answer, $cards, , $in, $out] = \humhub\modules\kiAssistent\controllers\ChatController::converse($claude,
-                    \humhub\modules\kiAssistent\controllers\ChatController::systemPrompt($t['frage']), $history);
-                $module->addTestUsage($in, $out);
+                // „vorher“: frühere Fragen desselben Gesprächs (Folgefragen); geprüft wird nur die Antwort auf „frage“
+                foreach ([...($t['vorher'] ?? []), $t['frage']] as $frage) {
+                    $history[] = ['role' => 'user', 'text' => $frage];
+                    $c = \humhub\modules\kiAssistent\controllers\ChatController::class;
+                    [$answer, $cards, $memo, $in, $out] = $c::converse($claude, $c::systemPrompt($c::searchText($history)), $history);
+                    $module->addTestUsage($in, $out);
+                    $history[] = ['role' => 'model', 'text' => trim($answer . "\n" . $memo)];
+                }
             } catch (\Throwable $e) {
                 $this->stdout(sprintf("%2d ✗ %s\n   FEHLER %s\n", $i + 1, $t['frage'], $e->getMessage()));
                 continue;
@@ -1523,7 +1529,8 @@ class SetupController extends Controller
             }
             $problems ? null : $ok++;
             $this->stdout(sprintf("%2d %s %s (%.1f s%s)\n", $i + 1, $problems ? '✗' : '✓', $t['frage'],
-                microtime(true) - $start, $cards ? ', Aktion: ' . implode('/', array_column($cards, 'typ')) : ''));
+                microtime(true) - $start, ($cards ? ', Aktion: ' . implode('/', array_column($cards, 'typ')) : '')
+                . (($w = \humhub\modules\kiAssistent\components\Aktionen::$aufrufe) ? ', Werkzeuge: ' . implode(' ', $w) : '')));
             if ($zeigen && !$problems) {
                 $this->stdout("   Antwort: $answer\n");
             }
@@ -1554,6 +1561,10 @@ class SetupController extends Controller
                 if ($sprache !== null && $sprache !== '' && $sprache !== $lang) {
                     continue;
                 }
+                // „folge“: Gespräch aus mehreren Fragen des Nutzers, gesucht wird wie im Chat (ChatController::searchText)
+                if (is_array($frage)) {
+                    $frage = \humhub\modules\kiAssistent\controllers\ChatController::searchText(array_map(fn($f) => ['role' => 'user', 'text' => $f], $frage));
+                }
                 $suchtext = $roh ? $frage : \humhub\modules\kiAssistent\components\Suchfrage::deutsch($frage);
                 $a = \humhub\modules\kiAssistent\components\Wissen::auswahl($suchtext, $embed);
                 $passt = fn($rel) => (bool)preg_match('~' . $t['quelle'] . '~', $rel);
@@ -1564,20 +1575,24 @@ class SetupController extends Controller
                         break;
                     }
                 }
+                // Der wievielte ausgewählte Abschnitt (bester zuerst) gehört zur erwarteten Seite: reichen auch weniger?
+                $pos = array_search(true, array_map($passt, $a['abschnitte']), true);
                 $geladen = array_filter($a['geladen'], $passt) !== [];
-                $stat[$lang] ??= ['n' => 0, 'geladen' => 0, 'link' => 0, 'fehlt' => 0, 'stichwort' => 0];
+                $stat[$lang] ??= ['n' => 0, 'geladen' => 0, 'link' => 0, 'fehlt' => 0, 'stichwort' => 0, 'top3' => 0, 'top6' => 0];
+                $stat[$lang]['top3'] += $geladen && $pos !== false && $pos < 4 ? 1 : 0;
+                $stat[$lang]['top6'] += $geladen && $pos !== false && $pos < 8 ? 1 : 0;
                 $stat[$lang]['n']++;
                 $stat[$lang][$geladen ? 'geladen' : ($platz !== null ? 'link' : 'fehlt')]++;
                 $stat[$lang]['stichwort'] += $a['verfahren'] === 'stichwort' ? 1 : 0;
                 if ($zeigen || !$geladen) {
-                    $this->stdout(sprintf("%2d %s %s %s%s\n", $nr + 1, $lang, $geladen ? '✓' : ($platz !== null ? "○ nur Link (Seite auf Platz $platz)" : '✗ fehlt'),
+                    $this->stdout(sprintf("%2d %s %s %s%s\n", $nr + 1, $lang, $geladen ? '✓ Abschnitt ' . ($pos === false ? '–' : $pos + 1) : ($platz !== null ? "○ nur Link (Seite auf Platz $platz)" : '✗ fehlt'),
                         $frage, $suchtext !== $frage ? "\n      gesucht mit: $suchtext" : ''));
                 }
             }
         }
-        $this->stdout("\nSprache  geladen  nur Link  fehlt\n");
+        $this->stdout("\nSprache  geladen  (unter den ersten 4 / 8 Abschnitten)  nur Link  fehlt\n");
         foreach ($stat as $lang => $s) {
-            $this->stdout(sprintf("%-7s  %2d/%-2d    %2d        %2d%s\n", $lang, $s['geladen'], $s['n'], $s['link'], $s['fehlt'],
+            $this->stdout(sprintf("%-7s  %2d/%-2d    %2d / %2d                       %2d        %2d%s\n", $lang, $s['geladen'], $s['n'], $s['top3'], $s['top6'], $s['link'], $s['fehlt'],
                 $s['stichwort'] ? "   ({$s['stichwort']}× nur Stichwortsuche, Embedding-Dienst prüfen)" : ''));
         }
         // Gegenprobe ohne Aufruf: welche der Testfragen (fast alle deutsch) gelten als fremdsprachig und würden übersetzt

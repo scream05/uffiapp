@@ -87,6 +87,7 @@ return [
     'Verbindungsfehler' => 'خطأ في الاتصال',
     'Uffi überlegt …' => 'أوفي يفكّر …',
     'Uffi sucht im Verzeichnis …' => 'أوفي يبحث في الدليل …',
+    'Uffi sucht noch einmal nach …' => 'أوفي يبحث مرة أخرى …',
     'Uffi bereitet die Aktion vor …' => 'أوفي يُحضّر الإجراء …',
     'Uffi fragen – zum Verschieben ziehen' => 'اسأل Uffi – اسحب للتحريك',
     'Uffi, den KI-Assistenten, öffnen' => 'افتح Uffi، المساعد الذكي',
