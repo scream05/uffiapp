@@ -3454,6 +3454,55 @@ class SetupController extends Controller
      * die Bauhofleitung bekommt „bitte anrufen“ (Queue-Job, wird zurückgerollt), Meldende bekommen keine Vorlage.
      *   scripts/run-setup.sh bauhof-kostenlos-test [content-id einer Meldung]
      */
+    /**
+     * Echter Testauftrag an einen Bauhof-Mitarbeiter (Standard: Torsten, id 7) über den eingestellten Kanal.
+     * Die Meldung ist ein privater Entwurf im Mängelmelder (in keinem Stream, nicht auf der Karte für Gäste).
+     *   scripts/run-setup.sh bauhof-testauftrag [mitarbeiter-id]
+     *   scripts/run-setup.sh bauhof-testauftrag loeschen     (alle Testaufträge samt Verlauf entfernen)
+     */
+    public function actionBauhofTestauftrag($mitarbeiter = 7)
+    {
+        $marke = 'TESTAUFTRAG – bitte ignorieren';
+        $space = \humhub\modules\space\models\Space::findOne(['url' => 'mangelmelder']);
+        $admin = User::findOne(['username' => 'admin']);
+        if ($mitarbeiter === 'loeschen') {
+            $n = 0;
+            foreach (\humhub\modules\post\models\Post::find()->contentContainer($space)
+                         ->andWhere(['like', 'post.message', $marke])->all() as $post) {
+                $cid = $post->content->id;
+                foreach (['maengel_auftrag', 'bauhof_nachricht', 'maengel_status'] as $t) {
+                    if (Yii::$app->db->getTableSchema($t)) {
+                        Yii::$app->db->createCommand()->delete($t, ['content_id' => $cid])->execute();
+                    }
+                }
+                $post->hardDelete();
+                $n++;
+            }
+            $this->stdout("$n Testauftrag/-aufträge gelöscht.\n");
+            return ExitCode::OK;
+        }
+        $m = \humhub\modules\maengelmelder\models\Mitarbeiter::findOne((int)$mitarbeiter);
+        if (!$space || !$admin || !$m || !$m->aktiv) {
+            $this->stderr("Space, admin oder aktiver Mitarbeiter $mitarbeiter fehlt.\n");
+            return ExitCode::UNSPECIFIED_ERROR;
+        }
+        Yii::$app->user->setIdentity($admin);
+        $post = new \humhub\modules\post\models\Post($space);
+        $post->message = \humhub\modules\maengelmelder\models\Mangel::message($space, 'Sonstiges',
+            "$marke. Test des Bauhof-Kanals (" . date('d.m.Y H:i') . ').', 49.5466, 10.2337, 'Marktplatz, Uffenheim');
+        $post->content->visibility = \humhub\modules\content\models\Content::VISIBILITY_PRIVATE;
+        $post->content->getStateService()->set(\humhub\modules\content\models\Content::STATE_DRAFT);
+        if (!$post->save()) {
+            $this->stderr(json_encode($post->getErrors()) . "\n");
+            return ExitCode::UNSPECIFIED_ERROR;
+        }
+        $auftrag = \humhub\modules\maengelmelder\models\Auftrag::forContentId($post->content->id);
+        $fehler = \humhub\modules\maengelmelder\components\Bauhof::zuweisen($auftrag, $m->id, $admin);
+        $kanal = $m->istTelegram() ? 'Telegram' : 'WhatsApp';
+        $this->stdout("Testauftrag Nr. {$post->content->id} an {$m->name} ($kanal): " . ($fehler ?? 'gesendet') . "\n");
+        return $fehler ? ExitCode::UNSPECIFIED_ERROR : ExitCode::OK;
+    }
+
     public function actionBauhofKostenlosTest($id = 478)
     {
         $B = \humhub\modules\maengelmelder\components\Bauhof::class;
