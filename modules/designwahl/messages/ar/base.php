@@ -163,4 +163,7 @@ return [
     'In meinen Kalender' => "إضافة إلى تقويمي",
     'Per WhatsApp teilen' => "مشاركة عبر واتساب",
     'Google Kalender' => "تقويم Google",
+    'Ohne Leerzeichen – erlaubt sind Buchstaben, Ziffern und _ - . @ (z. B. Max_Muster). Deinen vollen Namen gibst du weiter unten an.' => 'بدون مسافات – يُسمح بالحروف والأرقام و _ - . @ (مثلًا Max_Muster). تُدخل اسمك الكامل في الأسفل.',
+    'Leerzeichen' => 'مسافات',
+    'Der Benutzername darf kein {zeichen} enthalten. Erlaubt sind Buchstaben, Ziffern und _ - . @ – zum Beispiel „{vorschlag}“.' => 'لا يجوز أن يحتوي اسم المستخدم على {zeichen}. يُسمح بالحروف والأرقام و _ - . @ – مثلًا «{vorschlag}».',
 ];

@@ -3503,6 +3503,37 @@ class SetupController extends Controller
         return $fehler ? ExitCode::UNSPECIFIED_ERROR : ExitCode::OK;
     }
 
+    /**
+     * Registrierung: Hinweis unter „Benutzername“ und genaue Fehlermeldung bei unerlaubten Zeichen (designwahl Events).
+     * Prüft nur (validate), legt kein Konto an.   scripts/run-setup.sh benutzername-test
+     */
+    public function actionBenutzernameTest()
+    {
+        $ok = 0;
+        $fehl = 0;
+        $pruefe = function (string $was, bool $bed) use (&$ok, &$fehl) {
+            $bed ? $ok++ : $fehl++;
+            $this->stdout(($bed ? '  ok   ' : '  FEHL ') . "$was\n");
+        };
+        Yii::$app->language = 'de';
+        foreach (['Torsten Test' => 'Leerzeichen', 'Torsten#Test!' => '„#“', 'Torsten_Test' => null] as $name => $erwartet) {
+            $u = new User(['scenario' => User::SCENARIO_REGISTRATION]);
+            $u->username = $name;
+            $u->email = 'benutzername-test@example.org';
+            $u->validate(['username']);
+            $f = implode(' / ', $u->getErrors('username'));
+            $this->stdout("       „{$name}“: " . ($f ?: '(kein Fehler)') . "\n");
+            $pruefe("„{$name}“", $erwartet === null ? $f === '' : (str_contains($f, $erwartet) && !str_contains($f, 'ungültige Zeichen')));
+        }
+        $reg = new \humhub\modules\user\models\forms\Registration();
+        $reg->setForm(); // wie RegistrationController
+        $hint = $reg->definition['elements']['User']['elements']['username']['hint'] ?? '';
+        $this->stdout("       Hinweis: $hint\n");
+        $pruefe('Hinweis unter „Benutzername“', str_contains($hint, 'Ohne Leerzeichen'));
+        $this->stdout("$ok ok, $fehl Fehler\n");
+        return $fehl ? ExitCode::UNSPECIFIED_ERROR : ExitCode::OK;
+    }
+
     public function actionBauhofKostenlosTest($id = 478)
     {
         $B = \humhub\modules\maengelmelder\components\Bauhof::class;

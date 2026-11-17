@@ -163,4 +163,7 @@ return [
     'In meinen Kalender' => "До мого календаря",
     'Per WhatsApp teilen' => "Поділитися у WhatsApp",
     'Google Kalender' => "Google Календар",
+    'Ohne Leerzeichen – erlaubt sind Buchstaben, Ziffern und _ - . @ (z. B. Max_Muster). Deinen vollen Namen gibst du weiter unten an.' => 'Без пробілів – дозволено літери, цифри та _ - . @ (наприклад, Max_Muster). Повне ім’я ти вкажеш нижче.',
+    'Leerzeichen' => 'пробіли',
+    'Der Benutzername darf kein {zeichen} enthalten. Erlaubt sind Buchstaben, Ziffern und _ - . @ – zum Beispiel „{vorschlag}“.' => 'Ім’я користувача не може містити {zeichen}. Дозволено літери, цифри та _ - . @ – наприклад, «{vorschlag}».',
 ];

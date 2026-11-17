@@ -163,4 +163,7 @@ return [
     'In meinen Kalender' => "Takvimime ekle",
     'Per WhatsApp teilen' => "WhatsApp'ta paylaş",
     'Google Kalender' => "Google Takvim",
+    'Ohne Leerzeichen – erlaubt sind Buchstaben, Ziffern und _ - . @ (z. B. Max_Muster). Deinen vollen Namen gibst du weiter unten an.' => 'Boşluk olmadan – harf, rakam ve _ - . @ kullanılabilir (ör. Max_Muster). Tam adını aşağıda girersin.',
+    'Leerzeichen' => 'boşluk',
+    'Der Benutzername darf kein {zeichen} enthalten. Erlaubt sind Buchstaben, Ziffern und _ - . @ – zum Beispiel „{vorschlag}“.' => 'Kullanıcı adı {zeichen} içeremez. Harf, rakam ve _ - . @ kullanılabilir – örneğin „{vorschlag}“.',
 ];

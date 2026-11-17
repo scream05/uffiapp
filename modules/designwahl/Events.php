@@ -656,4 +656,49 @@ self.addEventListener('push', function (event) {
 });
 JS;
     }
+
+    /** Registrierung: unter „Benutzername“ sagen, welche Zeichen erlaubt sind (HumHub sagt es erst nach dem Fehler, und ungenau) */
+    public static function onRegistrationSetForm($event)
+    {
+        try {
+            $def = &$event->sender->definition;
+            if (isset($def['elements']['User']['elements']['username'])) {
+                $def['elements']['User']['elements']['username']['hint'] = Yii::t('DesignwahlModule.base',
+                    'Ohne Leerzeichen – erlaubt sind Buchstaben, Ziffern und _ - . @ (z. B. Max_Muster). Deinen vollen Namen gibst du weiter unten an.');
+            }
+        } catch (\Throwable $e) {
+            Yii::error($e, 'designwahl');
+        }
+    }
+
+    /** Statt „Benutzername enthält ungültige Zeichen“ genau sagen, welche Zeichen stören */
+    public static function onUserAfterValidate($event)
+    {
+        try {
+            $user = $event->sender;
+            $name = (string)$user->username;
+            $muster = Yii::$app->getModule('user')->validUsernameRegexp;
+            if ($name === '' || !$user->hasErrors('username') || preg_match($muster, $name)) {
+                return;
+            }
+            $stoerend = [];
+            foreach (preg_split('//u', $name, -1, PREG_SPLIT_NO_EMPTY) as $z) {
+                if (!preg_match($muster, $z)) {
+                    $stoerend[$z] = preg_match('/\s/u', $z) ? Yii::t('DesignwahlModule.base', 'Leerzeichen') : '„' . $z . '“';
+                }
+            }
+            $vorschlag = trim(preg_replace('/_+/', '_', preg_replace('/[^\p{L}\d_\-@.]/u', '_', $name)), '_');
+            $fehler = $user->getErrors('username');
+            $user->clearErrors('username');
+            foreach ($fehler as $f) {
+                if (!str_contains($f, Yii::t('UserModule.base', 'Username contains invalid characters.'))) {
+                    $user->addError('username', $f);
+                }
+            }
+            $user->addError('username', Yii::t('DesignwahlModule.base', 'Der Benutzername darf kein {zeichen} enthalten. Erlaubt sind Buchstaben, Ziffern und _ - . @ – zum Beispiel „{vorschlag}“.',
+                ['zeichen' => implode(', ', $stoerend), 'vorschlag' => $vorschlag]));
+        } catch (\Throwable $e) {
+            Yii::error($e, 'designwahl');
+        }
+    }
 }

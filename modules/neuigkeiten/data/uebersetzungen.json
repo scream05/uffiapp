@@ -1,4 +1,31 @@
 {
+    "registrierung-benutzername": {
+        "en": {
+            "titel": "Registering: clearer hint about the username",
+            "text": "When you register, you'll now see right under \"Benutzername\" which characters are allowed. If something doesn't fit, the error message tells you exactly which character is causing the problem (for example a space), together with a suggestion for a fix.",
+            "quelle": "ca1a08addc71b1da30021e212e1b3b8fdc06064f"
+        },
+        "uk": {
+            "titel": "Реєстрація: зрозуміла підказка щодо імені користувача",
+            "text": "Під полем «Benutzername» під час реєстрації тепер одразу видно, які символи дозволені. Якщо щось не так, у повідомленні про помилку точно вказано, який символ заважає (наприклад, пробіл), і пропонується відповідний варіант.",
+            "quelle": "ca1a08addc71b1da30021e212e1b3b8fdc06064f"
+        },
+        "ar": {
+            "titel": "التسجيل: توضيح واضح بشأن اسم المستخدم",
+            "text": "عند التسجيل، يظهر الآن مباشرةً تحت حقل „اسم المستخدم“ الرموز المسموح بها. وإذا لم يكن شيء مناسباً، توضح رسالة الخطأ بالضبط أي رمز يسبب المشكلة (على سبيل المثال مسافة فارغة)، مع اقتراح مناسب.",
+            "quelle": "ca1a08addc71b1da30021e212e1b3b8fdc06064f"
+        },
+        "tr": {
+            "titel": "Kayıt olma: kullanıcı adı için net bir uyarı",
+            "text": "Kayıt olurken artık „Kullanıcı adı“ alanının hemen altında hangi karakterlerin kullanılabileceği yazıyor. Bir şey uymuyorsa hata mesajında tam olarak hangi karakterin sorun çıkardığı (örneğin bir boşluk) ve uygun bir öneri gösteriliyor.",
+            "quelle": "ca1a08addc71b1da30021e212e1b3b8fdc06064f"
+        },
+        "ru": {
+            "titel": "Регистрация: понятная подсказка по имени пользователя",
+            "text": "При регистрации теперь сразу под полем «Имя пользователя» написано, какие символы разрешены. Если что-то не подходит, в сообщении об ошибке точно указано, какой символ мешает (например, пробел), и предлагается подходящий вариант.",
+            "quelle": "ca1a08addc71b1da30021e212e1b3b8fdc06064f"
+        }
+    },
     "maengel-fehlerfelder": {
         "en": {
             "titel": "Report a problem: errors right at the field",

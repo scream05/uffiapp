@@ -36,5 +36,8 @@ return [
         // Zahl am Symbol der Web-App (PWA) bei jedem Push setzen
         ['class' => 'humhub\modules\web\pwa\controllers\ServiceWorkerController', 'event' => 'init', 'callback' => [Events::class, 'onServiceWorkerInit']],
         ['class' => 'humhub\modules\mail\models\MessageEntry', 'event' => 'afterInsert', 'callback' => [Events::class, 'onMessageEntryInsert']],
+        // Registrierung: Hinweis zu erlaubten Zeichen im Benutzernamen und genauere Fehlermeldung
+        ['class' => 'humhub\modules\user\models\forms\Registration', 'event' => 'afterSetForm', 'callback' => [Events::class, 'onRegistrationSetForm']],
+        ['class' => 'humhub\modules\user\models\User', 'event' => 'afterValidate', 'callback' => [Events::class, 'onUserAfterValidate']],
     ],
 ];
