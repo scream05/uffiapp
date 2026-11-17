@@ -1,4 +1,31 @@
 {
+    "abfuhr-auswahl-darstellung": {
+        "en": {
+            "titel": "Waste collection reminder displayed neatly",
+            "text": "In the settings of the waste collection reminder, the selection buttons (Kernstadt\/Ortsteil, bins, time) had shifted out of place and long texts ran under the button. Now buttons and text sit neatly side by side again.",
+            "quelle": "d8b0a796542ca848f64a448cd8d10dab2d24ddce"
+        },
+        "uk": {
+            "titel": "Нагадування про вивіз сміття тепер гарно відображається",
+            "text": "У налаштуваннях нагадування про вивіз сміття кнопки вибору (Kernstadt\/Ortsteil, Tonnen, Uhrzeit) зсунулися, а довгі тексти заходили під кнопку. Тепер кнопка і текст знову стоять акуратно поруч.",
+            "quelle": "d8b0a796542ca848f64a448cd8d10dab2d24ddce"
+        },
+        "ar": {
+            "titel": "تنسيق تذكير جمع النفايات بشكل مرتب",
+            "text": "في إعدادات تذكير جمع النفايات كانت أزرار الاختيار (المدينة الرئيسية\/الحي، الحاويات، الوقت) غير مرتبة، وكانت النصوص الطويلة تمتد أسفل الزر. الآن أصبح الزر والنص متجاورين بشكل مرتب من جديد.",
+            "quelle": "d8b0a796542ca848f64a448cd8d10dab2d24ddce"
+        },
+        "tr": {
+            "titel": "Abfuhr-Erinnerung düzgün gösteriliyor",
+            "text": "Abfuhr-Erinnerung ayarlarında seçim düğmeleri (Kernstadt\/Ortsteil, Tonnen, Uhrzeit) kaymıştı ve uzun metinler düğmenin altına taşıyordu. Artık düğme ile metin yeniden düzgün yan yana duruyor.",
+            "quelle": "d8b0a796542ca848f64a448cd8d10dab2d24ddce"
+        },
+        "ru": {
+            "titel": "Erinnerung an die Abholung jetzt sauber dargestellt",
+            "text": "In den Einstellungen der Abholungs-Erinnerung waren die Auswahlknöpfe (Kernstadt\/Ortsteil, Tonnen, Uhrzeit) verrutscht, und lange Texte liefen unter den Knopf. Jetzt stehen Knopf und Text wieder ordentlich nebeneinander.",
+            "quelle": "d8b0a796542ca848f64a448cd8d10dab2d24ddce"
+        }
+    },
     "registrierung-benutzername": {
         "en": {
             "titel": "Registering: clearer hint about the username",

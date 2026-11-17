@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'abfuhr-auswahl-darstellung', 'datum' => '2026-11-17', 'art' => 'behoben', 'popup' => false,
+        'titel' => 'Abfuhr-Erinnerung sauber dargestellt',
+        'text' => 'In den Einstellungen der Abfuhr-Erinnerung waren die Auswahlknöpfe (Kernstadt/Ortsteil, Tonnen, Uhrzeit) verrutscht und lange Texte liefen unter den Knopf. Jetzt stehen Knopf und Text wieder ordentlich nebeneinander.'],
     ['id' => 'registrierung-benutzername', 'datum' => '2026-11-17', 'art' => 'besser', 'popup' => false,
         'titel' => 'Registrieren: klarer Hinweis zum Benutzernamen',
         'text' => 'Beim Registrieren steht jetzt direkt unter „Benutzername“, welche Zeichen erlaubt sind. Passt etwas nicht, steht in der Fehlermeldung genau, welches Zeichen stört (zum Beispiel ein Leerzeichen), mit einem passenden Vorschlag.'],

@@ -19,29 +19,42 @@ use yii\helpers\Url;
         'link' => Html::a(Yii::t('AbfuhrModule.base', 'Benachrichtigungen'), ['/notification/user'])]) ?></p>
 
     <?= Html::beginForm(['index'], 'post') ?>
-    <div class="checkbox" style="margin-bottom:14px">
-        <label style="font-weight:600"><?= Html::checkbox('aktiv', $aktiv) ?> <?= Yii::t('AbfuhrModule.base', 'Erinnerung einschalten') ?></label>
+    <?php // Bootstrap-5-Markup (form-check), das alte div.radio/div.checkbox aus Bootstrap 3 stellt HumHub 1.19 schief dar ?>
+    <div class="form-check" style="margin-bottom:14px">
+        <?= Html::checkbox('aktiv', $aktiv, ['id' => 'abfuhr-aktiv', 'class' => 'form-check-input']) ?>
+        <label class="form-check-label" for="abfuhr-aktiv" style="font-weight:600"><?= Yii::t('AbfuhrModule.base', 'Erinnerung einschalten') ?></label>
     </div>
 
     <div class="mb-3">
-        <label class="control-label"><?= Yii::t('AbfuhrModule.base', 'Wo wohnst du?') ?></label>
+        <label class="control-label d-block"><?= Yii::t('AbfuhrModule.base', 'Wo wohnst du?') ?></label>
         <div class="help-block" style="margin-top:0"><?= Yii::t('AbfuhrModule.base', 'Restmüll, Bio- und Papiertonne sind in ganz Uffenheim gleich, nur die Gelbe Tonne kommt in den Ortsteilen an einem anderen Tag.') ?></div>
-        <div class="radio"><label><?= Html::radio('gebiet', $gebiet === 'kernstadt', ['value' => 'kernstadt']) ?> <?= Yii::t('AbfuhrModule.base', 'Kernstadt Uffenheim') ?></label></div>
-        <div class="radio"><label><?= Html::radio('gebiet', $gebiet === 'ortsteil', ['value' => 'ortsteil']) ?>
-                <?= Yii::t('AbfuhrModule.base', 'Ortsteil (Brackenlohr, Custenlohr mit Vorder-/Hinterpfeinach, Langensteinach, Rudolzhofen, Uttenhofen, Wallmersbach, Welbhausen)') ?></label></div>
+        <div class="form-check">
+            <?= Html::radio('gebiet', $gebiet === 'kernstadt', ['value' => 'kernstadt', 'id' => 'abfuhr-gebiet-kernstadt', 'class' => 'form-check-input']) ?>
+            <label class="form-check-label" for="abfuhr-gebiet-kernstadt"><?= Yii::t('AbfuhrModule.base', 'Kernstadt Uffenheim') ?></label>
+        </div>
+        <div class="form-check">
+            <?= Html::radio('gebiet', $gebiet === 'ortsteil', ['value' => 'ortsteil', 'id' => 'abfuhr-gebiet-ortsteil', 'class' => 'form-check-input']) ?>
+            <label class="form-check-label" for="abfuhr-gebiet-ortsteil"><?= Yii::t('AbfuhrModule.base', 'Ortsteil (Brackenlohr, Custenlohr mit Vorder-/Hinterpfeinach, Langensteinach, Rudolzhofen, Uttenhofen, Wallmersbach, Welbhausen)') ?></label>
+        </div>
     </div>
 
     <div class="mb-3">
         <label class="control-label"><?= Yii::t('AbfuhrModule.base', 'Woran erinnern?') ?></label>
         <?php foreach (array_keys($module->tonnen) as $key): ?>
-            <div class="checkbox"><label><?= Html::checkbox('tonnen[]', in_array($key, $tonnen, true), ['value' => $key]) ?> <?= Html::encode($module->tonneLabel($key)) ?></label></div>
+            <div class="form-check">
+                <?= Html::checkbox('tonnen[]', in_array($key, $tonnen, true), ['value' => $key, 'id' => 'abfuhr-tonne-' . $key, 'class' => 'form-check-input']) ?>
+                <label class="form-check-label" for="abfuhr-tonne-<?= Html::encode($key) ?>"><?= Html::encode($module->tonneLabel($key)) ?></label>
+            </div>
         <?php endforeach ?>
     </div>
 
     <div class="mb-3">
         <label class="control-label"><?= Yii::t('AbfuhrModule.base', 'Wann?') ?></label>
         <?php foreach (array_keys($module->zeiten) as $key): ?>
-            <div class="radio"><label><?= Html::radio('zeit', $zeit === (string)$key, ['value' => $key]) ?> <?= Html::encode($module->zeitLabel((string)$key)) ?></label></div>
+            <div class="form-check">
+                <?= Html::radio('zeit', $zeit === (string)$key, ['value' => $key, 'id' => 'abfuhr-zeit-' . $key, 'class' => 'form-check-input']) ?>
+                <label class="form-check-label" for="abfuhr-zeit-<?= Html::encode($key) ?>"><?= Html::encode($module->zeitLabel((string)$key)) ?></label>
+            </div>
         <?php endforeach ?>
     </div>
 
