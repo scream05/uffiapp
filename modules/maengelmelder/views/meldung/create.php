@@ -517,8 +517,36 @@ function fehlerWeg(feld) {
     var form = document.getElementById('maengel-form');
     if (!form) return;
     ['input', 'change'].forEach(function (ev) {
-        form.addEventListener(ev, function (e) { if (e.target.id !== 'maengel-adresse') fehlerWeg(e.target); });
+        form.addEventListener(ev, function (e) {
+            if (e.target.id === 'maengel-adresse') return;
+            // Vom Browser geprüfte Felder bleiben rot, bis sie wirklich passen (z. B. mindestens 5 Zeichen)
+            if (e.target.dataset.browserFehler && e.target.checkValidity && !e.target.checkValidity()) return;
+            fehlerWeg(e.target);
+        });
     });
+    // Prüfung des Browsers (Pflichtfeld, Mindestlänge, E-Mail-Format) vor dem Absenden: Feld genauso rot markieren
+    // wie bei einer Ablehnung durch den Server, Hinweis darunter (statt nur der kurzen Sprechblase des Browsers)
+    var eigeneTexte = <?= json_encode([
+        'maengel-kategorie' => Yii::t('MaengelmelderModule.base', 'Bitte eine Kategorie wählen.'),
+        'maengel-beschreibung' => Yii::t('MaengelmelderModule.base', 'Bitte kurz beschreiben, was kaputt ist.'),
+    ], JSON_UNESCAPED_UNICODE) ?>;
+    form.addEventListener('invalid', function (e) {
+        var feld = e.target;
+        if (!feld.id || feld.type === 'hidden') return;
+        feld.dataset.browserFehler = '1';
+        feld.classList.add('is-invalid');
+        feld.setAttribute('aria-invalid', 'true');
+        var hinweis = document.getElementById(feld.id + '-fehler');
+        if (!hinweis) {
+            hinweis = document.createElement('div');
+            hinweis.id = feld.id + '-fehler';
+            hinweis.className = 'invalid-feedback d-block';
+            var nach = feld.closest('.form-check') || feld;
+            nach.after(hinweis);
+            feld.setAttribute('aria-describedby', ((feld.getAttribute('aria-describedby') || '') + ' ' + hinweis.id).trim());
+        }
+        hinweis.textContent = eigeneTexte[feld.id] || feld.validationMessage;
+    }, true);
     function hinfuehren(feld) {
         feld.scrollIntoView({block: 'center', behavior: 'smooth'});
         // Captcha ist ein eigenes Element: das Kästchen darin fokussieren
