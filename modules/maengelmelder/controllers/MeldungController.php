@@ -69,19 +69,21 @@ class MeldungController extends ContentContainerController
             $lat = (float)str_replace(',', '.', $data['lat']);
             $lng = (float)str_replace(',', '.', $data['lng']);
             if (!in_array($data['kategorie'], $this->module->categories, true)) {
-                $errors[] = Yii::t('MaengelmelderModule.base', 'Bitte eine Kategorie wählen.');
+                $errors['kategorie'] = Yii::t('MaengelmelderModule.base', 'Bitte eine Kategorie wählen.');
             }
             if (mb_strlen($data['beschreibung']) < 5) {
-                $errors[] = Yii::t('MaengelmelderModule.base', 'Bitte kurz beschreiben, was kaputt ist.');
+                $errors['beschreibung'] = Yii::t('MaengelmelderModule.base', 'Bitte kurz beschreiben, was kaputt ist.');
             }
             if ($data['lat'] === '' || $data['lng'] === '') {
-                $errors[] = Yii::t('MaengelmelderModule.base', 'Bitte den Ort auf der Karte markieren.');
+                $errors['ort'] = Yii::t('MaengelmelderModule.base', 'Bitte den Ort auf der Karte markieren.');
             } elseif (!$this->module->inBounds($lat, $lng)) {
-                $errors[] = Yii::t('MaengelmelderModule.base', 'Der markierte Ort liegt nicht im Stadtgebiet von Uffenheim.');
+                $errors['ort'] = Yii::t('MaengelmelderModule.base', 'Der markierte Ort liegt nicht im Stadtgebiet von Uffenheim.');
             }
             $kontakt->load(Yii::$app->request->post());
             if (!$kontakt->validate()) {
-                $errors = array_merge($errors, $kontakt->getErrorSummary(false));
+                foreach ($kontakt->getFirstErrors() as $attr => $fehler) {
+                    $errors['kontakt_' . $attr] = $fehler; // Schlüssel = Feld, damit das Formular dorthin führt
+                }
             }
             if ($gast) {
                 if ($kontakt->istBot()) {
@@ -89,7 +91,9 @@ class MeldungController extends ContentContainerController
                     return $this->redirect($space->createUrl('/maengelmelder/meldung/create', ['danke' => 0]));
                 }
                 [$fotos, $fotoFehler] = GastFotos::pruefen($this->module);
-                $errors = array_merge($errors, $fotoFehler);
+                if ($fotoFehler) {
+                    $errors['fotos'] = implode(' ', $fotoFehler);
+                }
                 if (!$errors && !$this->gastZaehlen(false)) {
                     $errors[] = Yii::t('MaengelmelderModule.base', 'Von deinem Anschluss kamen heute schon mehrere Meldungen. Bitte versuch es morgen wieder oder leg ein kostenloses Konto an.');
                 }
@@ -292,13 +296,13 @@ class MeldungController extends ContentContainerController
             $lat = (float)str_replace(',', '.', $data['lat']);
             $lng = (float)str_replace(',', '.', $data['lng']);
             if (!in_array($data['kategorie'], $this->module->categories, true)) {
-                $errors[] = Yii::t('MaengelmelderModule.base', 'Bitte eine Kategorie wählen.');
+                $errors['kategorie'] = Yii::t('MaengelmelderModule.base', 'Bitte eine Kategorie wählen.');
             }
             if (mb_strlen($data['beschreibung']) < 5) {
-                $errors[] = Yii::t('MaengelmelderModule.base', 'Bitte kurz beschreiben, was kaputt ist.');
+                $errors['beschreibung'] = Yii::t('MaengelmelderModule.base', 'Bitte kurz beschreiben, was kaputt ist.');
             }
             if (!$this->module->inBounds($lat, $lng)) {
-                $errors[] = Yii::t('MaengelmelderModule.base', 'Der markierte Ort liegt nicht im Stadtgebiet von Uffenheim.');
+                $errors['ort'] = Yii::t('MaengelmelderModule.base', 'Der markierte Ort liegt nicht im Stadtgebiet von Uffenheim.');
             }
             if (!$errors) {
                 $post = $mangel->post;

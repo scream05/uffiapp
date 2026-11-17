@@ -1,4 +1,31 @@
 {
+    "maengel-fehlerfelder": {
+        "en": {
+            "titel": "Report a problem: errors right at the field",
+            "text": "If something is still missing when you report a problem, the page now jumps straight to the affected field. It is outlined in red and the note appears right below it. The hints in the red box at the top can be tapped too and also take you to the field.",
+            "quelle": "a902a95e45a515f3f9977b73c4a8468ab6f4ff5f"
+        },
+        "uk": {
+            "titel": "Mangel melden: Fehler direkt am Feld",
+            "text": "Fehlt beim Mangel melden noch etwas, springt die Seite jetzt direkt zum betroffenen Feld. Es ist rot umrandet und der Hinweis steht gleich darunter. Die Hinweise oben im roten Kasten lassen sich antippen und führen ebenfalls zum Feld.",
+            "quelle": "a902a95e45a515f3f9977b73c4a8468ab6f4ff5f"
+        },
+        "ar": {
+            "titel": "الإبلاغ عن عطل: الحقول الخاطئة مباشرةً",
+            "text": "إذا كان هناك شيء ناقص عند الإبلاغ عن عطل، تنتقل الصفحة الآن مباشرةً إلى الحقل المعني. يظهر الحقل محاطاً بإطار أحمر، وتظهر الملاحظة مباشرةً تحته. ويمكنك أيضاً النقر على الملاحظات الموجودة أعلى الصندوق الأحمر، فتنقلك هي الأخرى إلى الحقل.",
+            "quelle": "a902a95e45a515f3f9977b73c4a8468ab6f4ff5f"
+        },
+        "tr": {
+            "titel": "Sorun bildir: Hatalar doğrudan alanda",
+            "text": "Sorun bildirirken bir şey eksikse sayfa artık doğrudan ilgili alana geçiyor. Alan kırmızı çerçeveyle vurgulanıyor ve uyarı hemen altında yer alıyor. Üstteki kırmızı kutudaki uyarılara dokunabilirsiniz; bunlar da sizi ilgili alana götürür.",
+            "quelle": "a902a95e45a515f3f9977b73c4a8468ab6f4ff5f"
+        },
+        "ru": {
+            "titel": "Mangel melden: Fehler direkt am Feld",
+            "text": "Fehlt beim Mangel melden noch etwas, springt die Seite jetzt direkt zum betroffenen Feld. Es ist rot umrandet und der Hinweis steht gleich darunter. Die Hinweise oben im roten Kasten lassen sich antippen und führen ebenfalls zum Feld.",
+            "quelle": "a902a95e45a515f3f9977b73c4a8468ab6f4ff5f"
+        }
+    },
     "uffi-gross-klein": {
         "en": {
             "titel": "Uffi forgets nothing when you enlarge it",

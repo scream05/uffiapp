@@ -21,6 +21,15 @@ use yii\helpers\Url;
 MapAsset::register($this);
 $gast = Yii::$app->user->isGuest;
 $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '';
+// Fehler der Meldungsfelder (Schlüssel aus dem Controller) → Feld rot markieren, Hinweis direkt darunter
+$feldIds = ['kategorie' => 'maengel-kategorie', 'beschreibung' => 'maengel-beschreibung', 'ort' => 'maengel-adresse', 'fotos' => 'maengel-fotos'];
+foreach (['vorname', 'nachname', 'email', 'telefon', 'info_mail', 'info_whatsapp', 'datenschutz'] as $attr) {
+    $feldIds['kontakt_' . $attr] = 'kontakt-' . str_replace('_', '-', $attr);
+}
+$ungueltig = fn(string $k) => isset($errors[$k]) ? ' is-invalid' : '';
+$hinweis = fn(string $k) => isset($errors[$k])
+    ? Html::tag('div', Html::encode($errors[$k]), ['class' => 'invalid-feedback d-block', 'id' => $feldIds[$k] . '-fehler']) : '';
+$fehlerAria = fn(string $k) => isset($errors[$k]) ? ['aria-invalid' => 'true', 'aria-describedby' => $feldIds[$k] . '-fehler'] : [];
 ?>
 <div class="panel panel-default">
     <div class="panel-heading"><strong><?= $bearbeiten ? 'Meldung Nr. ' . $bearbeiten->getContentId() . ' bearbeiten' : Yii::t('MaengelmelderModule.base', 'Mangel melden') ?></strong>
@@ -74,7 +83,11 @@ $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '
             <p class="help-block"><?= Yii::t('MaengelmelderModule.base', 'Schlagloch, defekte Laterne, wilder Müll? Beschreib den Mangel, markier den Ort auf der Karte und füg gern ein Foto hinzu. Die Meldung erscheint als Beitrag in diesem Bereich. Bitte keine Personen oder Kfz-Kennzeichen erkennbar fotografieren.') ?></p>
             <?php endif ?>
             <?php if ($errors): ?>
-                <div class="alert alert-danger"><?= implode('<br>', array_map([Html::class, 'encode'], $errors)) ?></div>
+                <div class="alert alert-danger maengel-fehler" role="alert">
+                    <?php foreach ($errors as $k => $e): ?>
+                        <div><?= isset($feldIds[$k]) ? Html::a(Html::encode($e), '#' . $feldIds[$k], ['class' => 'alert-link']) : Html::encode($e) ?></div>
+                    <?php endforeach ?>
+                </div>
             <?php endif ?>
 
             <?= Html::beginForm('', 'post', ['id' => 'maengel-form'] + ($gast ? ['enctype' => 'multipart/form-data'] : [])) ?>
@@ -82,23 +95,26 @@ $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '
                 <label for="maengel-kategorie"><?= Yii::t('MaengelmelderModule.base', 'Kategorie') ?></label>
                 <?php // Gespeichert wird der deutsche Wert (Beitragstext, KI-Assistent), angezeigt die Übersetzung ?>
                 <?= Html::dropDownList('Meldung[kategorie]', $data['kategorie'], array_combine($module->categories, array_map([$module, 'kategorieLabel'], $module->categories)),
-                    ['id' => 'maengel-kategorie', 'class' => 'form-control', 'prompt' => Yii::t('MaengelmelderModule.base', 'Bitte wählen …'), 'required' => true]) ?>
+                    ['id' => 'maengel-kategorie', 'class' => 'form-control' . $ungueltig('kategorie'), 'prompt' => Yii::t('MaengelmelderModule.base', 'Bitte wählen …'), 'required' => true] + $fehlerAria('kategorie')) ?>
+                <?= $hinweis('kategorie') ?>
             </div>
             <div class="form-group">
                 <label for="maengel-beschreibung"><?= Yii::t('MaengelmelderModule.base', 'Was ist kaputt?') ?></label>
                 <?= Html::textarea('Meldung[beschreibung]', $data['beschreibung'],
-                    ['id' => 'maengel-beschreibung', 'class' => 'form-control', 'rows' => 4, 'maxlength' => 3000, 'required' => true,
-                        'placeholder' => Yii::t('MaengelmelderModule.base', 'z. B. Tiefes Schlagloch am Fahrbahnrand, ca. 30 cm breit')]) ?>
+                    ['id' => 'maengel-beschreibung', 'class' => 'form-control' . $ungueltig('beschreibung'), 'rows' => 4, 'minlength' => 5, 'maxlength' => 3000, 'required' => true,
+                        'placeholder' => Yii::t('MaengelmelderModule.base', 'z. B. Tiefes Schlagloch am Fahrbahnrand, ca. 30 cm breit')] + $fehlerAria('beschreibung')) ?>
+                <?= $hinweis('beschreibung') ?>
             </div>
             <div class="form-group">
                 <label for="maengel-adresse"><?= Yii::t('MaengelmelderModule.base', 'Ort') ?></label>
                 <p class="help-block" id="maengel-ort-hilfe" style="margin-top:0"><?= Yii::t('MaengelmelderModule.base', 'Adresse eingeben und suchen, in die Karte tippen oder deinen Standort verwenden.') ?></p>
                 <div class="maengel-adresse-zeile">
-                    <input type="text" id="maengel-adresse" class="form-control" autocomplete="street-address"
-                           aria-describedby="maengel-ort-hilfe maengel-coords" placeholder="<?= Html::encode(Yii::t('MaengelmelderModule.base', 'z. B. Hauptstraße 5')) ?>">
+                    <input type="text" id="maengel-adresse" class="form-control<?= $ungueltig('ort') ?>" autocomplete="street-address"
+                           aria-describedby="maengel-ort-hilfe maengel-coords<?= isset($errors['ort']) ? ' maengel-adresse-fehler' : '' ?>"<?= isset($errors['ort']) ? ' aria-invalid="true"' : '' ?> placeholder="<?= Html::encode(Yii::t('MaengelmelderModule.base', 'z. B. Hauptstraße 5')) ?>">
                     <button type="button" class="btn btn-light" id="maengel-suchen"><i class="fa fa-search" aria-hidden="true"></i> <?= Yii::t('MaengelmelderModule.base', 'Ort suchen') ?></button>
                 </div>
-                <div id="maengel-map" style="height:380px;border-radius:4px;margin-top:8px" role="region" aria-label="<?= Html::encode(Yii::t('MaengelmelderModule.base', 'Karte zum Markieren des Orts')) ?>"></div>
+                <?= $hinweis('ort') ?>
+                <div id="maengel-map" class="<?= isset($errors['ort']) ? 'maengel-ungueltig' : '' ?>" style="height:380px;border-radius:4px;margin-top:8px" role="region" aria-label="<?= Html::encode(Yii::t('MaengelmelderModule.base', 'Karte zum Markieren des Orts')) ?>"></div>
                 <div style="margin-top:6px">
                     <button type="button" class="btn btn-light btn-sm" id="maengel-locate"><i class="fa fa-crosshairs" aria-hidden="true"></i> <?= Yii::t('MaengelmelderModule.base', 'Meinen Standort verwenden') ?></button>
                     <span id="maengel-coords" class="text-muted" style="margin-left:8px" role="status" aria-live="polite"></span>
@@ -110,9 +126,10 @@ $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '
             <?php if ($gast): ?>
             <div class="form-group">
                 <label for="maengel-fotos"><?= Yii::t('MaengelmelderModule.base', 'Fotos') ?> <small class="text-muted"><?= Yii::t('MaengelmelderModule.base', '– freiwillig, höchstens {max}', ['max' => $module->gastFotos]) ?></small></label>
-                <input type="file" name="fotos[]" id="maengel-fotos" class="form-control" accept="image/*" multiple
+                <input type="file" name="fotos[]" id="maengel-fotos" class="form-control<?= $ungueltig('fotos') ?>" accept="image/*" multiple
                        data-max="<?= $module->gastFotos ?>" data-max-mb="<?= $module->gastFotoMaxMb ?>">
                 <small class="text-muted" id="maengel-fotos-hinweis"></small>
+                <?= $hinweis('fotos') ?>
             </div>
             <?php else: ?>
             <div class="form-group">
@@ -140,11 +157,13 @@ $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '
                         <label for="kontakt-vorname"><?= Yii::t('MaengelmelderModule.base', 'Vorname') ?></label>
                         <?= Html::activeTextInput($kontakt, 'vorname', ['id' => 'kontakt-vorname', 'class' => 'form-control' . $feld('vorname'),
                             'required' => true, 'maxlength' => 60, 'autocomplete' => 'given-name']) ?>
+                        <?= $hinweis('kontakt_vorname') ?>
                     </div>
                     <div class="col-sm-6 form-group">
                         <label for="kontakt-nachname"><?= Yii::t('MaengelmelderModule.base', 'Nachname') ?></label>
                         <?= Html::activeTextInput($kontakt, 'nachname', ['id' => 'kontakt-nachname', 'class' => 'form-control' . $feld('nachname'),
                             'required' => true, 'maxlength' => 60, 'autocomplete' => 'family-name']) ?>
+                        <?= $hinweis('kontakt_nachname') ?>
                     </div>
                 </div>
                 <div class="row">
@@ -152,11 +171,13 @@ $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '
                         <label for="kontakt-email"><?= Yii::t('MaengelmelderModule.base', 'E-Mail') ?></label>
                         <?= Html::activeInput('email', $kontakt, 'email', ['id' => 'kontakt-email', 'class' => 'form-control' . $feld('email'),
                             'maxlength' => 150, 'autocomplete' => 'email']) ?>
+                        <?= $hinweis('kontakt_email') ?>
                     </div>
                     <div class="col-sm-6 form-group">
                         <label for="kontakt-telefon"><?= Yii::t('MaengelmelderModule.base', 'Telefon') ?></label>
                         <?= Html::activeInput('tel', $kontakt, 'telefon', ['id' => 'kontakt-telefon', 'class' => 'form-control' . $feld('telefon'),
                             'maxlength' => 30, 'autocomplete' => 'tel']) ?>
+                        <?= $hinweis('kontakt_telefon') ?>
                     </div>
                 </div>
                 <p class="help-block"><?= Yii::t('MaengelmelderModule.base', 'Bitte mindestens E-Mail oder Telefon angeben.') ?></p>
@@ -186,6 +207,7 @@ $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '
                         'label' => false, 'uncheck' => '0', 'required' => true]) ?>
                     <label class="form-check-label" for="kontakt-datenschutz"><?= Yii::t('MaengelmelderModule.base', 'Ich bin einverstanden, dass meine Angaben zur Bearbeitung dieser Meldung gespeichert werden. Einzelheiten in der {link}.', [
                         'link' => Html::a(Yii::t('MaengelmelderModule.base', 'Datenschutzerklärung'), Url::to(['/legal/page/view', 'pageKey' => 'privacy']), ['target' => '_blank', 'rel' => 'noopener'])]) ?></label>
+                    <?= $hinweis('kontakt_datenschutz') ?>
                 </div>
                 <div class="form-group">
                     <?= CaptchaField::widget(['model' => $kontakt, 'attribute' => 'captcha']) ?>
@@ -201,6 +223,7 @@ $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '
                     <label for="kontakt-telefon"><?= Yii::t('MaengelmelderModule.base', 'Telefon') ?> <small class="text-muted"><?= Yii::t('MaengelmelderModule.base', '– freiwillig, für WhatsApp-Infos eine Handynummer') ?></small></label>
                     <?= Html::activeInput('tel', $kontakt, 'telefon', ['id' => 'kontakt-telefon', 'class' => 'form-control' . $feld('telefon'),
                         'maxlength' => 30, 'autocomplete' => 'tel']) ?>
+                        <?= $hinweis('kontakt_telefon') ?>
                     <small class="text-muted"><?= Yii::t('MaengelmelderModule.base', 'Nur für Rückfragen zu dieser Meldung; sieht nur der Bauhof.') ?></small>
                 </div>
                 <?php if ($module->buergerInfoAktiv()): ?>
@@ -233,6 +256,14 @@ $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '
     .maengel-kontakt legend { font-size: 1rem; font-weight: 600; margin-bottom: 6px; }
     .maengel-adresse-zeile { display: flex; gap: 8px; }
     .maengel-adresse-zeile .form-control { flex: 1; min-width: 0; }
+    /* Fehlerhafte Felder deutlich zeigen: rote Beschriftung, roter Rahmen mit Schein, Karte rot umrandet */
+    #maengel-form .form-group:has(.is-invalid) > label,
+    #maengel-form .form-check:has(.is-invalid) .form-check-label { color: var(--bs-danger, #dc3545); font-weight: 600; }
+    #maengel-form .form-control.is-invalid { border-color: var(--bs-danger, #dc3545) !important; border-width: 2px; box-shadow: 0 0 0 .2rem rgba(220, 53, 69, .2); }
+    #maengel-form .form-control.is-invalid:focus { border-color: var(--bs-danger, #dc3545) !important; outline: none; box-shadow: 0 0 0 .25rem rgba(220, 53, 69, .35) !important; }
+    #maengel-form .invalid-feedback { font-weight: 600; font-size: .9rem; }
+    #maengel-map.maengel-ungueltig { outline: 2px solid var(--bs-danger, #dc3545); outline-offset: 2px; }
+    .maengel-fehler .alert-link { text-decoration: underline; }
     .maengel-feld-website { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
 </style>
 <?= $this->render('_tiles') ?>
@@ -402,6 +433,7 @@ maengelReady(function () {
         }
         lat.value = ll.lat.toFixed(6);
         lng.value = ll.lng.toFixed(6);
+        fehlerWeg(document.getElementById('maengel-adresse'));
         coords.textContent = fmt(t.markiert, {koordinaten: lat.value + ', ' + lng.value});
         loadNahe(ll);
         if (pan) map.setView(ll, Math.max(map.getZoom(), 17));
@@ -469,5 +501,34 @@ maengelReady(function () {
         if (!lat.value) { e.preventDefault(); coords.textContent = t.ortFehlt; adresse.focus(); }
     });
 });
+// Nach einer abgelehnten Meldung direkt zum ersten fehlerhaften Feld führen; Markierung verschwindet beim Korrigieren
+function fehlerWeg(feld) {
+    if (!feld || !feld.classList.contains('is-invalid')) return;
+    feld.classList.remove('is-invalid');
+    feld.removeAttribute('aria-invalid');
+    var hinweis = document.getElementById(feld.id + '-fehler');
+    if (hinweis) hinweis.remove();
+    if (feld.id === 'maengel-adresse') document.getElementById('maengel-map').classList.remove('maengel-ungueltig');
+}
+(function () {
+    var form = document.getElementById('maengel-form');
+    if (!form) return;
+    ['input', 'change'].forEach(function (ev) {
+        form.addEventListener(ev, function (e) { if (e.target.id !== 'maengel-adresse') fehlerWeg(e.target); });
+    });
+    function hinfuehren(feld) {
+        feld.scrollIntoView({block: 'center', behavior: 'smooth'});
+        try { feld.focus({preventScroll: true}); } catch (e) { feld.focus(); }
+    }
+    var erstes = form.querySelector('.is-invalid');
+    if (erstes) hinfuehren(erstes);
+    // Links im roten Kasten: sanft zum Feld scrollen und hineinsetzen
+    document.querySelectorAll('.maengel-fehler a[href^="#"]').forEach(function (a) {
+        a.addEventListener('click', function (e) {
+            var feld = document.getElementById(a.getAttribute('href').slice(1));
+            if (feld) { e.preventDefault(); hinfuehren(feld); }
+        });
+    });
+})();
 </script>
 <?php endif ?>

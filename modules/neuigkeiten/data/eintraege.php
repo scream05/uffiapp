@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'maengel-fehlerfelder', 'datum' => '2026-11-17', 'art' => 'besser', 'popup' => false,
+        'titel' => 'Mangel melden: Fehler direkt am Feld',
+        'text' => 'Fehlt beim Mangel melden noch etwas, springt die Seite jetzt direkt zum betroffenen Feld. Es ist rot umrandet und der Hinweis steht gleich darunter. Die Hinweise oben im roten Kasten lassen sich antippen und führen ebenfalls zum Feld.'],
     ['id' => 'uffi-gross-klein', 'datum' => '2026-11-17', 'art' => 'behoben', 'popup' => false,
         'titel' => 'Uffi vergisst beim Vergrößern nichts mehr',
         'text' => 'Wenn du Uffis kleines Fenster als ganze Seite öffnest, siehst du dort jetzt dasselbe Gespräch und deinen angefangenen Text. Bisher war beides auf der großen Seite verschwunden und tauchte erst im kleinen Fenster wieder auf.'],
