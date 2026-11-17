@@ -84,6 +84,7 @@ $this->registerJs('window.kiChatDomains = ' . json_encode(Yii::$app->getModule('
     kiChat(document.querySelector('.ki-page'), {
         askUrl: <?= json_encode(Url::to(['ask'])) ?>,
         feedbackUrl: <?= json_encode(Url::to(['feedback'])) ?>,
+        storageKey: 'ki-assistent-chat', // gleiches Gespräch wie im Chatfenster
         pageScroll: mobile,
         onAsk: function () { info.removeAttribute('open'); },
         onUsage: function (usage) {

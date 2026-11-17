@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'uffi-gross-klein', 'datum' => '2026-11-17', 'art' => 'behoben', 'popup' => false,
+        'titel' => 'Uffi vergisst beim Vergrößern nichts mehr',
+        'text' => 'Wenn du Uffis kleines Fenster als ganze Seite öffnest, siehst du dort jetzt dasselbe Gespräch und deinen angefangenen Text. Bisher war beides auf der großen Seite verschwunden und tauchte erst im kleinen Fenster wieder auf.'],
     ['id' => 'uffi-archiv', 'datum' => '2026-11-16', 'art' => 'neu', 'popup' => false,
         'titel' => 'Uffi kennt das Mitteilungsblatt ab 2017',
         'text' => 'Du kannst Uffi jetzt auch nach Früherem fragen, zum Beispiel „Wann wurde das Hallenbad wieder eröffnet?“. Er sucht dann in den Mitteilungsblättern seit 2017, nennt Ausgabe und Datum und verlinkt die Seite.'],

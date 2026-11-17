@@ -129,31 +129,62 @@ window.kiChat = function (root, opts) {
         return div;
     }
 
+    // Verlauf und angefangene Eingabe teilen sich Chatfenster und Chat-Seite (gleicher storageKey):
+    // „Als Seite öffnen“ und zurück zeigt dasselbe Gespräch und denselben Entwurf.
+    var laeuft = false;
+    var stand = null; // zuletzt geladener/gespeicherter Verlauf als JSON (erkennt Änderungen der anderen Ansicht)
     function save() {
         if (!opts.storageKey) return;
         try {
-            sessionStorage.setItem(opts.storageKey, JSON.stringify({history: history, log: log}));
+            stand = JSON.stringify({history: history, log: log});
+            sessionStorage.setItem(opts.storageKey, stand);
         } catch (e) { /* privater Modus o. Ä.: dann eben ohne Wiederherstellen */ }
     }
 
-    if (opts.storageKey) {
+    function saveEntwurf() {
+        if (!opts.storageKey) return;
+        try { sessionStorage.setItem(opts.storageKey + '-eingabe', input.value); } catch (e) {}
+    }
+
+    // Aus sessionStorage (neu) aufbauen – beim Start und wenn die andere Ansicht inzwischen weitergeschrieben hat
+    function laden() {
+        if (!opts.storageKey || laeuft) return; // während eine Antwort läuft nichts umbauen
         try {
-            var saved = JSON.parse(sessionStorage.getItem(opts.storageKey) || 'null');
-            if (saved && Array.isArray(saved.history) && Array.isArray(saved.log)) {
-                history = saved.history;
-                log = saved.log;
-                log.forEach(function (m) {
-                    add(m.role, m.role === 'user' ? esc(m.text) : render(m.text) + cards(m.cards));
-                });
+            var roh = sessionStorage.getItem(opts.storageKey) || 'null';
+            if (roh !== stand) {
+                stand = roh;
+                var saved = JSON.parse(roh);
+                box.querySelectorAll('.ki-msg').forEach(function (m) { m.remove(); });
+                lastUser = null;
+                history = [];
+                log = [];
+                if (saved && Array.isArray(saved.history) && Array.isArray(saved.log)) {
+                    history = saved.history;
+                    log = saved.log;
+                    log.forEach(function (m) {
+                        add(m.role, m.role === 'user' ? esc(m.text) : render(m.text) + cards(m.cards));
+                    });
+                }
             }
+            var entwurf = sessionStorage.getItem(opts.storageKey + '-eingabe');
+            if (entwurf !== null && entwurf !== input.value) input.value = entwurf;
         } catch (e) { /* defekter Eintrag: neu beginnen */ }
     }
+
+    laden();
+    input.addEventListener('input', saveEntwurf);
+    // Zurück-Taste (Seite aus dem Cache) und HumHub-Seitenwechsel ohne Neuladen (PJAX): das Chatfenster bleibt
+    // dann im Speicher stehen und muss den Stand der Chat-Seite übernehmen
+    window.addEventListener('pageshow', laden);
+    if (window.jQuery) window.jQuery(document).on('pjax:end', laden);
 
     form.addEventListener('submit', function (e) {
         e.preventDefault();
         var q = input.value.trim();
         if (!q) return;
         input.value = '';
+        saveEntwurf();
+        laeuft = true;
         input.disabled = true;
         if (opts.onAsk) opts.onAsk();
         add('user', esc(q));
@@ -215,6 +246,7 @@ window.kiChat = function (root, opts) {
                 pending.innerHTML = '<span class="text-danger">' + esc(t('Verbindungsfehler')) + '</span>';
             })
             .finally(function () {
+                laeuft = false;
                 input.disabled = false;
                 // Handy/Tablet: Bildschirmtastatur nicht wieder über die Antwort legen
                 if (!touchDevice()) input.focus();

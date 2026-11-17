@@ -1,4 +1,31 @@
 {
+    "uffi-gross-klein": {
+        "en": {
+            "titel": "Uffi forgets nothing when you enlarge it",
+            "text": "When you open Uffi's small window as a full page, you now see the same conversation and your unfinished text there too. Until now, both had disappeared on the full page and only reappeared in the small window.",
+            "quelle": "96f47ac116c3c08824c1be9304375ecd66ff5288"
+        },
+        "uk": {
+            "titel": "Uffi більше нічого не губить під час збільшення",
+            "text": "Коли ти відкриваєш маленьке вікно Uffi на всю сторінку, там тепер видно ту саму розмову та твій початий текст. Раніше на великій сторінці все це зникало і з'являлося лише знову в маленькому вікні.",
+            "quelle": "96f47ac116c3c08824c1be9304375ecd66ff5288"
+        },
+        "ar": {
+            "titel": "أوفي لا ينسى شيئًا بعد الآن عند التكبير",
+            "text": "عندما تفتح نافذة أوفي الصغيرة كصفحة كاملة، سترى هناك الآن المحادثة نفسها والنص الذي بدأت كتابته. حتى الآن كان كلاهما يختفي في الصفحة الكبيرة ولا يظهر إلا مرة أخرى في النافذة الصغيرة.",
+            "quelle": "96f47ac116c3c08824c1be9304375ecd66ff5288"
+        },
+        "tr": {
+            "titel": "Uffi vergisst beim Vergrößern nichts mehr",
+            "text": "Wenn du Uffis kleines Fenster als ganze Seite öffnest, siehst du dort jetzt dasselbe Gespräch und deinen angefangenen Text. Bisher war beides auf der großen Seite verschwunden und tauchte erst im kleinen Fenster wieder auf.",
+            "quelle": "96f47ac116c3c08824c1be9304375ecd66ff5288"
+        },
+        "ru": {
+            "titel": "Uffi vergisst beim Vergrößern nichts mehr",
+            "text": "Wenn du Uffis kleines Fenster als ganze Seite öffnest, siehst du dort jetzt dasselbe Gespräch und deinen angefangenen Text. Bisher war beides auf der großen Seite verschwunden und tauchte erst im kleinen Fenster wieder auf.",
+            "quelle": "96f47ac116c3c08824c1be9304375ecd66ff5288"
+        }
+    },
     "uffi-archiv": {
         "en": {
             "titel": "Uffi knows the community newsletter from 2017 onwards",
