@@ -165,4 +165,5 @@ return [
     'Geprüft und freigegeben' => 'تم الفحص والنشر',
     'Deine Meldung ist jetzt auf der Karte zu sehen.' => 'بلاغك ظاهر الآن على الخريطة.',
     'Tipp auf den Knopf und in WhatsApp auf Senden. Damit bestätigst du, dass die angegebene Nummer deine ist – so bekommt niemand Nachrichten, der sie nicht will. Erst danach schreiben wir dir per WhatsApp.' => 'اضغط على الزر ثم على «إرسال» في واتساب. بذلك تؤكد أن الرقم الذي أدخلته هو رقمك – فلا يتلقى أحد رسائل لا يريدها. بعد ذلك فقط نراسلك عبر واتساب.',
+    'Bitte unten „Ich bin kein Roboter“ antippen und warten, bis „Überprüft“ erscheint.' => 'يرجى النقر أدناه على «لست روبوتًا» والانتظار حتى تظهر «تم التحقق».',
 ];

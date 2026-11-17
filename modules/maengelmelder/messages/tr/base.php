@@ -165,4 +165,5 @@ return [
     'Geprüft und freigegeben' => 'Kontrol edildi ve yayınlandı',
     'Deine Meldung ist jetzt auf der Karte zu sehen.' => 'Bildirimin artık haritada görünüyor.',
     'Tipp auf den Knopf und in WhatsApp auf Senden. Damit bestätigst du, dass die angegebene Nummer deine ist – so bekommt niemand Nachrichten, der sie nicht will. Erst danach schreiben wir dir per WhatsApp.' => 'Düğmeye dokun ve WhatsApp’ta Gönder’e bas. Böylece girdiğin numaranın sana ait olduğunu onaylarsın – istemeyen kimse mesaj almaz. Ancak bundan sonra sana WhatsApp’tan yazarız.',
+    'Bitte unten „Ich bin kein Roboter“ antippen und warten, bis „Überprüft“ erscheint.' => 'Lütfen aşağıdaki „Ben robot değilim“ kutusuna dokun ve „Doğrulandı“ yazısı çıkana kadar bekle.',
 ];

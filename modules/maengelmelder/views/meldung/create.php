@@ -23,7 +23,7 @@ $gast = Yii::$app->user->isGuest;
 $feld = fn(string $a) => $kontakt && $kontakt->hasErrors($a) ? ' is-invalid' : '';
 // Fehler der Meldungsfelder (Schlüssel aus dem Controller) → Feld rot markieren, Hinweis direkt darunter
 $feldIds = ['kategorie' => 'maengel-kategorie', 'beschreibung' => 'maengel-beschreibung', 'ort' => 'maengel-adresse', 'fotos' => 'maengel-fotos'];
-foreach (['vorname', 'nachname', 'email', 'telefon', 'info_mail', 'info_whatsapp', 'datenschutz'] as $attr) {
+foreach (['vorname', 'nachname', 'email', 'telefon', 'info_mail', 'info_whatsapp', 'datenschutz', 'captcha'] as $attr) {
     $feldIds['kontakt_' . $attr] = 'kontakt-' . str_replace('_', '-', $attr);
 }
 $ungueltig = fn(string $k) => isset($errors[$k]) ? ' is-invalid' : '';
@@ -209,8 +209,9 @@ $fehlerAria = fn(string $k) => isset($errors[$k]) ? ['aria-invalid' => 'true', '
                         'link' => Html::a(Yii::t('MaengelmelderModule.base', 'Datenschutzerklärung'), Url::to(['/legal/page/view', 'pageKey' => 'privacy']), ['target' => '_blank', 'rel' => 'noopener'])]) ?></label>
                     <?= $hinweis('kontakt_datenschutz') ?>
                 </div>
-                <div class="form-group">
+                <div class="form-group maengel-captcha<?= isset($errors['kontakt_captcha']) ? ' maengel-ungueltig' : '' ?>">
                     <?= CaptchaField::widget(['model' => $kontakt, 'attribute' => 'captcha']) ?>
+                    <?= $hinweis('kontakt_captcha') ?>
                 </div>
             </fieldset>
             <?php elseif ($kontakt): ?>
@@ -262,6 +263,7 @@ $fehlerAria = fn(string $k) => isset($errors[$k]) ? ['aria-invalid' => 'true', '
     #maengel-form .form-control.is-invalid { border-color: var(--bs-danger, #dc3545) !important; border-width: 2px; box-shadow: 0 0 0 .2rem rgba(220, 53, 69, .2); }
     #maengel-form .form-control.is-invalid:focus { border-color: var(--bs-danger, #dc3545) !important; outline: none; box-shadow: 0 0 0 .25rem rgba(220, 53, 69, .35) !important; }
     #maengel-form .invalid-feedback { font-weight: 600; font-size: .9rem; }
+    .maengel-captcha.maengel-ungueltig { outline: 2px solid var(--bs-danger, #dc3545); outline-offset: 4px; border-radius: 4px; }
     #maengel-map.maengel-ungueltig { outline: 2px solid var(--bs-danger, #dc3545); outline-offset: 2px; }
     .maengel-fehler .alert-link { text-decoration: underline; }
     .maengel-feld-website { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
@@ -509,6 +511,7 @@ function fehlerWeg(feld) {
     var hinweis = document.getElementById(feld.id + '-fehler');
     if (hinweis) hinweis.remove();
     if (feld.id === 'maengel-adresse') document.getElementById('maengel-map').classList.remove('maengel-ungueltig');
+    if (feld.id === 'kontakt-captcha') feld.closest('.maengel-captcha').classList.remove('maengel-ungueltig');
 }
 (function () {
     var form = document.getElementById('maengel-form');
@@ -518,9 +521,14 @@ function fehlerWeg(feld) {
     });
     function hinfuehren(feld) {
         feld.scrollIntoView({block: 'center', behavior: 'smooth'});
-        try { feld.focus({preventScroll: true}); } catch (e) { feld.focus(); }
+        // Captcha ist ein eigenes Element: das Kästchen darin fokussieren
+        var ziel = feld.tagName === 'ALTCHA-WIDGET' ? (feld.querySelector('input') || feld) : feld;
+        try { ziel.focus({preventScroll: true}); } catch (e) { ziel.focus(); }
     }
-    var erstes = form.querySelector('.is-invalid');
+    var captcha = document.getElementById('kontakt-captcha');
+    if (captcha) captcha.addEventListener('verified', function () { fehlerWeg(captcha); });
+    var erstes = form.querySelector('.is-invalid, .maengel-captcha.maengel-ungueltig');
+    if (erstes && erstes.classList.contains('maengel-captcha')) erstes = erstes.querySelector('altcha-widget') || erstes;
     if (erstes) hinfuehren(erstes);
     // Links im roten Kasten: sanft zum Feld scrollen und hineinsetzen
     document.querySelectorAll('.maengel-fehler a[href^="#"]').forEach(function (a) {

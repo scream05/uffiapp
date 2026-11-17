@@ -84,6 +84,10 @@ class MeldungController extends ContentContainerController
                 foreach ($kontakt->getFirstErrors() as $attr => $fehler) {
                     $errors['kontakt_' . $attr] = $fehler; // Schlüssel = Feld, damit das Formular dorthin führt
                 }
+                if (isset($errors['kontakt_captcha'])) {
+                    // HumHub sagt nur „Überprüfung fehlgeschlagen“ – sagen, was zu tun ist
+                    $errors['kontakt_captcha'] = Yii::t('MaengelmelderModule.base', 'Bitte unten „Ich bin kein Roboter“ antippen und warten, bis „Überprüft“ erscheint.');
+                }
             }
             if ($gast) {
                 if ($kontakt->istBot()) {

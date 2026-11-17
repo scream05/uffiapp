@@ -165,4 +165,5 @@ return [
     'Geprüft und freigegeben' => 'Проверено и опубликовано',
     'Deine Meldung ist jetzt auf der Karte zu sehen.' => 'Ваше сообщение теперь видно на карте.',
     'Tipp auf den Knopf und in WhatsApp auf Senden. Damit bestätigst du, dass die angegebene Nummer deine ist – so bekommt niemand Nachrichten, der sie nicht will. Erst danach schreiben wir dir per WhatsApp.' => 'Нажми на кнопку, а затем «Отправить» в WhatsApp. Так ты подтверждаешь, что указанный номер принадлежит тебе, – и никто не получит нежелательных сообщений. Только после этого мы будем писать тебе в WhatsApp.',
+    'Bitte unten „Ich bin kein Roboter“ antippen und warten, bis „Überprüft“ erscheint.' => 'Пожалуйста, нажми ниже «Я не робот» и подожди, пока появится «Проверено».',
 ];
