@@ -513,6 +513,11 @@ function fehlerWeg(feld) {
     if (feld.id === 'maengel-adresse') document.getElementById('maengel-map').classList.remove('maengel-ungueltig');
     if (feld.id === 'kontakt-captcha') feld.closest('.maengel-captcha').classList.remove('maengel-ungueltig');
 }
+<?php if (Yii::$app->request->isPost): ?>
+// Diese Seite ist die Antwort auf ein abgelehntes Absenden. Ohne das hier landet „Zurück“ nach der erfolgreichen
+// Meldung hier und der Browser meldet „Seite abgelaufen / Formular erneut senden?“ – so lädt er das Formular neu.
+if (window.history.replaceState) window.history.replaceState(null, '', window.location.href);
+<?php endif ?>
 (function () {
     var form = document.getElementById('maengel-form');
     if (!form) return;
