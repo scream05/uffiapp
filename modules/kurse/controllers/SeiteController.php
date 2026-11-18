@@ -41,7 +41,30 @@ class SeiteController extends Controller
         $h->set('X-Robots-Tag', 'noindex, nofollow');
         $h->set('Referrer-Policy', 'no-referrer'); // Token aus den Mail-Links nicht weitergeben
         $h->set('Cache-Control', 'no-store');
+
+        // Sprachauswahl im Kopf (?sprache=uk): wie die Auswahl auf der Anmeldeseite der Plattform im Cookie „language“
+        // speichern und ohne den Parameter neu laden. Per GET-Link, damit kein Formular (z. B. Bestätigen) ausgelöst wird.
+        $request = Yii::$app->request;
+        $wahl = $request->get('sprache');
+        if (is_string($wahl) && Yii::$app->user->isGuest) {
+            $form = new \humhub\models\forms\ChooseLanguage(['language' => $wahl]);
+            $form->save(); // ungültige Werte speichert es nicht
+            $this->redirect(\yii\helpers\Url::current(['sprache' => null]));
+            return false;
+        }
+        // Gäste wie auf der übrigen Plattform (designwahl gastSprache): Deutsch statt Browsersprache, außer selbst gewählt.
+        // Seiten aus Mail-Links stellen danach ggf. die Sprache der Anmeldung ein (Anmeldung::spracheFuerSeite).
+        if (Yii::$app->user->isGuest && !isset($request->cookies['language'])) {
+            Yii::$app->i18n->setDefaultLocale();
+        }
         return parent::beforeAction($action);
+    }
+
+    /** Sprachen der Auswahl im Kopf, jeweils in der eigenen Sprache benannt (nur erlaubte Sprachen der Plattform) */
+    public static function sprachen(): array
+    {
+        $namen = ['de' => 'Deutsch', 'en-US' => 'English', 'uk' => 'Українська', 'ar' => 'العربية', 'tr' => 'Türkçe', 'ru' => 'Русский'];
+        return array_intersect_key($namen, Yii::$app->i18n->getAllowedLanguages());
     }
 
     /** Startseite: Titelbereich, Kurse, Vorstellung, Team, Kontakt */

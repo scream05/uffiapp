@@ -364,4 +364,5 @@ return [
     '{wochentag}, {datum}' => '{wochentag}, {datum}',
     'Über uns' => 'About us',
     'Überweisung' => 'Bank transfer',
+    'Sprache wählen' => 'Choose language',
 ];

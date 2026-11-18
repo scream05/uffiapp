@@ -364,4 +364,5 @@ return [
     '{wochentag}, {datum}' => '{wochentag}، {datum}',
     'Über uns' => 'من نحن',
     'Überweisung' => 'تحويل بنكي',
+    'Sprache wählen' => 'اختر اللغة',
 ];

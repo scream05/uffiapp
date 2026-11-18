@@ -64,6 +64,15 @@ $rtl = in_array(strtolower(substr($sprache, 0, 2)), ['ar', 'fa', 'he', 'ur'], tr
         .kopf nav a { padding: 6px 12px; border-radius: 999px; font-size: .92em; }
         .kopf nav a:hover, .kopf nav a:focus-visible { background: rgba(255,255,255,.14); }
         @media (max-width: 640px) { .kopf nav .nur-breit { display: none; } .marke span { font-size: .95em; } }
+        .sprachwahl { position: relative; flex: none; }
+        .kopf .sprachwahl summary { color: #fff; font-weight: 400; list-style: none; cursor: pointer; padding: 6px 10px; border-radius: 999px; font-size: .9em; white-space: nowrap; }
+        .kopf .sprachwahl summary::-webkit-details-marker { display: none; }
+        .kopf .sprachwahl summary:hover, .kopf .sprachwahl summary:focus-visible, .kopf .sprachwahl[open] summary { background: rgba(255,255,255,.14); }
+        .sprachwahl ul { position: absolute; inset-inline-end: 0; top: calc(100% + 6px); z-index: 20; list-style: none; margin: 0; padding: 6px 0;
+            min-width: 160px; background: #fff; border-radius: 10px; box-shadow: 0 6px 24px rgba(0,0,0,.18); }
+        .kopf .sprachwahl a { display: block; padding: 8px 16px; color: var(--f-dunkel); }
+        .kopf .sprachwahl a:hover, .kopf .sprachwahl a:focus-visible { background: rgba(0,0,0,.06); }
+        .kopf .sprachwahl a[aria-current] { font-weight: 600; }
 
         .vorschau { background: #fff4d6; color: #5c4300; font-size: .9em; padding: 8px 0; border-bottom: 1px solid #f0d68a; }
         .meldung { margin: 18px 0 0; padding: 12px 16px; border-radius: 10px; background: var(--f-hell); border-inline-start: 4px solid var(--f); }
@@ -136,6 +145,17 @@ $rtl = in_array(strtolower(substr($sprache, 0, 2)), ['ar', 'fa', 'he', 'ur'], tr
             <a class="nur-breit" href="<?= Html::encode($seite->seiteUrl()) ?>#kontakt"><?= Yii::t('KurseModule.base', 'Kontakt') ?></a>
             <?php if ($website !== ''): ?><a class="nur-breit" href="<?= Html::encode($website) ?>" rel="noopener"><?= Yii::t('KurseModule.base', 'Vereins-Website') ?> ↗</a><?php endif ?>
         </nav>
+        <?php $sprachen = $c::sprachen(); $aktuell = Yii::$app->language; ?>
+        <?php if (count($sprachen) > 1): ?>
+        <details class="sprachwahl">
+            <summary aria-label="<?= Html::encode(Yii::t('KurseModule.base', 'Sprache wählen')) ?>"><span aria-hidden="true">🌐</span> <?= Html::encode(strtoupper(substr($aktuell, 0, 2))) ?></summary>
+            <ul>
+                <?php foreach ($sprachen as $code => $name): ?>
+                    <li><a href="<?= Html::encode(\yii\helpers\Url::current(['sprache' => $code])) ?>" lang="<?= Html::encode($code) ?>"<?= $code === $aktuell ? ' aria-current="true"' : '' ?>><?= Html::encode($name) ?></a></li>
+                <?php endforeach ?>
+            </ul>
+        </details>
+        <?php endif ?>
     </div>
 </header>
 <?php if ($c->vorschau): ?>

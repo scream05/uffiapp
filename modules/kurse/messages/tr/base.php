@@ -364,4 +364,5 @@ return [
     '{wochentag}, {datum}' => '{wochentag}, {datum}',
     'Über uns' => 'Hakkımızda',
     'Überweisung' => 'Havale',
+    'Sprache wählen' => 'Dil seç',
 ];

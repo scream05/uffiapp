@@ -364,4 +364,5 @@ return [
     '{wochentag}, {datum}' => '{wochentag}, {datum}',
     'Über uns' => 'О нас',
     'Überweisung' => 'Перевод',
+    'Sprache wählen' => 'Выбрать язык',
 ];
