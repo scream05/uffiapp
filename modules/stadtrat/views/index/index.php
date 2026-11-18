@@ -19,6 +19,8 @@ use yii\helpers\Url;
 
 $t = fn($s, $p = []) => Yii::t('StadtratModule.base', $s, $p);
 $this->title = $t('Stadtrat');
+// Tagesordnungen, Hinweise und Kurzfassungen kommen nur auf Deutsch (RIS bzw. Redaktion)
+$deutsch = str_starts_with((string)Yii::$app->language, 'de');
 $filterLink = fn($label, $g) => Html::a(($g !== '' ? Sitzung::symbolHtml($g, 'sr-symbol-klein') : '') . Html::encode($label), Ris::url() . ($g !== '' || $q !== '' ? '?' . http_build_query(array_filter(['gremium' => $g, 'q' => $q])) : ''),
     ['class' => 'btn btn-sm ' . ($g === $gremium ? 'btn-primary' : 'btn-default btn-light')]);
 $sitzung = function ($s, bool $offen) use ($t, $module, $erklaert) {
@@ -30,7 +32,7 @@ $sitzung = function ($s, bool $offen) use ($t, $module, $erklaert) {
             <?= Sitzung::symbolHtml($s->gremium) ?>
             <span class="sr-kopf">
                 <strong><?= Html::encode($s->gremium) ?></strong>
-                <span class="sr-datum"><?= Html::encode($s->tag()) ?><?= $s->beginn ? ', ' . Html::encode($t('{uhr} Uhr', ['uhr' => $s->beginn])) : '' ?>
+                <span class="sr-datum"><?= Html::encode($s->tagAnzeige()) ?><?= $s->beginn ? ', ' . Html::encode($s->uhrAnzeige()) : '' ?>
                     · <?= $punkte ? $t('{n, plural, =1{1 Punkt} other{# Punkte}}', ['n' => count($punkte)]) : $t('Tagesordnung folgt') ?></span>
             </span>
             <?php if ($k): ?><span class="sr-marke"><i class="fa fa-commenting-o" aria-hidden="true"></i> <?= $t('kurz erklärt') ?></span><?php endif ?>
@@ -116,6 +118,7 @@ $sitzung = function ($s, bool $offen) use ($t, $module, $erklaert) {
     <div class="panel-heading"><strong><?= $t('Stadtrat und Ausschüsse') ?></strong>
         <?php if ($darfBearbeiten): ?><?= Html::a($t('Kurz erklärt schreiben'), ['/stadtrat/kurzfassung/index'], ['class' => 'btn btn-sm btn-primary float-end pull-right']) ?><?php endif ?></div>
     <div class="panel-body">
+        <?php if (!$deutsch): ?><p class="sr-klein"><i class="fa fa-language" aria-hidden="true"></i> <?= $t('Tagesordnungen und Kurzfassungen gibt es nur auf Deutsch.') ?></p><?php endif ?>
         <div class="sr-filter">
             <?= $filterLink($t('Alle Gremien'), '') ?>
             <?php foreach ($gremien as $g): ?><?= $filterLink($g, $g) ?><?php endforeach ?>
@@ -134,13 +137,13 @@ $sitzung = function ($s, bool $offen) use ($t, $module, $erklaert) {
         <?php if (!$vergangene): ?><p class="sr-klein"><?= $t('Keine Treffer.') ?></p><?php endif ?>
         <?php foreach ($vergangene as $s): ?><?= $sitzung($s, $q !== '') ?><?php endforeach ?>
         <?php if ($mehr): ?>
-            <p style="margin-top:8px"><?= Html::a($t('{n} ältere Sitzungen zeigen', ['n' => $mehr]), Ris::url() . '?' . http_build_query(array_filter(['gremium' => $gremium, 'alle' => 1]))) ?></p>
+            <p style="margin-top:8px"><?= Html::a($t('{n, plural, =1{1 ältere Sitzung zeigen} other{# ältere Sitzungen zeigen}}', ['n' => $mehr]), Ris::url() . '?' . http_build_query(array_filter(['gremium' => $gremium, 'alle' => 1]))) ?></p>
         <?php endif ?>
 
         <p class="sr-klein" style="margin-top:18px">
             <?= $t('Quelle: {link} der Verwaltungsgemeinschaft Uffenheim, unverändert übernommen und ohne Bewertung (nur bei Bauanträgen ohne genaue Adresse). Verbindlich sind die Bekanntmachungen der Stadt. Beschlüsse und Unterlagen stehen dort nicht öffentlich; die Niederschriften öffentlicher Sitzungen können Gemeindebürgerinnen und -bürger im Rathaus einsehen (Art. 54 Abs. 3 Gemeindeordnung).', [
                 'link' => Html::a($t('Ratsinformationssystem'), $module->risUrl, ['target' => '_blank', 'rel' => 'noopener'])]) ?>
-            <?php if ($stand): ?><?= $t('Stand: {zeit}', ['zeit' => date('j.n.Y, G:i', strtotime($stand))]) ?><?php endif ?>
+            <?php if ($stand): ?><?= $t('Stand: {zeit}', ['zeit' => $deutsch ? date('j.n.Y, G:i', strtotime($stand)) : Yii::$app->formatter->asDatetime($stand, 'short')]) ?><?php endif ?>
         </p>
     </div>
 </div>

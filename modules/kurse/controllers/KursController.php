@@ -70,7 +70,7 @@ class KursController extends ContentContainerController
     {
         $verein = Verein::findOne((int)$verein);
         if (!$verein || !Module::kannVerwalten($verein->id)) {
-            throw new ForbiddenHttpException('Kurse dieses Vereins darfst du nicht verwalten.');
+            throw new ForbiddenHttpException(Yii::t('KurseModule.base', 'Kurse dieses Vereins darfst du nicht verwalten.'));
         }
         // Vorschläge aus dem letzten Kurs des Vereins übernehmen
         $letzter = Kurs::find()->where(['verein_id' => $verein->id])->orderBy(['id' => SORT_DESC])->one();
@@ -105,7 +105,7 @@ class KursController extends ContentContainerController
                 if (!$neu && $kurs->plaetze > $plaetzeVorher) {
                     $nach = Dienst::nachruecken($kurs);
                     if ($nach) {
-                        $this->view->info(count($nach) . ' Kind(er) von der Warteliste nachgerückt und per Mail informiert.');
+                        $this->view->info(Yii::t('KurseModule.base', 'Von der Warteliste nachgerückt und per Mail informiert: {n}', ['n' => count($nach)]));
                     }
                 }
                 $this->view->saved();
@@ -122,7 +122,9 @@ class KursController extends ContentContainerController
         if ($kurs->status === Kurs::STATUS_ENTWURF) {
             $kurs->status = Kurs::STATUS_OFFEN;
             $kurs->save(false);
-            $this->view->success('Der Kurs ist jetzt sichtbar' . ($kurs->anmeldung_ab ? ', die Anmeldung startet zur eingestellten Zeit.' : ' und die Anmeldung ist offen.'));
+            $this->view->success($kurs->anmeldung_ab
+                ? Yii::t('KurseModule.base', 'Der Kurs ist jetzt sichtbar, die Anmeldung startet zur eingestellten Zeit.')
+                : Yii::t('KurseModule.base', 'Der Kurs ist jetzt sichtbar und die Anmeldung ist offen.'));
         }
         return $this->redirect($kurs->getUrl());
     }
@@ -134,9 +136,9 @@ class KursController extends ContentContainerController
         $kurs = new Kurs();
         $kurs->setAttributes($alt->getAttributes(null, ['id', 'status', 'absage_grund', 'erinnerung_am', 'created_at', 'created_by', 'updated_at', 'updated_by']), false);
         $kurs->status = Kurs::STATUS_ENTWURF;
-        $kurs->titel = mb_substr($alt->titel . ' (Kopie)', 0, 150);
+        $kurs->titel = mb_substr(Yii::t('KurseModule.base', '{titel} (Kopie)', ['titel' => $alt->titel]), 0, 150);
         $kurs->save(false);
-        $this->view->info('Kopie angelegt. Bitte Termine und Anmeldezeitraum anpassen.');
+        $this->view->info(Yii::t('KurseModule.base', 'Kopie angelegt. Bitte Termine und Anmeldezeitraum anpassen.'));
         return $this->redirect($kurs->createUrl('/kurse/kurs/edit', ['id' => $kurs->id]));
     }
 
@@ -145,11 +147,11 @@ class KursController extends ContentContainerController
         $this->forcePostRequest();
         $kurs = $this->kursZumVerwalten($id);
         if (Anmeldung::find()->where(['kurs_id' => $kurs->id])->andWhere(['!=', 'status', Anmeldung::STATUS_UNBESTAETIGT])->exists()) {
-            $this->view->error('Für diesen Kurs gibt es schon Anmeldungen. Bitte stattdessen absagen.');
+            $this->view->error(Yii::t('KurseModule.base', 'Für diesen Kurs gibt es schon Anmeldungen. Bitte stattdessen absagen.'));
             return $this->redirect($kurs->getUrl());
         }
         $kurs->delete();
-        $this->view->success('Kurs gelöscht.');
+        $this->view->success(Yii::t('KurseModule.base', 'Kurs gelöscht.'));
         return $this->redirect($this->contentContainer->createUrl('/kurse/kurs/index'));
     }
 
@@ -158,7 +160,7 @@ class KursController extends ContentContainerController
         $kurs = $this->kursZumVerwalten($id);
         if (Yii::$app->request->isPost && $kurs->status !== Kurs::STATUS_ABGESAGT) {
             $n = Dienst::absagen($kurs, trim((string)Yii::$app->request->post('grund', '')));
-            $this->view->success("Kurs abgesagt, $n Mail(s) verschickt.");
+            $this->view->success(Yii::t('KurseModule.base', 'Kurs abgesagt. Verschickte Mails: {n}', ['n' => $n]));
             return $this->redirect($kurs->getUrl());
         }
         return $this->render('absagen', ['kurs' => $kurs,
@@ -168,7 +170,8 @@ class KursController extends ContentContainerController
     public function actionTeilnehmer($id, $liste = 'platz')
     {
         $kurs = $this->kursZumVerwalten($id);
-        $listen = ['platz' => 'Teilnehmer', 'warteliste' => 'Warteliste', 'unbestaetigt' => 'Unbestätigt', 'storniert' => 'Abgemeldet'];
+        $listen = ['platz' => Yii::t('KurseModule.base', 'Teilnehmer'), 'warteliste' => Yii::t('KurseModule.base', 'Warteliste'),
+            'unbestaetigt' => Yii::t('KurseModule.base', 'Unbestätigt'), 'storniert' => Yii::t('KurseModule.base', 'Abgemeldet')];
         if (!isset($listen[$liste])) {
             $liste = 'platz';
         }
@@ -188,7 +191,7 @@ class KursController extends ContentContainerController
         ]);
     }
 
-    /** CSV für Excel (Semikolon, UTF-8 mit BOM): Teilnehmer und Warteliste */
+    /** CSV für Excel (Semikolon, UTF-8 mit BOM): Teilnehmer und Warteliste. Spalten und Werte bewusst deutsch (Vereinsarbeit, Weiterverarbeitung) */
     public function actionExport($id)
     {
         $kurs = $this->kursZumVerwalten($id);
@@ -227,14 +230,14 @@ class KursController extends ContentContainerController
         $an = Yii::$app->request->post('an', 'platz');
         if (Yii::$app->request->isPost) {
             if ($betreff === '' || $nachricht === '') {
-                $this->view->error('Bitte Betreff und Nachricht ausfüllen.');
+                $this->view->error(Yii::t('KurseModule.base', 'Bitte Betreff und Nachricht ausfüllen.'));
             } else {
                 $status = self::rundmailStatus($an);
                 $n = 0;
                 foreach (Anmeldung::find()->where(['kurs_id' => $kurs->id, 'status' => $status])->andWhere(['not', ['email' => null]])->all() as $a) {
                     $n += Dienst::mailRundmail($a, $betreff, $nachricht) ? 1 : 0;
                 }
-                $this->view->success("$n Mail(s) verschickt.");
+                $this->view->success(Yii::t('KurseModule.base', 'Verschickte Mails: {n}', ['n' => $n]));
                 return $this->redirect($kurs->createUrl('/kurse/kurs/teilnehmer', ['id' => $kurs->id]));
             }
         }
@@ -270,10 +273,10 @@ class KursController extends ContentContainerController
         $row = KursVerein::findOne($verein->id);
         if ($row) {
             $row->delete();
-            $this->view->info('Kursmodul für ' . $verein->name . ' gesperrt. Bestehende Kurse bleiben gespeichert, sind aber nicht mehr sichtbar.');
+            $this->view->info(Yii::t('KurseModule.base', 'Kursmodul für {verein} gesperrt. Bestehende Kurse bleiben gespeichert, sind aber nicht mehr sichtbar.', ['verein' => $verein->name]));
         } else {
             (new KursVerein(['verein_id' => $verein->id, 'created_at' => date('Y-m-d H:i:s'), 'created_by' => Yii::$app->user->id]))->save(false);
-            $this->view->success('Kursmodul für ' . $verein->name . ' freigeschaltet. Die bestätigten Verwalter des Vereins können jetzt Kurse anlegen.');
+            $this->view->success(Yii::t('KurseModule.base', 'Kursmodul für {verein} freigeschaltet. Die bestätigten Verwalter des Vereins können jetzt Kurse anlegen.', ['verein' => $verein->name]));
         }
         return $this->redirect($verein->getUrl());
     }
@@ -282,7 +285,7 @@ class KursController extends ContentContainerController
     {
         $kurs = Kurs::findOne((int)$id);
         if (!$kurs) {
-            throw new NotFoundHttpException('Kurs nicht gefunden.');
+            throw new NotFoundHttpException(Yii::t('KurseModule.base', 'Kurs nicht gefunden.'));
         }
         return $kurs;
     }
@@ -291,7 +294,7 @@ class KursController extends ContentContainerController
     {
         $kurs = $this->findKurs($id);
         if (!Module::kannVerwalten($kurs->verein_id)) {
-            throw new ForbiddenHttpException('Diesen Kurs darfst du nicht verwalten.');
+            throw new ForbiddenHttpException(Yii::t('KurseModule.base', 'Diesen Kurs darfst du nicht verwalten.'));
         }
         return $kurs;
     }

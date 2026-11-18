@@ -43,7 +43,7 @@ class Events
                 return;
             }
             $event->sender->addEntry(new MenuLink([
-                'label' => 'Kurse',
+                'label' => Yii::t('KurseModule.base', 'Kurse'),
                 'url' => $space->createUrl('/kurse/kurs/index'),
                 'icon' => 'graduation-cap',
                 'isActive' => Yii::$app->controller->module && Yii::$app->controller->module->id === 'kurse',

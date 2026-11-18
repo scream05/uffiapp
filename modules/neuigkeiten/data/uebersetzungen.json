@@ -1,4 +1,31 @@
 {
+    "sprachen-stadtrat-wochenblick": {
+        "en": {
+            "titel": "City council and weekly overview in your language",
+            "text": "If you've set English, Ukrainian, Arabic, Turkish or Russian, you now also see \"City council explained simply\" and the box for the next council meeting in that language. The weekly overview also comes with translated headings, weather and date. Agendas, short summaries and event titles stay in German.",
+            "quelle": "9c1b4cd72f9f6d0b616ebec8d523055f14924c16"
+        },
+        "uk": {
+            "titel": "Stadtrat und Wochenüberblick in deiner Sprache",
+            "text": "Wer Englisch, Ukrainisch, Arabisch, Türkisch oder Russisch eingestellt hat, sieht jetzt auch „Stadtrat kurz erklärt“ und den Kasten zur nächsten Sitzung in dieser Sprache. Der Wochenüberblick kommt ebenfalls mit übersetzten Überschriften, Wetter und Datum. Tagesordnungen, Kurzfassungen und Termintitel bleiben auf Deutsch.",
+            "quelle": "9c1b4cd72f9f6d0b616ebec8d523055f14924c16"
+        },
+        "ar": {
+            "titel": "مجلس المدينة والنظرة الأسبوعية بلغتك",
+            "text": "إذا اخترت الإنجليزية أو الأوكرانية أو العربية أو التركية أو الروسية، فستجد الآن أيضاً قسم „مجلس المدينة بكلمات بسيطة“ والبطاقة الخاصة بالجلسة القادمة بهذه اللغة. كما تظهر النظرة الأسبوعية بعناوين مترجمة، والطقس والتاريخ. أما جداول الأعمال والملخصات وعناوين المواعيد فتبقى بالألمانية.",
+            "quelle": "9c1b4cd72f9f6d0b616ebec8d523055f14924c16"
+        },
+        "tr": {
+            "titel": "Stadtrat ve haftalık özet, senin dilinde",
+            "text": "İngilizce, Ukraynaca, Arapça, Türkçe veya Rusça seçtiysen artık „Stadtrat kurz erklärt“ bölümünü ve bir sonraki meclis toplantısına dair kutucuğu da bu dilde görürsün. Haftalık özet de çevrilmiş başlıklar, hava durumu ve tarihle geliyor. Gündem maddeleri, kısa özetler ve etkinlik başlıkları Almanca kalmaya devam ediyor.",
+            "quelle": "9c1b4cd72f9f6d0b616ebec8d523055f14924c16"
+        },
+        "ru": {
+            "titel": "Stadtrat und Wochenüberblick in deiner Sprache",
+            "text": "Wer Englisch, Ukrainisch, Arabisch, Türkisch oder Russisch eingestellt hat, sieht jetzt auch „Stadtrat kurz erklärt“ und den Kasten zur nächsten Sitzung in dieser Sprache. Der Wochenüberblick kommt ebenfalls mit übersetzten Überschriften, Wetter und Datum. Tagesordnungen, Kurzfassungen und Termintitel bleiben auf Deutsch.",
+            "quelle": "9c1b4cd72f9f6d0b616ebec8d523055f14924c16"
+        }
+    },
     "abfuhr-auswahl-darstellung": {
         "en": {
             "titel": "Waste collection reminder displayed neatly",

@@ -68,7 +68,7 @@ class Kurs extends ActiveRecord
             [['titel', 'niveau', 'ort', 'termine_hinweis', 'kontoinhaber', 'iban', 'kontakt_email', 'beschreibung', 'bedingungen'], 'trim'],
             [['beginn', 'ende'], 'date', 'format' => 'php:Y-m-d'],
             ['ende', 'compare', 'compareAttribute' => 'beginn', 'operator' => '>=', 'type' => 'date', 'skipOnEmpty' => true,
-                'message' => 'Das Ende darf nicht vor dem Beginn liegen.'],
+                'message' => Yii::t('KurseModule.base', 'Das Ende darf nicht vor dem Beginn liegen.')],
             [['zeit_von', 'zeit_bis'], 'match', 'pattern' => '/^\d{2}:\d{2}(:\d{2})?$/'],
             [['plaetze'], 'integer', 'min' => 1, 'max' => 500],
             [['warteliste_max'], 'integer', 'min' => 0, 'max' => 500],
@@ -77,7 +77,7 @@ class Kurs extends ActiveRecord
             [['erinnerung_tage'], 'integer', 'min' => 1, 'max' => 30],
             [['alter_min', 'alter_max'], 'number', 'min' => 0, 'max' => 99],
             ['alter_max', 'compare', 'compareAttribute' => 'alter_min', 'operator' => '>=', 'type' => 'number', 'skipOnEmpty' => true,
-                'message' => 'Das Höchstalter muss mindestens so groß wie das Mindestalter sein.'],
+                'message' => Yii::t('KurseModule.base', 'Das Höchstalter muss mindestens so groß wie das Mindestalter sein.')],
             [['preis_mitglied', 'preis_nichtmitglied'], 'number', 'min' => 0, 'max' => 9999],
             [['nur_mitglieder', 'zahlart_bar', 'zahlart_ueberweisung'], 'boolean'],
             ['zahlart_bar', 'validateZahlart'],
@@ -95,10 +95,10 @@ class Kurs extends ActiveRecord
     public function validateZahlart()
     {
         if (!$this->zahlart_bar && !$this->zahlart_ueberweisung) {
-            $this->addError('zahlart_bar', 'Bitte mindestens eine Zahlart wählen.');
+            $this->addError('zahlart_bar', Yii::t('KurseModule.base', 'Bitte mindestens eine Zahlart wählen.'));
         }
         if ($this->zahlart_ueberweisung && $this->hatPreis() && (!$this->iban || !$this->kontoinhaber)) {
-            $this->addError('iban', 'Für Überweisung bitte Kontoinhaber und IBAN angeben.');
+            $this->addError('iban', Yii::t('KurseModule.base', 'Für Überweisung bitte Kontoinhaber und IBAN angeben.'));
         }
     }
 
@@ -109,7 +109,7 @@ class Kurs extends ActiveRecord
         }
         $iban = $this->iban;
         if (!preg_match('/^[A-Z]{2}\d{2}[A-Z0-9]{10,30}$/', $iban)) {
-            $this->addError('iban', 'Die IBAN sieht nicht gültig aus.');
+            $this->addError('iban', Yii::t('KurseModule.base', 'Die IBAN sieht nicht gültig aus.'));
             return;
         }
         $num = '';
@@ -121,40 +121,40 @@ class Kurs extends ActiveRecord
             $rest = (int)(($rest . $teil) % 97);
         }
         if ($rest !== 1) {
-            $this->addError('iban', 'Die Prüfziffer der IBAN stimmt nicht. Bitte noch einmal kontrollieren.');
+            $this->addError('iban', Yii::t('KurseModule.base', 'Die Prüfziffer der IBAN stimmt nicht. Bitte noch einmal kontrollieren.'));
         }
     }
 
     public function attributeLabels()
     {
         return [
-            'titel' => 'Kursname',
-            'niveau' => 'Kursziel / Niveau',
-            'beschreibung' => 'Beschreibung',
-            'ort' => 'Ort',
-            'beginn' => 'Erster Kurstag',
-            'ende' => 'Letzter Kurstag',
-            'zeit_von' => 'Uhrzeit von',
-            'zeit_bis' => 'bis',
-            'termine_hinweis' => 'Hinweis zu den Terminen',
-            'einheiten' => 'Anzahl der Einheiten',
-            'alter_min' => 'Mindestalter (Jahre)',
-            'alter_max' => 'Höchstalter (Jahre)',
-            'plaetze' => 'Plätze',
-            'warteliste_max' => 'Plätze auf der Warteliste',
-            'preis_mitglied' => 'Preis für Mitglieder (€)',
-            'preis_nichtmitglied' => 'Preis für Nichtmitglieder (€)',
-            'nur_mitglieder' => 'Nur für Vereinsmitglieder',
-            'zahlart_bar' => 'Barzahlung am ersten Kurstag',
-            'zahlart_ueberweisung' => 'Überweisung',
-            'kontoinhaber' => 'Kontoinhaber',
-            'iban' => 'IBAN',
-            'zahlungsfrist_tage' => 'Zahlungsfrist (Tage nach Zusage)',
-            'anmeldung_ab' => 'Anmeldung ab',
-            'anmeldung_bis' => 'Anmeldung bis',
-            'erinnerung_tage' => 'Erinnerung so viele Tage vor Beginn',
-            'kontakt_email' => 'Kontakt-E-Mail (Antworten auf Mails)',
-            'bedingungen' => 'Teilnahmebedingungen',
+            'titel' => Yii::t('KurseModule.base', 'Kursname'),
+            'niveau' => Yii::t('KurseModule.base', 'Kursziel / Niveau'),
+            'beschreibung' => Yii::t('KurseModule.base', 'Beschreibung'),
+            'ort' => Yii::t('KurseModule.base', 'Ort'),
+            'beginn' => Yii::t('KurseModule.base', 'Erster Kurstag'),
+            'ende' => Yii::t('KurseModule.base', 'Letzter Kurstag'),
+            'zeit_von' => Yii::t('KurseModule.base', 'Uhrzeit von'),
+            'zeit_bis' => Yii::t('KurseModule.base', 'bis'),
+            'termine_hinweis' => Yii::t('KurseModule.base', 'Hinweis zu den Terminen'),
+            'einheiten' => Yii::t('KurseModule.base', 'Anzahl der Einheiten'),
+            'alter_min' => Yii::t('KurseModule.base', 'Mindestalter (Jahre)'),
+            'alter_max' => Yii::t('KurseModule.base', 'Höchstalter (Jahre)'),
+            'plaetze' => Yii::t('KurseModule.base', 'Plätze'),
+            'warteliste_max' => Yii::t('KurseModule.base', 'Plätze auf der Warteliste'),
+            'preis_mitglied' => Yii::t('KurseModule.base', 'Preis für Mitglieder (€)'),
+            'preis_nichtmitglied' => Yii::t('KurseModule.base', 'Preis für Nichtmitglieder (€)'),
+            'nur_mitglieder' => Yii::t('KurseModule.base', 'Nur für Vereinsmitglieder'),
+            'zahlart_bar' => Yii::t('KurseModule.base', 'Barzahlung am ersten Kurstag'),
+            'zahlart_ueberweisung' => Yii::t('KurseModule.base', 'Überweisung'),
+            'kontoinhaber' => Yii::t('KurseModule.base', 'Kontoinhaber'),
+            'iban' => Yii::t('KurseModule.base', 'IBAN'),
+            'zahlungsfrist_tage' => Yii::t('KurseModule.base', 'Zahlungsfrist (Tage nach Zusage)'),
+            'anmeldung_ab' => Yii::t('KurseModule.base', 'Anmeldung ab'),
+            'anmeldung_bis' => Yii::t('KurseModule.base', 'Anmeldung bis'),
+            'erinnerung_tage' => Yii::t('KurseModule.base', 'Erinnerung so viele Tage vor Beginn'),
+            'kontakt_email' => Yii::t('KurseModule.base', 'Kontakt-E-Mail (Antworten auf Mails)'),
+            'bedingungen' => Yii::t('KurseModule.base', 'Teilnahmebedingungen'),
         ];
     }
 
@@ -221,23 +221,24 @@ class Kurs extends ActiveRecord
     public function anmeldungGesperrt(): ?string
     {
         if ($this->status === self::STATUS_ABGESAGT) {
-            return 'Dieser Kurs wurde abgesagt.';
+            return Yii::t('KurseModule.base', 'Dieser Kurs wurde abgesagt.');
         }
         if ($this->status !== self::STATUS_OFFEN) {
-            return 'Für diesen Kurs ist die Anmeldung noch nicht geöffnet.';
+            return Yii::t('KurseModule.base', 'Für diesen Kurs ist die Anmeldung noch nicht geöffnet.');
         }
         $jetzt = date('Y-m-d H:i:s');
         if ($this->anmeldung_ab && $jetzt < $this->anmeldung_ab) {
-            return 'Die Anmeldung startet am ' . date('d.m.Y \u\m H:i', strtotime($this->anmeldung_ab)) . ' Uhr.';
+            return Yii::t('KurseModule.base', 'Die Anmeldung startet am {datum} um {zeit} Uhr.',
+                ['datum' => self::datum($this->anmeldung_ab), 'zeit' => substr($this->anmeldung_ab, 11, 5)]);
         }
         if ($this->anmeldung_bis && $jetzt > $this->anmeldung_bis) {
-            return 'Die Anmeldefrist ist abgelaufen.';
+            return Yii::t('KurseModule.base', 'Die Anmeldefrist ist abgelaufen.');
         }
         if ($this->hatBegonnen()) {
-            return 'Der Kurs hat schon begonnen.';
+            return Yii::t('KurseModule.base', 'Der Kurs hat schon begonnen.');
         }
         if ($this->freiePlaetze() === 0 && !$this->wartelisteFrei()) {
-            return 'Der Kurs und die Warteliste sind voll.';
+            return Yii::t('KurseModule.base', 'Der Kurs und die Warteliste sind voll.');
         }
         return null;
     }
@@ -265,23 +266,40 @@ class Kurs extends ActiveRecord
     {
         $z = [];
         if ($this->zahlart_ueberweisung) {
-            $z[Anmeldung::ZAHLART_UEBERWEISUNG] = 'Überweisung';
+            $z[Anmeldung::ZAHLART_UEBERWEISUNG] = Yii::t('KurseModule.base', 'Überweisung');
         }
         if ($this->zahlart_bar) {
-            $z[Anmeldung::ZAHLART_BAR] = 'Bar am ersten Kurstag';
+            $z[Anmeldung::ZAHLART_BAR] = Yii::t('KurseModule.base', 'Bar am ersten Kurstag');
         }
         return $z;
     }
 
+    /** Betrag in Euro im Format der aktuellen Sprache (z. B. „60,00 €“, englisch „€60.00“) */
     public static function euro($betrag): string
     {
-        return number_format((float)$betrag, 2, ',', '.') . ' €';
+        return Yii::$app->formatter->asCurrency((float)$betrag, 'EUR');
+    }
+
+    /** Datum (Y-m-d, auch Y-m-d H:i:s – dann nur der Tag) im Format der aktuellen Sprache, deutsch „13.01.2027“ */
+    public static function datum(string $datum): string
+    {
+        try {
+            return Yii::$app->formatter->asDate(substr($datum, 0, 10), 'medium');
+        } catch (\Throwable $e) {
+            return $datum; // kaputter Wert: lieber roh anzeigen als die Seite abbrechen
+        }
+    }
+
+    /** Zeitpunkt (Y-m-d H:i:s, Ortszeit wie gespeichert) als „13.01.2027, 18:00 Uhr“ */
+    public static function datumZeit(string $zeitpunkt): string
+    {
+        return Yii::t('KurseModule.base', '{datum}, {zeit} Uhr', ['datum' => self::datum($zeitpunkt), 'zeit' => substr($zeitpunkt, 11, 5)]);
     }
 
     public function getPreisText(): string
     {
         if (!$this->hatPreis()) {
-            return 'kostenlos';
+            return Yii::t('KurseModule.base', 'kostenlos');
         }
         $m = $this->preis_mitglied;
         $n = $this->preis_nichtmitglied;
@@ -291,27 +309,30 @@ class Kurs extends ActiveRecord
         if ($m === null) {
             return self::euro($n);
         }
-        return self::euro($m) . ' für Mitglieder, ' . self::euro($n) . ' für Nichtmitglieder';
+        return Yii::t('KurseModule.base', '{mitglieder} für Mitglieder, {andere} für Nichtmitglieder', ['mitglieder' => self::euro($m), 'andere' => self::euro($n)]);
     }
 
     public function getAlterText(): ?string
     {
-        $f = fn($v) => rtrim(rtrim(number_format((float)$v, 1, ',', ''), '0'), ',');
+        // ganze Jahre ohne, halbe mit einer Nachkommastelle (5 / 5,5)
+        $f = fn($v) => Yii::$app->formatter->asDecimal((float)$v, fmod((float)$v, 1.0) == 0 ? 0 : 1);
         if ($this->alter_min !== null && $this->alter_max !== null) {
-            return $f($this->alter_min) . ' bis ' . $f($this->alter_max) . ' Jahre';
+            return Yii::t('KurseModule.base', '{min} bis {max} Jahre', ['min' => $f($this->alter_min), 'max' => $f($this->alter_max)]);
         }
         if ($this->alter_min !== null) {
-            return 'ab ' . $f($this->alter_min) . ' Jahren';
+            return Yii::t('KurseModule.base', 'ab {min} Jahren', ['min' => $f($this->alter_min)]);
         }
         if ($this->alter_max !== null) {
-            return 'bis ' . $f($this->alter_max) . ' Jahre';
+            return Yii::t('KurseModule.base', 'bis {max} Jahre', ['max' => $f($this->alter_max)]);
         }
         return null;
     }
 
-    private static function wochentag(string $datum): string
+    /** „Dienstag, 13.01.2027“ – Wochentag und Datum im Format der aktuellen Sprache */
+    private static function tagUndDatum(string $datum): string
     {
-        return ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'][(int)date('w', strtotime($datum))];
+        return Yii::t('KurseModule.base', '{wochentag}, {datum}', [
+            'wochentag' => Yii::$app->formatter->asDate($datum, 'EEEE'), 'datum' => self::datum($datum)]);
     }
 
     public function getZeitText(): ?string
@@ -319,19 +340,22 @@ class Kurs extends ActiveRecord
         if (!$this->zeit_von) {
             return null;
         }
-        return substr($this->zeit_von, 0, 5) . ($this->zeit_bis ? '–' . substr($this->zeit_bis, 0, 5) : '') . ' Uhr';
+        return $this->zeit_bis
+            ? Yii::t('KurseModule.base', '{von}–{bis} Uhr', ['von' => substr($this->zeit_von, 0, 5), 'bis' => substr($this->zeit_bis, 0, 5)])
+            : Yii::t('KurseModule.base', '{von} Uhr', ['von' => substr($this->zeit_von, 0, 5)]);
     }
 
-    /** z. B. „ab Dienstag, 13.01.2027 · 15:00–15:45 Uhr · 10 Einheiten“ */
+    /** z. B. „Dienstag, 13.01.2027 · 15:00–15:45 Uhr · 10 Einheiten“ (Format der aktuellen Sprache) */
     public function getTermineText(): string
     {
-        $teile = [self::wochentag($this->beginn) . ', ' . date('d.m.Y', strtotime($this->beginn))
-            . ($this->ende ? ' bis ' . self::wochentag($this->ende) . ', ' . date('d.m.Y', strtotime($this->ende)) : '')];
+        $teile = [$this->ende
+            ? Yii::t('KurseModule.base', '{beginn} bis {ende}', ['beginn' => self::tagUndDatum($this->beginn), 'ende' => self::tagUndDatum($this->ende)])
+            : self::tagUndDatum($this->beginn)];
         if ($z = $this->getZeitText()) {
             $teile[] = $z;
         }
         if ($this->einheiten) {
-            $teile[] = $this->einheiten . ($this->einheiten == 1 ? ' Einheit' : ' Einheiten');
+            $teile[] = Yii::t('KurseModule.base', '{n, plural, =1{# Einheit} other{# Einheiten}}', ['n' => (int)$this->einheiten]);
         }
         return implode(' · ', $teile);
     }
@@ -339,18 +363,18 @@ class Kurs extends ActiveRecord
     public function getStatusLabel(): array
     {
         if ($this->status === self::STATUS_ENTWURF) {
-            return ['Entwurf (nicht sichtbar)', 'default'];
+            return [Yii::t('KurseModule.base', 'Entwurf (nicht sichtbar)'), 'default'];
         }
         if ($this->status === self::STATUS_ABGESAGT) {
-            return ['abgesagt', 'danger'];
+            return [Yii::t('KurseModule.base', 'abgesagt'), 'danger'];
         }
         if ($this->istVorbei()) {
-            return ['beendet', 'default'];
+            return [Yii::t('KurseModule.base', 'beendet'), 'default'];
         }
         if ($this->freiePlaetze() > 0) {
-            return [$this->freiePlaetze() . ' von ' . $this->plaetze . ' Plätzen frei', 'success'];
+            return [Yii::t('KurseModule.base', '{frei} von {plaetze} Plätzen frei', ['frei' => $this->freiePlaetze(), 'plaetze' => $this->plaetze]), 'success'];
         }
-        return $this->wartelisteFrei() ? ['ausgebucht – Warteliste', 'warning'] : ['ausgebucht', 'danger'];
+        return $this->wartelisteFrei() ? [Yii::t('KurseModule.base', 'ausgebucht – Warteliste'), 'warning'] : [Yii::t('KurseModule.base', 'ausgebucht'), 'danger'];
     }
 
     public function getUrl(bool $scheme = false): string

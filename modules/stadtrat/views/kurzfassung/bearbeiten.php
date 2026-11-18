@@ -9,7 +9,8 @@ use humhub\modules\stadtrat\components\Ris;
 /** @var bool $laeuft */
 /** @var bool $hatPdf */
 /** @var bool $hatAudio */
-$t = fn($x, $p = []) => Yii::t('StadtratModule.base', $x, $p);
+// Nur für die Redaktion (Admins): bleibt bewusst deutsch, daher ohne Übersetzung (nur Platzhalter/Plural auflösen)
+$t = fn($x, $p = []) => Yii::$app->i18n->format($x, $p, 'de');
 $hatText = $k->kurz !== null;
 // Name des eingestellten KI-Anbieters (umschaltbar) – nicht fest „Claude“ schreiben
 $ki = Yii::$app->getModule('ki-assistent')?->getAnbieterName() ?? 'KI';

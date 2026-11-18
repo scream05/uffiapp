@@ -5,16 +5,17 @@
  */
 
 use humhub\helpers\Html;
+use humhub\modules\kurse\models\Kurs;
 ?>
 <dl class="fakten">
-    <dt>Termine</dt><dd><?= Html::encode($kurs->getTermineText()) ?><?= $kurs->termine_hinweis ? '<br><span class="grau">' . Html::encode($kurs->termine_hinweis) . '</span>' : '' ?></dd>
-    <dt>Ort</dt><dd><?= Html::encode($kurs->ort) ?></dd>
-    <?php if ($alter = $kurs->getAlterText()): ?><dt>Alter</dt><dd><?= Html::encode($alter) ?> (am ersten Kurstag)</dd><?php endif ?>
-    <dt>Kosten</dt><dd><?= Html::encode($kurs->getPreisText()) ?><?php if ($kurs->hatPreis()): ?><br><span class="grau">Zahlung: <?= Html::encode(implode(' oder ', $kurs->zahlarten())) ?></span><?php endif ?></dd>
-    <dt>Plätze</dt><dd><?= $kurs->plaetze ?><?= $kurs->nur_mitglieder ? ' · nur für Vereinsmitglieder' : '' ?></dd>
+    <dt><?= Yii::t('KurseModule.base', 'Termine') ?></dt><dd><?= Html::encode($kurs->getTermineText()) ?><?= $kurs->termine_hinweis ? '<br><span class="grau">' . Html::encode($kurs->termine_hinweis) . '</span>' : '' ?></dd>
+    <dt><?= Yii::t('KurseModule.base', 'Ort') ?></dt><dd><?= Html::encode($kurs->ort) ?></dd>
+    <?php if ($alter = $kurs->getAlterText()): ?><dt><?= Yii::t('KurseModule.base', 'Alter') ?></dt><dd><?= Yii::t('KurseModule.base', '{alter} (am ersten Kurstag)', ['alter' => Html::encode($alter)]) ?></dd><?php endif ?>
+    <dt><?= Yii::t('KurseModule.base', 'Kosten') ?></dt><dd><?= Html::encode($kurs->getPreisText()) ?><?php if ($kurs->hatPreis()): ?><br><span class="grau"><?= Yii::t('KurseModule.base', 'Zahlung: {zahlarten}', ['zahlarten' => Html::encode(implode(' ' . Yii::t('KurseModule.base', 'oder') . ' ', $kurs->zahlarten()))]) ?></span><?php endif ?></dd>
+    <dt><?= Yii::t('KurseModule.base', 'Plätze') ?></dt><dd><?= $kurs->plaetze ?><?= $kurs->nur_mitglieder ? ' · ' . Yii::t('KurseModule.base', 'nur für Vereinsmitglieder') : '' ?></dd>
     <?php if ($kurs->anmeldung_ab || $kurs->anmeldung_bis): ?>
-        <dt>Anmeldung</dt><dd><?= $kurs->anmeldung_ab ? 'ab ' . date('d.m.Y, H:i', strtotime($kurs->anmeldung_ab)) . ' Uhr' : '' ?>
-            <?= $kurs->anmeldung_bis ? ' bis ' . date('d.m.Y, H:i', strtotime($kurs->anmeldung_bis)) . ' Uhr' : '' ?></dd>
+        <dt><?= Yii::t('KurseModule.base', 'Anmeldung') ?></dt><dd><?= $kurs->anmeldung_ab ? Html::encode(Yii::t('KurseModule.base', 'ab {zeitpunkt}', ['zeitpunkt' => Kurs::datumZeit($kurs->anmeldung_ab)])) : '' ?>
+            <?= $kurs->anmeldung_bis ? Html::encode(Yii::t('KurseModule.base', 'bis {zeitpunkt}', ['zeitpunkt' => Kurs::datumZeit($kurs->anmeldung_bis)])) : '' ?></dd>
     <?php endif ?>
-    <dt>Kontakt</dt><dd><?= Html::mailto(Html::encode($kurs->kontakt_email), $kurs->kontakt_email) ?></dd>
+    <dt><?= Yii::t('KurseModule.base', 'Kontakt') ?></dt><dd><?= Html::mailto(Html::encode($kurs->kontakt_email), $kurs->kontakt_email) ?></dd>
 </dl>

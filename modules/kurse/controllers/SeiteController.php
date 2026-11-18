@@ -96,7 +96,7 @@ class SeiteController extends Controller
         $this->ladeSeite($slug, false);
         $kurs = Kurs::findOne(['id' => (int)$id, 'verein_id' => $this->verein->id]);
         if (!$kurs) {
-            throw new NotFoundHttpException('Kurs nicht gefunden.');
+            throw new NotFoundHttpException(Yii::t('KurseModule.base', 'Kurs nicht gefunden.'));
         }
         return $this->render('datenschutz', ['kurs' => $kurs]);
     }
@@ -122,7 +122,7 @@ class SeiteController extends Controller
         if (Yii::$app->request->isPost && Yii::$app->request->post('aktion') === 'abmelden'
             && in_array($a->status, [Anmeldung::STATUS_PLATZ, Anmeldung::STATUS_WARTELISTE], true)) {
             Dienst::stornieren($a, 'eltern');
-            Yii::$app->session->setFlash('kurse-ok', 'Abmeldung gespeichert. Du bekommst gleich eine Bestätigung per Mail.');
+            Yii::$app->session->setFlash('kurse-ok', Yii::t('KurseModule.base', 'Abmeldung gespeichert. Du bekommst gleich eine Bestätigung per Mail.'));
             return $this->redirect($a->getStatusUrl(false));
         }
         return $this->render('status', ['a' => $a]);
@@ -138,7 +138,7 @@ class SeiteController extends Controller
         $seite = is_string($slug) && KursVerein::gueltigerSlug($slug) ? KursVerein::findOne(['slug' => $slug]) : null;
         $verein = $seite ? Verein::findOne($seite->verein_id) : null;
         if (!$seite || !$verein) {
-            throw new NotFoundHttpException('Diese Seite gibt es nicht.');
+            throw new NotFoundHttpException(Yii::t('KurseModule.base', 'Diese Seite gibt es nicht.'));
         }
         if (!$seite->seite_aktiv) {
             // Vorschau: Kursverwalter/Admins oder wer den Vorschau-Link hat (gilt dann für die Sitzung)
@@ -150,7 +150,7 @@ class SeiteController extends Controller
             $hatLink = Yii::$app->session->get($key) === $seite->vorschauSchluessel();
             $this->vorschau = $hatLink || Module::kannVerwalten($verein->id);
             if ($nurFreigegeben && !$this->vorschau) {
-                throw new NotFoundHttpException('Diese Seite gibt es (noch) nicht.');
+                throw new NotFoundHttpException(Yii::t('KurseModule.base', 'Diese Seite gibt es (noch) nicht.'));
             }
         }
         $this->seite = $seite;
@@ -163,7 +163,7 @@ class SeiteController extends Controller
         $this->ladeSeite($slug);
         $kurs = Kurs::findOne(['id' => (int)$id, 'verein_id' => $this->verein->id]);
         if (!$kurs || ($kurs->status === Kurs::STATUS_ENTWURF && !Module::kannVerwalten($this->verein->id))) {
-            throw new NotFoundHttpException('Diesen Kurs gibt es nicht (mehr).');
+            throw new NotFoundHttpException(Yii::t('KurseModule.base', 'Diesen Kurs gibt es nicht (mehr).'));
         }
         $this->view->title = $kurs->titel . ' – ' . $this->verein->name;
         return $kurs;
@@ -174,10 +174,12 @@ class SeiteController extends Controller
         $this->ladeSeite($slug, false);
         $a = is_string($t) && strlen($t) === 40 ? Anmeldung::findOne(['token' => $t]) : null;
         if (!$a || $a->anonymisiert_am || (int)$a->kurs->verein_id !== (int)$this->verein->id) {
-            throw new NotFoundHttpException('Diese Anmeldung gibt es nicht (mehr). Nicht bestätigte Anmeldungen werden nach '
-                . $this->module->unbestaetigtStunden . ' Stunden gelöscht – dann bitte einfach neu anmelden.');
+            throw new NotFoundHttpException(Yii::t('KurseModule.base', 'Diese Anmeldung gibt es nicht (mehr). Nicht bestätigte Anmeldungen werden nach {stunden} Stunden gelöscht – dann bitte einfach neu anmelden.',
+                ['stunden' => $this->module->unbestaetigtStunden]));
         }
-        $this->view->title = 'Anmeldung ' . $a->getNummer() . ' – ' . $this->verein->name;
+        // Seite in der Sprache der Anmeldung (Gäste ohne eigene Sprachwahl)
+        $a->spracheFuerSeite();
+        $this->view->title = Yii::t('KurseModule.base', 'Anmeldung {nummer} – {verein}', ['nummer' => $a->getNummer(), 'verein' => $this->verein->name]);
         return $a;
     }
 }

@@ -18,9 +18,12 @@ $farbe = $seite->getFarbe();
 $logo = $verein->getLogo();
 $website = trim((string)$verein->website);
 $flash = array_filter(['ok' => Yii::$app->session->getFlash('kurse-ok'), 'info' => Yii::$app->session->getFlash('kurse-info')]);
+// Sprache der Seite; Arabisch von rechts nach links (nur in diesem eigenen Layout)
+$sprache = Yii::$app->language;
+$rtl = in_array(strtolower(substr($sprache, 0, 2)), ['ar', 'fa', 'he', 'ur'], true);
 ?>
 <!DOCTYPE html>
-<html lang="de">
+<html lang="<?= Html::encode($sprache) ?>"<?= $rtl ? ' dir="rtl"' : '' ?>>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -55,7 +58,7 @@ $flash = array_filter(['ok' => Yii::$app->session->getFlash('kurse-ok'), 'info' 
         .kopf { background: var(--f-dunkel); color: #fff; }
         .kopf .breite { display: flex; align-items: center; gap: 14px; min-height: 64px; padding-top: 8px; padding-bottom: 8px; }
         .kopf a { color: #fff; text-decoration: none; }
-        .marke { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 1.05em; margin-right: auto; }
+        .marke { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 1.05em; margin-inline-end: auto; }
         .marke img { width: 44px; height: 44px; object-fit: contain; background: #fff; border-radius: 8px; padding: 3px; }
         .kopf nav { display: flex; gap: 6px; flex-wrap: wrap; }
         .kopf nav a { padding: 6px 12px; border-radius: 999px; font-size: .92em; }
@@ -63,7 +66,7 @@ $flash = array_filter(['ok' => Yii::$app->session->getFlash('kurse-ok'), 'info' 
         @media (max-width: 640px) { .kopf nav .nur-breit { display: none; } .marke span { font-size: .95em; } }
 
         .vorschau { background: #fff4d6; color: #5c4300; font-size: .9em; padding: 8px 0; border-bottom: 1px solid #f0d68a; }
-        .meldung { margin: 18px 0 0; padding: 12px 16px; border-radius: 10px; background: var(--f-hell); border-left: 4px solid var(--f); }
+        .meldung { margin: 18px 0 0; padding: 12px 16px; border-radius: 10px; background: var(--f-hell); border-inline-start: 4px solid var(--f); }
         .meldung.ok { background: #e7f5ec; border-color: var(--ok); }
         .meldung.fehler { background: #fdecea; border-color: var(--fehler); }
         .meldung.warn { background: #fff4d6; border-color: #e0a100; }
@@ -90,6 +93,11 @@ $flash = array_filter(['ok' => Yii::$app->session->getFlash('kurse-ok'), 'info' 
         .fakten dt { font-weight: 600; color: var(--f-dunkel); } .fakten dd { margin: 0; }
         @media (max-width: 520px) { .fakten { grid-template-columns: 1fr; gap: 0; } .fakten dd { margin-bottom: 10px; } }
         details summary { cursor: pointer; font-weight: 600; color: var(--f-dunkel); }
+        /* Richtungspfeile (← Zurück, Weiter →) bei Schrift von rechts nach links spiegeln */
+        [dir=rtl] .pfeil { display: inline-block; transform: scaleX(-1); }
+        /* Bot-Falle im Formular: aus dem Bild schieben, ohne bei rtl seitlich scrollbar zu werden */
+        .falle { position: absolute; left: -5000px; }
+        [dir=rtl] .falle { left: auto; right: -5000px; }
 
         /* Formular */
         .feld { margin-bottom: 16px; }
@@ -122,17 +130,16 @@ $flash = array_filter(['ok' => Yii::$app->session->getFlash('kurse-ok'), 'info' 
             <?php if ($logo): ?><img src="<?= Html::encode($logo->getUrl()) ?>" alt=""><?php endif ?>
             <span><?= Html::encode($verein->name) ?></span>
         </a>
-        <nav aria-label="Seitenmenü">
-            <a href="<?= Html::encode($seite->seiteUrl()) ?>#kurse">Kurse</a>
-            <a class="nur-breit" href="<?= Html::encode($seite->seiteUrl()) ?>#ueber-uns">Über uns</a>
-            <a class="nur-breit" href="<?= Html::encode($seite->seiteUrl()) ?>#kontakt">Kontakt</a>
-            <?php if ($website !== ''): ?><a class="nur-breit" href="<?= Html::encode($website) ?>" rel="noopener">Vereins-Website ↗</a><?php endif ?>
+        <nav aria-label="<?= Html::encode(Yii::t('KurseModule.base', 'Seitenmenü')) ?>">
+            <a href="<?= Html::encode($seite->seiteUrl()) ?>#kurse"><?= Yii::t('KurseModule.base', 'Kurse') ?></a>
+            <a class="nur-breit" href="<?= Html::encode($seite->seiteUrl()) ?>#ueber-uns"><?= Yii::t('KurseModule.base', 'Über uns') ?></a>
+            <a class="nur-breit" href="<?= Html::encode($seite->seiteUrl()) ?>#kontakt"><?= Yii::t('KurseModule.base', 'Kontakt') ?></a>
+            <?php if ($website !== ''): ?><a class="nur-breit" href="<?= Html::encode($website) ?>" rel="noopener"><?= Yii::t('KurseModule.base', 'Vereins-Website') ?> ↗</a><?php endif ?>
         </nav>
     </div>
 </header>
 <?php if ($c->vorschau): ?>
-    <div class="vorschau"><div class="breite"><strong>Vorschau:</strong> Diese Seite ist noch nicht freigegeben – sichtbar nur für Kursverwalter, Admins und mit dem Vorschau-Link.
-        Links aus Bestätigungsmails funktionieren trotzdem für alle.</div></div>
+    <div class="vorschau"><div class="breite"><strong><?= Yii::t('KurseModule.base', 'Vorschau:') ?></strong> <?= Yii::t('KurseModule.base', 'Diese Seite ist noch nicht freigegeben – sichtbar nur für Kursverwalter, Admins und mit dem Vorschau-Link. Links aus Bestätigungsmails funktionieren trotzdem für alle.') ?></div></div>
 <?php endif ?>
 <main id="inhalt">
     <?php if ($flash): ?>
@@ -145,9 +152,9 @@ $flash = array_filter(['ok' => Yii::$app->session->getFlash('kurse-ok'), 'info' 
 <footer class="fuss">
     <ul class="breite">
         <li><?= $seite->impressum_url
-                ? Html::a('Impressum', $seite->impressum_url, ['rel' => 'noopener'])
-                : Html::a('Impressum', ['/legal/page/view', 'pageKey' => 'imprint']) ?></li>
-        <li><?= Html::a('Datenschutz', $seite->seiteUrl('datenschutzseite')) ?></li>
+                ? Html::a(Yii::t('KurseModule.base', 'Impressum'), $seite->impressum_url, ['rel' => 'noopener'])
+                : Html::a(Yii::t('KurseModule.base', 'Impressum'), ['/legal/page/view', 'pageKey' => 'imprint']) ?></li>
+        <li><?= Html::a(Yii::t('KurseModule.base', 'Datenschutz'), $seite->seiteUrl('datenschutzseite')) ?></li>
     </ul>
 </footer>
 </body>

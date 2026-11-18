@@ -1,6 +1,7 @@
 <?php
 /**
- * Text der Datenschutzhinweise zur Kursanmeldung (Space-Seite und eigene Vereinsseite)
+ * Text der Datenschutzhinweise zur Kursanmeldung (Space-Seite und eigene Vereinsseite).
+ * Rechtstext bewusst nur auf Deutsch (lang="de"); in anderen Sprachen steht oben ein übersetzter Hinweis darauf.
  * @var \humhub\modules\kurse\models\Kurs $kurs
  * @var string|null $allgemeinUrl Datenschutzseite der eigenen Kursseite (sonst Datenschutzerklärung der Plattform)
  */
@@ -10,6 +11,10 @@ use humhub\helpers\Html;
 $tage = Yii::$app->getModule('kurse')->loeschenNachTagen;
 $verein = Html::encode($kurs->verein->name);
 ?>
+<?php if (!str_starts_with(Yii::$app->language, 'de')): ?>
+    <p class="alert alert-info meldung"><?= Yii::t('KurseModule.base', 'Die Datenschutzerklärung ist rechtlich nur auf Deutsch verbindlich.') ?></p>
+<?php endif ?>
+<div lang="de" dir="ltr">
 <p><strong>Verantwortlich</strong> für die Anmeldedaten zu diesem Kurs ist der Verein <?= $verein ?>
     (Kontakt: <?= Html::mailto(Html::encode($kurs->kontakt_email), $kurs->kontakt_email) ?>).
     Die Plattform „Rund um Uffni“ der Bürgerliste Uffenheim e. V. stellt die Anmeldung technisch bereit und verarbeitet die Daten
@@ -32,3 +37,4 @@ $verein = Html::encode($kurs->verein->name);
 <?php else: ?>
     <p class="small text-muted">Allgemeine Hinweise zur Plattform: <?= Html::a('Datenschutzerklärung', ['/legal/page/view', 'pageKey' => 'privacy']) ?>.</p>
 <?php endif ?>
+</div>

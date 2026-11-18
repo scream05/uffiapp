@@ -81,4 +81,22 @@ class Sitzung extends ActiveRecord
     {
         return ['So.', 'Mo.', 'Di.', 'Mi.', 'Do.', 'Fr.', 'Sa.'][(int)date('w', strtotime($this->datum))] . ', ' . date('j.n.Y', strtotime($this->datum));
     }
+
+    /**
+     * Datum für Bürger-Seiten: auf Deutsch wie tag(), sonst passend zur eingestellten Sprache (Formatter).
+     * tag() selbst bleibt deutsch – es geht auch an die KI und in die Redaktionsseiten.
+     */
+    public function tagAnzeige(): string
+    {
+        if (str_starts_with((string)\Yii::$app->language, 'de')) {
+            return $this->tag();
+        }
+        return \Yii::$app->formatter->asDate($this->datum, 'full');
+    }
+
+    /** Uhrzeit für Bürger-Seiten („19:00 Uhr“ bzw. passend zur Sprache) */
+    public function uhrAnzeige(): string
+    {
+        return $this->beginn ? \Yii::t('StadtratModule.base', '{uhr} Uhr', ['uhr' => $this->beginn]) : '';
+    }
 }

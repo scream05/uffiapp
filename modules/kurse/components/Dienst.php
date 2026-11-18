@@ -84,20 +84,20 @@ class Dienst
         // Erst zählen, dann prüfen: auch Versuche mit schon angemeldeten Kindern zählen mit
         $std = date('YmdH');
         if (!self::zaehlen('kurse-anmeldung-ip-' . md5(self::anschluss()), self::MAX_PRO_STUNDE, 3600)) {
-            $hinweis = 'Zu viele Anmeldungen in kurzer Zeit. Bitte versuche es später noch einmal.';
+            $hinweis = Yii::t('KurseModule.base', 'Zu viele Anmeldungen in kurzer Zeit. Bitte versuche es später noch einmal.');
             return false;
         }
         if (!self::zaehlen('kurse-anmeldung-adr-' . md5(mb_strtolower((string)$a->email)), self::MAX_PRO_ADRESSE, 86400)) {
-            $hinweis = 'Für diese E-Mail-Adresse wurden heute schon mehrere Anmeldungen abgeschickt. Bitte schau in dein Postfach (auch im Spam-Ordner) '
-                . 'oder melde dich direkt beim Verein: ' . $a->kurs->kontakt_email;
+            $hinweis = Yii::t('KurseModule.base', 'Für diese E-Mail-Adresse wurden heute schon mehrere Anmeldungen abgeschickt. Bitte schau in dein Postfach (auch im Spam-Ordner) oder melde dich direkt beim Verein: {email}',
+                ['email' => $a->kurs->kontakt_email]);
             return false;
         }
         if (!self::zaehlen("kurse-anmeldung-gesamt-$std", self::MAX_GESAMT_STUNDE, 3700)) {
             if (Yii::$app->cache->add("kurse-anmeldung-gesamt-warnung-$std", 1, 3700)) {
                 Yii::warning('Kursanmeldung: mehr als ' . self::MAX_GESAMT_STUNDE . ' Anmeldungen in einer Stunde – weitere werden bis zur vollen Stunde abgewiesen', 'kurse');
             }
-            $hinweis = 'Gerade gehen ungewöhnlich viele Anmeldungen ein. Bitte versuche es in einer Stunde noch einmal oder melde dich direkt beim Verein: '
-                . $a->kurs->kontakt_email;
+            $hinweis = Yii::t('KurseModule.base', 'Gerade gehen ungewöhnlich viele Anmeldungen ein. Bitte versuche es in einer Stunde noch einmal oder melde dich direkt beim Verein: {email}',
+                ['email' => $a->kurs->kontakt_email]);
             return false;
         }
 
@@ -138,7 +138,7 @@ class Dienst
             }
             $a->setIsNewRecord(true);
             $a->id = null;
-            $hinweis = 'Die Anmeldung konnte gerade nicht gespeichert werden (technischer Fehler). Bitte versuche es in ein paar Minuten noch einmal.';
+            $hinweis = Yii::t('KurseModule.base', 'Die Anmeldung konnte gerade nicht gespeichert werden (technischer Fehler). Bitte versuche es in ein paar Minuten noch einmal.');
         }
         return false;
     }
@@ -326,18 +326,21 @@ class Dienst
     }
 
     // ---------------------------------------------------------------- Mails
+    //
+    // Alle Mails an Eltern entstehen in deren Sprache (Anmeldung::inSprache, gespeichert beim Anmelden; sonst Deutsch) –
+    // auch aus der Konsole (Cron). Von Menschen geschriebene Inhalte (Kursname, Absagegrund, Rundmail) bleiben wie geschrieben.
 
     private static function kursBlock(Kurs $k): string
     {
         $zeilen = [
-            'Kurs: ' . $k->titel . ($k->niveau ? ' (' . $k->niveau . ')' : ''),
-            'Verein: ' . $k->verein->name,
-            'Termine: ' . $k->getTermineText(),
+            Yii::t('KurseModule.base', 'Kurs: {titel}', ['titel' => $k->titel . ($k->niveau ? ' (' . $k->niveau . ')' : '')]),
+            Yii::t('KurseModule.base', 'Verein: {verein}', ['verein' => $k->verein->name]),
+            Yii::t('KurseModule.base', 'Termine: {termine}', ['termine' => $k->getTermineText()]),
         ];
         if ($k->termine_hinweis) {
             $zeilen[] = '          ' . $k->termine_hinweis;
         }
-        $zeilen[] = 'Ort: ' . $k->ort;
+        $zeilen[] = Yii::t('KurseModule.base', 'Ort: {ort}', ['ort' => $k->ort]);
         return implode("\n", $zeilen);
     }
 
@@ -347,159 +350,204 @@ class Dienst
         if (!$k->hatPreis() || $a->betrag === null || (float)$a->betrag <= 0) {
             return '';
         }
+        $betrag = Kurs::euro($a->betrag);
         if ($a->bezahlt_am) {
-            return 'Kursgebühr: ' . Kurs::euro($a->betrag) . ' – bereits bezahlt, danke!';
+            return Yii::t('KurseModule.base', 'Kursgebühr: {betrag} – bereits bezahlt, danke!', ['betrag' => $betrag]);
         }
         if ($a->zahlart === Anmeldung::ZAHLART_UEBERWEISUNG) {
             $frist = $a->zahlungsfrist();
-            return "Bitte überweise die Kursgebühr" . ($frist ? ' bis ' . date('d.m.Y', strtotime($frist)) : ' vor dem ersten Kurstag') . ":\n"
-                . 'Betrag: ' . Kurs::euro($a->betrag) . "\n"
-                . 'Empfänger: ' . $k->kontoinhaber . "\n"
+            return ($frist ? Yii::t('KurseModule.base', 'Bitte überweise die Kursgebühr bis {datum}:', ['datum' => Kurs::datum($frist)])
+                    : Yii::t('KurseModule.base', 'Bitte überweise die Kursgebühr vor dem ersten Kurstag:')) . "\n"
+                . Yii::t('KurseModule.base', 'Betrag: {betrag}', ['betrag' => $betrag]) . "\n"
+                . Yii::t('KurseModule.base', 'Empfänger: {kontoinhaber}', ['kontoinhaber' => $k->kontoinhaber]) . "\n"
                 . 'IBAN: ' . trim(chunk_split((string)$k->iban, 4, ' ')) . "\n"
-                . 'Verwendungszweck: ' . $a->getVerwendungszweck();
+                . Yii::t('KurseModule.base', 'Verwendungszweck: {zweck}', ['zweck' => $a->getVerwendungszweck()]);
         }
-        return 'Bitte bring die Kursgebühr von ' . Kurs::euro($a->betrag) . ' am ersten Kurstag bar mit (am besten passend).';
+        return Yii::t('KurseModule.base', 'Bitte bring die Kursgebühr von {betrag} am ersten Kurstag bar mit (am besten passend).', ['betrag' => $betrag]);
     }
 
     private static function anrede(Anmeldung $a): string
     {
-        return 'Hallo ' . $a->eltern_name . ',';
+        return Yii::t('KurseModule.base', 'Hallo {name},', ['name' => $a->eltern_name]);
+    }
+
+    private static function gruss(Anmeldung $a): string
+    {
+        return Yii::t('KurseModule.base', 'Viele Grüße') . "\n" . $a->kurs->verein->name;
     }
 
     private static function fuss(Anmeldung $a): string
     {
-        return "Deine Anmeldung ansehen oder abmelden:\n" . $a->getStatusUrl()
-            . "\n\nFragen? Antworte einfach auf diese Mail, sie geht an " . $a->kurs->kontakt_email . '.'
-            . "\n\nViele Grüße\n" . $a->kurs->verein->name;
+        return Yii::t('KurseModule.base', 'Deine Anmeldung ansehen oder abmelden:') . "\n" . $a->getStatusUrl()
+            . "\n\n" . Yii::t('KurseModule.base', 'Fragen? Antworte einfach auf diese Mail, sie geht an {email}.', ['email' => $a->kurs->kontakt_email])
+            . "\n\n" . self::gruss($a);
     }
 
     public static function mailBestaetigen(Anmeldung $a): bool
     {
-        $link = $a->kurs->elternUrl('bestaetigen', ['t' => $a->token], true);
-        $text = self::anrede($a) . "\n\n"
-            . 'du hast ' . $a->getKindName() . ' für folgenden Kurs angemeldet:' . "\n\n" . self::kursBlock($a->kurs) . "\n\n"
-            . 'Bitte bestätige die Anmeldung über diesen Link. Erst dann wird ein Platz (oder ein Platz auf der Warteliste) vergeben – '
-            . 'in der Reihenfolge der Bestätigungen.' . "\n\n" . $link . "\n\n"
-            . 'Der Link gilt ' . Yii::$app->getModule('kurse')->unbestaetigtStunden . ' Stunden. '
-            . 'Wenn du das nicht warst, kannst du diese Mail einfach ignorieren.' . "\n\n"
-            . 'Viele Grüße' . "\n" . $a->kurs->verein->name;
-        return self::senden($a, 'Bitte bestätige die Anmeldung: ' . $a->kurs->titel, $text, [$link, 'Anmeldung bestätigen']);
+        return $a->inSprache(function () use ($a) {
+            $link = $a->kurs->elternUrl('bestaetigen', ['t' => $a->token], true);
+            $text = self::anrede($a) . "\n\n"
+                . Yii::t('KurseModule.base', 'du hast {kind} für folgenden Kurs angemeldet:', ['kind' => $a->getKindName()]) . "\n\n" . self::kursBlock($a->kurs) . "\n\n"
+                . Yii::t('KurseModule.base', 'Bitte bestätige die Anmeldung über diesen Link. Erst dann wird ein Platz (oder ein Platz auf der Warteliste) vergeben – in der Reihenfolge der Bestätigungen.')
+                . "\n\n" . $link . "\n\n"
+                . Yii::t('KurseModule.base', 'Der Link gilt {stunden} Stunden. Wenn du das nicht warst, kannst du diese Mail einfach ignorieren.',
+                    ['stunden' => Yii::$app->getModule('kurse')->unbestaetigtStunden]) . "\n\n"
+                . self::gruss($a);
+            return self::senden($a, Yii::t('KurseModule.base', 'Bitte bestätige die Anmeldung: {kurs}', ['kurs' => $a->kurs->titel]), $text,
+                [$link, Yii::t('KurseModule.base', 'Anmeldung bestätigen')]);
+        });
     }
 
     /** Erneute Anmeldung mit derselben Adresse, obwohl das Kind schon angemeldet ist: Link noch einmal schicken */
     public static function mailSchonAngemeldet(Anmeldung $a): bool
     {
-        $text = self::anrede($a) . "\n\n"
-            . $a->getKindName() . ' ist für diesen Kurs bereits angemeldet (' . $a->getStatusText() . '):' . "\n\n" . self::kursBlock($a->kurs) . "\n\n"
-            . 'Du musst nichts weiter tun – eine zweite Anmeldung haben wir nicht angelegt.' . "\n\n" . self::fuss($a);
-        return self::senden($a, 'Schon angemeldet: ' . $a->kurs->titel, $text);
+        return $a->inSprache(function () use ($a) {
+            $text = self::anrede($a) . "\n\n"
+                . Yii::t('KurseModule.base', '{kind} ist für diesen Kurs bereits angemeldet ({status}):', ['kind' => $a->getKindName(), 'status' => $a->getStatusText()])
+                . "\n\n" . self::kursBlock($a->kurs) . "\n\n"
+                . Yii::t('KurseModule.base', 'Du musst nichts weiter tun – eine zweite Anmeldung haben wir nicht angelegt.') . "\n\n" . self::fuss($a);
+            return self::senden($a, Yii::t('KurseModule.base', 'Schon angemeldet: {kurs}', ['kurs' => $a->kurs->titel]), $text);
+        });
     }
 
     /** Jemand hat dasselbe Kind mit einer anderen E-Mail-Adresse angemeldet: nur die ursprüngliche Adresse erfährt davon */
     public static function mailWeitererVersuch(Anmeldung $a): bool
     {
-        $text = self::anrede($a) . "\n\n"
-            . 'für ' . $a->getKindName() . ' wurde gerade noch einmal eine Anmeldung zu diesem Kurs abgeschickt, mit einer anderen E-Mail-Adresse:' . "\n\n"
-            . self::kursBlock($a->kurs) . "\n\n"
-            . 'Deine Anmeldung besteht unverändert (' . $a->getStatusText() . '), eine zweite haben wir nicht angelegt. '
-            . 'War das zum Beispiel der andere Elternteil, ist nichts weiter zu tun. Kommt dir das merkwürdig vor, antworte bitte auf diese Mail.'
-            . "\n\n" . self::fuss($a);
-        return self::senden($a, 'Weitere Anmeldung für ' . $a->kind_vorname . ': ' . $a->kurs->titel, $text);
+        return $a->inSprache(function () use ($a) {
+            $text = self::anrede($a) . "\n\n"
+                . Yii::t('KurseModule.base', 'für {kind} wurde gerade noch einmal eine Anmeldung zu diesem Kurs abgeschickt, mit einer anderen E-Mail-Adresse:',
+                    ['kind' => $a->getKindName()]) . "\n\n"
+                . self::kursBlock($a->kurs) . "\n\n"
+                . Yii::t('KurseModule.base', 'Deine Anmeldung besteht unverändert ({status}), eine zweite haben wir nicht angelegt. War das zum Beispiel der andere Elternteil, ist nichts weiter zu tun. Kommt dir das merkwürdig vor, antworte bitte auf diese Mail.',
+                    ['status' => $a->getStatusText()])
+                . "\n\n" . self::fuss($a);
+            return self::senden($a, Yii::t('KurseModule.base', 'Weitere Anmeldung für {vorname}: {kurs}', ['vorname' => $a->kind_vorname, 'kurs' => $a->kurs->titel]), $text);
+        });
     }
 
     public static function mailZusage(Anmeldung $a, bool $nachgerueckt): bool
     {
-        $text = self::anrede($a) . "\n\n"
-            . ($nachgerueckt ? 'gute Nachricht: Es ist ein Platz frei geworden. ' . $a->getKindName() . ' ist von der Warteliste nachgerückt und hat jetzt einen festen Platz im Kurs.'
-                : 'die Anmeldung ist bestätigt: ' . $a->getKindName() . ' hat einen Platz im Kurs.') . "\n\n"
-            . self::kursBlock($a->kurs) . "\n\n"
-            . 'Anmeldenummer: ' . $a->getNummer() . "\n";
-        if ($z = self::zahlungBlock($a)) {
-            $text .= "\n" . $z . "\n";
-        }
-        if (!$a->kurs->hatBegonnen() && $a->kurs->erinnerung_tage) {
-            $text .= "\nKurz vor dem Start erinnern wir dich noch einmal per Mail.\n";
-        }
-        $text .= "\nFalls ihr doch nicht teilnehmen könnt, melde dich bitte ab – dann rückt das nächste Kind nach.\n\n" . self::fuss($a);
-        return self::senden($a, ($nachgerueckt ? 'Nachgerückt: ' : 'Platz bestätigt: ') . $a->kurs->titel, $text,
-            [$a->getStatusUrl(), 'Anmeldung ansehen']);
+        return $a->inSprache(function () use ($a, $nachgerueckt) {
+            $text = self::anrede($a) . "\n\n"
+                . ($nachgerueckt
+                    ? Yii::t('KurseModule.base', 'gute Nachricht: Es ist ein Platz frei geworden. {kind} ist von der Warteliste nachgerückt und hat jetzt einen festen Platz im Kurs.', ['kind' => $a->getKindName()])
+                    : Yii::t('KurseModule.base', 'die Anmeldung ist bestätigt: {kind} hat einen Platz im Kurs.', ['kind' => $a->getKindName()])) . "\n\n"
+                . self::kursBlock($a->kurs) . "\n\n"
+                . Yii::t('KurseModule.base', 'Anmeldenummer: {nummer}', ['nummer' => $a->getNummer()]) . "\n";
+            if ($z = self::zahlungBlock($a)) {
+                $text .= "\n" . $z . "\n";
+            }
+            if (!$a->kurs->hatBegonnen() && $a->kurs->erinnerung_tage) {
+                $text .= "\n" . Yii::t('KurseModule.base', 'Kurz vor dem Start erinnern wir dich noch einmal per Mail.') . "\n";
+            }
+            $text .= "\n" . Yii::t('KurseModule.base', 'Falls ihr doch nicht teilnehmen könnt, melde dich bitte ab – dann rückt das nächste Kind nach.') . "\n\n" . self::fuss($a);
+            $betreff = $nachgerueckt ? Yii::t('KurseModule.base', 'Nachgerückt: {kurs}', ['kurs' => $a->kurs->titel])
+                : Yii::t('KurseModule.base', 'Platz bestätigt: {kurs}', ['kurs' => $a->kurs->titel]);
+            return self::senden($a, $betreff, $text, [$a->getStatusUrl(), Yii::t('KurseModule.base', 'Anmeldung ansehen')]);
+        });
     }
 
     public static function mailWarteliste(Anmeldung $a): bool
     {
-        $text = self::anrede($a) . "\n\n"
-            . 'danke für die Bestätigung. Der Kurs ist leider schon voll – ' . $a->getKindName()
-            . ' steht auf der Warteliste (Platz ' . $a->getWartelistenPosition() . ').' . "\n\n"
-            . self::kursBlock($a->kurs) . "\n\n"
-            . 'Wird ein Platz frei, rückt das nächste Kind automatisch nach und bekommt eine Mail. Du musst nichts weiter tun.' . "\n\n"
-            . self::fuss($a);
-        return self::senden($a, 'Warteliste: ' . $a->kurs->titel, $text, [$a->getStatusUrl(), 'Anmeldung ansehen']);
+        return $a->inSprache(function () use ($a) {
+            $text = self::anrede($a) . "\n\n"
+                . Yii::t('KurseModule.base', 'danke für die Bestätigung. Der Kurs ist leider schon voll – {kind} steht auf der Warteliste (Platz {position}).',
+                    ['kind' => $a->getKindName(), 'position' => $a->getWartelistenPosition()]) . "\n\n"
+                . self::kursBlock($a->kurs) . "\n\n"
+                . Yii::t('KurseModule.base', 'Wird ein Platz frei, rückt das nächste Kind automatisch nach und bekommt eine Mail. Du musst nichts weiter tun.') . "\n\n"
+                . self::fuss($a);
+            return self::senden($a, Yii::t('KurseModule.base', 'Warteliste: {kurs}', ['kurs' => $a->kurs->titel]), $text, [$a->getStatusUrl(), Yii::t('KurseModule.base', 'Anmeldung ansehen')]);
+        });
     }
 
     public static function mailVoll(Anmeldung $a): bool
     {
-        $text = self::anrede($a) . "\n\n"
-            . 'danke für die Bestätigung. Leider sind der Kurs „' . $a->kurs->titel . '“ und die Warteliste inzwischen voll, '
-            . 'deshalb konnten wir ' . $a->getKindName() . ' nicht mehr aufnehmen.' . "\n\n"
-            . 'Bei Fragen antworte einfach auf diese Mail.' . "\n\n" . 'Viele Grüße' . "\n" . $a->kurs->verein->name;
-        return self::senden($a, 'Kurs ausgebucht: ' . $a->kurs->titel, $text);
+        return $a->inSprache(function () use ($a) {
+            $text = self::anrede($a) . "\n\n"
+                . Yii::t('KurseModule.base', 'danke für die Bestätigung. Leider sind der Kurs „{kurs}“ und die Warteliste inzwischen voll, deshalb konnten wir {kind} nicht mehr aufnehmen.',
+                    ['kurs' => $a->kurs->titel, 'kind' => $a->getKindName()]) . "\n\n"
+                . Yii::t('KurseModule.base', 'Bei Fragen antworte einfach auf diese Mail.') . "\n\n" . self::gruss($a);
+            return self::senden($a, Yii::t('KurseModule.base', 'Kurs ausgebucht: {kurs}', ['kurs' => $a->kurs->titel]), $text);
+        });
     }
 
     public static function mailAbgemeldet(Anmeldung $a, string $von): bool
     {
-        $text = self::anrede($a) . "\n\n"
-            . ($von === 'eltern' ? 'du hast ' . $a->getKindName() . ' vom Kurs „' . $a->kurs->titel . '“ abgemeldet.'
-                : $a->getKindName() . ' wurde vom Verein vom Kurs „' . $a->kurs->titel . '“ abgemeldet.') . "\n\n"
-            . ($a->bezahlt_am ? "Wegen der bereits bezahlten Kursgebühr melden wir uns bei dir.\n\n" : '')
-            . 'Bei Fragen antworte einfach auf diese Mail.' . "\n\n" . 'Viele Grüße' . "\n" . $a->kurs->verein->name;
-        return self::senden($a, 'Abmeldung: ' . $a->kurs->titel, $text);
+        return $a->inSprache(function () use ($a, $von) {
+            $p = ['kind' => $a->getKindName(), 'kurs' => $a->kurs->titel];
+            $text = self::anrede($a) . "\n\n"
+                . ($von === 'eltern' ? Yii::t('KurseModule.base', 'du hast {kind} vom Kurs „{kurs}“ abgemeldet.', $p)
+                    : Yii::t('KurseModule.base', '{kind} wurde vom Verein vom Kurs „{kurs}“ abgemeldet.', $p)) . "\n\n"
+                . ($a->bezahlt_am ? Yii::t('KurseModule.base', 'Wegen der bereits bezahlten Kursgebühr melden wir uns bei dir.') . "\n\n" : '')
+                . Yii::t('KurseModule.base', 'Bei Fragen antworte einfach auf diese Mail.') . "\n\n" . self::gruss($a);
+            return self::senden($a, Yii::t('KurseModule.base', 'Abmeldung: {kurs}', ['kurs' => $a->kurs->titel]), $text);
+        });
     }
 
     public static function mailAbsage(Anmeldung $a, string $grund): bool
     {
-        $text = self::anrede($a) . "\n\n"
-            . 'leider müssen wir den Kurs „' . $a->kurs->titel . '“ (Beginn ' . date('d.m.Y', strtotime($a->kurs->beginn)) . ') absagen.' . "\n\n"
-            . ($grund !== '' ? $grund . "\n\n" : '')
-            . ($a->bezahlt_am ? "Die bereits bezahlte Kursgebühr bekommst du zurück – wir melden uns dazu bei dir.\n\n" : '')
-            . 'Bei Fragen antworte einfach auf diese Mail.' . "\n\n" . 'Viele Grüße' . "\n" . $a->kurs->verein->name;
-        return self::senden($a, 'Kurs abgesagt: ' . $a->kurs->titel, $text);
+        return $a->inSprache(function () use ($a, $grund) {
+            $text = self::anrede($a) . "\n\n"
+                . Yii::t('KurseModule.base', 'leider müssen wir den Kurs „{kurs}“ (Beginn {datum}) absagen.', ['kurs' => $a->kurs->titel, 'datum' => Kurs::datum($a->kurs->beginn)]) . "\n\n"
+                . ($grund !== '' ? $grund . "\n\n" : '')
+                . ($a->bezahlt_am ? Yii::t('KurseModule.base', 'Die bereits bezahlte Kursgebühr bekommst du zurück – wir melden uns dazu bei dir.') . "\n\n" : '')
+                . Yii::t('KurseModule.base', 'Bei Fragen antworte einfach auf diese Mail.') . "\n\n" . self::gruss($a);
+            return self::senden($a, Yii::t('KurseModule.base', 'Kurs abgesagt: {kurs}', ['kurs' => $a->kurs->titel]), $text);
+        });
     }
 
     public static function mailErinnerung(Anmeldung $a): bool
     {
-        $k = $a->kurs;
-        $tage = (int)round((strtotime($k->beginn) - strtotime(date('Y-m-d'))) / 86400);
-        $wann = $tage <= 0 ? 'heute' : ($tage === 1 ? 'morgen' : "in $tage Tagen");
-        $text = self::anrede($a) . "\n\n"
-            . 'kleine Erinnerung: ' . $wann . ' beginnt der Kurs von ' . $a->getKindName() . '.' . "\n\n"
-            . self::kursBlock($k) . "\n";
-        if ($z = self::zahlungBlock($a)) {
-            $text .= "\n" . $z . "\n";
-        }
-        $text .= "\nWir freuen uns auf euch! Falls ihr doch nicht kommen könnt, melde dich bitte ab.\n\n" . self::fuss($a);
-        return self::senden($a, 'Erinnerung: ' . $k->titel . ' beginnt ' . $wann, $text, [$a->getStatusUrl(), 'Anmeldung ansehen']);
+        return $a->inSprache(function () use ($a) {
+            $k = $a->kurs;
+            $tage = (int)round((strtotime($k->beginn) - strtotime(date('Y-m-d'))) / 86400);
+            $p = ['kind' => $a->getKindName(), 'kurs' => $k->titel, 'tage' => $tage];
+            if ($tage <= 0) {
+                $satz = Yii::t('KurseModule.base', 'kleine Erinnerung: Heute beginnt der Kurs von {kind}.', $p);
+                $betreff = Yii::t('KurseModule.base', 'Erinnerung: {kurs} beginnt heute', $p);
+            } elseif ($tage === 1) {
+                $satz = Yii::t('KurseModule.base', 'kleine Erinnerung: Morgen beginnt der Kurs von {kind}.', $p);
+                $betreff = Yii::t('KurseModule.base', 'Erinnerung: {kurs} beginnt morgen', $p);
+            } else {
+                $satz = Yii::t('KurseModule.base', 'kleine Erinnerung: In {tage} Tagen beginnt der Kurs von {kind}.', $p);
+                $betreff = Yii::t('KurseModule.base', 'Erinnerung: {kurs} beginnt in {tage} Tagen', $p);
+            }
+            $text = self::anrede($a) . "\n\n" . $satz . "\n\n" . self::kursBlock($k) . "\n";
+            if ($z = self::zahlungBlock($a)) {
+                $text .= "\n" . $z . "\n";
+            }
+            $text .= "\n" . Yii::t('KurseModule.base', 'Wir freuen uns auf euch! Falls ihr doch nicht kommen könnt, melde dich bitte ab.') . "\n\n" . self::fuss($a);
+            return self::senden($a, $betreff, $text, [$a->getStatusUrl(), Yii::t('KurseModule.base', 'Anmeldung ansehen')]);
+        });
     }
 
     public static function mailZahlungserinnerung(Anmeldung $a): bool
     {
-        $text = self::anrede($a) . "\n\n"
-            . 'für den Kurs von ' . $a->getKindName() . ' haben wir noch keine Zahlung verbucht. '
-            . 'Falls du schon überwiesen hast, ist alles gut – dann haben sich unsere Nachrichten überschnitten.' . "\n\n"
-            . self::zahlungBlock($a) . "\n\n" . self::fuss($a);
-        return self::senden($a, 'Zahlungserinnerung: ' . $a->kurs->titel, $text, [$a->getStatusUrl(), 'Anmeldung ansehen']);
+        return $a->inSprache(function () use ($a) {
+            $text = self::anrede($a) . "\n\n"
+                . Yii::t('KurseModule.base', 'für den Kurs von {kind} haben wir noch keine Zahlung verbucht. Falls du schon überwiesen hast, ist alles gut – dann haben sich unsere Nachrichten überschnitten.',
+                    ['kind' => $a->getKindName()]) . "\n\n"
+                . self::zahlungBlock($a) . "\n\n" . self::fuss($a);
+            return self::senden($a, Yii::t('KurseModule.base', 'Zahlungserinnerung: {kurs}', ['kurs' => $a->kurs->titel]), $text, [$a->getStatusUrl(), Yii::t('KurseModule.base', 'Anmeldung ansehen')]);
+        });
     }
 
-    /** Rundmail des Kursverwalters (Text vom Verein, darunter der persönliche Link) */
+    /** Rundmail des Kursverwalters (Betreff und Text vom Verein wie geschrieben, Rahmen in der Sprache der Eltern) */
     public static function mailRundmail(Anmeldung $a, string $betreff, string $nachricht): bool
     {
-        $text = self::anrede($a) . "\n\n" . $nachricht . "\n\n"
-            . '(Diese Nachricht betrifft den Kurs „' . $a->kurs->titel . '“ von ' . $a->getKindName() . '.)' . "\n\n" . self::fuss($a);
-        return self::senden($a, $betreff, $text);
+        return $a->inSprache(function () use ($a, $betreff, $nachricht) {
+            $text = self::anrede($a) . "\n\n" . $nachricht . "\n\n"
+                . Yii::t('KurseModule.base', '(Diese Nachricht betrifft den Kurs „{kurs}“ von {kind}.)', ['kurs' => $a->kurs->titel, 'kind' => $a->getKindName()])
+                . "\n\n" . self::fuss($a);
+            return self::senden($a, $betreff, $text);
+        });
     }
 
     /**
      * Mail im Stil der App (HumHub-Layout, Knopf über designwahl). Absendername: Verein über die Plattform,
-     * Antworten gehen an die Kontakt-E-Mail des Kurses.
+     * Antworten gehen an die Kontakt-E-Mail des Kurses. Wird aus den mail…-Methoden innerhalb von inSprache aufgerufen,
+     * damit auch der Mailrahmen (Layout) in der Sprache der Eltern erscheint.
      */
     public static function senden(Anmeldung $a, string $betreff, string $text, ?array $knopf = null): bool
     {
@@ -521,7 +569,7 @@ class Dienst
             $absender = Yii::$app->settings->get('mailerSystemEmailAddress');
             $name = Yii::$app->settings->get('mailerSystemEmailName');
             $mail = $mailer->compose()
-                ->setFrom([$absender => mb_substr($a->kurs->verein->name . ' über ' . $name, 0, 120)])
+                ->setFrom([$absender => mb_substr(Yii::t('KurseModule.base', '{verein} über {plattform}', ['verein' => $a->kurs->verein->name, 'plattform' => $name]), 0, 120)])
                 ->setTo($a->email)
                 ->setReplyTo($a->kurs->kontakt_email)
                 ->setSubject($betreff);

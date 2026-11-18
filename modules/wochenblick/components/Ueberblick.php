@@ -201,9 +201,27 @@ class Ueberblick
             arsort($icons);
             $icon = (string)array_key_first($icons);
             [$symbol, $text] = self::WETTER[$icon] ?? self::WETTER['cloudy'];
-            $out[] = [self::tag($tag), $symbol, Yii::t('WochenblickModule.base', $text), (int)round(min($temp)), (int)round(max($temp)), $regen];
+            $out[] = [self::tag($tag), $symbol, self::wetterText($text), (int)round(min($temp)), (int)round(max($temp)), $regen];
         }
         return $out;
+    }
+
+    /** Wetterbeschreibung aus WETTER übersetzen (feste Schlüssel, damit die Übersetzungsprüfung sie findet) */
+    private static function wetterText(string $text): string
+    {
+        return match ($text) {
+            'Sonnig' => Yii::t('WochenblickModule.base', 'Sonnig'),
+            'Wechselnd bewölkt' => Yii::t('WochenblickModule.base', 'Wechselnd bewölkt'),
+            'Bewölkt' => Yii::t('WochenblickModule.base', 'Bewölkt'),
+            'Nebel' => Yii::t('WochenblickModule.base', 'Nebel'),
+            'Windig' => Yii::t('WochenblickModule.base', 'Windig'),
+            'Regen' => Yii::t('WochenblickModule.base', 'Regen'),
+            'Schneeregen' => Yii::t('WochenblickModule.base', 'Schneeregen'),
+            'Schnee' => Yii::t('WochenblickModule.base', 'Schnee'),
+            'Hagel' => Yii::t('WochenblickModule.base', 'Hagel'),
+            'Gewitter' => Yii::t('WochenblickModule.base', 'Gewitter'),
+            default => $text,
+        };
     }
 
     private const WETTER = [
@@ -271,8 +289,9 @@ class Ueberblick
         $we = count(array_filter($d['termine'], fn($t) => $t[5]));
         $woche = count($d['termine']) + $d['mehrTermine'];
         if ($woche) {
-            $teile[] = Yii::t('WochenblickModule.base', '{n, plural, =1{1 Termin} other{# Termine}}', ['n' => $woche])
-                . ($we ? ' ' . Yii::t('WochenblickModule.base', '({n} am Wochenende)', ['n' => $we]) : '');
+            $teile[] = $we
+                ? Yii::t('WochenblickModule.base', '{n, plural, =1{1 Termin} other{# Termine}} ({we} am Wochenende)', ['n' => $woche, 'we' => $we])
+                : Yii::t('WochenblickModule.base', '{n, plural, =1{1 Termin} other{# Termine}}', ['n' => $woche]);
         }
         if ($d['spiele']) {
             $teile[] = Yii::t('WochenblickModule.base', '{n, plural, =1{1 Spiel} other{# Spiele}}', ['n' => count($d['spiele'])]);

@@ -39,7 +39,7 @@ class AnmeldungController extends ContentContainerController
         $kurs = Kurs::findOne((int)$kurs);
         if (!$kurs || $kurs->status === Kurs::STATUS_ENTWURF || !Module::istFreigeschaltet($kurs->verein_id)
             || (!$this->module->kannSehen() && !Module::kannVerwalten($kurs->verein_id))) {
-            throw new NotFoundHttpException('Kurs nicht gefunden.');
+            throw new NotFoundHttpException(Yii::t('KurseModule.base', 'Kurs nicht gefunden.'));
         }
         if (($grund = $kurs->anmeldungGesperrt()) !== null) {
             $this->view->info($grund);
@@ -68,6 +68,7 @@ class AnmeldungController extends ContentContainerController
     public function actionBestaetigen($t)
     {
         $a = $this->findToken($t);
+        $a->spracheFuerSeite();
         if (Yii::$app->request->isPost && $a->status === Anmeldung::STATUS_UNBESTAETIGT) {
             Dienst::bestaetigen($a);
             $a->refresh();
@@ -82,9 +83,10 @@ class AnmeldungController extends ContentContainerController
     public function actionStatus($t)
     {
         $a = $this->findToken($t);
+        $a->spracheFuerSeite();
         if (Yii::$app->request->isPost && Yii::$app->request->post('aktion') === 'abmelden') {
             Dienst::stornieren($a, 'eltern');
-            $this->view->success('Abmeldung gespeichert.');
+            $this->view->success(Yii::t('KurseModule.base', 'Abmeldung gespeichert.'));
             return $this->redirect($a->getStatusUrl(false));
         }
         return $this->render('status', ['a' => $a]);
@@ -103,7 +105,7 @@ class AnmeldungController extends ContentContainerController
         $a->zahlart = $kurs->vorbelegteZahlart();
         $a->populateRelation('kurs', $kurs);
         if ($a->load(Yii::$app->request->post()) && Dienst::vonHand($a, (bool)Yii::$app->request->post('mail'))) {
-            $this->view->success($a->getKindName() . ': ' . $a->getStatusText() . '.');
+            $this->view->success(Yii::t('KurseModule.base', '{kind}: {status}.', ['kind' => $a->getKindName(), 'status' => $a->getStatusText()]));
             return $this->redirect($kurs->createUrl('/kurse/kurs/teilnehmer', ['id' => $kurs->id, 'liste' => $a->status]));
         }
         return $this->render('hand', ['a' => $a, 'kurs' => $kurs]);
@@ -121,7 +123,9 @@ class AnmeldungController extends ContentContainerController
     {
         $a = $this->zumVerwalten($id);
         Dienst::platzGeben($a, (bool)Yii::$app->request->post('mail', 1));
-        $this->view->success($a->getKindName() . ' hat jetzt einen Platz' . ($a->email ? ' und wurde per Mail informiert.' : '.'));
+        $this->view->success($a->email
+            ? Yii::t('KurseModule.base', '{kind} hat jetzt einen Platz und wurde per Mail informiert.', ['kind' => $a->getKindName()])
+            : Yii::t('KurseModule.base', '{kind} hat jetzt einen Platz.', ['kind' => $a->getKindName()]));
         return $this->zurueck($a, Anmeldung::STATUS_PLATZ);
     }
 
@@ -130,7 +134,7 @@ class AnmeldungController extends ContentContainerController
         $a = $this->zumVerwalten($id);
         $status = $a->status;
         Dienst::stornieren($a, 'verein', (bool)Yii::$app->request->post('mail', 1));
-        $this->view->success($a->getKindName() . ' abgemeldet.');
+        $this->view->success(Yii::t('KurseModule.base', '{kind} abgemeldet.', ['kind' => $a->getKindName()]));
         return $this->zurueck($a, $status);
     }
 
@@ -161,8 +165,8 @@ class AnmeldungController extends ContentContainerController
     {
         $a = is_string($t) && strlen($t) === 40 ? Anmeldung::findOne(['token' => $t]) : null;
         if (!$a || $a->anonymisiert_am) {
-            throw new NotFoundHttpException('Diese Anmeldung gibt es nicht (mehr). Nicht bestätigte Anmeldungen werden nach '
-                . $this->module->unbestaetigtStunden . ' Stunden gelöscht – dann bitte einfach neu anmelden.');
+            throw new NotFoundHttpException(Yii::t('KurseModule.base', 'Diese Anmeldung gibt es nicht (mehr). Nicht bestätigte Anmeldungen werden nach {stunden} Stunden gelöscht – dann bitte einfach neu anmelden.',
+                ['stunden' => $this->module->unbestaetigtStunden]));
         }
         return $a;
     }

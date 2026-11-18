@@ -13,7 +13,7 @@ $entwurf = $kurs->status === Kurs::STATUS_ENTWURF;
 <article class="karte kurs-karte">
     <div class="kurs-karte-kopf">
         <h3><a href="<?= Html::encode($kurs->elternUrl('kurs')) ?>"><?= Html::encode($kurs->titel) ?></a></h3>
-        <span class="marke-status s-<?= $entwurf ? 'default' : $farbe ?>"><?= Html::encode($entwurf ? 'Entwurf – nur für Kursverwalter' : $label) ?></span>
+        <span class="marke-status s-<?= $entwurf ? 'default' : $farbe ?>"><?= Html::encode($entwurf ? Yii::t('KurseModule.base', 'Entwurf – nur für Kursverwalter') : $label) ?></span>
     </div>
     <?php if ($kurs->niveau): ?><p class="grau klein kurs-niveau"><?= Html::encode($kurs->niveau) ?></p><?php endif ?>
     <ul class="kurs-eckdaten">
@@ -22,5 +22,5 @@ $entwurf = $kurs->status === Kurs::STATUS_ENTWURF;
         <?php if ($alter = $kurs->getAlterText()): ?><li><span aria-hidden="true">👧</span> <?= Html::encode($alter) ?></li><?php endif ?>
         <li><span aria-hidden="true">💶</span> <?= Html::encode($kurs->getPreisText()) ?></li>
     </ul>
-    <a class="knopf" href="<?= Html::encode($kurs->elternUrl('kurs')) ?>">Details &amp; Anmeldung <span aria-hidden="true">→</span></a>
+    <a class="knopf" href="<?= Html::encode($kurs->elternUrl('kurs')) ?>"><?= Html::encode(Yii::t('KurseModule.base', 'Details & Anmeldung')) ?> <span class="pfeil" aria-hidden="true">→</span></a>
 </article>

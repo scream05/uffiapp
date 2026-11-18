@@ -5,7 +5,8 @@ use humhub\modules\stadtrat\components\Ris;
 
 /** @var \humhub\modules\stadtrat\models\Sitzung[] $sitzungen */
 /** @var \humhub\modules\stadtrat\models\Kurzfassung[] $fassungen */
-$t = fn($s, $p = []) => Yii::t('StadtratModule.base', $s, $p);
+// Nur für die Redaktion (Admins): bleibt bewusst deutsch, daher ohne Übersetzung (nur Platzhalter/Plural auflösen)
+$t = fn($s, $p = []) => Yii::$app->i18n->format($s, $p, 'de');
 ?>
 <div class="panel panel-default">
     <div class="panel-heading"><strong><?= $t('Stadtrat kurz erklärt') ?></strong> · <?= Html::a($t('zur Seite „Stadtrat“'), Ris::url()) ?></div>

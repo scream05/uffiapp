@@ -14,6 +14,7 @@ use yii\web\UploadedFile;
 
 /**
  * „Stadtrat kurz erklärt“ schreiben und freigeben (nur Admins, Module::darfBearbeiten), im Space „Rathaus Uffenheim“.
+ * Texte bleiben bewusst deutsch (Redaktion), daher hier kein Yii::t.
  * Entwurf und Audio laufen in der Warteschlange; die Seite lädt sich währenddessen neu.
  */
 class KurzfassungController extends ContentContainerController
@@ -49,7 +50,7 @@ class KurzfassungController extends ContentContainerController
     {
         $sitzungen = Sitzung::vergangene()->limit(30)->all();
         $fassungen = \humhub\modules\stadtrat\models\Kurzfassung::find()->where(['sitzung_id' => array_map(fn($s) => $s->id, $sitzungen) ?: [0]])->indexBy('sitzung_id')->all();
-        $this->view->setPageTitle(Yii::t('StadtratModule.base', 'Stadtrat kurz erklärt'));
+        $this->view->setPageTitle('Stadtrat kurz erklärt');
         return $this->render('index', ['sitzungen' => $sitzungen, 'fassungen' => $fassungen]);
     }
 
@@ -75,9 +76,9 @@ class KurzfassungController extends ContentContainerController
                 if ($fehler !== null) {
                     Yii::warning('Niederschrift-Upload abgelehnt: ' . $fehler . ' (' . ($datei ? $datei->name . ', ' . $datei->type . ', ' . $datei->size . ' B, Fehler ' . $datei->error : 'keine Datei') . ', ' . Yii::$app->request->userAgent . ')', 'stadtrat');
                     if ($req->isAjax) {
-                        return $this->asJson(['fehler' => Yii::t('StadtratModule.base', $fehler)]);
+                        return $this->asJson(['fehler' => $fehler]);
                     }
-                    $this->view->error(Yii::t('StadtratModule.base', $fehler));
+                    $this->view->error($fehler);
                     return $this->redirect(['bearbeiten', 'id' => $s->id]);
                 }
                 Erklaert::speichernPdf($s->id, $datei->tempName);
@@ -104,10 +105,10 @@ class KurzfassungController extends ContentContainerController
                 Yii::$app->queue->push(new AudioJob(['sitzungId' => $s->id]));
             } elseif ($tun === 'freigeben' && $k->kurz && $k->lang) {
                 Erklaert::freigeben($k, $user);
-                $this->view->success(Yii::t('StadtratModule.base', 'Veröffentlicht.'));
+                $this->view->success('Veröffentlicht.');
             } elseif ($tun === 'beitrag' && $k->istFreigegeben() && $k->kurz) {
                 Erklaert::beitrag($k, $user);
-                $this->view->success(Yii::t('StadtratModule.base', 'Beitrag in der Übersicht erstellt.'));
+                $this->view->success('Beitrag in der Übersicht erstellt.');
             } elseif ($tun === 'zurueckziehen' && $k->istFreigegeben()) {
                 Erklaert::beitragLoeschen($k);
                 $k->status = 'entwurf';
@@ -121,7 +122,7 @@ class KurzfassungController extends ContentContainerController
             }
             return $this->redirect(['bearbeiten', 'id' => $s->id]);
         }
-        $this->view->setPageTitle(Yii::t('StadtratModule.base', 'Stadtrat kurz erklärt'));
+        $this->view->setPageTitle('Stadtrat kurz erklärt');
         return $this->render('bearbeiten', [
             's' => $s,
             'k' => $k,

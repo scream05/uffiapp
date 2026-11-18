@@ -37,12 +37,12 @@ class Module extends ContentContainerModule
 
     public function getContentContainerName($container)
     {
-        return 'Kurse';
+        return Yii::t('KurseModule.base', 'Kurse');
     }
 
     public function getContentContainerDescription($container)
     {
-        return 'Kurse freigeschalteter Vereine mit Online-Anmeldung, Warteliste und Bezahlstatus.';
+        return Yii::t('KurseModule.base', 'Kurse freigeschalteter Vereine mit Online-Anmeldung, Warteliste und Bezahlstatus.');
     }
 
     /** Space, in dem die Kurse laufen (derselbe wie das Vereinsverzeichnis) */

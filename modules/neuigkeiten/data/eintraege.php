@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'sprachen-stadtrat-wochenblick', 'datum' => '2026-11-18', 'art' => 'besser', 'popup' => false,
+        'titel' => 'Stadtrat und Wochenüberblick in deiner Sprache',
+        'text' => 'Wer Englisch, Ukrainisch, Arabisch, Türkisch oder Russisch eingestellt hat, sieht jetzt auch „Stadtrat kurz erklärt“ und den Kasten zur nächsten Sitzung in dieser Sprache. Der Wochenüberblick kommt ebenfalls mit übersetzten Überschriften, Wetter und Datum. Tagesordnungen, Kurzfassungen und Termintitel bleiben auf Deutsch.'],
     ['id' => 'abfuhr-auswahl-darstellung', 'datum' => '2026-11-17', 'art' => 'behoben', 'popup' => false,
         'titel' => 'Abfuhr-Erinnerung sauber dargestellt',
         'text' => 'In den Einstellungen der Abfuhr-Erinnerung waren die Auswahlknöpfe (Kernstadt/Ortsteil, Tonnen, Uhrzeit) verrutscht und lange Texte liefen unter den Knopf. Jetzt stehen Knopf und Text wieder ordentlich nebeneinander.'],

@@ -18,7 +18,7 @@ class Module extends \humhub\components\Module
      * Übersetzungen in <modul>/messages/<sprache>/base.php (en, uk, ar, tr, ru). Registrierung in Events::onBeforeRequest.
      */
     public const DEUTSCHE_MODULE = ['abfuhr', 'designwahl', 'gewerbe', 'ki-assistent', 'maengelmelder', 'mitteilungsblatt',
-        'neuigkeiten', 'notdienst', 'statistik', 'tanken', 'uebersicht', 'vereine', 'vorschlaege'];
+        'neuigkeiten', 'notdienst', 'statistik', 'tanken', 'uebersicht', 'vereine', 'vorschlaege', 'kurse', 'stadtrat', 'wochenblick'];
 
     /**
      * Umschalter „Design: …“ im Profilmenü anzeigen? Seit 15.10.2026 aus (alle nutzen „Uffi frisch“); die Technik

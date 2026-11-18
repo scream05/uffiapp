@@ -20,7 +20,7 @@ $zeigen = 5;
     <div class="panel-heading"><i class="fa fa-university"></i> <strong><?= $t('Nächste Sitzung') ?></strong></div>
     <div class="panel-body">
         <div class="sr-gremium"><?= \humhub\modules\stadtrat\models\Sitzung::symbolHtml($s->gremium) ?><strong><?= Html::encode($s->gremium) ?></strong></div>
-        <div class="sr-klein"><?= Html::encode($s->tag() . ($s->beginn ? ', ' . $t('{uhr} Uhr', ['uhr' => $s->beginn]) : '')) ?><?= $s->ort ? ' · ' . Html::encode($s->ort) : '' ?></div>
+        <div class="sr-klein"><?= Html::encode($s->tagAnzeige() . ($s->beginn ? ', ' . $s->uhrAnzeige() : '')) ?><?= $s->ort ? ' · ' . Html::encode($s->ort) : '' ?></div>
         <?php if ($punkte): ?>
             <ol>
                 <?php foreach (array_slice($punkte, 0, $zeigen) as [$nr, $titel]): ?>
@@ -28,7 +28,7 @@ $zeigen = 5;
                 <?php endforeach ?>
             </ol>
             <?php if (count($punkte) > $zeigen): ?>
-                <div class="sr-klein"><?= $t('und {n} weitere Punkte', ['n' => count($punkte) - $zeigen]) ?></div>
+                <div class="sr-klein"><?= $t('{n, plural, =1{und 1 weiterer Punkt} other{und # weitere Punkte}}', ['n' => count($punkte) - $zeigen]) ?></div>
             <?php endif ?>
         <?php else: ?>
             <p class="sr-klein" style="margin:8px 0 0"><?= $t('Die Tagesordnung ist noch nicht veröffentlicht.') ?></p>

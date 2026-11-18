@@ -3,6 +3,7 @@
  * Datenschutzhinweise der eigenen Kursseite (/kurse/<slug>/datenschutz): Verein verantwortlich,
  * Bürgerliste Uffenheim e. V. als Auftragsverarbeiter (Plattform „Rund um Uffni“).
  * Inhaltlich abgeleitet aus legal/datenschutz.md (Abschnitte 2–4, 7, 12, 14, 16) – bei Änderungen dort mitpflegen.
+ * Rechtstext bewusst nur auf Deutsch (lang="de"); in anderen Sprachen steht oben ein übersetzter Hinweis darauf.
  *
  * @var \yii\web\View $this
  */
@@ -22,8 +23,11 @@ $modul = Yii::$app->getModule('kurse');
     .datenschutz p { margin: 0 0 .8em; }
 </style>
 <div class="breite schmal abschnitt">
-    <p><a href="<?= Html::encode($seite->seiteUrl()) ?>">← Zur Kursseite</a></p>
-    <div class="karte datenschutz">
+    <p><a href="<?= Html::encode($seite->seiteUrl()) ?>"><span class="pfeil" aria-hidden="true">←</span> <?= Yii::t('KurseModule.base', 'Zur Kursseite') ?></a></p>
+    <?php if (!str_starts_with(Yii::$app->language, 'de')): ?>
+        <p class="meldung"><?= Yii::t('KurseModule.base', 'Die Datenschutzerklärung ist rechtlich nur auf Deutsch verbindlich.') ?></p>
+    <?php endif ?>
+    <div class="karte datenschutz" lang="de" dir="ltr">
         <h1 style="margin-top:0;font-size:1.6em">Datenschutz</h1>
         <p class="grau klein">Stand: 11. November 2026</p>
 

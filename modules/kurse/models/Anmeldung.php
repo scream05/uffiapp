@@ -38,6 +38,7 @@ use Yii;
  * @property string|null $erinnerung_am
  * @property string|null $zahlungserinnerung_am
  * @property string|null $anonymisiert_am
+ * @property string|null $sprache Sprache beim Anmelden (Yii::$app->language), für Mails und die Seiten aus den Mail-Links; leer = Deutsch
  * @property-read Kurs $kurs
  */
 class Anmeldung extends ActiveRecord
@@ -86,11 +87,11 @@ class Anmeldung extends ActiveRecord
             ['eltern_name', 'string', 'max' => 150],
             // Namen stehen in den Mails („Hallo …,“): nur Buchstaben und übliche Zeichen, keine Links oder Werbetexte
             [['kind_vorname', 'kind_nachname', 'eltern_name'], 'match', 'pattern' => '/^\p{L}[\p{L} .,\'’&\/-]*$/u',
-                'message' => 'Bitte nur den Namen angeben (Buchstaben, Leerzeichen, Bindestrich).'],
+                'message' => Yii::t('KurseModule.base', 'Bitte nur den Namen angeben (Buchstaben, Leerzeichen, Bindestrich).')],
             ['email', 'email'],
             ['email', 'string', 'max' => 150],
             [['telefon', 'notfall_telefon'], 'string', 'max' => 50],
-            [['telefon', 'notfall_telefon'], 'match', 'pattern' => '/^[0-9 +()\/\-]{5,}$/', 'message' => 'Bitte eine Telefonnummer angeben (nur Ziffern, Leerzeichen, + / -).'],
+            [['telefon', 'notfall_telefon'], 'match', 'pattern' => '/^[0-9 +()\/\-]{5,}$/', 'message' => Yii::t('KurseModule.base', 'Bitte eine Telefonnummer angeben (nur Ziffern, Leerzeichen, + / -).')],
             [['schwimmstand', 'notiz'], 'string', 'max' => 1000],
             ['kind_geburtsdatum', 'date', 'format' => 'php:Y-m-d'],
             ['kind_geburtsdatum', 'validateAlter'],
@@ -98,8 +99,8 @@ class Anmeldung extends ActiveRecord
             ['mitglied', 'validateMitglied'],
             ['zahlart', 'validateZahlart', 'skipOnEmpty' => false],
             [['bedingungen_ok', 'datenschutz_ok'], 'required', 'requiredValue' => 1, 'on' => self::SCENARIO_ELTERN,
-                'message' => 'Bitte bestätigen.'],
-            ['webseite', 'compare', 'compareValue' => '', 'on' => self::SCENARIO_ELTERN, 'message' => 'Bitte dieses Feld leer lassen.'],
+                'message' => Yii::t('KurseModule.base', 'Bitte bestätigen.')],
+            ['webseite', 'compare', 'compareValue' => '', 'on' => self::SCENARIO_ELTERN, 'message' => Yii::t('KurseModule.base', 'Bitte dieses Feld leer lassen.')],
             [['kind_geburtsdatum', 'email', 'telefon', 'notfall_telefon', 'schwimmstand', 'notiz'], 'default', 'value' => null],
         ];
     }
@@ -110,22 +111,22 @@ class Anmeldung extends ActiveRecord
             return;
         }
         if ($this->kind_geburtsdatum > date('Y-m-d')) {
-            $this->addError('kind_geburtsdatum', 'Das Geburtsdatum liegt in der Zukunft.');
+            $this->addError('kind_geburtsdatum', Yii::t('KurseModule.base', 'Das Geburtsdatum liegt in der Zukunft.'));
             return;
         }
         $alter = $this->alterBeiBeginn();
         $k = $this->kurs;
         if ($this->scenario === self::SCENARIO_ELTERN && (($k->alter_min !== null && $alter < (float)$k->alter_min)
                 || ($k->alter_max !== null && $alter >= (float)$k->alter_max + 1))) {
-            $this->addError('kind_geburtsdatum', 'Dieser Kurs ist für Kinder ' . $k->getAlterText() . ' (zum ersten Kurstag). '
-                . 'Bei Fragen wende dich bitte an ' . $k->kontakt_email . '.');
+            $this->addError('kind_geburtsdatum', Yii::t('KurseModule.base', 'Dieser Kurs ist für Kinder {alter} (zum ersten Kurstag). Bei Fragen wende dich bitte an {email}.',
+                ['alter' => $k->getAlterText(), 'email' => $k->kontakt_email]));
         }
     }
 
     public function validateMitglied()
     {
         if ($this->scenario === self::SCENARIO_ELTERN && $this->kurs && $this->kurs->nur_mitglieder && !$this->mitglied) {
-            $this->addError('mitglied', 'Dieser Kurs ist nur für Vereinsmitglieder.');
+            $this->addError('mitglied', Yii::t('KurseModule.base', 'Dieser Kurs ist nur für Vereinsmitglieder.'));
         }
     }
 
@@ -140,24 +141,24 @@ class Anmeldung extends ActiveRecord
             $this->zahlart = array_key_first($erlaubt);
         }
         if (!isset($erlaubt[$this->zahlart])) {
-            $this->addError('zahlart', 'Bitte eine Zahlart wählen.');
+            $this->addError('zahlart', Yii::t('KurseModule.base', 'Bitte eine Zahlart wählen.'));
         }
     }
 
     public function attributeLabels()
     {
         return [
-            'kind_vorname' => 'Vorname des Kindes',
-            'kind_nachname' => 'Nachname des Kindes',
-            'kind_geburtsdatum' => 'Geburtsdatum des Kindes',
-            'schwimmstand' => 'Was kann dein Kind schon?',
-            'eltern_name' => 'Name der/des Erziehungsberechtigten',
-            'email' => 'E-Mail',
-            'telefon' => 'Telefon (mobil)',
-            'notfall_telefon' => 'Telefon für Notfälle während des Kurses',
-            'mitglied' => 'Das Kind ist Mitglied im Verein',
-            'zahlart' => 'Zahlart',
-            'notiz' => 'Interne Notiz',
+            'kind_vorname' => Yii::t('KurseModule.base', 'Vorname des Kindes'),
+            'kind_nachname' => Yii::t('KurseModule.base', 'Nachname des Kindes'),
+            'kind_geburtsdatum' => Yii::t('KurseModule.base', 'Geburtsdatum des Kindes'),
+            'schwimmstand' => Yii::t('KurseModule.base', 'Was kann dein Kind schon?'),
+            'eltern_name' => Yii::t('KurseModule.base', 'Name der/des Erziehungsberechtigten'),
+            'email' => Yii::t('KurseModule.base', 'E-Mail'),
+            'telefon' => Yii::t('KurseModule.base', 'Telefon (mobil)'),
+            'notfall_telefon' => Yii::t('KurseModule.base', 'Telefon für Notfälle während des Kurses'),
+            'mitglied' => Yii::t('KurseModule.base', 'Das Kind ist Mitglied im Verein'),
+            'zahlart' => Yii::t('KurseModule.base', 'Zahlart'),
+            'notiz' => Yii::t('KurseModule.base', 'Interne Notiz'),
         ];
     }
 
@@ -168,8 +169,45 @@ class Anmeldung extends ActiveRecord
             if (!$this->token) {
                 $this->token = Yii::$app->security->generateRandomString(40);
             }
+            // Sprache der Eltern (Formular), damit alle späteren Mails – auch aus dem Cron – in dieser Sprache kommen.
+            // Von Hand eingetragene Anmeldungen: Sprache unbekannt, also Standard (Deutsch).
+            if ($this->scenario === self::SCENARIO_ELTERN && $this->hasAttribute('sprache') && !$this->sprache) {
+                $this->sprache = mb_substr((string)Yii::$app->language, 0, 10);
+            }
         }
         return parent::beforeSave($insert);
+    }
+
+    /** Sprache für Mails an die Eltern (gespeichert beim Anmelden), sonst Deutsch */
+    public function getSprache(): string
+    {
+        return ($this->hasAttribute('sprache') ? $this->sprache : null) ?: 'de';
+    }
+
+    /** $fn in der Sprache der Eltern ausführen (Mailtexte, Datumsformate), danach die bisherige Sprache wiederherstellen */
+    public function inSprache(callable $fn)
+    {
+        $alt = [Yii::$app->language, Yii::$app->formatter->locale];
+        Yii::$app->language = Yii::$app->formatter->locale = $this->getSprache();
+        try {
+            return $fn();
+        } finally {
+            [Yii::$app->language, Yii::$app->formatter->locale] = $alt;
+        }
+    }
+
+    /**
+     * Seiten aus den Mail-Links (Bestätigen, Status): Gäste ohne selbst gewählte Sprache (Cookie „language“) sehen sie
+     * in der Sprache, in der sie sich angemeldet haben. Angemeldete Nutzer behalten ihre Kontosprache.
+     */
+    public function spracheFuerSeite(): void
+    {
+        $request = Yii::$app->request;
+        if (!$this->hasAttribute('sprache') || !$this->sprache || !Yii::$app->user->isGuest
+            || !$request instanceof \yii\web\Request || isset($request->cookies['language'])) {
+            return;
+        }
+        Yii::$app->language = Yii::$app->formatter->locale = $this->sprache;
     }
 
     public function getKurs()
@@ -200,7 +238,8 @@ class Anmeldung extends ActiveRecord
         }
         $j = (int)floor($a);
         $m = (int)round(($a - $j) * 12);
-        return $j . ' J.' . ($m ? " $m M." : '');
+        return $m ? Yii::t('KurseModule.base', '{jahre} J. {monate} M.', ['jahre' => $j, 'monate' => $m])
+            : Yii::t('KurseModule.base', '{jahre} J.', ['jahre' => $j]);
     }
 
     /** Anmeldenummer, z. B. „K3-17“ (Kurs 3, Anmeldung 17) */
@@ -238,10 +277,10 @@ class Anmeldung extends ActiveRecord
     public function getStatusText(): string
     {
         return [
-            self::STATUS_UNBESTAETIGT => 'E-Mail noch nicht bestätigt',
-            self::STATUS_PLATZ => 'Platz bestätigt',
-            self::STATUS_WARTELISTE => 'Warteliste',
-            self::STATUS_STORNIERT => 'abgemeldet',
+            self::STATUS_UNBESTAETIGT => Yii::t('KurseModule.base', 'E-Mail noch nicht bestätigt'),
+            self::STATUS_PLATZ => Yii::t('KurseModule.base', 'Platz bestätigt'),
+            self::STATUS_WARTELISTE => Yii::t('KurseModule.base', 'Warteliste'),
+            self::STATUS_STORNIERT => Yii::t('KurseModule.base', 'abgemeldet'),
         ][$this->status] ?? $this->status;
     }
 

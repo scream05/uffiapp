@@ -48,7 +48,9 @@ class Wochenueberblick extends BaseNotification
     public function text()
     {
         $d = $this->data();
-        return Yii::t('WochenblickModule.base', 'Dein Wochenüberblick') . (empty($d['kurz']) ? '' : ': ' . $d['kurz']);
+        return empty($d['kurz'])
+            ? Yii::t('WochenblickModule.base', 'Dein Wochenüberblick')
+            : Yii::t('WochenblickModule.base', 'Dein Wochenüberblick: {kurz}', ['kurz' => $d['kurz']]);
     }
 
     public function html()

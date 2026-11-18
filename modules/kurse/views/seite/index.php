@@ -30,7 +30,7 @@ foreach ($kurse as $kurs) {
 ksort($jahre);
 $titelbild = $verein->getTitelbild();
 $stichwoerter = $verein->getStichwortList();
-$knopf = trim((string)$verein->knopf_text) ?: 'Kurse ansehen';
+$knopf = trim((string)$verein->knopf_text) ?: Yii::t('KurseModule.base', 'Kurse ansehen');
 $teams = $verein->getTeamList();
 $teambild = $verein->getTeambild();
 // Kontakt: E-Mail des Vereins, sonst die Kontaktadresse des nächsten ausgeschriebenen Kurses
@@ -41,6 +41,7 @@ $social = $verein->getSocialList();
 ?>
 <style <?= Html::nonce() ?>>
     .held { position: relative; color: #fff; background: linear-gradient(135deg, var(--f) 0%, var(--f-dunkel) 100%); overflow: hidden; }
+    [dir=rtl] .held.mit-bild { background: linear-gradient(270deg, rgba(14,20,24,.82) 0%, rgba(14,20,24,.45) 70%, rgba(14,20,24,.25) 100%), var(--bild) center / cover no-repeat; }
     .held.mit-bild { background: linear-gradient(90deg, rgba(14,20,24,.82) 0%, rgba(14,20,24,.45) 70%, rgba(14,20,24,.25) 100%), var(--bild) center / cover no-repeat; }
     .held .breite { position: relative; z-index: 1; padding-top: 64px; padding-bottom: 110px; display: grid; grid-template-columns: 1fr auto; gap: 30px; align-items: center; }
     .held h1 { color: #fff; font-size: clamp(1.9em, 4.6vw, 3em); margin: 0 0 12px; letter-spacing: -.01em; max-width: 18em; }
@@ -70,6 +71,7 @@ $social = $verein->getSocialList();
     .kurs-jahr > summary::-webkit-details-marker { display: none; }
     .kurs-jahr > summary::after { content: ''; margin-left: auto; width: 10px; height: 10px; border-right: 2.5px solid currentColor;
         border-bottom: 2.5px solid currentColor; transform: rotate(45deg); transition: transform .2s; margin-top: -4px; }
+    [dir=rtl] .kurs-jahr > summary::after { margin-left: 0; margin-right: auto; }
     .kurs-jahr[open] > summary::after { transform: rotate(-135deg); margin-top: 4px; }
     .kurs-jahr > summary:hover { background: color-mix(in srgb, var(--f) 20%, #fff); }
     .kurs-jahr-zahl { font-size: 1.25em; }
@@ -81,6 +83,8 @@ $social = $verein->getSocialList();
     .vorstellung img { border-radius: 14px; margin: 6px 0; }
     .vorstellung img.float-start { float: left; width: 45%; margin: 4px 22px 12px 0; }
     .vorstellung img.float-end { float: right; width: 45%; margin: 4px 0 12px 22px; }
+    [dir=rtl] .vorstellung img.float-start { float: right; margin: 4px 0 12px 22px; }
+    [dir=rtl] .vorstellung img.float-end { float: left; margin: 4px 22px 12px 0; }
     @media (max-width: 600px) { .vorstellung img.float-start, .vorstellung img.float-end { float: none; width: 100%; margin: 8px 0; } }
     .vorstellung h1, .vorstellung h2, .vorstellung h3 { font-size: 1.3em; margin: 1.4em 0 .5em; }
 
@@ -107,7 +111,7 @@ $social = $verein->getSocialList();
                 <?php if (trim((string)$verein->knopf_untertext) !== ''): ?><small><?= Html::encode($verein->knopf_untertext) ?></small><?php endif ?></a>
         </div>
         <?php if (($logo = $verein->getLogo()) && !$titelbild): ?>
-            <img class="wappen" src="<?= Html::encode($logo->getUrl()) ?>" alt="Logo <?= Html::encode($verein->name) ?>">
+            <img class="wappen" src="<?= Html::encode($logo->getUrl()) ?>" alt="<?= Html::encode(Yii::t('KurseModule.base', 'Logo {verein}', ['verein' => $verein->name])) ?>">
         <?php endif ?>
     </div>
     <svg class="welle" viewBox="0 0 1440 70" preserveAspectRatio="none" aria-hidden="true">
@@ -118,14 +122,14 @@ $social = $verein->getSocialList();
 
 <section class="abschnitt" id="kurse">
     <div class="breite">
-        <h2>Unsere Kurse</h2>
+        <h2><?= Yii::t('KurseModule.base', 'Unsere Kurse') ?></h2>
         <?php if ($kurse): ?>
-            <p class="grau">Die Anmeldung geht ohne Konto: Du bekommst eine Mail zum Bestätigen. Plätze werden in der Reihenfolge der Bestätigungen vergeben.</p>
+            <p class="grau"><?= Yii::t('KurseModule.base', 'Die Anmeldung geht ohne Konto: Du bekommst eine Mail zum Bestätigen. Plätze werden in der Reihenfolge der Bestätigungen vergeben.') ?></p>
             <?php $erstes = true; foreach ($jahre as $jahr => $liste): ?>
                 <?php // Aktuelles Jahr offen; gibt es dort keine Kurse, ist das nächste Jahr mit Kursen offen ?>
                 <details class="kurs-jahr"<?= $erstes ? ' open' : '' ?>>
                     <summary><span class="kurs-jahr-zahl"><?= $jahr ?></span>
-                        <span class="kurs-jahr-anzahl"><?= count($liste) === 1 ? '1 Kurs' : count($liste) . ' Kurse' ?></span></summary>
+                        <span class="kurs-jahr-anzahl"><?= Yii::t('KurseModule.base', '{n, plural, =1{1 Kurs} other{# Kurse}}', ['n' => count($liste)]) ?></span></summary>
                     <div class="kurs-liste">
                         <?php foreach ($liste as $kurs): ?><?= $this->render('_karte', ['kurs' => $kurs]) ?><?php endforeach ?>
                     </div>
@@ -133,8 +137,9 @@ $social = $verein->getSocialList();
             <?php $erstes = false; endforeach ?>
         <?php else: ?>
             <div class="karte leer">
-                <p><strong>Gerade sind keine Kurse ausgeschrieben.</strong></p>
-                <p class="grau">Schau bald wieder vorbei<?= $email !== '' ? ' oder schreib uns: ' . Html::mailto(Html::encode($email), $email) : '' ?>.</p>
+                <p><strong><?= Yii::t('KurseModule.base', 'Gerade sind keine Kurse ausgeschrieben.') ?></strong></p>
+                <p class="grau"><?= $email !== '' ? Yii::t('KurseModule.base', 'Schau bald wieder vorbei oder schreib uns: {email}.', ['email' => Html::mailto(Html::encode($email), $email)])
+                    : Html::encode(Yii::t('KurseModule.base', 'Schau bald wieder vorbei.')) ?></p>
             </div>
         <?php endif ?>
     </div>
@@ -143,7 +148,7 @@ $social = $verein->getSocialList();
 <?php if (trim((string)$verein->beschreibung) !== ''): ?>
     <section class="abschnitt zart" id="ueber-uns">
         <div class="breite">
-            <h2>Über uns</h2>
+            <h2><?= Yii::t('KurseModule.base', 'Über uns') ?></h2>
             <div class="vorstellung"><?= RichText::convert($verein->beschreibung, RichText::FORMAT_HTML) ?></div>
         </div>
     </section>
@@ -152,8 +157,8 @@ $social = $verein->getSocialList();
 <?php if ($teams || $teambild || trim((string)$verein->team_text) !== ''): ?>
     <section class="abschnitt" id="team">
         <div class="breite">
-            <h2>Unser Team</h2>
-            <?php if ($teambild): ?><img class="teambild" src="<?= Html::encode($teambild->getUrl()) ?>" alt="Teamfoto" loading="lazy"><?php endif ?>
+            <h2><?= Yii::t('KurseModule.base', 'Unser Team') ?></h2>
+            <?php if ($teambild): ?><img class="teambild" src="<?= Html::encode($teambild->getUrl()) ?>" alt="<?= Html::encode(Yii::t('KurseModule.base', 'Teamfoto')) ?>" loading="lazy"><?php endif ?>
             <?php if (trim((string)$verein->team_text) !== ''): ?><p style="white-space:pre-line"><?= Html::encode($verein->team_text) ?></p><?php endif ?>
             <?php if ($teams): ?>
                 <div class="teams">
@@ -175,10 +180,10 @@ $social = $verein->getSocialList();
 
 <section class="abschnitt zart" id="kontakt">
     <div class="breite">
-        <h2>Kontakt</h2>
+        <h2><?= Yii::t('KurseModule.base', 'Kontakt') ?></h2>
         <div class="kontakt">
             <div class="karte">
-                <h3>So erreichst du uns</h3>
+                <h3><?= Yii::t('KurseModule.base', 'So erreichst du uns') ?></h3>
                 <ul>
                     <?php if ($email !== ''): ?><li>✉️ <?= Html::mailto(Html::encode($email), $email) ?></li><?php endif ?>
                     <?php if ($verein->telefon): ?><li>📞 <?= Html::a(Html::encode($verein->telefon), 'tel:' . preg_replace('/[^0-9+]/', '', $verein->telefon)) ?></li><?php endif ?>
@@ -189,7 +194,7 @@ $social = $verein->getSocialList();
             </div>
             <?php if ($ap): ?>
                 <div class="karte">
-                    <h3>Ansprechpartner</h3>
+                    <h3><?= Yii::t('KurseModule.base', 'Ansprechpartner') ?></h3>
                     <ul>
                         <?php foreach ($ap as $p): ?>
                             <li><?= ($p['funktion'] ?? '') !== '' ? Html::encode($p['funktion']) . ': ' : '' ?><strong><?= Html::encode($p['name']) ?></strong>
