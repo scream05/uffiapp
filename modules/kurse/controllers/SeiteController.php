@@ -30,6 +30,9 @@ class SeiteController extends Controller
 {
     public $layout = 'seite';
 
+    /** Sitzungsschlüssel der Sprachauswahl auf der Kursseite */
+    public const SPRACHE_SESSION = 'kurse.sprache';
+
     public KursVerein $seite;
     public Verein $verein;
     /** Vorschau (Seite noch nicht freigegeben) – wird im Layout angezeigt */
@@ -42,19 +45,27 @@ class SeiteController extends Controller
         $h->set('Referrer-Policy', 'no-referrer'); // Token aus den Mail-Links nicht weitergeben
         $h->set('Cache-Control', 'no-store');
 
-        // Sprachauswahl im Kopf (?sprache=uk): wie die Auswahl auf der Anmeldeseite der Plattform im Cookie „language“
-        // speichern und ohne den Parameter neu laden. Per GET-Link, damit kein Formular (z. B. Bestätigen) ausgelöst wird.
+        // Sprachauswahl im Kopf (?sprache=uk), per GET-Link, damit kein Formular (z. B. Bestätigen) ausgelöst wird:
+        // gilt für die Kursseite in dieser Sitzung (auch angemeldet – die Kontosprache bleibt unverändert); Gäste bekommen
+        // zusätzlich das Cookie „language“ wie bei der Auswahl auf der Anmeldeseite der Plattform. Danach ohne Parameter neu laden.
         $request = Yii::$app->request;
         $wahl = $request->get('sprache');
-        if (is_string($wahl) && Yii::$app->user->isGuest) {
-            $form = new \humhub\models\forms\ChooseLanguage(['language' => $wahl]);
-            $form->save(); // ungültige Werte speichert es nicht
+        if (is_string($wahl)) {
+            if (isset(static::sprachen()[$wahl])) {
+                Yii::$app->session->set(self::SPRACHE_SESSION, $wahl);
+                if (Yii::$app->user->isGuest) {
+                    (new \humhub\models\forms\ChooseLanguage(['language' => $wahl]))->save();
+                }
+            }
             $this->redirect(\yii\helpers\Url::current(['sprache' => null]));
             return false;
         }
-        // Gäste wie auf der übrigen Plattform (designwahl gastSprache): Deutsch statt Browsersprache, außer selbst gewählt.
-        // Seiten aus Mail-Links stellen danach ggf. die Sprache der Anmeldung ein (Anmeldung::spracheFuerSeite).
-        if (Yii::$app->user->isGuest && !isset($request->cookies['language'])) {
+        $gewaehlt = Yii::$app->session->get(self::SPRACHE_SESSION);
+        if (is_string($gewaehlt) && isset(static::sprachen()[$gewaehlt])) {
+            Yii::$app->language = Yii::$app->formatter->locale = $gewaehlt;
+        } elseif (Yii::$app->user->isGuest && !isset($request->cookies['language'])) {
+            // Gäste wie auf der übrigen Plattform (designwahl gastSprache): Deutsch statt Browsersprache, außer selbst
+            // gewählt. Seiten aus Mail-Links stellen danach ggf. die Sprache der Anmeldung ein (Anmeldung::spracheFuerSeite).
             Yii::$app->i18n->setDefaultLocale();
         }
         return parent::beforeAction($action);
