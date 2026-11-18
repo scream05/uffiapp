@@ -8,6 +8,7 @@
  */
 
 use humhub\helpers\Html;
+use humhub\modules\kurse\components\Inhalt;
 use humhub\modules\content\widgets\richtext\RichText;
 use humhub\modules\kurse\models\Kurs;
 use humhub\modules\kurse\Module;
@@ -30,7 +31,7 @@ foreach ($kurse as $kurs) {
 ksort($jahre);
 $titelbild = $verein->getTitelbild();
 $stichwoerter = $verein->getStichwortList();
-$knopf = trim((string)$verein->knopf_text) ?: Yii::t('KurseModule.base', 'Kurse ansehen');
+$knopf = trim(Inhalt::t($verein->knopf_text)) ?: Yii::t('KurseModule.base', 'Kurse ansehen');
 $teams = $verein->getTeamList();
 $teambild = $verein->getTeambild();
 // Kontakt: E-Mail des Vereins, sonst die Kontaktadresse des nächsten ausgeschriebenen Kurses
@@ -102,13 +103,13 @@ $social = $verein->getSocialList();
     <div class="breite">
         <div>
             <p class="vereinsname"><?= Html::encode($verein->name) ?></p>
-            <h1><?= Html::encode(trim((string)$verein->slogan) ?: $verein->name) ?></h1>
-            <?php if (trim((string)$verein->untertitel) !== ''): ?><p class="unterzeile"><?= Html::encode($verein->untertitel) ?></p><?php endif ?>
+            <h1><?= Html::encode(trim(Inhalt::t($verein->slogan)) ?: $verein->name) ?></h1>
+            <?php if (trim((string)$verein->untertitel) !== ''): ?><p class="unterzeile"><?= Html::encode(Inhalt::t($verein->untertitel)) ?></p><?php endif ?>
             <?php if ($stichwoerter): ?>
-                <ul class="stichwoerter"><?php foreach ($stichwoerter as $w): ?><li><?= Html::encode($w) ?></li><?php endforeach ?></ul>
+                <ul class="stichwoerter"><?php foreach ($stichwoerter as $w): ?><li><?= Html::encode(Inhalt::t($w)) ?></li><?php endforeach ?></ul>
             <?php endif ?>
             <a class="knopf hell" href="#kurse"><span><?= Html::encode($knopf) ?> <span aria-hidden="true">↓</span></span>
-                <?php if (trim((string)$verein->knopf_untertext) !== ''): ?><small><?= Html::encode($verein->knopf_untertext) ?></small><?php endif ?></a>
+                <?php if (trim((string)$verein->knopf_untertext) !== ''): ?><small><?= Html::encode(Inhalt::t($verein->knopf_untertext)) ?></small><?php endif ?></a>
         </div>
         <?php if (($logo = $verein->getLogo()) && !$titelbild): ?>
             <img class="wappen" src="<?= Html::encode($logo->getUrl()) ?>" alt="<?= Html::encode(Yii::t('KurseModule.base', 'Logo {verein}', ['verein' => $verein->name])) ?>">
@@ -149,7 +150,7 @@ $social = $verein->getSocialList();
     <section class="abschnitt zart" id="ueber-uns">
         <div class="breite">
             <h2><?= Yii::t('KurseModule.base', 'Über uns') ?></h2>
-            <div class="vorstellung"><?= RichText::convert($verein->beschreibung, RichText::FORMAT_HTML) ?></div>
+            <div class="vorstellung"><?= RichText::convert(Inhalt::t($verein->beschreibung), RichText::FORMAT_HTML) ?></div>
         </div>
     </section>
 <?php endif ?>
@@ -159,15 +160,15 @@ $social = $verein->getSocialList();
         <div class="breite">
             <h2><?= Yii::t('KurseModule.base', 'Unser Team') ?></h2>
             <?php if ($teambild): ?><img class="teambild" src="<?= Html::encode($teambild->getUrl()) ?>" alt="<?= Html::encode(Yii::t('KurseModule.base', 'Teamfoto')) ?>" loading="lazy"><?php endif ?>
-            <?php if (trim((string)$verein->team_text) !== ''): ?><p style="white-space:pre-line"><?= Html::encode($verein->team_text) ?></p><?php endif ?>
+            <?php if (trim((string)$verein->team_text) !== ''): ?><p style="white-space:pre-line"><?= Html::encode(Inhalt::t($verein->team_text)) ?></p><?php endif ?>
             <?php if ($teams): ?>
                 <div class="teams">
                     <?php foreach ($teams as $team): ?>
                         <div class="karte">
-                            <?php if (($team['titel'] ?? '') !== ''): ?><h3><?= Html::encode($team['titel']) ?></h3><?php endif ?>
+                            <?php if (($team['titel'] ?? '') !== ''): ?><h3><?= Html::encode(Inhalt::t($team['titel'])) ?></h3><?php endif ?>
                             <ul>
                                 <?php foreach ($team['mitglieder'] ?? [] as $p): ?>
-                                    <li><strong><?= Html::encode($p['name']) ?></strong><?= ($p['funktion'] ?? '') !== '' ? ' <span class="grau">· ' . Html::encode($p['funktion']) . '</span>' : '' ?></li>
+                                    <li><strong><?= Html::encode($p['name']) ?></strong><?= ($p['funktion'] ?? '') !== '' ? ' <span class="grau">· ' . Html::encode(Inhalt::t($p['funktion'])) . '</span>' : '' ?></li>
                                 <?php endforeach ?>
                             </ul>
                         </div>
@@ -187,7 +188,7 @@ $social = $verein->getSocialList();
                 <ul>
                     <?php if ($email !== ''): ?><li>✉️ <?= Html::mailto(Html::encode($email), $email) ?></li><?php endif ?>
                     <?php if ($verein->telefon): ?><li>📞 <?= Html::a(Html::encode($verein->telefon), 'tel:' . preg_replace('/[^0-9+]/', '', $verein->telefon)) ?></li><?php endif ?>
-                    <?php if ($verein->treffpunkt): ?><li>📍 <?= Html::encode($verein->treffpunkt) ?></li><?php endif ?>
+                    <?php if ($verein->treffpunkt): ?><li>📍 <?= Html::encode(Inhalt::t($verein->treffpunkt)) ?></li><?php endif ?>
                     <?php if ($website !== ''): ?><li>🌐 <?= Html::a(Html::encode(preg_replace('#^https?://(www\.)?|/$#', '', $website)), $website, ['rel' => 'noopener']) ?></li><?php endif ?>
                     <?php foreach ($social as $link): ?><li>🔗 <?= Html::a(Html::encode($link['typ']), $link['url'], ['rel' => 'noopener nofollow']) ?></li><?php endforeach ?>
                 </ul>
@@ -197,7 +198,7 @@ $social = $verein->getSocialList();
                     <h3><?= Yii::t('KurseModule.base', 'Ansprechpartner') ?></h3>
                     <ul>
                         <?php foreach ($ap as $p): ?>
-                            <li><?= ($p['funktion'] ?? '') !== '' ? Html::encode($p['funktion']) . ': ' : '' ?><strong><?= Html::encode($p['name']) ?></strong>
+                            <li><?= ($p['funktion'] ?? '') !== '' ? Html::encode(Inhalt::t($p['funktion'])) . ': ' : '' ?><strong><?= Html::encode($p['name']) ?></strong>
                                 <?php if (($p['email'] ?? '') !== ''): ?><br><?= Html::mailto(Html::encode($p['email']), $p['email']) ?><?php endif ?>
                                 <?php if (($p['telefon'] ?? '') !== ''): ?><br><?= Html::a(Html::encode($p['telefon']), 'tel:' . preg_replace('/[^0-9+]/', '', $p['telefon'])) ?><?php endif ?>
                             </li>

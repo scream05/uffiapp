@@ -6,6 +6,7 @@
  */
 
 use humhub\helpers\Html;
+use humhub\modules\kurse\components\Inhalt;
 use humhub\modules\kurse\models\Kurs;
 use humhub\modules\kurse\Module;
 
@@ -18,8 +19,8 @@ $seite = $this->context->seite;
     <div class="karte">
         <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start">
             <div>
-                <h1 style="margin:0 0 4px;font-size:1.8em"><?= Html::encode($kurs->titel) ?></h1>
-                <?php if ($kurs->niveau): ?><p class="grau" style="margin:0"><?= Html::encode($kurs->niveau) ?></p><?php endif ?>
+                <h1 style="margin:0 0 4px;font-size:1.8em"><?= Html::encode(Inhalt::t($kurs->titel)) ?></h1>
+                <?php if ($kurs->niveau): ?><p class="grau" style="margin:0"><?= Html::encode(Inhalt::t($kurs->niveau)) ?></p><?php endif ?>
             </div>
             <span class="marke-status s-<?= $kurs->status === Kurs::STATUS_ENTWURF ? 'default' : $farbe ?>"><?= Html::encode($kurs->status === Kurs::STATUS_ENTWURF ? Yii::t('KurseModule.base', 'Entwurf') : $label) ?></span>
         </div>
@@ -28,13 +29,13 @@ $seite = $this->context->seite;
             <div class="meldung klein"><?= Yii::t('KurseModule.base', 'Du verwaltest diesen Kurs: {link}', ['link' => Html::a(Html::encode(Yii::t('KurseModule.base', 'Teilnehmer, Bearbeiten, Veröffentlichen …')), $kurs->getUrl())]) ?></div>
         <?php endif ?>
         <?php if ($kurs->status === Kurs::STATUS_ABGESAGT): ?>
-            <div class="meldung fehler"><?= Yii::t('KurseModule.base', 'Dieser Kurs wurde abgesagt.') ?><?= $kurs->absage_grund ? '<br>' . nl2br(Html::encode($kurs->absage_grund), false) : '' ?></div>
+            <div class="meldung fehler"><?= Yii::t('KurseModule.base', 'Dieser Kurs wurde abgesagt.') ?><?= $kurs->absage_grund ? '<br>' . nl2br(Html::encode(Inhalt::t($kurs->absage_grund)), false) : '' ?></div>
         <?php endif ?>
 
         <?= $this->render('_fakten', ['kurs' => $kurs]) ?>
 
         <?php if ($kurs->beschreibung): ?>
-            <p><?= nl2br(Html::encode($kurs->beschreibung), false) ?></p>
+            <p><?= nl2br(Html::encode(Inhalt::t($kurs->beschreibung)), false) ?></p>
         <?php endif ?>
 
         <?php if ($gesperrt === null): ?>
@@ -45,7 +46,7 @@ $seite = $this->context->seite;
         <?php endif ?>
 
         <?php if ($kurs->bedingungen): ?>
-            <details style="margin-top:20px"><summary><?= Yii::t('KurseModule.base', 'Teilnahmebedingungen') ?></summary><p><?= nl2br(Html::encode($kurs->bedingungen), false) ?></p></details>
+            <details style="margin-top:20px"><summary><?= Yii::t('KurseModule.base', 'Teilnahmebedingungen') ?></summary><p><?= nl2br(Html::encode(Inhalt::t($kurs->bedingungen)), false) ?></p></details>
         <?php endif ?>
         <p class="klein" style="margin-top:18px"><a href="<?= Html::encode($kurs->elternUrl('datenschutz')) ?>"><?= Yii::t('KurseModule.base', 'Datenschutzhinweise zur Kursanmeldung') ?></a></p>
     </div>

@@ -24,6 +24,20 @@ use yii\console\ExitCode;
 class KurseController extends Controller
 {
     /** @param int $probe 1 = Mails nur als Datei in @runtime/mail (Test) */
+    /**
+     * Sammelübersetzung prüfen (wie für die Kursseite): kurse/uebersetzen-test uk "Satz eins" "Satz zwei"
+     * Speichert die Ergebnisse im Übersetzungs-Zwischenspeicher (ki_uebersetzung) und gibt sie aus.
+     */
+    public function actionUebersetzenTest($sprache, ...$texte)
+    {
+        $neu = \humhub\modules\kiAssistent\components\Uebersetzer::translateBatch($texte, $sprache);
+        $this->stdout("neu übersetzt: $neu\n");
+        foreach ($texte as $t) {
+            $this->stdout("- $t\n  → " . (\humhub\modules\kiAssistent\components\Uebersetzer::cached(trim($t), $sprache) ?? '(keine)') . "\n");
+        }
+        return ExitCode::OK;
+    }
+
     public function actionCron($probe = 0)
     {
         if ($probe) {

@@ -365,4 +365,6 @@ return [
     'Über uns' => 'About us',
     'Überweisung' => 'Bank transfer',
     'Sprache wählen' => 'Choose language',
+    'Einige Texte des Vereins werden gerade automatisch übersetzt. Lade die Seite in einer Minute neu.' => 'Some of the club’s texts are being translated automatically right now. Reload the page in a minute.',
+    'Die Texte des Vereins wurden automatisch übersetzt. Maßgeblich ist die deutsche Fassung.' => 'The club’s texts were translated automatically. The German version is authoritative.',
 ];

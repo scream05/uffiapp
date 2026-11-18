@@ -264,7 +264,7 @@ class Module extends \humhub\components\Module
     }
 
     /** Prüft die Grenzen für eine neue Übersetzung und zählt sie; null oder Grund der Ablehnung (in der Sprache des Nutzers) */
-    public function reserveUebersetzung(): ?string
+    public function reserveUebersetzung(bool $hintergrund = false): ?string
     {
         $mutex = \Yii::$app->mutex;
         if (!$mutex->acquire('ki-uebersetzung-limit', 5)) {
@@ -276,6 +276,11 @@ class Module extends \humhub\components\Module
             [$anzahl, $in, $out] = array_values(array_map('intval', is_array($usage) ? $usage + [0, 0, 0] : [0, 0, 0]));
             if ($anzahl >= $this->uebersetzungMonat) {
                 return \Yii::t('KiAssistentModule.base', 'Das Übersetzungs-Kontingent für diesen Monat ist aufgebraucht. Ab dem 1. geht es weiter.');
+            }
+            if ($hintergrund) {
+                // Warteschlange (z. B. Vereinsinhalte der Kursseite): kein Besucher, nur das Monatskontingent zählt
+                $this->settings->set($key, json_encode([$anzahl + 1, $in, $out]));
+                return null;
             }
             $cache = \Yii::$app->cache;
             $stunde = 'ki-ue-stunde-' . $this->ident() . '-' . date('YmdH');

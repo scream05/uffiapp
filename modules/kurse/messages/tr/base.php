@@ -365,4 +365,6 @@ return [
     'Über uns' => 'Hakkımızda',
     'Überweisung' => 'Havale',
     'Sprache wählen' => 'Dil seç',
+    'Einige Texte des Vereins werden gerade automatisch übersetzt. Lade die Seite in einer Minute neu.' => 'Kulübün bazı metinleri şu anda otomatik olarak çevriliyor. Sayfayı bir dakika sonra yeniden yükle.',
+    'Die Texte des Vereins wurden automatisch übersetzt. Maßgeblich ist die deutsche Fassung.' => 'Kulübün metinleri otomatik olarak çevrildi. Geçerli olan Almanca metindir.',
 ];

@@ -5,11 +5,12 @@
  */
 
 use humhub\helpers\Html;
+use humhub\modules\kurse\components\Inhalt;
 use humhub\modules\kurse\models\Kurs;
 ?>
 <dl class="fakten">
-    <dt><?= Yii::t('KurseModule.base', 'Termine') ?></dt><dd><?= Html::encode($kurs->getTermineText()) ?><?= $kurs->termine_hinweis ? '<br><span class="grau">' . Html::encode($kurs->termine_hinweis) . '</span>' : '' ?></dd>
-    <dt><?= Yii::t('KurseModule.base', 'Ort') ?></dt><dd><?= Html::encode($kurs->ort) ?></dd>
+    <dt><?= Yii::t('KurseModule.base', 'Termine') ?></dt><dd><?= Html::encode($kurs->getTermineText()) ?><?= $kurs->termine_hinweis ? '<br><span class="grau">' . Html::encode(Inhalt::t($kurs->termine_hinweis)) . '</span>' : '' ?></dd>
+    <dt><?= Yii::t('KurseModule.base', 'Ort') ?></dt><dd><?= Html::encode(Inhalt::t($kurs->ort)) ?></dd>
     <?php if ($alter = $kurs->getAlterText()): ?><dt><?= Yii::t('KurseModule.base', 'Alter') ?></dt><dd><?= Yii::t('KurseModule.base', '{alter} (am ersten Kurstag)', ['alter' => Html::encode($alter)]) ?></dd><?php endif ?>
     <dt><?= Yii::t('KurseModule.base', 'Kosten') ?></dt><dd><?= Html::encode($kurs->getPreisText()) ?><?php if ($kurs->hatPreis()): ?><br><span class="grau"><?= Yii::t('KurseModule.base', 'Zahlung: {zahlarten}', ['zahlarten' => Html::encode(implode(' ' . Yii::t('KurseModule.base', 'oder') . ' ', $kurs->zahlarten()))]) ?></span><?php endif ?></dd>
     <dt><?= Yii::t('KurseModule.base', 'Plätze') ?></dt><dd><?= $kurs->plaetze ?><?= $kurs->nur_mitglieder ? ' · ' . Yii::t('KurseModule.base', 'nur für Vereinsmitglieder') : '' ?></dd>

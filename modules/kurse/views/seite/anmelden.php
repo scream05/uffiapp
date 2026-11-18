@@ -8,6 +8,7 @@
  */
 
 use humhub\helpers\Html;
+use humhub\modules\kurse\components\Inhalt;
 
 $zahlarten = $kurs->hatPreis() ? $kurs->zahlarten() : [];
 /** Eingabefeld mit Beschriftung, Hinweis und Fehlermeldung */
@@ -33,8 +34,8 @@ $haken = function (string $attr, string $label) use ($a) {
 <div class="breite schmal abschnitt">
     <p><a href="<?= Html::encode($kurs->elternUrl('kurs')) ?>"><span class="pfeil" aria-hidden="true">←</span> <?= Yii::t('KurseModule.base', 'Zum Kurs') ?></a></p>
     <div class="karte">
-        <h1 style="margin:0 0 6px;font-size:1.6em"><?= Yii::t('KurseModule.base', 'Anmeldung: {kurs}', ['kurs' => Html::encode($kurs->titel)]) ?></h1>
-        <p class="grau"><?= Html::encode($kurs->getTermineText()) ?> · <?= Html::encode($kurs->ort) ?></p>
+        <h1 style="margin:0 0 6px;font-size:1.6em"><?= Yii::t('KurseModule.base', 'Anmeldung: {kurs}', ['kurs' => Html::encode(Inhalt::t($kurs->titel))]) ?></h1>
+        <p class="grau"><?= Html::encode($kurs->getTermineText()) ?> · <?= Html::encode(Inhalt::t($kurs->ort)) ?></p>
 
         <?php if ($hinweis): ?><div class="meldung fehler" role="alert"><?= Html::encode($hinweis) ?></div><?php endif ?>
         <?php if ($a->hasErrors()): ?><div class="meldung fehler" role="alert"><?= Yii::t('KurseModule.base', 'Bitte prüfe die markierten Angaben.') ?></div><?php endif ?>
@@ -83,7 +84,7 @@ $haken = function (string $attr, string $label) use ($a) {
         <fieldset>
             <legend><?= Yii::t('KurseModule.base', 'Einverständnis') ?></legend>
             <?php if ($kurs->bedingungen): ?>
-                <details style="margin-bottom:10px"><summary><?= Yii::t('KurseModule.base', 'Teilnahmebedingungen lesen') ?></summary><p><?= nl2br(Html::encode($kurs->bedingungen), false) ?></p></details>
+                <details style="margin-bottom:10px"><summary><?= Yii::t('KurseModule.base', 'Teilnahmebedingungen lesen') ?></summary><p><?= nl2br(Html::encode(Inhalt::t($kurs->bedingungen)), false) ?></p></details>
                 <?= $haken('bedingungen_ok', Html::encode(Yii::t('KurseModule.base', 'Ich habe die Teilnahmebedingungen gelesen und bin einverstanden.'))) ?>
             <?php else: ?>
                 <?= Html::hiddenInput(Html::getInputName($a, 'bedingungen_ok'), '1') ?>

@@ -365,4 +365,6 @@ return [
     'Über uns' => 'من نحن',
     'Überweisung' => 'تحويل بنكي',
     'Sprache wählen' => 'اختر اللغة',
+    'Einige Texte des Vereins werden gerade automatisch übersetzt. Lade die Seite in einer Minute neu.' => 'تتم الآن ترجمة بعض نصوص النادي تلقائيًا. أعد تحميل الصفحة بعد دقيقة.',
+    'Die Texte des Vereins wurden automatisch übersetzt. Maßgeblich ist die deutsche Fassung.' => 'تُرجمت نصوص النادي تلقائيًا. النسخة الألمانية هي المعتمدة.',
 ];

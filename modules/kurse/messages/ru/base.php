@@ -365,4 +365,6 @@ return [
     'Über uns' => 'О нас',
     'Überweisung' => 'Перевод',
     'Sprache wählen' => 'Выбрать язык',
+    'Einige Texte des Vereins werden gerade automatisch übersetzt. Lade die Seite in einer Minute neu.' => 'Некоторые тексты клуба сейчас автоматически переводятся. Обнови страницу через минуту.',
+    'Die Texte des Vereins wurden automatisch übersetzt. Maßgeblich ist die deutsche Fassung.' => 'Тексты клуба переведены автоматически. Действующей является немецкая версия.',
 ];

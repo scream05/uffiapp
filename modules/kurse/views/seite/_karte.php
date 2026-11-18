@@ -5,6 +5,7 @@
  */
 
 use humhub\helpers\Html;
+use humhub\modules\kurse\components\Inhalt;
 use humhub\modules\kurse\models\Kurs;
 
 [$label, $farbe] = $kurs->getStatusLabel();
@@ -12,13 +13,13 @@ $entwurf = $kurs->status === Kurs::STATUS_ENTWURF;
 ?>
 <article class="karte kurs-karte">
     <div class="kurs-karte-kopf">
-        <h3><a href="<?= Html::encode($kurs->elternUrl('kurs')) ?>"><?= Html::encode($kurs->titel) ?></a></h3>
+        <h3><a href="<?= Html::encode($kurs->elternUrl('kurs')) ?>"><?= Html::encode(Inhalt::t($kurs->titel)) ?></a></h3>
         <span class="marke-status s-<?= $entwurf ? 'default' : $farbe ?>"><?= Html::encode($entwurf ? Yii::t('KurseModule.base', 'Entwurf – nur für Kursverwalter') : $label) ?></span>
     </div>
-    <?php if ($kurs->niveau): ?><p class="grau klein kurs-niveau"><?= Html::encode($kurs->niveau) ?></p><?php endif ?>
+    <?php if ($kurs->niveau): ?><p class="grau klein kurs-niveau"><?= Html::encode(Inhalt::t($kurs->niveau)) ?></p><?php endif ?>
     <ul class="kurs-eckdaten">
         <li><span aria-hidden="true">📅</span> <?= Html::encode($kurs->getTermineText()) ?></li>
-        <li><span aria-hidden="true">📍</span> <?= Html::encode($kurs->ort) ?></li>
+        <li><span aria-hidden="true">📍</span> <?= Html::encode(Inhalt::t($kurs->ort)) ?></li>
         <?php if ($alter = $kurs->getAlterText()): ?><li><span aria-hidden="true">👧</span> <?= Html::encode($alter) ?></li><?php endif ?>
         <li><span aria-hidden="true">💶</span> <?= Html::encode($kurs->getPreisText()) ?></li>
     </ul>

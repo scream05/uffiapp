@@ -129,6 +129,7 @@ $rtl = in_array(strtolower(substr($sprache, 0, 2)), ['ar', 'fa', 'he', 'ur'], tr
         .fuss ul { list-style: none; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 0; }
         .fuss li + li::before { content: '·'; color: var(--grau); margin: 0 10px; }
         .fuss a { color: var(--grau); text-decoration: none; }
+        .fuss .hinweis-ki { text-align: center; color: var(--grau); margin: 8px auto 0; }
         .fuss a:hover { color: var(--f-dunkel); text-decoration: underline; }
     </style>
 </head>
@@ -158,6 +159,10 @@ $rtl = in_array(strtolower(substr($sprache, 0, 2)), ['ar', 'fa', 'he', 'ur'], tr
         <?php endif ?>
     </div>
 </header>
+<?php \humhub\modules\kurse\components\Inhalt::auftragStarten(); ?>
+<?php if (\humhub\modules\kurse\components\Inhalt::fehlt()): ?>
+    <div class="vorschau uebersetzung-laeuft" role="status"><div class="breite"><?= Yii::t('KurseModule.base', 'Einige Texte des Vereins werden gerade automatisch übersetzt. Lade die Seite in einer Minute neu.') ?></div></div>
+<?php endif ?>
 <?php if ($c->vorschau): ?>
     <div class="vorschau"><div class="breite"><strong><?= Yii::t('KurseModule.base', 'Vorschau:') ?></strong> <?= Yii::t('KurseModule.base', 'Diese Seite ist noch nicht freigegeben – sichtbar nur für Kursverwalter, Admins und mit dem Vorschau-Link. Links aus Bestätigungsmails funktionieren trotzdem für alle.') ?></div></div>
 <?php endif ?>
@@ -176,6 +181,9 @@ $rtl = in_array(strtolower(substr($sprache, 0, 2)), ['ar', 'fa', 'he', 'ur'], tr
                 : Html::a(Yii::t('KurseModule.base', 'Impressum'), ['/legal/page/view', 'pageKey' => 'imprint']) ?></li>
         <li><?= Html::a(Yii::t('KurseModule.base', 'Datenschutz'), $seite->seiteUrl('datenschutzseite')) ?></li>
     </ul>
+    <?php if (\humhub\modules\kurse\components\Inhalt::ziel() !== null): ?>
+        <p class="breite hinweis-ki"><?= Yii::t('KurseModule.base', 'Die Texte des Vereins wurden automatisch übersetzt. Maßgeblich ist die deutsche Fassung.') ?></p>
+    <?php endif ?>
 </footer>
 </body>
 </html>

@@ -5,6 +5,7 @@
  */
 
 use humhub\helpers\Html;
+use humhub\modules\kurse\components\Inhalt;
 use humhub\modules\kurse\models\Anmeldung;
 use humhub\modules\kurse\models\Kurs;
 
@@ -15,12 +16,12 @@ $farbe = [Anmeldung::STATUS_PLATZ => 'success', Anmeldung::STATUS_WARTELISTE => 
     <div class="karte">
         <p class="grau klein" style="margin:0"><?= Yii::t('KurseModule.base', 'Anmeldung {nummer}', ['nummer' => Html::encode($a->getNummer())]) ?></p>
         <h1 style="margin:0 0 6px;font-size:1.6em"><?= Html::encode($a->getKindName()) ?></h1>
-        <p style="margin:0 0 10px"><?= Html::a(Html::encode($kurs->titel), $kurs->elternUrl('kurs')) ?></p>
+        <p style="margin:0 0 10px"><?= Html::a(Html::encode(Inhalt::t($kurs->titel)), $kurs->elternUrl('kurs')) ?></p>
         <p><span class="marke-status s-<?= $farbe ?>" style="font-size:1em"><?= Html::encode($a->getStatusText()) ?><?=
             $a->status === Anmeldung::STATUS_WARTELISTE ? ' – ' . Yii::t('KurseModule.base', 'Platz {position}', ['position' => $a->getWartelistenPosition()]) : '' ?></span></p>
 
         <?php if ($kurs->status === Kurs::STATUS_ABGESAGT): ?>
-            <div class="meldung fehler"><?= Yii::t('KurseModule.base', 'Der Kurs wurde abgesagt.') ?><?= $kurs->absage_grund ? '<br>' . nl2br(Html::encode($kurs->absage_grund), false) : '' ?></div>
+            <div class="meldung fehler"><?= Yii::t('KurseModule.base', 'Der Kurs wurde abgesagt.') ?><?= $kurs->absage_grund ? '<br>' . nl2br(Html::encode(Inhalt::t($kurs->absage_grund)), false) : '' ?></div>
         <?php elseif ($a->status === Anmeldung::STATUS_WARTELISTE): ?>
             <p><?= Yii::t('KurseModule.base', 'Wird ein Platz frei, rückt dein Kind automatisch nach und du bekommst eine Mail.') ?></p>
         <?php elseif ($a->status === Anmeldung::STATUS_STORNIERT && $a->storniert_von === 'voll'): ?>
@@ -30,8 +31,8 @@ $farbe = [Anmeldung::STATUS_PLATZ => 'success', Anmeldung::STATUS_WARTELISTE => 
         <?php endif ?>
 
         <dl class="fakten">
-            <dt><?= Yii::t('KurseModule.base', 'Termine') ?></dt><dd><?= Html::encode($kurs->getTermineText()) ?><?= $kurs->termine_hinweis ? '<br>' . Html::encode($kurs->termine_hinweis) : '' ?></dd>
-            <dt><?= Yii::t('KurseModule.base', 'Ort') ?></dt><dd><?= Html::encode($kurs->ort) ?></dd>
+            <dt><?= Yii::t('KurseModule.base', 'Termine') ?></dt><dd><?= Html::encode($kurs->getTermineText()) ?><?= $kurs->termine_hinweis ? '<br>' . Html::encode(Inhalt::t($kurs->termine_hinweis)) : '' ?></dd>
+            <dt><?= Yii::t('KurseModule.base', 'Ort') ?></dt><dd><?= Html::encode(Inhalt::t($kurs->ort)) ?></dd>
             <?php if ($a->status === Anmeldung::STATUS_PLATZ && $a->betrag !== null && (float)$a->betrag > 0): ?>
                 <dt><?= Yii::t('KurseModule.base', 'Kursgebühr') ?></dt><dd><?= Kurs::euro($a->betrag) ?> ·
                     <?php if ($a->bezahlt_am): ?><strong style="color:var(--ok)"><?= Yii::t('KurseModule.base', 'bezahlt') ?></strong>
