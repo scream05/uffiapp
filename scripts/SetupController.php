@@ -2142,6 +2142,59 @@ class SetupController extends Controller
     }
 
     /**
+     * Geschlossener Arbeits-Space für einen Verein mit Dateiablage (cfiles) und Aufgaben (tasks):
+     * setup/vereins-space <vereinId> <url> (idempotent). Nur auf Einladung, für Gäste und Nichtmitglieder unsichtbar;
+     * Mitglieder lädt der Admin selbst ein (keine automatischen Benachrichtigungen an Vereinsverwalter).
+     * Dateien liegen auf dem eigenen Server (/data/uploads → tägliche Sicherung + NAS).
+     */
+    public function actionVereinsSpace($vereinId, $url, $ownerUsername = 'admin')
+    {
+        $verein = \humhub\modules\vereine\models\Verein::findOne((int)$vereinId);
+        if ($verein === null) {
+            $this->stderr("Verein $vereinId nicht gefunden\n");
+            return ExitCode::DATAERR;
+        }
+        $space = Space::findOne(['url' => $url]);
+        if ($space === null) {
+            $owner = User::findOne(['username' => $ownerUsername]);
+            if ($owner === null) {
+                $this->stderr("User $ownerUsername not found\n");
+                return ExitCode::DATAERR;
+            }
+            Yii::$app->user->switchIdentity($owner);
+            $space = new Space();
+            $space->scenario = Space::SCENARIO_CREATE;
+            $space->name = $verein->name;
+            $space->description = 'Interner Arbeitsbereich: Dateiablage und Aufgaben.';
+            $space->color = '#1f6f8b';
+            $space->visibility = Space::VISIBILITY_NONE;
+            $space->join_policy = Space::JOIN_POLICY_NONE;
+            $space->auto_add_new_members = 0;
+            if (!$space->save()) {
+                $this->stderr('! ' . json_encode($space->getErrors(), JSON_UNESCAPED_UNICODE) . "\n");
+                return ExitCode::DATAERR;
+            }
+            if ($space->url !== $url) {
+                $space->updateAttributes(['url' => $url]);
+            }
+            $this->stdout("+ {$space->name} (id {$space->id})\n");
+        }
+        $space->visibility = Space::VISIBILITY_NONE;
+        $space->join_policy = Space::JOIN_POLICY_NONE;
+        $space->default_content_visibility = 0;
+        $space->save(false);
+        foreach (['cfiles', 'tasks'] as $m) {
+            if (!$space->moduleManager->isEnabled($m)) {
+                $space->moduleManager->enable($m);
+                $this->stdout("+ $m im Space {$space->name}\n");
+            }
+        }
+        Yii::$app->cache->flush();
+        $this->stdout('Space: ' . $space->createUrl('/space/space/home', [], true) . "\n");
+        return ExitCode::OK;
+    }
+
+    /**
      * Space „Ideen & Vorschläge“ (url vorschlaege) mit Modul vorschlaege: setup/vorschlaege (idempotent).
      * Startseite ist die Übersicht; Beiträge entstehen nur über „Vorschlag einreichen“, kommentieren dürfen alle Angemeldeten.
      */
