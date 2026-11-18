@@ -4,6 +4,7 @@ namespace humhub\modules\designwahl\widgets;
 
 use humhub\modules\space\models\Space;
 use humhub\modules\space\widgets\InviteButton;
+use Yii;
 
 /**
  * Knopf „Einladen“ im Space-Kopf ausblenden – außer in geschlossenen Spaces (Sichtbarkeit „nur Mitglieder“,
@@ -19,5 +20,13 @@ class OhneEinladen extends InviteButton
             return parent::run();
         }
         return '';
+    }
+
+    /**
+     * Vorlage inviteButton.php des Kerns verwenden (Yii sucht sonst neben der Unterklasse → Fehlerseite).
+     */
+    public function getViewPath()
+    {
+        return Yii::getAlias('@humhub/modules/space/widgets/views');
     }
 }

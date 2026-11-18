@@ -2195,6 +2195,30 @@ class SetupController extends Controller
     }
 
     /**
+     * Selbsttest Knopf „Einladen“ (setup/einladen-test): im geschlossenen Space rendert er für den Admin fehlerfrei,
+     * in öffentlichen Spaces bleibt er leer.
+     */
+    public function actionEinladenTest($url = 'buergerverein', $oeffentlich = 'rathaus-uffenheim')
+    {
+        Yii::$app->user->switchIdentity(User::findOne(['username' => 'admin']));
+        $ok = true;
+        foreach ([$url => true, $oeffentlich => false] as $u => $soll) {
+            $space = Space::findOne(['url' => $u]);
+            try {
+                $html = (string)\humhub\modules\designwahl\widgets\OhneEinladen::widget(['space' => $space]);
+            } catch (\Throwable $e) {
+                $this->stdout("FEHLER $u: " . $e->getMessage() . "\n");
+                $ok = false;
+                continue;
+            }
+            $hat = $html !== '';
+            $this->stdout(($hat === $soll ? 'ok ' : 'FALSCH ') . "$u: Knopf " . ($hat ? 'sichtbar' : 'leer') . "\n");
+            $ok = $ok && $hat === $soll;
+        }
+        return $ok ? ExitCode::OK : ExitCode::SOFTWARE;
+    }
+
+    /**
      * Space „Ideen & Vorschläge“ (url vorschlaege) mit Modul vorschlaege: setup/vorschlaege (idempotent).
      * Startseite ist die Übersicht; Beiträge entstehen nur über „Vorschlag einreichen“, kommentieren dürfen alle Angemeldeten.
      */
