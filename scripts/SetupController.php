@@ -2521,7 +2521,8 @@ class SetupController extends Controller
                 Yii::$app->user->switchIdentity($u);
                 $res = [];
                 foreach (['dashboard', 'space'] as $art) {
-                    $sb = new class { public $widgets = []; };
+                    // wie humhub\widgets\BaseStack: addWidget() ruft Events::onDashboardSidebarInit für Admins auf
+                    $sb = new class { public $widgets = []; public function addWidget($c, $p = [], $o = []) { $this->widgets[] = [$c, $p, $o]; } };
                     $sb->widgets = [[$box, [], ['sortOrder' => 10]], ['humhub\modules\space\widgets\Members', [], ['sortOrder' => 30]]];
                     $art === 'dashboard' ? \humhub\modules\uebersicht\Events::onDashboardSidebarInit((object)['sender' => $sb])
                         : \humhub\modules\uebersicht\Events::onSpaceSidebarInit((object)['sender' => $sb]);

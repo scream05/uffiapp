@@ -169,7 +169,8 @@ def pruefe_images(hh_version):
             continue
         lokal = lokaler_digest(ref)
         if remote.get('digest') and lokal and remote['digest'] not in lokal:
-            tun = ('docker compose build --pull embeddings && docker compose up -d embeddings' if 'python' in ref
+            # build --pull nutzt die neue Basis, aktualisiert aber den lokalen Tag nicht → vorher docker pull
+            tun = (f'docker pull {ref} && docker compose build --no-cache embeddings && docker compose up -d embeddings' if 'python' in ref
                    else 'docker compose pull && docker compose up -d (vorher Sicherung, danach Seite und Module prüfen)')
             befund(f"image:{ref}:{remote['digest']}", 'Docker-Image', 'wichtig',
                    f"{wer}: neu gebautes Image {ref} vom {remote.get('last_updated', '')[:10]} (enthält meist Sicherheitsupdates "
@@ -254,7 +255,8 @@ def pruefe_osv():
         # Dienst nur im Docker-Netz bzw. auf 127.0.0.1 erreichbar und verarbeitet nur Text → Info; mit dem nächsten
         # Neubau (docker compose build --pull embeddings) kommen neuere Pakete
         osv([('PyPI', p['name'], p['version']) for p in json.loads(r.stdout)], 'Python-Paket (Embeddings, nur intern)', 'info',
-            ' – Neubau: docker compose build --pull --no-cache embeddings && docker compose up -d embeddings')
+            ' – Pillow hält fastembed 0.7.3 unter 12 (nur für Bildmodelle, Textsuche nutzt es nicht); beheben = fastembed in '
+            'embeddings/Dockerfile anheben, danach ki-suche-test')
     else:
         fehler.append('pip list im Embedding-Dienst fehlgeschlagen')
 
