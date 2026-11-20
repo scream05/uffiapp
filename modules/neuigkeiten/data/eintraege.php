@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'fussball-ticker-halbzeit', 'datum' => '2026-11-20', 'art' => 'behoben', 'popup' => false,
+        'titel' => 'Fußball-Spielberichte bis zum Schluss',
+        'text' => 'Der Liveticker eines Fußballspiels blieb bisher manchmal zur Halbzeit stehen, weil der Halbzeitpfiff als Spielende galt. Jetzt läuft er bis zum Abpfiff weiter. Der Bericht vom Spiel in Arberg am 15.11. ist nachgetragen.'],
     ['id' => 'sprachen-stadtrat-wochenblick', 'datum' => '2026-11-18', 'art' => 'besser', 'popup' => false,
         'titel' => 'Stadtrat und Wochenüberblick in deiner Sprache',
         'text' => 'Wer Englisch, Ukrainisch, Arabisch, Türkisch oder Russisch eingestellt hat, sieht jetzt auch „Stadtrat kurz erklärt“ und den Kasten zur nächsten Sitzung in dieser Sprache. Der Wochenüberblick kommt ebenfalls mit übersetzten Überschriften, Wetter und Datum. Tagesordnungen, Kurzfassungen und Termintitel bleiben auf Deutsch.'],

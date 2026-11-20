@@ -1,4 +1,31 @@
 {
+    "fussball-ticker-halbzeit": {
+        "en": {
+            "titel": "Football match reports until the final whistle",
+            "text": "The live ticker of a football match used to sometimes stop at half-time, because the half-time whistle was treated as the end of the game. Now it keeps running until the final whistle. The report from the match in Arberg on 15.11. has been added after the fact.",
+            "quelle": "16f8fc2405ec0f20733f7d226186ba2984d325f3"
+        },
+        "uk": {
+            "titel": "Fußball-Spielberichte bis zum Schluss",
+            "text": "Der Liveticker eines Fußballspiels blieb bisher manchmal zur Halbzeit stehen, weil der Halbzeitpfiff als Spielende galt. Jetzt läuft er bis zum Abpfiff weiter. Der Bericht vom Spiel in Arberg am 15.11. ist nachgetragen.",
+            "quelle": "16f8fc2405ec0f20733f7d226186ba2984d325f3"
+        },
+        "ar": {
+            "titel": "تقارير مباريات كرة القدم حتى النهاية",
+            "text": "كان البث المباشر لمباراة كرة القدم يتوقف أحياناً حتى الآن عند نهاية الشوط الأول، لأن صافرة الاستراحة كانت تُعتبر نهاية المباراة. الآن يستمر حتى صافرة النهاية. وقد أضيف تقرير المباراة في آربرغ بتاريخ 15.11 متأخراً.",
+            "quelle": "16f8fc2405ec0f20733f7d226186ba2984d325f3"
+        },
+        "tr": {
+            "titel": "Fußball-Spielberichte bis zum Schluss",
+            "text": "Der Liveticker eines Fußballspiels blieb bisher manchmal zur Halbzeit stehen, weil der Halbzeitpfiff als Spielende galt. Jetzt läuft er bis zum Abpfiff weiter. Der Bericht vom Spiel in Arberg am 15.11. ist nachgetragen.",
+            "quelle": "16f8fc2405ec0f20733f7d226186ba2984d325f3"
+        },
+        "ru": {
+            "titel": "Fußball-Spielberichte bis zum Schluss",
+            "text": "Der Liveticker eines Fußballspiels blieb bisher manchmal zur Halbzeit stehen, weil der Halbzeitpfiff als Spielende galt. Jetzt läuft er bis zum Abpfiff weiter. Der Bericht vom Spiel in Arberg am 15.11. ist nachgetragen.",
+            "quelle": "16f8fc2405ec0f20733f7d226186ba2984d325f3"
+        }
+    },
     "sprachen-stadtrat-wochenblick": {
         "en": {
             "titel": "City council and weekly overview in your language",
