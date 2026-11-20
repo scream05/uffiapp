@@ -4021,6 +4021,10 @@ class SetupController extends Controller
             $Bfv::live($anstoss + 41 * 60);
             $gleich('Live: Ticker gespeichert, Spiel läuft', [$sp6()->ticker_status, $sp6()->ticker_stand, $sp6()->laeuft($anstoss + 41 * 60)], ['live', '1:0', true]);
             $gleich('Live: Herren mit Namen', str_contains((string)$sp6()->ticker, 'Max Muster'), true);
+            $ev[] = $e(29, 46, 'Abpfiff 1. Halbzeit', '1:0', 100);
+            $antworten["https://www.bfv.de/ergebnisse/spiel/-/$s6/liveticker"] = $tickerSeite($ev);
+            $Bfv::live($anstoss + 50 * 60);
+            $gleich('Live: Abpfiff 1. Halbzeit → läuft weiter', $sp6()->ticker_status, 'live');
             $ev[] = $e(29, 92, 'Abpfiff der Begegnung', '1:0', 200);
             $antworten["https://www.bfv.de/ergebnisse/spiel/-/$s6/liveticker"] = $tickerSeite($ev);
             $daten = json_decode($antworten[$Bfv::API . "team/$h1/matches"], true);

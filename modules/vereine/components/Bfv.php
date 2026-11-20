@@ -211,7 +211,8 @@ class Bfv
             $score = preg_match('/^\d+:\d+$/', (string)($e['score'] ?? '')) ? $e['score'] : null;
             $stand ??= $score;
             $minute ??= $min;
-            if (preg_match('/Abpfiff|Spielende/u', $text)) {
+            // „Abpfiff 1. Halbzeit“ ist nur die Pause (15.11.: Ticker blieb sonst zur Halbzeit stehen)
+            if (preg_match('/Spielende|Abpfiff(?!\s+(1\.|erste))/u', $text)) {
                 $status = 'beendet';
             }
             $typ = (int)($e['typeId'] ?? 0);
