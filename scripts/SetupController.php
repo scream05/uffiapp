@@ -3920,6 +3920,10 @@ class SetupController extends Controller
         Yii::$app->language = 'de';
         $tx = Yii::$app->db->beginTransaction();
         try {
+            // Echte Spiele rund um die Testtage aus dem Weg (Rollback stellt sie wieder her), sonst ruft Bfv::live()
+            // deren Ticker ab und die Live-Prüfungen hängen vom echten Spielplan ab
+            \humhub\modules\vereine\models\VereinSpiel::updateAll(['datum' => new \yii\db\Expression('DATE_SUB(datum, INTERVAL 20 YEAR)')],
+                ['between', 'datum', date('Y-m-d', strtotime('-2 days')), date('Y-m-d', strtotime('+4 days'))]);
             $club = str_repeat('C', 32);
             $h1 = str_repeat('H', 32);
             $e1 = str_repeat('E', 32);
