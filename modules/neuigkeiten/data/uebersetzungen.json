@@ -1,4 +1,31 @@
 {
+    "spielergebnisse-nachtrag": {
+        "en": {
+            "titel": "Match results arrive faster",
+            "text": "If a result was only entered with the association late in the evening, it didn't show up in the app until the next morning. Now the app checks regularly after a match has ended. This applies to football, badminton, basketball and volleyball.",
+            "quelle": "010305f27fd9b463ea3f6a0624c2482bb76a63ef"
+        },
+        "uk": {
+            "titel": "Результати матчів надходять швидше",
+            "text": "Якщо результат занесли до федерації пізно ввечері, раніше він з'являвся в застосунку лише наступного ранку. Тепер застосунок після завершення гри регулярно перевіряє оновлення. Це стосується футболу, бадмінтону, баскетболу та волейболу.",
+            "quelle": "010305f27fd9b463ea3f6a0624c2482bb76a63ef"
+        },
+        "ar": {
+            "titel": "نتائج المباريات تصل أسرع",
+            "text": "إذا تم تسجيل النتيجة لدى الاتحاد متأخراً في المساء، كانت تظهر في التطبيق حتى الصباح التالي فقط. الآن يتحقق التطبيق بانتظام بعد انتهاء المباراة. وينطبق ذلك على كرة القدم والريشة الطائرة (البadminton) وكرة السلة والكرة الطائرة.",
+            "quelle": "010305f27fd9b463ea3f6a0624c2482bb76a63ef"
+        },
+        "tr": {
+            "titel": "Maç sonuçları artık daha hızlı geliyor",
+            "text": "Sonuç federasyona geç girildiyse, şimdiye kadar uygulamada ancak ertesi sabah görünüyordu. Artık uygulama maç bittikten sonra düzenli olarak kontrol ediyor. Bu, futbol, badminton, basketbol ve voleybol için geçerli.",
+            "quelle": "010305f27fd9b463ea3f6a0624c2482bb76a63ef"
+        },
+        "ru": {
+            "titel": "Результаты матчей появляются быстрее",
+            "text": "Если результат вносили в систему союза поздно, в приложении он раньше появлялся только на следующее утро. Теперь приложение после окончания матча регулярно проверяет обновления. Это касается футбола, бадминтона, баскетбола и волейбола.",
+            "quelle": "010305f27fd9b463ea3f6a0624c2482bb76a63ef"
+        }
+    },
     "fussball-ticker-halbzeit": {
         "en": {
             "titel": "Football match reports until the final whistle",

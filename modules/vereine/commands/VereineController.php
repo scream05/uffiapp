@@ -13,6 +13,8 @@ use yii\console\ExitCode;
  * Spiele der Vereine vom BFV und den anderen Spielquellen (components/Spielquellen.php):
  *   /app/yii vereine/spiele        Abgleich aller Vereine mit Spielquelle (Crontab täglich 5:20)
  *   /app/yii vereine/live          Liveticker laufender Spiele (Crontab minütlich, ruft ohne laufendes Spiel nichts ab)
+ *   /app/yii vereine/nachtrag      Ergebnisse der anderen Quellen nachholen (Crontab halbstündlich; ruft nur ab, wenn ein
+ *                                  Spiel von heute/gestern vorbei ist und noch kein Ergebnis hat)
  *   /app/yii vereine/ticker <spiel-id>   Liveticker eines Spiels anzeigen (Prüfung, speichert nichts)
  *   /app/yii vereine/name-sperren "Vorname Name"   Namen nach Widerspruch aus allen Spielberichten entfernen (auch künftig)
  *   /app/yii vereine/bfv <verein-id> <bfv-kennung|->   Verein mit dem BFV verknüpfen bzw. lösen („-“)
@@ -36,6 +38,34 @@ class VereineController extends Controller
             $this->stdout(date('Y-m-d H:i:s') . " {$verein->name}: " . implode('; ', $log) . "\n");
         }
         Yii::$app->cache->delete('ki-assistent-context-aktuell'); // Spielstände stehen im veränderlichen Teil
+        return $fehler ? ExitCode::UNSPECIFIED_ERROR : ExitCode::OK;
+    }
+
+    public function actionNachtrag()
+    {
+        // Fußball holt live() selbst nach; hier nur DBB, BVV, BBV (sonst stünde das Ergebnis erst am nächsten Morgen da)
+        $vereinIds = [];
+        foreach (\humhub\modules\vereine\models\VereinSpiel::find()->innerJoinWith('mannschaft.verein v')
+                     ->where(['datum' => [date('Y-m-d', strtotime('-1 day')), date('Y-m-d')]])
+                     ->andWhere(['not', ['v.spiele_quelle' => 'bfv']])->andWhere(['not', ['v.bfv_id' => null]])
+                     ->andWhere(['or', ['ergebnis' => null], ['ergebnis' => '']])->all() as $spiel) {
+            if ($spiel->istVorbei()) {
+                $vereinIds[$spiel->mannschaft->verein_id] = true;
+            }
+        }
+        $fehler = false;
+        foreach (Verein::findAll(array_keys($vereinIds) ?: [0]) as $verein) {
+            try {
+                $log = Spielquellen::abrufen($verein);
+            } catch (\Throwable $e) {
+                $log = ['! ' . $e->getMessage()];
+            }
+            $fehler = $fehler || (bool)preg_grep('/^!/', $log);
+            $this->stdout(date('Y-m-d H:i:s') . " Nachtrag {$verein->name}: " . implode('; ', $log) . "\n");
+        }
+        if ($vereinIds) {
+            Yii::$app->cache->delete('ki-assistent-context-aktuell');
+        }
         return $fehler ? ExitCode::UNSPECIFIED_ERROR : ExitCode::OK;
     }
 

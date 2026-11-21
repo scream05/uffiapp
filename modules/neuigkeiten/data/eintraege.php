@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'spielergebnisse-nachtrag', 'datum' => '2026-11-21', 'art' => 'behoben', 'popup' => false,
+        'titel' => 'Spielergebnisse kommen schneller',
+        'text' => 'Wurde ein Ergebnis erst spät beim Verband eingetragen, stand es bisher erst am nächsten Morgen in der App. Jetzt schaut die App nach Spielende regelmäßig nach. Das gilt für Fußball, Badminton, Basketball und Volleyball.'],
     ['id' => 'fussball-ticker-halbzeit', 'datum' => '2026-11-20', 'art' => 'behoben', 'popup' => false,
         'titel' => 'Fußball-Spielberichte bis zum Schluss',
         'text' => 'Der Liveticker eines Fußballspiels blieb bisher manchmal zur Halbzeit stehen, weil der Halbzeitpfiff als Spielende galt. Jetzt läuft er bis zum Abpfiff weiter. Der Bericht vom Spiel in Arberg am 15.11. ist nachgetragen.'],

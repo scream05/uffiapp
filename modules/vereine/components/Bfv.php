@@ -169,6 +169,13 @@ class Bfv
     /** Ab dieser Minute nach Anstoß holt die Live-Abfrage alle 5 Minuten auch das Ergebnis aus der Schnittstelle */
     public const ERGEBNIS_AB = 100;
 
+    /**
+     * Nach dem Live-Fenster das Ergebnis noch so viele Minuten nach Anstoß alle ERGEBNIS_TAKT Minuten nachfragen
+     * (21.11.: E-Jugend-Ergebnis kam erst nach 14:30, Fenster war zu – sonst stünde es erst am nächsten Morgen da)
+     */
+    public const ERGEBNIS_BIS = 1440;
+    public const ERGEBNIS_TAKT = 15;
+
     /** Mannschaftsarten mit Spielernamen und Kommentaren im Liveticker (sonst nur Ereignis, Minute, Stand: Minderjährige) */
     public const MIT_NAMEN = ['Herren', 'Frauen', 'Senioren', 'Alte Herren'];
 
@@ -299,7 +306,8 @@ class Bfv
 
     /**
      * Minütlich (Crontab): Liveticker der Spiele, die gerade laufen; gegen Ende alle 5 Minuten auch das Ergebnis
-     * aus der Schnittstelle. Ohne laufendes Spiel wird nichts abgerufen.
+     * aus der Schnittstelle, danach bis 24 h nach Anstoß alle 15 Minuten, solange keins gemeldet ist.
+     * Ohne laufendes oder unbeantwortetes Spiel wird nichts abgerufen.
      * @return string[] Meldungen
      */
     public static function live(?int $jetzt = null): array
@@ -319,6 +327,10 @@ class Bfv
                 if ($spiel->ticker_status === 'live') {
                     VereinSpiel::updateAll(['ticker_status' => 'beendet'], ['spiel_id' => $spiel->spiel_id]); // Ticker nicht zu Ende geführt
                     $log[] = "{$spiel->heim} – {$spiel->gast}: Ticker ohne Abpfiff, als beendet markiert";
+                }
+                // Ergebnis noch nicht gemeldet: weiter nachfragen, aber seltener
+                if ($spiel->getTore() === null && $seit <= self::ERGEBNIS_BIS && intdiv($jetzt, 60) % self::ERGEBNIS_TAKT === 0) {
+                    $ergebnisTeams[$spiel->mannschaft_id] = true;
                 }
                 continue;
             }
@@ -350,8 +362,10 @@ class Bfv
         $n = 0;
         foreach (self::json(self::API . 'team/' . $teamId . '/matches')['matches'] as $s) {
             $ergebnis = trim((string)($s['result'] ?? '')) ?: null;
+            // Nur echte Änderungen (vorher zählte „leer → leer“ als neu)
+            $anders = $ergebnis === null ? ['not', ['ergebnis' => null]] : ['or', ['ergebnis' => null], ['!=', 'ergebnis', $ergebnis]];
             $n += VereinSpiel::updateAll(['ergebnis' => $ergebnis, 'aktualisiert_am' => date('Y-m-d H:i:s')],
-                ['and', ['mannschaft_id' => $teamId, 'spiel_id' => $s['matchId']], ['or', ['ergebnis' => null], ['!=', 'ergebnis', (string)$ergebnis]]]);
+                ['and', ['mannschaft_id' => $teamId, 'spiel_id' => $s['matchId']], $anders]);
         }
         return $n;
     }
