@@ -166,4 +166,6 @@ return [
     'Ohne Leerzeichen – erlaubt sind Buchstaben, Ziffern und _ - . @ (z. B. Max_Muster). Deinen vollen Namen gibst du weiter unten an.' => 'Без пробелов – разрешены буквы, цифры и _ - . @ (например, Max_Muster). Полное имя ты укажешь ниже.',
     'Leerzeichen' => 'пробелы',
     'Der Benutzername darf kein {zeichen} enthalten. Erlaubt sind Buchstaben, Ziffern und _ - . @ – zum Beispiel „{vorschlag}“.' => 'Имя пользователя не может содержать {zeichen}. Разрешены буквы, цифры и _ - . @ – например, «{vorschlag}».',
+    'Auch alle meine Beiträge, Termine, Mängelmeldungen, Kommentare und „Gefällt mir“ löschen' => 'Также удалить все мои публикации, события, сообщения о неисправностях, комментарии и отметки «Нравится»',
+    'Ohne Häkchen bleiben deine Beiträge und Kommentare ohne deinen Namen stehen, damit Gespräche verständlich bleiben. Private Nachrichten bleiben bei den Empfängern.' => 'Без отметки ваши публикации и комментарии останутся без вашего имени, чтобы разговоры оставались понятными. Личные сообщения остаются у получателей.',
 ];

@@ -166,4 +166,6 @@ return [
     'Ohne Leerzeichen – erlaubt sind Buchstaben, Ziffern und _ - . @ (z. B. Max_Muster). Deinen vollen Namen gibst du weiter unten an.' => 'Без пробілів – дозволено літери, цифри та _ - . @ (наприклад, Max_Muster). Повне ім’я ти вкажеш нижче.',
     'Leerzeichen' => 'пробіли',
     'Der Benutzername darf kein {zeichen} enthalten. Erlaubt sind Buchstaben, Ziffern und _ - . @ – zum Beispiel „{vorschlag}“.' => 'Ім’я користувача не може містити {zeichen}. Дозволено літери, цифри та _ - . @ – наприклад, «{vorschlag}».',
+    'Auch alle meine Beiträge, Termine, Mängelmeldungen, Kommentare und „Gefällt mir“ löschen' => 'Також видалити всі мої дописи, події, повідомлення про несправності, коментарі та вподобання',
+    'Ohne Häkchen bleiben deine Beiträge und Kommentare ohne deinen Namen stehen, damit Gespräche verständlich bleiben. Private Nachrichten bleiben bei den Empfängern.' => 'Без позначки ваші дописи й коментарі залишаться без вашого імені, щоб розмови залишалися зрозумілими. Особисті повідомлення залишаються в отримувачів.',
 ];

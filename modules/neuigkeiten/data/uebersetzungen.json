@@ -1,4 +1,31 @@
 {
+    "konto-loeschen-inhalte": {
+        "en": {
+            "titel": "Delete account: optionally with all your posts",
+            "text": "When you delete your account, you can now tick a box to also delete all your posts, events, defect reports, comments and \"likes\". If you leave the box unticked, they stay as they were, just without your name.",
+            "quelle": "45fcbb461f1c520f8ec025595c2c217a1c48b989"
+        },
+        "uk": {
+            "titel": "Обліковий запис видалити: за бажанням разом із усіма дописами",
+            "text": "Коли ти видаляєш свій обліковий запис, тепер можна позначити, що разом із ним також мають бути видалені всі твої дописи, події, повідомлення про несправності, коментарі та «Подобається». Без позначки вони залишаються, як і раніше, але без твого імені.",
+            "quelle": "45fcbb461f1c520f8ec025595c2c217a1c48b989"
+        },
+        "ar": {
+            "titel": "حذف الحساب: مع حذف جميع المساهمات عند الرغبة",
+            "text": "عند حذف حسابك، يمكنك الآن تحديد خيار حذف جميع مساهماتك أيضاً، مثل المنشورات والمواعيد وبلاغات العيوب والتعليقات و«الإعجابات». وبدون تحديد هذا الخيار، تبقى هذه المحتويات كما هي دون ذكر اسمك.",
+            "quelle": "45fcbb461f1c520f8ec025595c2c217a1c48b989"
+        },
+        "tr": {
+            "titel": "Hesabı silme: istersen tüm gönderilerinle birlikte",
+            "text": "Hesabını sildiğinde artık tüm gönderilerinin, etkinliklerinin, sorun bildirimlerinin, yorumlarının ve „Beğendim“ işaretlerinin de silinmesini işaretleyebilirsin. İşaretlemezsen, şimdiye kadar olduğu gibi adın kaldırılarak yerinde kalırlar.",
+            "quelle": "45fcbb461f1c520f8ec025595c2c217a1c48b989"
+        },
+        "ru": {
+            "titel": "Удаление аккаунта: по желанию вместе со всеми публикациями",
+            "text": "Если ты удаляешь свой аккаунт, теперь можно отметить галочкой, что вместе с ним будут удалены все твои публикации, события, сообщения о проблемах, комментарии и отметки «Нравится». Без галочки они останутся, как и раньше, но без твоего имени.",
+            "quelle": "45fcbb461f1c520f8ec025595c2c217a1c48b989"
+        }
+    },
     "ki-einwilligung": {
         "en": {
             "titel": "Uffi and Übersetzen ask for your consent",

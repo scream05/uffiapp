@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'konto-loeschen-inhalte', 'datum' => '2026-11-23', 'art' => 'besser', 'popup' => false,
+        'titel' => 'Konto löschen: auf Wunsch mit allen Beiträgen',
+        'text' => 'Wenn du dein Konto löschst, kannst du jetzt ankreuzen, dass auch alle deine Beiträge, Termine, Mängelmeldungen, Kommentare und „Gefällt mir“ gelöscht werden. Ohne Häkchen bleiben sie wie bisher ohne deinen Namen stehen.'],
     ['id' => 'ki-einwilligung', 'datum' => '2026-11-23', 'art' => 'besser', 'popup' => false,
         'titel' => 'Uffi und Übersetzen fragen nach deinem Einverständnis',
         'text' => 'Bevor du Uffi oder „Übersetzen“ nutzt, bestätigst du jetzt neben deinem Alter auch, dass dein Text an den KI-Anbieter übermittelt wird. Das fragt die App einmal neu, auch wenn du schon bestätigt hattest. Unter dem Chat kannst du dein Einverständnis jederzeit widerrufen.'],

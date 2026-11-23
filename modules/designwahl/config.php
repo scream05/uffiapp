@@ -27,6 +27,7 @@ return [
         ['class' => 'humhub\modules\calendar\widgets\CalendarFilterBar', 'event' => 'beforeRun', 'callback' => [Events::class, 'onCalendarFilterBar']],
         ['class' => 'humhub\modules\calendar\widgets\FullCalendar', 'event' => 'beforeRun', 'callback' => [Events::class, 'onFullCalendar']],
         ['class' => 'humhub\components\Controller', 'event' => 'beforeAction', 'callback' => [Events::class, 'onControllerBeforeAction']],
+        ['class' => 'humhub\components\Controller', 'event' => 'afterAction', 'callback' => [Events::class, 'onControllerAfterAction']],
         ['class' => 'humhub\modules\content\widgets\WallEntryControls', 'event' => 'init', 'callback' => [Events::class, 'onWallEntryControlsInit']],
         ['class' => 'humhub\modules\content\widgets\WallEntryControls', 'event' => 'run', 'callback' => [Events::class, 'onWallEntryControlsRun']],
         ['class' => 'yii\web\Response', 'event' => 'beforeSend', 'callback' => [Events::class, 'onResponseBeforeSend']],

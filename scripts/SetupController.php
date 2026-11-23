@@ -4443,7 +4443,36 @@ class SetupController extends Controller
             $db->createCommand()->insert('statistik_konto_tag', ['tag' => date('Y-m-d'), 'user_id' => $u->id])->execute();
             $pruef(Yii::$app->getModule('user')->softDeleteKeepProfileFields === [], 'Einstellung: Kern behält keine Profilfelder');
 
+            // Inhalte des Kontos (für das Häkchen „Inhalte mitlöschen“): eigener Beitrag mit eigenem Kommentar,
+            // dazu Kommentar und „Gefällt mir“ bei einem fremden Beitrag
+            Yii::$app->user->switchIdentity($u);
+            // im Space (Beiträge auf der eigenen Profilseite löscht der Kern ohnehin mit dem Konto)
+            $post = new \humhub\modules\post\models\Post(\humhub\modules\space\models\Space::findOne(['url' => 'rathaus-uffenheim']));
+            $post->message = 'Löschtest';
+            $post->save() || throw new \Exception('Beitrag: ' . json_encode($post->getErrors()));
+            $k1 = new \humhub\modules\comment\models\Comment(['message' => 'Löschtest', 'content_id' => $post->content->id]);
+            $k1->save() || throw new \Exception('Kommentar: ' . json_encode($k1->getErrors()));
+            $fremd = \humhub\modules\post\models\Post::find()->joinWith('content')->where(['!=', 'content.created_by', $u->id])
+                ->orderBy(['post.id' => SORT_DESC])->one();
+            $k2 = new \humhub\modules\comment\models\Comment(['message' => 'Löschtest', 'content_id' => $fremd->content->id]);
+            $k2->save() || throw new \Exception('Kommentar fremd: ' . json_encode($k2->getErrors()));
+            $like = new \humhub\modules\like\models\Like(['content_id' => $fremd->content->id]);
+            $like->save() || throw new \Exception('Gefällt mir: ' . json_encode($like->getErrors()));
+            $zaehle = fn() => [
+                (int)(new \yii\db\Query())->from('content')->where(['created_by' => $u->id])->count(),
+                (int)(new \yii\db\Query())->from('comment')->where(['created_by' => $u->id])->count(),
+                (int)(new \yii\db\Query())->from('like')->where(['created_by' => $u->id])->count(),
+            ];
+            $vorher = $zaehle();
+            $pruef($vorher === [1, 2, 1], 'Testinhalte angelegt (Inhalte/Kommentare/Gefällt mir: ' . implode('/', $vorher) . ')');
+
             $u->softDelete();
+            $pruef($zaehle() === $vorher, 'Ohne Häkchen: Inhalte bleiben stehen (' . implode('/', $zaehle()) . ')');
+            $ergebnis = \humhub\modules\designwahl\jobs\InhalteLoeschen::ausfuehren($u->id);
+            $pruef($zaehle() === [0, 0, 0], 'Mit Häkchen: alles gelöscht (gemeldet ' . implode('/', $ergebnis) . ', übrig ' . implode('/', $zaehle()) . ')');
+            $pruef(\humhub\modules\post\models\Post::findOne($fremd->id) !== null, 'Fremder Beitrag bleibt');
+            $pruef(!(new \yii\db\Query())->from('post')->where(['id' => $post->id])->exists(), 'Eigener Beitrag endgültig weg (nicht nur Papierkorb)');
+            Yii::$app->user->setIdentity(null);
 
             $p = (new \yii\db\Query())->from('profile')->where(['user_id' => $u->id])->one();
             $pruef($p && (string)$p['firstname'] === '' && (string)$p['lastname'] === '', 'Vor- und Nachname geleert');

@@ -166,4 +166,6 @@ return [
     'Ohne Leerzeichen – erlaubt sind Buchstaben, Ziffern und _ - . @ (z. B. Max_Muster). Deinen vollen Namen gibst du weiter unten an.' => 'بدون مسافات – يُسمح بالحروف والأرقام و _ - . @ (مثلًا Max_Muster). تُدخل اسمك الكامل في الأسفل.',
     'Leerzeichen' => 'مسافات',
     'Der Benutzername darf kein {zeichen} enthalten. Erlaubt sind Buchstaben, Ziffern und _ - . @ – zum Beispiel „{vorschlag}“.' => 'لا يجوز أن يحتوي اسم المستخدم على {zeichen}. يُسمح بالحروف والأرقام و _ - . @ – مثلًا «{vorschlag}».',
+    'Auch alle meine Beiträge, Termine, Mängelmeldungen, Kommentare und „Gefällt mir“ löschen' => 'احذف أيضًا جميع منشوراتي ومواعيدي وبلاغات الأعطال وتعليقاتي وإعجاباتي',
+    'Ohne Häkchen bleiben deine Beiträge und Kommentare ohne deinen Namen stehen, damit Gespräche verständlich bleiben. Private Nachrichten bleiben bei den Empfängern.' => 'بدون هذه العلامة تبقى منشوراتك وتعليقاتك دون اسمك حتى تظل المحادثات مفهومة. تبقى الرسائل الخاصة لدى مستلميها.',
 ];

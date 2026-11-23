@@ -166,4 +166,6 @@ return [
     'Ohne Leerzeichen – erlaubt sind Buchstaben, Ziffern und _ - . @ (z. B. Max_Muster). Deinen vollen Namen gibst du weiter unten an.' => 'Boşluk olmadan – harf, rakam ve _ - . @ kullanılabilir (ör. Max_Muster). Tam adını aşağıda girersin.',
     'Leerzeichen' => 'boşluk',
     'Der Benutzername darf kein {zeichen} enthalten. Erlaubt sind Buchstaben, Ziffern und _ - . @ – zum Beispiel „{vorschlag}“.' => 'Kullanıcı adı {zeichen} içeremez. Harf, rakam ve _ - . @ kullanılabilir – örneğin „{vorschlag}“.',
+    'Auch alle meine Beiträge, Termine, Mängelmeldungen, Kommentare und „Gefällt mir“ löschen' => 'Tüm gönderilerimi, etkinliklerimi, arıza bildirimlerimi, yorumlarımı ve beğenilerimi de sil',
+    'Ohne Häkchen bleiben deine Beiträge und Kommentare ohne deinen Namen stehen, damit Gespräche verständlich bleiben. Private Nachrichten bleiben bei den Empfängern.' => 'İşaretlemezsen gönderilerin ve yorumların, sohbetler anlaşılır kalsın diye adın olmadan yerinde kalır. Özel mesajlar alıcılarda kalır.',
 ];

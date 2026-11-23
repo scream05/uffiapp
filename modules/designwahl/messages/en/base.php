@@ -166,4 +166,6 @@ return [
     'Ohne Leerzeichen – erlaubt sind Buchstaben, Ziffern und _ - . @ (z. B. Max_Muster). Deinen vollen Namen gibst du weiter unten an.' => 'No spaces – letters, digits and _ - . @ are allowed (e.g. Max_Muster). You enter your full name further down.',
     'Leerzeichen' => 'spaces',
     'Der Benutzername darf kein {zeichen} enthalten. Erlaubt sind Buchstaben, Ziffern und _ - . @ – zum Beispiel „{vorschlag}“.' => 'The username must not contain {zeichen}. Letters, digits and _ - . @ are allowed – for example “{vorschlag}”.',
+    'Auch alle meine Beiträge, Termine, Mängelmeldungen, Kommentare und „Gefällt mir“ löschen' => 'Also delete all my posts, events, defect reports, comments and likes',
+    'Ohne Häkchen bleiben deine Beiträge und Kommentare ohne deinen Namen stehen, damit Gespräche verständlich bleiben. Private Nachrichten bleiben bei den Empfängern.' => 'Without the tick, your posts and comments remain without your name so that conversations stay understandable. Private messages remain with their recipients.',
 ];

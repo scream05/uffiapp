@@ -396,7 +396,29 @@ JS, ['DN_ABBRECHEN' => json_encode(Yii::t('DesignwahlModule.base', 'Abbrechen'),
         '@humhub/modules/space/widgets/views' => '@designwahl/views/space/widgets', // nur profileHeaderControls.php (Leiste nur für Admins)
         '@humhub/modules/file/widgets/views' => '@designwahl/views/file/widgets', // nur showFiles.php (Alt-Text aus der Bildbeschreibung)
         '@humhub/modules/content/widgets/stream/views' => '@designwahl/views/content/stream', // nur wallStreamEntryHeader.php (Space-Bild im Beitragskopf)
+        '@humhub/modules/user/views/account' => '@designwahl/views/user/account', // nur delete.php (Häkchen „Inhalte mitlöschen“)
     ];
+
+    /** Kontolöschung mit Häkchen „Inhalte mitlöschen“: [Konto-ID] zwischen beforeAction und afterAction */
+    private static ?int $inhalteLoeschenFuer = null;
+
+    /** Nach erfolgreicher Kontolöschung (Status „gelöscht“) mit Häkchen: Inhalte im Hintergrund löschen */
+    public static function onControllerAfterAction($event)
+    {
+        if (self::$inhalteLoeschenFuer === null) {
+            return;
+        }
+        $id = self::$inhalteLoeschenFuer;
+        self::$inhalteLoeschenFuer = null;
+        try {
+            $user = \humhub\modules\user\models\User::findOne($id);
+            if ($user !== null && (int)$user->status === \humhub\modules\user\models\User::STATUS_SOFT_DELETED) {
+                Yii::$app->queue->push(new jobs\InhalteLoeschen(['user_id' => $id]));
+            }
+        } catch (\Throwable $e) {
+            Yii::error($e);
+        }
+    }
 
     /** Teilnehmerliste eines Termins: nur wer ihn bearbeiten darf (Ersteller, Space-Admins, Admins) */
     public static function darfTeilnehmerSehen($eintragId): bool
@@ -417,6 +439,10 @@ JS, ['DN_ABBRECHEN' => json_encode(Yii::t('DesignwahlModule.base', 'Abbrechen'),
             && in_array($event->action->id, ['modal-participants', 'participants-list'], true)
             && !self::darfTeilnehmerSehen(Yii::$app->request->get('id'))) {
             throw new \yii\web\ForbiddenHttpException();
+        }
+        if ($event->action->controller->uniqueId === 'user/account' && $event->action->id === 'delete'
+            && Yii::$app->request->isPost && Yii::$app->request->post('inhalteLoeschen') === '1' && !Yii::$app->user->isGuest) {
+            self::$inhalteLoeschenFuer = (int)Yii::$app->user->id;
         }
         try {
             self::gastSprache();
