@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'ki-haekchen-darstellung', 'datum' => '2026-11-23', 'art' => 'behoben', 'popup' => false,
+        'titel' => 'Häkchen bei Uffi sauber angeordnet',
+        'text' => 'Die beiden Kästchen für Alter und Einverständnis standen im Uffi-Fenster übereinander verrutscht. Jetzt steht jedes Kästchen ordentlich neben seinem Text.'],
     ['id' => 'konto-loeschen-inhalte', 'datum' => '2026-11-23', 'art' => 'besser', 'popup' => false,
         'titel' => 'Konto löschen: auf Wunsch mit allen Beiträgen',
         'text' => 'Wenn du dein Konto löschst, kannst du jetzt ankreuzen, dass auch alle deine Beiträge, Termine, Mängelmeldungen, Kommentare und „Gefällt mir“ gelöscht werden. Ohne Häkchen bleiben sie wie bisher ohne deinen Namen stehen.'],

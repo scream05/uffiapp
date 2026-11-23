@@ -51,7 +51,7 @@ $this->registerJs('window.kiChatDomains = ' . json_encode(Yii::$app->getModule('
             <?php endif ?>
             <?php if (!$ageConfirmed): ?>
                 <div class="alert alert-info">
-                    <?= Html::beginForm(['confirm-age'], 'post') ?>
+                    <?= Html::beginForm(['confirm-age'], 'post', ['class' => 'ki-zustimmung']) ?>
                     <p><?= Yii::t('KiAssistentModule.base', 'Uffi steht nur Personen ab 18 Jahren zur Verfügung.') ?>
                         <?= Yii::$app->user->isGuest ? Yii::t('KiAssistentModule.base', 'Bitte bestätige dein Alter.') : Yii::t('KiAssistentModule.base', 'Bitte bestätige einmalig dein Alter.') ?></p>
                     <div class="checkbox">

@@ -1,4 +1,31 @@
 {
+    "ki-haekchen-darstellung": {
+        "en": {
+            "titel": "Checkboxes in Uffi neatly aligned",
+            "text": "The two boxes for age and consent were stacked out of line in the Uffi window. Now each box sits neatly next to its text.",
+            "quelle": "f82bf9cdeb1623a7f785d27b689201b3760d8d25"
+        },
+        "uk": {
+            "titel": "Галочки в Uffi тепер вирівняні",
+            "text": "Два поля для віку та згоди у вікні Uffi раніше були зміщені одне над одним. Тепер кожне поле акуратно стоїть поруч зі своїм текстом.",
+            "quelle": "f82bf9cdeb1623a7f785d27b689201b3760d8d25"
+        },
+        "ar": {
+            "titel": "تم ترتيب مربعات الاختيار في Uffi بشكل مرتب",
+            "text": "كانت المربعان الخاصان بالعمر والموافقة في نافذة Uffi متراكبين وغير مرتبين. الآن يقف كل مربع بشكل مرتب بجانب نصه.",
+            "quelle": "f82bf9cdeb1623a7f785d27b689201b3760d8d25"
+        },
+        "tr": {
+            "titel": "Uffi'deki onay kutucukları düzgün hizalandı",
+            "text": "Yaş ve onay için olan iki kutucuk Uffi penceresinde üst üste kaymıştı. Artık her kutucuk, yazısının yanında düzgünce duruyor.",
+            "quelle": "f82bf9cdeb1623a7f785d27b689201b3760d8d25"
+        },
+        "ru": {
+            "titel": "Галочки в Uffi выровнены",
+            "text": "Два квадратика для возраста и согласия в окне Uffi съезжали друг над другом. Теперь каждый квадратик аккуратно стоит рядом со своим текстом.",
+            "quelle": "f82bf9cdeb1623a7f785d27b689201b3760d8d25"
+        }
+    },
     "konto-loeschen-inhalte": {
         "en": {
             "titel": "Delete account: optionally with all your posts",
