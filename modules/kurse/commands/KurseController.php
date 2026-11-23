@@ -23,6 +23,39 @@ use yii\console\ExitCode;
  */
 class KurseController extends Controller
 {
+    /**
+     * Vereinsinhalte der Kursseite fest übersetzen (Tabelle kurs_inhalt_uebersetzung, verfällt nicht):
+     *   kurse/uebersetzen 76            fehlende Texte in allen Sprachen
+     *   kurse/uebersetzen 76 uk         nur Ukrainisch
+     *   kurse/uebersetzen 76 alle neu   alles neu übersetzen (z. B. nach Änderung der Übersetzungsregeln)
+     *   kurse/uebersetzen 76 uk zeigen  gespeicherte Übersetzungen zum Gegenlesen ausgeben
+     */
+    public function actionUebersetzen($vereinId, $sprache = 'alle', $modus = '')
+    {
+        $verein = \humhub\modules\vereine\models\Verein::findOne((int)$vereinId);
+        if (!$verein) {
+            $this->stderr("Verein $vereinId nicht gefunden\n");
+            return ExitCode::DATAERR;
+        }
+        $sprachen = $sprache === 'alle' ? array_keys(\humhub\modules\kiAssistent\components\Uebersetzer::SPRACHEN) : [$sprache];
+        $texte = \humhub\modules\kurse\components\Inhalt::texte($verein);
+        $this->stdout(count($texte) . " Texte auf der Kursseite von {$verein->name}\n");
+        $ok = true;
+        foreach ($sprachen as $s) {
+            if ($modus === 'zeigen') {
+                foreach ($texte as $t) {
+                    $ue = \humhub\modules\kurse\components\Inhalt::gespeichert($t, $s);
+                    $this->stdout("- " . str_replace("\n", " ⏎ ", mb_substr($t, 0, 300)) . "\n  → " . ($ue === null ? '(fehlt)' : str_replace("\n", " ⏎ ", $ue)) . "\n");
+                }
+                continue;
+            }
+            [$neu, $fehler] = \humhub\modules\kurse\components\Inhalt::uebersetzen($texte, $s, $modus === 'neu');
+            $this->stdout("$s: $neu übersetzt" . ($fehler ? ', ' . count($fehler) . ' nicht brauchbar: ' . implode(' | ', array_map(fn($t) => mb_substr($t, 0, 40), $fehler)) : '') . "\n");
+            $ok = $ok && !$fehler;
+        }
+        return $ok ? ExitCode::OK : ExitCode::UNSPECIFIED_ERROR;
+    }
+
     /** @param int $probe 1 = Mails nur als Datei in @runtime/mail (Test) */
     /**
      * Sammelübersetzung prüfen (wie für die Kursseite): kurse/uebersetzen-test uk "Satz eins" "Satz zwei"

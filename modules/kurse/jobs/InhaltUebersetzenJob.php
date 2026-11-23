@@ -3,11 +3,12 @@
 namespace humhub\modules\kurse\jobs;
 
 use humhub\modules\kiAssistent\components\Uebersetzer;
+use humhub\modules\kurse\components\Inhalt;
 use humhub\modules\kiAssistent\components\UebersetzungGrenze;
 use humhub\modules\queue\LongRunningActiveJob;
 use Yii;
 
-/** Vereinsinhalte der Kursseite in eine Sprache übersetzen (ein KI-Aufruf je Paket, siehe components/Inhalt) */
+/** Vereinsinhalte der Kursseite in eine Sprache fest übersetzen (siehe components/Inhalt) */
 class InhaltUebersetzenJob extends LongRunningActiveJob
 {
     /** @var string[] */
@@ -20,7 +21,7 @@ class InhaltUebersetzenJob extends LongRunningActiveJob
             return;
         }
         try {
-            $neu = Uebersetzer::translateBatch($this->texte, $this->sprache);
+            [$neu] = Inhalt::uebersetzen($this->texte, $this->sprache);
             Yii::info("Kursseite: $neu von " . count($this->texte) . " Texten nach {$this->sprache} übersetzt", 'kurse');
         } catch (UebersetzungGrenze $e) {
             Yii::warning('Kursseite: Übersetzung abgelehnt – ' . $e->getMessage(), 'kurse');
