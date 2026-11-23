@@ -29,6 +29,11 @@ use yii\helpers\Url;
             <input type="checkbox" class="form-check-input" name="adult" value="1" id="ki-adult" required>
             <label class="form-check-label" for="ki-adult"><?= Yii::t('KiAssistentModule.base', 'Ich bin mindestens 18 Jahre alt.') ?></label>
         </div>
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" name="einwilligung" value="1" id="ki-einwilligung" required>
+            <label class="form-check-label" for="ki-einwilligung"><?= Html::encode(Yii::$app->getModule('ki-assistent')->einwilligungText()) ?></label>
+        </div>
+        <p class="small mb-1"><?= Yii::t('KiAssistentModule.base', 'Bitte gib keine sensiblen persönlichen Daten ein. Die Einwilligung kannst du jederzeit unter dem Chat widerrufen.') ?></p>
         <button type="submit" class="btn btn-primary btn-sm mt-1"><?= Yii::t('KiAssistentModule.base', 'Bestätigen') ?></button>
         <?= Html::endForm() ?>
     <?php endif ?>
@@ -42,7 +47,8 @@ use yii\helpers\Url;
             </div>
         </form>
         <div class="ki-links"><a href="#" class="ki-reset"><?= Yii::t('KiAssistentModule.base', 'Neues Gespräch') ?></a> ·
-            <?= Html::a(Html::encode(Yii::t('KiAssistentModule.base', 'Datenschutz')), ['/legal/page/view', 'pageKey' => 'privacy']) ?></div>
+            <?= Html::a(Html::encode(Yii::t('KiAssistentModule.base', 'Datenschutz')), ['/legal/page/view', 'pageKey' => 'privacy']) ?><?php if ($ageConfirmed): ?> ·
+            <?= Html::a(Html::encode(Yii::t('KiAssistentModule.base', 'Einwilligung widerrufen')), ['/ki-assistent/chat/widerrufen'], ['data-method' => 'post', 'data-pjax' => '0']) ?><?php endif ?></div>
     </div>
 </div>
 <?php

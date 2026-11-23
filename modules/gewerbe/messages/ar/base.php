@@ -380,4 +380,8 @@ return [
     'Sprache der Karten:' => 'لغة البطاقات:',
     'Drucken' => 'طباعة',
     'Bild {nr} von {anzahl} in voller Größe öffnen' => 'فتح الصورة {nr} من {anzahl} بالحجم الكامل',
+    'Du bekommst eine Push-Nachricht, wenn ein Betrieb einen neuen Gutschein veröffentlicht.' => 'ستتلقى إشعارًا فوريًا عندما ينشر أحد المتاجر قسيمة جديدة.',
+    'Möchtest du eine Push-Nachricht bekommen, wenn ein Betrieb einen neuen Gutschein veröffentlicht?' => 'هل تريد تلقي إشعار فوري عندما ينشر أحد المتاجر قسيمة جديدة؟',
+    'Push für neue Gutscheine einschalten' => 'تفعيل الإشعارات للقسائم الجديدة',
+    'Push für neue Gutscheine ausschalten' => 'إيقاف الإشعارات للقسائم الجديدة',
 ];

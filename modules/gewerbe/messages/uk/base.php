@@ -380,4 +380,8 @@ return [
     'Sprache der Karten:' => 'Мова табличок:',
     'Drucken' => 'Друкувати',
     'Bild {nr} von {anzahl} in voller Größe öffnen' => 'Відкрити зображення {nr} з {anzahl} у повному розмірі',
+    'Du bekommst eine Push-Nachricht, wenn ein Betrieb einen neuen Gutschein veröffentlicht.' => 'Ви отримуєте push-повідомлення, коли заклад публікує новий купон.',
+    'Möchtest du eine Push-Nachricht bekommen, wenn ein Betrieb einen neuen Gutschein veröffentlicht?' => 'Бажаєте отримувати push-повідомлення, коли заклад публікує новий купон?',
+    'Push für neue Gutscheine einschalten' => 'Увімкнути push для нових купонів',
+    'Push für neue Gutscheine ausschalten' => 'Вимкнути push для нових купонів',
 ];

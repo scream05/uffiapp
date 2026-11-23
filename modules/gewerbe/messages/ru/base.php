@@ -380,4 +380,8 @@ return [
     'Sprache der Karten:' => 'Язык табличек:',
     'Drucken' => 'Печать',
     'Bild {nr} von {anzahl} in voller Größe öffnen' => 'Открыть изображение {nr} из {anzahl} в полном размере',
+    'Du bekommst eine Push-Nachricht, wenn ein Betrieb einen neuen Gutschein veröffentlicht.' => 'Вы получаете push-уведомление, когда заведение публикует новый купон.',
+    'Möchtest du eine Push-Nachricht bekommen, wenn ein Betrieb einen neuen Gutschein veröffentlicht?' => 'Хотите получать push-уведомление, когда заведение публикует новый купон?',
+    'Push für neue Gutscheine einschalten' => 'Включить push для новых купонов',
+    'Push für neue Gutscheine ausschalten' => 'Выключить push для новых купонов',
 ];

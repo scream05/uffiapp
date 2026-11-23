@@ -380,4 +380,8 @@ return [
     'Sprache der Karten:' => 'Language of the cards:',
     'Drucken' => 'Print',
     'Bild {nr} von {anzahl} in voller Größe öffnen' => 'Open image {nr} of {anzahl} in full size',
+    'Du bekommst eine Push-Nachricht, wenn ein Betrieb einen neuen Gutschein veröffentlicht.' => 'You will get a push notification when a business publishes a new coupon.',
+    'Möchtest du eine Push-Nachricht bekommen, wenn ein Betrieb einen neuen Gutschein veröffentlicht?' => 'Would you like a push notification when a business publishes a new coupon?',
+    'Push für neue Gutscheine einschalten' => 'Turn on push for new coupons',
+    'Push für neue Gutscheine ausschalten' => 'Turn off push for new coupons',
 ];

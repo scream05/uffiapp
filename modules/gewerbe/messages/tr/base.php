@@ -380,4 +380,8 @@ return [
     'Sprache der Karten:' => 'Kartların dili:',
     'Drucken' => 'Yazdır',
     'Bild {nr} von {anzahl} in voller Größe öffnen' => '{anzahl} görselden {nr}. görseli tam boyutta aç',
+    'Du bekommst eine Push-Nachricht, wenn ein Betrieb einen neuen Gutschein veröffentlicht.' => 'Bir işletme yeni bir kupon yayınladığında anlık bildirim alırsın.',
+    'Möchtest du eine Push-Nachricht bekommen, wenn ein Betrieb einen neuen Gutschein veröffentlicht?' => 'Bir işletme yeni bir kupon yayınladığında anlık bildirim almak ister misin?',
+    'Push für neue Gutscheine einschalten' => 'Yeni kuponlar için bildirimi aç',
+    'Push für neue Gutscheine ausschalten' => 'Yeni kuponlar için bildirimi kapat',
 ];

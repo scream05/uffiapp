@@ -24,7 +24,7 @@ class ChatController extends Controller
     {
         return [
             // offen für alle, auch Gäste (Limits je Monat und je Konto/IP und Stunde in actionAsk)
-            [ControllerAccess::RULE_POST => ['ask', 'confirm-age', 'feedback']],
+            [ControllerAccess::RULE_POST => ['ask', 'confirm-age', 'feedback', 'widerrufen']],
         ];
     }
 
@@ -39,15 +39,22 @@ class ChatController extends Controller
         ]);
     }
 
-    /** Bestätigung „mindestens 18 Jahre“ (Formular auf der Chat-Seite) */
+    /** Bestätigung „mindestens 18 Jahre“ + Einwilligung in die Übermittlung an den KI-Anbieter (Chat-Seite, Chatfenster, Übersetzen) */
     public function actionConfirmAge()
     {
-        if (Yii::$app->request->post('adult') === '1') {
+        if (Yii::$app->request->post('adult') === '1' && Yii::$app->request->post('einwilligung') === '1') {
             $this->module->confirmAge();
         }
         if (Yii::$app->request->isAjax) { // Chatfenster unten rechts
             return $this->asJson(['ok' => $this->module->isAgeConfirmed()]);
         }
+        return $this->redirect(['index']);
+    }
+
+    /** Einwilligung widerrufen (Link „Einwilligung widerrufen“ auf der Chat-Seite und im Chatfenster) */
+    public function actionWiderrufen()
+    {
+        $this->module->widerrufen();
         return $this->redirect(['index']);
     }
 
@@ -79,7 +86,7 @@ class ChatController extends Controller
         }
 
         if (!$this->module->isAgeConfirmed()) {
-            return $this->asJson(['error' => Yii::t('KiAssistentModule.base', 'Bitte bestätige zuerst, dass du mindestens 18 Jahre alt bist.')]);
+            return $this->asJson(['error' => Yii::t('KiAssistentModule.base', 'Bitte bestätige zuerst dein Alter und dein Einverständnis.')]);
         }
         $key = $this->module->getApiKey();
         if ($key === null) {

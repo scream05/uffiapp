@@ -101,4 +101,9 @@ return [
     'Auf der Karte (OpenStreetMap)' => 'На карте (OpenStreetMap)',
     'In Google Maps' => 'В Google Maps',
     'Google Maps ist ein Dienst von Google; erst beim Klick werden Daten an Google übertragen.' => 'Google Maps — сервис Google; данные передаются Google только после нажатия.',
+    'Ich bin einverstanden, dass meine Eingaben samt Gesprächsverlauf an {firma} übermittelt werden, damit die KI {anbieter} antworten kann.' => 'Я согласен(на), что мои запросы вместе с историей разговора передаются компании {firma}, чтобы ИИ {anbieter} мог ответить.',
+    'Bitte gib keine sensiblen persönlichen Daten ein. Die Einwilligung kannst du jederzeit unter dem Chat widerrufen.' => 'Пожалуйста, не вводите конфиденциальные персональные данные. Согласие можно в любой момент отозвать под чатом.',
+    'Die Übersetzung nutzt die KI {anbieter}. Dafür wird der Text an {firma} übermittelt. Die Funktion ist ab 18 Jahren freigegeben. Bist du mindestens 18 Jahre alt und damit einverstanden?' => 'Перевод использует ИИ {anbieter}. Для этого текст передаётся компании {firma}. Функция доступна с 18 лет. Вам есть 18 лет и вы согласны?',
+    'Bitte bestätige zuerst dein Alter und dein Einverständnis.' => 'Сначала подтвердите свой возраст и согласие.',
+    'Einwilligung widerrufen' => 'Отозвать согласие',
 ];

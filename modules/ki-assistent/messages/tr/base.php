@@ -101,4 +101,9 @@ return [
     'Auf der Karte (OpenStreetMap)' => 'Haritada (OpenStreetMap)',
     'In Google Maps' => 'Google Haritalar\'da',
     'Google Maps ist ein Dienst von Google; erst beim Klick werden Daten an Google übertragen.' => 'Google Haritalar bir Google hizmetidir; veriler yalnızca tıkladığınızda Google\'a gönderilir.',
+    'Ich bin einverstanden, dass meine Eingaben samt Gesprächsverlauf an {firma} übermittelt werden, damit die KI {anbieter} antworten kann.' => 'Yapay zekânın {anbieter} yanıt verebilmesi için girdilerimin sohbet geçmişiyle birlikte {firma} şirketine iletilmesini kabul ediyorum.',
+    'Bitte gib keine sensiblen persönlichen Daten ein. Die Einwilligung kannst du jederzeit unter dem Chat widerrufen.' => 'Lütfen hassas kişisel veriler girme. Onayını istediğin zaman sohbetin altından geri alabilirsin.',
+    'Die Übersetzung nutzt die KI {anbieter}. Dafür wird der Text an {firma} übermittelt. Die Funktion ist ab 18 Jahren freigegeben. Bist du mindestens 18 Jahre alt und damit einverstanden?' => 'Çeviri bir yapay zekâ {anbieter} kullanır. Bunun için metin {firma} şirketine iletilir. Bu özellik 18 yaş ve üzeri içindir. En az 18 yaşında mısın ve bunu kabul ediyor musun?',
+    'Bitte bestätige zuerst dein Alter und dein Einverständnis.' => 'Lütfen önce yaşını ve onayını teyit et.',
+    'Einwilligung widerrufen' => 'Onayı geri al',
 ];

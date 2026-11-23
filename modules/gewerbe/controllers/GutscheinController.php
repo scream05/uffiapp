@@ -8,6 +8,7 @@ use humhub\modules\gewerbe\models\Betrieb;
 use humhub\modules\gewerbe\models\Einloesung;
 use humhub\modules\gewerbe\models\Gutschein;
 use humhub\modules\gewerbe\Module;
+use humhub\modules\gewerbe\notifications\GutscheinCategory;
 use Yii;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
@@ -24,7 +25,7 @@ class GutscheinController extends ContentContainerController
     protected function getAccessRules()
     {
         return [['login' => ['theke', 'einloesen', 'bestaetigung', 'create', 'edit', 'status', 'verwaltung', 'stornieren',
-            'theke-erneuern', 'aufsteller']]];
+            'theke-erneuern', 'aufsteller', 'push']]];
     }
 
     public function actionIndex()
@@ -33,7 +34,18 @@ class GutscheinController extends ContentContainerController
             ->orderBy(['gewerbe_gutschein.created_at' => SORT_DESC])->all();
         // Einlösbare zuerst, pausierte/aufgebrauchte/kommende danach
         usort($gutscheine, fn(Gutschein $a, Gutschein $b) => (int)!$this->offen($a) <=> (int)!$this->offen($b));
-        return $this->render('index', ['gutscheine' => $gutscheine, 'mine' => $this->meineBetriebe()]);
+        return $this->render('index', ['gutscheine' => $gutscheine, 'mine' => $this->meineBetriebe(),
+            'pushAn' => Yii::$app->user->isGuest ? null : GutscheinCategory::pushAn(Yii::$app->user->getIdentity())]);
+    }
+
+    /** Push für neue Gutscheine ein-/ausschalten (Opt-in auf der Gutscheinseite) */
+    public function actionPush()
+    {
+        if (!Yii::$app->request->isPost) {
+            throw new BadRequestHttpException();
+        }
+        GutscheinCategory::pushSetzen(Yii::$app->user->getIdentity(), Yii::$app->request->post('an') === '1');
+        return $this->redirect($this->contentContainer->createUrl('/gewerbe/gutschein/index'));
     }
 
     public function actionView($id)

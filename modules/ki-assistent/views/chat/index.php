@@ -57,6 +57,11 @@ $this->registerJs('window.kiChatDomains = ' . json_encode(Yii::$app->getModule('
                     <div class="checkbox">
                         <label><input type="checkbox" name="adult" value="1" required> <?= Yii::t('KiAssistentModule.base', 'Ich bin mindestens 18 Jahre alt.') ?></label>
                     </div>
+                    <div class="checkbox">
+                        <label><input type="checkbox" name="einwilligung" value="1" required> <?= Html::encode(Yii::$app->getModule('ki-assistent')->einwilligungText()) ?></label>
+                    </div>
+                    <p class="small"><?= Yii::t('KiAssistentModule.base', 'Bitte gib keine sensiblen persönlichen Daten ein. Die Einwilligung kannst du jederzeit unter dem Chat widerrufen.') ?>
+                        <?= Html::a(Html::encode(Yii::t('KiAssistentModule.base', 'Datenschutz')), ['/legal/page/view', 'pageKey' => 'privacy']) ?></p>
                     <button type="submit" class="btn btn-primary"><?= Yii::t('KiAssistentModule.base', 'Bestätigen') ?></button>
                     <?= Html::endForm() ?>
                 </div>
@@ -71,6 +76,7 @@ $this->registerJs('window.kiChatDomains = ' . json_encode(Yii::$app->getModule('
                 </div>
             </form>
             <p style="margin-top:8px"><a href="#" id="ki-reset" class="ki-reset"><?= Yii::t('KiAssistentModule.base', 'Neues Gespräch') ?></a>
+                <?php if ($ageConfirmed): ?> · <?= Html::a(Html::encode(Yii::t('KiAssistentModule.base', 'Einwilligung widerrufen')), ['widerrufen'], ['data-method' => 'post', 'data-pjax' => '0']) ?><?php endif ?>
                 <?php if (Yii::$app->user->isAdmin()): ?> · <?= Html::a('Bewertungen', ['bewertungen']) ?><?php endif ?></p>
         </div>
     </div>

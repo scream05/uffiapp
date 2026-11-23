@@ -192,24 +192,57 @@ class Module extends \humhub\components\Module
     }
 
     /**
-     * Nur für Volljährige (Nutzungsbedingungen des KI-Anbieters): Bestätigung einmal je Konto
-     * (Benutzereinstellung, wird mit dem Konto gelöscht), bei Gästen je Browser-Sitzung.
+     * Vor der ersten Nutzung von Uffi oder „Übersetzen“: Bestätigung „mindestens 18 Jahre“ (Nutzungsbedingungen des
+     * KI-Anbieters) und ausdrückliche Einwilligung in die Übermittlung an den KI-Anbieter (Apple-Richtlinie 5.1.2(i)).
+     * Einmal je Konto (Benutzereinstellung „ki-einwilligung“ mit Zeitpunkt und Anbieter, wird mit dem Konto gelöscht),
+     * bei Gästen je Browser-Sitzung. Die frühere reine Altersbestätigung („age-confirmed“) reicht nicht mehr.
+     * Wechselt der Anbieter, wird erneut gefragt.
      */
     public function isAgeConfirmed(): bool
     {
-        if (\Yii::$app->user->isGuest) {
-            return (bool)\Yii::$app->session->get('ki-age-confirmed');
-        }
-        return (bool)$this->settings->user()?->get('age-confirmed');
+        $wert = \Yii::$app->user->isGuest
+            ? (string)\Yii::$app->session->get('ki-einwilligung')
+            : (string)$this->settings->user()?->get('ki-einwilligung');
+        return $wert !== '' && str_ends_with($wert, '|' . $this->getAnbieterFirma());
     }
 
     public function confirmAge(): void
     {
+        $wert = date('Y-m-d H:i:s') . '|' . $this->getAnbieterFirma();
         if (\Yii::$app->user->isGuest) {
-            \Yii::$app->session->set('ki-age-confirmed', 1);
+            \Yii::$app->session->set('ki-einwilligung', $wert);
             return;
         }
-        $this->settings->user()?->set('age-confirmed', date('Y-m-d H:i:s'));
+        $this->settings->user()?->set('ki-einwilligung', $wert);
+    }
+
+    /** Einwilligung widerrufen (Link unter dem Chat): danach fragen Uffi und „Übersetzen“ erneut */
+    public function widerrufen(): void
+    {
+        if (\Yii::$app->user->isGuest) {
+            \Yii::$app->session->remove('ki-einwilligung');
+            return;
+        }
+        $this->settings->user()?->delete('ki-einwilligung');
+    }
+
+    /** Wer die Daten erhält (für die Einwilligung): bei Bedrock Amazon, sonst der Hersteller */
+    public function getAnbieterFirma(): string
+    {
+        return match ($this->getAnbieter()) {
+            'openai' => 'OpenAI',
+            'bedrock' => 'Amazon Web Services',
+            default => 'Anthropic',
+        };
+    }
+
+    /** Text der Einwilligung (Chat-Seite, Chatfenster) */
+    public function einwilligungText(): string
+    {
+        return \Yii::t('KiAssistentModule.base', 'Ich bin einverstanden, dass meine Eingaben samt Gesprächsverlauf an {firma} übermittelt werden, damit die KI {anbieter} antworten kann.', [
+            'firma' => $this->getAnbieterFirma(),
+            'anbieter' => $this->getAnbieterName(),
+        ]);
     }
 
     /** Wer fragt: Konto, sonst Anschluss (IPv6 auf das /64-Netz gekürzt – ein Anschluss hat dort viele Adressen) */

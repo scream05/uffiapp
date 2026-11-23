@@ -1709,9 +1709,10 @@ class SetupController extends Controller
         if ($mode === 'setzen') {
             $module->confirmAge();
         } elseif ($mode === 'zuruecksetzen') {
-            $module->settings->user()->delete('age-confirmed');
+            $module->settings->user()->delete('ki-einwilligung');
         }
-        $this->stdout("$username: " . ($module->settings->user()->get('age-confirmed') ?: 'nicht bestätigt') . "\n");
+        $this->stdout("$username: " . ($module->settings->user()->get('ki-einwilligung') ?: 'nicht bestätigt')
+            . ($module->isAgeConfirmed() ? '' : ' (gilt nicht für den aktuellen Anbieter ' . $module->getAnbieterFirma() . ')') . "\n");
         return ExitCode::OK;
     }
 

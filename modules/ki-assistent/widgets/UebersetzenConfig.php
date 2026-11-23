@@ -26,7 +26,10 @@ class UebersetzenConfig extends Widget
                 'laedt' => $t('Wird übersetzt …'),
                 'hinweis' => $t('Maschinell übersetzt (KI), Fehler möglich'),
                 'fehler' => $t('Die Übersetzung hat nicht geklappt. Bitte versuch es später noch einmal.'),
-                'alter' => $t('Die Übersetzung nutzt eine KI (Claude von Anthropic). Sie ist ab 18 Jahren freigegeben. Bist du mindestens 18 Jahre alt?'),
+                'alter' => Yii::t('KiAssistentModule.base', 'Die Übersetzung nutzt die KI {anbieter}. Dafür wird der Text an {firma} übermittelt. Die Funktion ist ab 18 Jahren freigegeben. Bist du mindestens 18 Jahre alt und damit einverstanden?', [
+                    'anbieter' => Yii::$app->getModule('ki-assistent')->getAnbieterName(),
+                    'firma' => Yii::$app->getModule('ki-assistent')->getAnbieterFirma(),
+                ]),
             ], JSON_UNESCAPED_UNICODE),
         ]);
     }

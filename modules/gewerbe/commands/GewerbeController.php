@@ -27,6 +27,36 @@ use yii\console\ExitCode;
  */
 class GewerbeController extends Controller
 {
+    /**
+     * Push für neue Gutscheine (Opt-in seit 23.11.2026): ohne Argument Übersicht, wer ihn bekäme;
+     * mit <benutzer> [an|aus] für ein Konto anzeigen bzw. setzen.
+     */
+    public function actionGutscheinPush($benutzer = '', $wert = '')
+    {
+        if ($benutzer === '') {
+            $an = [];
+            $aktiv = 0;
+            foreach (\humhub\modules\user\models\User::find()->active()->each() as $u) {
+                $aktiv++;
+                if (\humhub\modules\gewerbe\notifications\GutscheinCategory::pushAn($u)) {
+                    $an[] = $u->id;
+                }
+            }
+            $this->stdout('Push für neue Gutscheine an: ' . count($an) . " von $aktiv aktiven Konten (ids " . implode(', ', $an) . ")\n");
+            return ExitCode::OK;
+        }
+        $u = \humhub\modules\user\models\User::findOne(['username' => $benutzer]);
+        if ($u === null) {
+            $this->stderr("Konto $benutzer fehlt\n");
+            return ExitCode::DATAERR;
+        }
+        if ($wert === 'an' || $wert === 'aus') {
+            \humhub\modules\gewerbe\notifications\GutscheinCategory::pushSetzen($u, $wert === 'an');
+        }
+        $this->stdout("$benutzer: " . (\humhub\modules\gewerbe\notifications\GutscheinCategory::pushAn($u) ? 'an' : 'aus') . "\n");
+        return ExitCode::OK;
+    }
+
     /** Felder, die aus OSM übernommen bzw. verglichen werden */
     private const FELDER = ['telefon' => 'Telefon', 'email' => 'E-Mail', 'website' => 'Website', 'zeiten' => 'Öffnungszeiten',
         'oeffnungszeiten' => 'Hinweise zu den Öffnungszeiten', 'adresse' => 'Adresse'];

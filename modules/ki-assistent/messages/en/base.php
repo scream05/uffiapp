@@ -101,4 +101,9 @@ return [
     'Auf der Karte (OpenStreetMap)' => 'On the map (OpenStreetMap)',
     'In Google Maps' => 'In Google Maps',
     'Google Maps ist ein Dienst von Google; erst beim Klick werden Daten an Google übertragen.' => 'Google Maps is a Google service; data is only sent to Google when you click.',
+    'Ich bin einverstanden, dass meine Eingaben samt Gesprächsverlauf an {firma} übermittelt werden, damit die KI {anbieter} antworten kann.' => 'I agree that my input, including the conversation history, will be sent to {firma} so that the AI {anbieter} can answer.',
+    'Bitte gib keine sensiblen persönlichen Daten ein. Die Einwilligung kannst du jederzeit unter dem Chat widerrufen.' => 'Please do not enter sensitive personal data. You can withdraw your consent at any time below the chat.',
+    'Die Übersetzung nutzt die KI {anbieter}. Dafür wird der Text an {firma} übermittelt. Die Funktion ist ab 18 Jahren freigegeben. Bist du mindestens 18 Jahre alt und damit einverstanden?' => 'Translation uses AI {anbieter}. The text is sent to {firma} for this. The feature is only available from age 18. Are you at least 18 years old and do you agree?',
+    'Bitte bestätige zuerst dein Alter und dein Einverständnis.' => 'Please first confirm your age and your consent.',
+    'Einwilligung widerrufen' => 'Withdraw consent',
 ];

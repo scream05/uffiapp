@@ -1,4 +1,58 @@
 {
+    "ki-einwilligung": {
+        "en": {
+            "titel": "Uffi and Übersetzen ask for your consent",
+            "text": "Before you use Uffi or \"Übersetzen\", you now confirm, in addition to your age, that your text is sent to the AI provider. The app asks this once again, even if you had already confirmed it. You can withdraw your consent at any time below the chat.",
+            "quelle": "e975607492b5ef58eecaccb7417cbdbc053df9be"
+        },
+        "uk": {
+            "titel": "Uffi і «Переклад» запитують твою згоду",
+            "text": "Перш ніж користуватися Uffi або «Перекладом», ти тепер підтверджуєш, крім свого віку, також те, що твій текст передається постачальнику ШІ. Застосунок питає це один раз заново, навіть якщо ти вже підтверджував раніше. Під чатом ти можеш будь-коли відкликати свою згоду.",
+            "quelle": "e975607492b5ef58eecaccb7417cbdbc053df9be"
+        },
+        "ar": {
+            "titel": "أوفي وميزة «الترجمة» تطلبان موافقتك",
+            "text": "قبل أن تستخدم أوفي أو ميزة «الترجمة»، ستؤكد الآن إلى جانب عمرك أيضًا أن نصك سيُرسل إلى مزوّد الذكاء الاصطناعي. سيطلب التطبيق هذا التأكيد مرة أخرى، حتى لو كنت قد وافقت من قبل. يمكنك سحب موافقتك في أي وقت من أسفل الدردشة.",
+            "quelle": "e975607492b5ef58eecaccb7417cbdbc053df9be"
+        },
+        "tr": {
+            "titel": "Uffi ve „Übersetzen“ sizden onayınızı istiyor",
+            "text": "Uffi veya „Übersetzen“ özelliğini kullanmadan önce yaşınızın yanı sıra metninizin yapay zekâ sağlayıcısına gönderileceğini de artık onaylıyorsunuz. Uygulama bunu, daha önce onaylamış olsanız bile bir kez daha soruyor. Onayınızı sohbetin altından istediğiniz zaman geri çekebilirsiniz.",
+            "quelle": "e975607492b5ef58eecaccb7417cbdbc053df9be"
+        },
+        "ru": {
+            "titel": "Uffi и «Перевод» спрашивают твоё согласие",
+            "text": "Прежде чем пользоваться Uffi или «Переводом», ты теперь подтверждаешь не только свой возраст, но и то, что твой текст будет передан поставщику ИИ. Приложение спросит об этом один раз заново, даже если ты уже подтверждал раньше. Согласие можно в любой момент отозвать под чатом.",
+            "quelle": "e975607492b5ef58eecaccb7417cbdbc053df9be"
+        }
+    },
+    "gutschein-push-optin": {
+        "en": {
+            "titel": "Push for new vouchers only if you want it",
+            "text": "The app now only informs you about new vouchers with the bell. You will only receive a push notification on your phone once you switch it on on the voucher page. If you had already set up push yourself, your setting stays the same.",
+            "quelle": "bbebbf70353fbb2c306e3ff12d35c242abd6469f"
+        },
+        "uk": {
+            "titel": "Push-повідомлення про нові ваучери лише якщо ти хочеш",
+            "text": "Про нові ваучери застосунок тепер повідомляє лише дзвіночком. Push-повідомлення на телефон ти отримаєш тільки тоді, коли увімкнеш їх на сторінці ваучерів. Якщо ти вже сам налаштував push, твоє налаштування залишається.",
+            "quelle": "bbebbf70353fbb2c306e3ff12d35c242abd6469f"
+        },
+        "ar": {
+            "titel": "إشعارات الكوبونات الجديدة فقط إذا أردت ذلك",
+            "text": "يُعلمك التطبيق الآن بالكوبونات الجديدة من خلال الجرس فقط. لن تتلقى إشعارًا فوريًا على هاتفك إلا بعد أن تفعّله في صفحة الكوبونات. أما من كان قد ضبط الإشعارات بنفسه من قبل، فسيحتفظ بإعداده.",
+            "quelle": "bbebbf70353fbb2c306e3ff12d35c242abd6469f"
+        },
+        "tr": {
+            "titel": "Yeni indirimler için bildirim yalnızca isterseniz",
+            "text": "Yeni indirimlerden artık uygulama sizi yalnızca çan simgesiyle bilgilendiriyor. Telefonunuza bildirim gönderilmesini ise indirim sayfasında açmanızın ardından alırsınız. Bildirimleri daha önce kendiniz ayarlamışsanız, bu ayarınız korunur.",
+            "quelle": "bbebbf70353fbb2c306e3ff12d35c242abd6469f"
+        },
+        "ru": {
+            "titel": "Push-уведомления о новых ваучерах только по твоему желанию",
+            "text": "О новых ваучерах приложение теперь сообщает только колокольчиком. Push-уведомление на телефон ты получишь лишь после того, как включишь его на странице ваучеров. Если ты уже сам настроил push, твоя настройка сохранится.",
+            "quelle": "bbebbf70353fbb2c306e3ff12d35c242abd6469f"
+        }
+    },
     "spielergebnisse-nachtrag": {
         "en": {
             "titel": "Match results arrive faster",

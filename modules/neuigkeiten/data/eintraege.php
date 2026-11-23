@@ -10,6 +10,12 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'ki-einwilligung', 'datum' => '2026-11-23', 'art' => 'besser', 'popup' => false,
+        'titel' => 'Uffi und Übersetzen fragen nach deinem Einverständnis',
+        'text' => 'Bevor du Uffi oder „Übersetzen“ nutzt, bestätigst du jetzt neben deinem Alter auch, dass dein Text an den KI-Anbieter übermittelt wird. Das fragt die App einmal neu, auch wenn du schon bestätigt hattest. Unter dem Chat kannst du dein Einverständnis jederzeit widerrufen.'],
+    ['id' => 'gutschein-push-optin', 'datum' => '2026-11-23', 'art' => 'besser', 'popup' => false,
+        'titel' => 'Push für neue Gutscheine nur, wenn du willst',
+        'text' => 'Über neue Gutscheine informiert dich die App jetzt nur noch mit der Glocke. Eine Push-Nachricht aufs Handy bekommst du erst, wenn du sie auf der Gutscheinseite einschaltest. Wer Push schon selbst eingestellt hatte, behält seine Einstellung.'],
     ['id' => 'spielergebnisse-nachtrag', 'datum' => '2026-11-21', 'art' => 'behoben', 'popup' => false,
         'titel' => 'Spielergebnisse kommen schneller',
         'text' => 'Wurde ein Ergebnis erst spät beim Verband eingetragen, stand es bisher erst am nächsten Morgen in der App. Jetzt schaut die App nach Spielende regelmäßig nach. Das gilt für Fußball, Badminton, Basketball und Volleyball.'],

@@ -70,7 +70,7 @@
                         if (!window.confirm(L.alter)) {
                             return {fehler: ''};
                         }
-                        return post(ageUrl, 'adult=1').then(anfrage);
+                        return post(ageUrl, 'adult=1&einwilligung=1').then(anfrage);
                     }
                     return res;
                 });
