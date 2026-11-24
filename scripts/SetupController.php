@@ -3349,6 +3349,36 @@ class SetupController extends Controller
         return ExitCode::OK;
     }
 
+    /**
+     * Fehlende Vereinslogos nachtragen: setup/vereine-logos /tmp/logos.json [1 = nur anzeigen]
+     * JSON-Array [{id, logo_url, logo_quelle}]. Setzt nur Logos von Vereinen, die noch keins haben; sonst ändert sich nichts.
+     */
+    public function actionVereineLogos($path, $dryRun = 0)
+    {
+        Yii::$app->user->switchIdentity(User::findOne(['username' => 'admin']));
+        $n = 0;
+        foreach (json_decode(file_get_contents($path), true) as $row) {
+            $verein = \humhub\modules\vereine\models\Verein::findOne((int)($row['id'] ?? 0));
+            if ($verein === null || empty($row['logo_url']) || $verein->getLogo() !== null) {
+                $this->stdout('- übersprungen: ' . ($verein->name ?? $row['id'] ?? '?') . "\n");
+                continue;
+            }
+            if ($dryRun) {
+                $this->stdout("= {$verein->name}: {$row['logo_url']}\n");
+                continue;
+            }
+            if ($file = $this->vereinImage($row['logo_url'], 600)) {
+                $verein->fileManager->attach($file);
+                $verein->updateAttributes(['logo_guid' => $file->guid,
+                    'logo_quelle' => mb_substr(trim((string)($row['logo_quelle'] ?? $row['logo_url'])), 0, 500)]);
+                $this->stdout("~ {$verein->name}\n");
+                $n++;
+            }
+        }
+        $this->stdout("$n Logos gesetzt\n");
+        return ExitCode::OK;
+    }
+
     /** Bild laden, SVG/WebP/GIF in PNG umwandeln, auf $max Pixel verkleinern, Metadaten entfernen; als File speichern */
     private function vereinImage($url, $max)
     {
