@@ -3351,7 +3351,7 @@ class SetupController extends Controller
 
     /**
      * Fehlende Vereinslogos nachtragen: setup/vereine-logos /tmp/logos.json [1 = nur anzeigen]
-     * JSON-Array [{id, logo_url, logo_quelle}]. Setzt nur Logos von Vereinen, die noch keins haben; sonst ändert sich nichts.
+     * JSON-Array [{id, logo_url, logo_quelle, ausschnitt?: [x, y, w, h]}]. Setzt nur Logos von Vereinen, die noch keins haben; sonst ändert sich nichts.
      */
     public function actionVereineLogos($path, $dryRun = 0)
     {
@@ -3367,7 +3367,7 @@ class SetupController extends Controller
                 $this->stdout("= {$verein->name}: {$row['logo_url']}\n");
                 continue;
             }
-            if ($file = $this->vereinImage($row['logo_url'], 600)) {
+            if ($file = $this->vereinImage($row['logo_url'], 600, $row['ausschnitt'] ?? null)) {
                 $verein->fileManager->attach($file);
                 $verein->updateAttributes(['logo_guid' => $file->guid,
                     'logo_quelle' => mb_substr(trim((string)($row['logo_quelle'] ?? $row['logo_url'])), 0, 500)]);
@@ -3380,7 +3380,7 @@ class SetupController extends Controller
     }
 
     /** Bild laden, SVG/WebP/GIF in PNG umwandeln, auf $max Pixel verkleinern, Metadaten entfernen; als File speichern */
-    private function vereinImage($url, $max)
+    private function vereinImage($url, $max, ?array $ausschnitt = null)
     {
         try {
             // Wikimedia-Originale sind oft über 15 MB: verkleinerte Fassung laden
@@ -3408,6 +3408,10 @@ class SetupController extends Controller
             }
             $im->readImageBlob($data);
             $im = $im->coalesceImages()->getImage(); // erstes Bild bei GIF
+            if ($ausschnitt !== null) { // [x, y, Breite, Höhe], z. B. Signet aus einem Banner
+                $im->cropImage(...array_map('intval', $ausschnitt));
+                $im->setImagePage(0, 0, 0, 0);
+            }
             if ($im->getImageWidth() < 48 || $im->getImageHeight() < 48) {
                 throw new \RuntimeException('zu klein');
             }
