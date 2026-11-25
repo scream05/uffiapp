@@ -452,11 +452,13 @@ class Wissen
                 $index[$rel] = "- {$chunks[$i]['titel']}: {$chunks[$i]['quelle']}";
             }
         }
-        return "## Informationen von der Website der Stadt Uffenheim (www.uffenheim.de) und aus dem Vereinsverzeichnis der Community\n"
+        return "## Informationen aus dem Stadtwissen\n"
+            . "Quellen: Website der Stadt Uffenheim (www.uffenheim.de), Landratsamt, Mitteilungsblatt sowie Verzeichnisse, Wikis und Beiträge "
+            . "der Community – welche Quelle, steht bei jeder Seite. Beiträge von Mitgliedern nicht als Angabe der Stadt ausgeben. "
             . "Bei Antworten daraus immer die Quelle der jeweiligen Seite verlinken. "
             . "Von längeren Seiten sind nur die zur Frage passenden Abschnitte enthalten ([…] = ausgelassen).\n\n"
             . implode("\n\n", $out)
-            . ($index ? "\n\n### Weitere möglicherweise passende Seiten der Stadt (Inhalt hier nicht geladen, bei Bedarf darauf verweisen)\n" . implode("\n", $index) : '');
+            . ($index ? "\n\n### Weitere möglicherweise passende Seiten (Inhalt hier nicht geladen, bei Bedarf darauf verweisen)\n" . implode("\n", $index) : '');
     }
 
     /** Eine Seite mit den gewählten Abschnitten; Lücken als […] */
