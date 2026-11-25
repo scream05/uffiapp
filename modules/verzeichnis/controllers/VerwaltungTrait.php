@@ -175,8 +175,13 @@ trait VerwaltungTrait
         $ok = [];
         foreach (array_filter($guids, 'is_string') as $guid) {
             $file = File::findOne(['guid' => $guid, 'created_by' => Yii::$app->user->id]);
-            $pfad = $file?->store->get();
-            $mime = $pfad && is_file($pfad) ? (new \finfo(FILEINFO_MIME_TYPE))->file($pfad) : null;
+            // store->get() ist seit 1.19 kein Dateipfad, sondern ein Pfad in der Flysystem-Ablage → Inhalt lesen
+            try {
+                $inhalt = $file?->store->getContent();
+            } catch (\Throwable $e) {
+                $inhalt = null;
+            }
+            $mime = is_string($inhalt) && $inhalt !== '' ? (new \finfo(FILEINFO_MIME_TYPE))->buffer($inhalt) : null;
             if (in_array($mime, ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], true)
                 && str_starts_with((string)$file->mime_type, 'image/') && $file->mime_type !== 'image/svg+xml') {
                 $ok[] = $guid;
