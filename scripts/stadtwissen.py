@@ -1209,6 +1209,72 @@ MB_SQL = "SELECT JSON_OBJECT('id', id, 'jahr', jahr, 'nr', nr, 'nr_bis', nr_bis,
 MB_ARCHIV_AB = 2017
 
 
+# Stand des Personenfilters: erhöhen, wenn er sich ändert, damit das Archiv neu aufgebaut wird
+PERSONEN_FILTER = 2
+PERSONEN_HINWEIS = '[Persönliche Angaben (Geburtstage, Jubiläen, Geburten, Eheschließungen, Sterbefälle) für Uffi entfernt]'
+# Zeilen, die eine Personenangabe einleiten oder enthalten
+_MB_PERSON = re.compile(
+    r'\bzu[mr]\s+\d{1,3}\.\s*(Geburtstag|Hochzeitstag|Ehejubiläum|Hochzeit)'  # 28.04. zum 70. Geburtstag, 08.02. zum 60. Hochzeitstag
+    r'|^\s*(am\s+)?\d{1,2}\.\s?\d{1,2}\.(\d{2,4})?\s*(zu[mr]\s+)?(goldenen|diamantenen|eisernen|Gnaden|Kronjuwelen|steinernen)[- ]?hochzeit'
+    r'|\bgeb\.\s?(am\s+)?\d{1,2}\.\s?\d{1,2}\.\s?\d{2,4}'  # Geburten: Name, geb. 19.12.2016 / geb. am 17.01.2026
+    r'|\bEheschließung\s+am\s+\d'
+    r'|\bverstorben\s+am\s+\d'  # auch „Name, verstorben am …“ in einer Zeile
+    r'|^\s*(Trauung|Taufe)\s+(von\s+)?[A-ZÄÖÜ][a-zäöüß]'  # Gottesdienstpläne: Taufe von …, Trauung … und …
+    r'|\b(Sohn|Tochter)\s+von\s+[A-ZÄÖÜ]', re.I)
+_MB_ADRESSE = re.compile(r'^\s*(97215\s|Uffenheim(\s+OT\b|,))|^\s*und\s+\S+.*\bgeb\.\s', re.I)
+_MB_ALTER = re.compile(r'^\s*\d{1,3}\s+Jahre\s*$')
+
+
+def personen_entfernen(text: str) -> str:
+    """Personenangaben aus dem Text des Mitteilungsblatts entfernen (Geburtstags-/Jubiläumslisten, Geburten,
+    Eheschließungen, Sterbefälle mit Namen und Anschrift), damit Uffi nicht gezielt nach Personen gefragt werden kann.
+    Kurze Absätze mit solchen Angaben fallen ganz weg, in langen (Spalten vermischt) nur die betroffenen Zeilen und
+    ihre Nachbarn mit Namen/Anschrift. Der übrige Text (Termine, Berichte, Bekanntmachungen) bleibt."""
+    absaetze = re.split(r'\n\s*\n', text)
+    out, vorher_weg = [], False
+    for a in absaetze:
+        zeilen = a.split('\n')
+        treffer = [bool(_MB_PERSON.search(z)) for z in zeilen]
+        if vorher_weg and len(zeilen) == 1 and _MB_ALTER.search(zeilen[0]):  # „96 Jahre“ unter einem Sterbefall
+            continue
+        if not any(treffer):
+            out.append(a)
+            vorher_weg = False
+            continue
+        if len(zeilen) <= 12 and all(len(z) < 100 for z in zeilen):
+            weg = [True] * len(zeilen)
+        else:
+            weg = list(treffer)
+            for i, t in enumerate(treffer):
+                if not t:
+                    continue
+                if zeilen[i].rstrip().endswith(' und') and i + 1 < len(zeilen):  # „Trauung A und“ / „B“
+                    weg[i + 1] = True
+                # Nachbarn: kurze Zeilen mit Name bzw. Anschrift (davor beim Sterbefall, danach bei Feiern/Geburten)
+                for j in list(range(i - 1, max(-1, i - 4), -1)) + list(range(i + 1, min(len(zeilen), i + 4))):
+                    if j < 0 or j >= len(zeilen) or treffer[j]:
+                        continue
+                    z = zeilen[j]
+                    if _MB_ADRESSE.search(z) or (len(z) < 60 and ',' in z and not z.rstrip().endswith(('.', ':', '!', '?'))):
+                        weg[j] = True
+        neu, im_block = [], False
+        for z, w in zip(zeilen, weg):
+            if w:
+                if not im_block:
+                    neu.append(PERSONEN_HINWEIS)
+                im_block = True
+            else:
+                neu.append(z)
+                im_block = False
+        teil = '\n'.join(neu)
+        if out and out[-1] == PERSONEN_HINWEIS and teil == PERSONEN_HINWEIS:
+            pass
+        else:
+            out.append(teil)
+        vorher_weg = True
+    return '\n\n'.join(out)
+
+
 def mb_seiten(a, vorspann):
     """Seiten einer Ausgabe als [(rel, titel, url, text)]; Text per pdftotext aus der Ablage. {datum} im Vorspann = Erscheinungstag."""
     pdf = os.path.join(MB_DIR, f"{a['jahr']:04d}-{a['nr']:02d}.pdf")
@@ -1224,6 +1290,7 @@ def mb_seiten(a, vorspann):
         text = re.sub(r'(\w)-\n(?=[a-zäöüß])', r'\1', text.replace('\f', ''))  # Silbentrennung am Zeilenende
         text = re.sub(r'[ \t]+', ' ', text)
         text = re.sub(r'\n{3,}', '\n\n', text).strip()
+        text = personen_entfernen(text)
         if len(text) < 150:  # nur Anzeigen/Bilder
             continue
         found.append((f"community/mitteilungsblatt/{a['jahr']:04d}-{a['nr']:02d}/seite-{seite:02d}.md",
@@ -1245,7 +1312,7 @@ def update_archiv(nur_text=False):
     stand = [[a['id'], a['seiten']] for a in ausgaben]
     alt = json.load(open(ARCHIV_FILE)) if os.path.exists(ARCHIV_FILE) else {}
     fehlt = sum(1 for c in alt.get('abschnitte', []) if not c.get('vec'))
-    if alt.get('ausgaben') == stand and (fehlt == 0 or model is None):
+    if alt.get('ausgaben') == stand and alt.get('filter') == PERSONEN_FILTER and (fehlt == 0 or model is None):
         return len(alt['abschnitte']), 0
     # Zwischenstand eines abgebrochenen Laufs mitnutzen (das erste Berechnen dauert Stunden)
     teil = ARCHIV_FILE + '.teil'
@@ -1271,11 +1338,11 @@ def update_archiv(nur_text=False):
     def speichern():
         tmp = ARCHIV_FILE + '.tmp'
         with open(tmp, 'w') as f:
-            json.dump({'modell': model or alt.get('modell'), 'ausgaben': stand, 'abschnitte': entries}, f, ensure_ascii=False,
+            json.dump({'modell': model or alt.get('modell'), 'ausgaben': stand, 'filter': PERSONEN_FILTER, 'abschnitte': entries}, f, ensure_ascii=False,
                       separators=(',', ':'))
         os.replace(tmp, ARCHIV_FILE)
 
-    if not os.path.exists(ARCHIV_FILE) or alt.get('ausgaben') != stand:
+    if not os.path.exists(ARCHIV_FILE) or alt.get('ausgaben') != stand or alt.get('filter') != PERSONEN_FILTER:
         speichern()  # gleich mit Text (Stichwortsuche), Vektoren folgen
     for i in range(0, len(todo), 4):
         batch = todo[i:i + 4]
