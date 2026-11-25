@@ -5,13 +5,16 @@
 cd "$(dirname "$0")/.." || exit 1
 ZIEL=8.4.27
 MERKER=rss/php-check.gemeldet
-docker pull -q humhub/humhub:1.18 >/dev/null || { echo "$(date '+%F %T') pull fehlgeschlagen"; exit 1; }
-NEU=$(docker run --rm --entrypoint php humhub/humhub:1.18 -r 'echo PHP_VERSION;')
+# Image-Zweig wie im Betrieb (HUMHUB_VERSION aus .env, Standard wie in compose.yml)
+IMAGE=humhub/humhub:$(sed -n 's/^HUMHUB_VERSION=//p' .env | tail -1)
+[ "$IMAGE" = humhub/humhub: ] && IMAGE=humhub/humhub:1.19
+docker pull -q "$IMAGE" >/dev/null || { echo "$(date '+%F %T') pull fehlgeschlagen"; exit 1; }
+NEU=$(docker run --rm --entrypoint php "$IMAGE" -r 'echo PHP_VERSION;')
 LAEUFT=$(docker compose exec -T humhub php -r 'echo PHP_VERSION;')
 echo "$(date '+%F %T') Image: PHP $NEU, läuft: PHP $LAEUFT"
 if [ "$(printf '%s\n' "$ZIEL" "$NEU" | sort -V | head -1)" = "$ZIEL" ] && [ "$LAEUFT" != "$NEU" ] && [ ! -f "$MERKER" ]; then
   scripts/run-setup.sh admin-hinweis "Rund um Uffni: PHP $NEU verfügbar" \
-"Das Image humhub/humhub:1.18 enthält jetzt PHP $NEU (läuft: $LAEUFT) – die Lücken CVE-2026-109618/109619 sind damit behoben.
+"Das Image $IMAGE enthält jetzt PHP $NEU (läuft: $LAEUFT) – die Lücken CVE-2026-109618/109619 sind damit behoben.
 
 Umstellen (README „PHP-Sicherheit“):
   cd ~/humhub-setup && docker compose up -d humhub
