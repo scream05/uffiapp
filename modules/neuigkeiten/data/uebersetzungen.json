@@ -1,4 +1,31 @@
 {
+    "uffi-mitteilungsblatt-personen": {
+        "en": {
+            "titel": "Uffi no longer mentions birthdays and obituaries",
+            "text": "Uffi now works with the Mitteilungsblatt without birthday lists, anniversaries, births, weddings and deaths. This way, nobody can use Uffi to ask about specific people. These details still appear in the Mitteilungsblatt itself.",
+            "quelle": "531ed19a568d6b71969a87350a1333f86d456a00"
+        },
+        "uk": {
+            "titel": "Uffi nennt keine Geburtstage und Trauerfälle mehr",
+            "text": "Uffi kennt das Mitteilungsblatt jetzt ohne Geburtstagslisten, Jubiläen, Geburten, Hochzeiten und Sterbefälle. So kann niemand Uffi gezielt nach Personen ausfragen. Im Mitteilungsblatt selbst stehen diese Angaben weiterhin.",
+            "quelle": "531ed19a568d6b71969a87350a1333f86d456a00"
+        },
+        "ar": {
+            "titel": "أوفي لم يعد يذكر أعياد الميلاد والوفيات",
+            "text": "تعرف أوفي الآن الجريدة البلدية بدون قوائم أعياد الميلاد والذكريات السنوية والمواليد والأعراس وحالات الوفاة. وبذلك لا يستطيع أحد أن يسأل أوفي عن أشخاص بعينهم. أما المعلومات فما زالت موجودة في الجريدة البلدية نفسها.",
+            "quelle": "531ed19a568d6b71969a87350a1333f86d456a00"
+        },
+        "tr": {
+            "titel": "Uffi artık doğum günü ve vefat haberlerini vermiyor",
+            "text": "Uffi artık Mitteilungsblatt'ı doğum günü listeleri, yıldönümleri, doğumlar, düğünler ve vefat haberleri olmadan biliyor. Böylece hiç kimse Uffi'ye belirli kişiler hakkında soru sorarak bilgi çekemez. Bu bilgiler Mitteilungsblatt'ın kendisinde yine yer alıyor.",
+            "quelle": "531ed19a568d6b71969a87350a1333f86d456a00"
+        },
+        "ru": {
+            "titel": "Uffi больше не называет дни рождения и траурные случаи",
+            "text": "Uffi теперь знает Mitteilungsblatt без списков дней рождения, юбилеев, рождений, свадеб и случаев смерти. Так никто не сможет целенаправленно расспрашивать Uffi о конкретных людях. В самом Mitteilungsblatt эти сведения по-прежнему есть.",
+            "quelle": "531ed19a568d6b71969a87350a1333f86d456a00"
+        }
+    },
     "verwalter-entfernt-hinweis": {
         "en": {
             "titel": "Notice when you are removed as an administrator",

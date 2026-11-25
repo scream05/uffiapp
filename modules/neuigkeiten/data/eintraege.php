@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'uffi-mitteilungsblatt-personen', 'datum' => '2026-11-25', 'art' => 'besser', 'popup' => false,
+        'titel' => 'Uffi nennt keine Geburtstage und Trauerfälle mehr',
+        'text' => 'Uffi kennt das Mitteilungsblatt jetzt ohne Geburtstagslisten, Jubiläen, Geburten, Hochzeiten und Sterbefälle. So kann niemand Uffi gezielt nach Personen ausfragen. Im Mitteilungsblatt selbst stehen diese Angaben weiterhin.'],
     ['id' => 'verwalter-entfernt-hinweis', 'datum' => '2026-11-25', 'art' => 'besser', 'popup' => false,
         'titel' => 'Hinweis, wenn du als Verwalter entfernt wirst',
         'text' => 'Verwaltest du einen Verein oder Betrieb und ein anderer Verwalter entfernt dich, bekommst du jetzt eine Benachrichtigung. Bisher hast du davon nichts mitbekommen.'],
