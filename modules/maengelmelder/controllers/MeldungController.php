@@ -45,9 +45,6 @@ class MeldungController extends ContentContainerController
         $data = ['kategorie' => '', 'beschreibung' => '', 'lat' => '', 'lng' => ''];
         $errors = [];
         $kontakt = new MeldeKontakt(['scenario' => $gast ? MeldeKontakt::SCENARIO_GAST : MeldeKontakt::SCENARIO_KONTO]);
-        if (!$gast) {
-            $kontakt->telefon = MeldeKontakt::telefonAusProfil(Yii::$app->user->getIdentity());
-        }
 
         // Vorbelegung per Link (z. B. vom KI-Assistenten); abgeschickt wird erst mit „Meldung absenden“
         if (!Yii::$app->request->isPost) {

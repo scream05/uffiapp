@@ -14,5 +14,7 @@ return [
         ['class' => LayoutAddons::class, 'event' => LayoutAddons::EVENT_BEFORE_RUN, 'callback' => [Events::class, 'onLayoutAddons']],
         // Täglicher HumHub-Cron: Bewertungen nach 180 Tagen löschen
         ['class' => 'humhub\commands\CronController', 'event' => 'daily', 'callback' => [Events::class, 'onCronDaily']],
+        // Stündlich: ausgefüllte Formular-PDFs nach einer Stunde löschen (nicht erst beim nächsten Formular)
+        ['class' => 'humhub\commands\CronController', 'event' => 'hourly', 'callback' => [Events::class, 'onCronHourly']],
     ],
 ];

@@ -84,11 +84,13 @@ services:
       - OPENAI_REASONING=${OPENAI_REASONING:-low}
       # https://eu.api.openai.com/v1 für Verarbeitung in der EU (nur für Projekte mit EU-Datenstandort)
       - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://api.openai.com/v1}
-      # Anfragekörper schon im Webserver begrenzen (passend zu post_max_size, auch ohne Content-Length)
+      # Anfragekörper schon im Webserver begrenzen (passend zu post_max_size, auch ohne Content-Length);
+      # PHP-Version nicht im Header X-Powered-By verraten
       - |
         CADDY_SERVER_EXTRA_DIRECTIVES=request_body {
         	max_size 64MB
         }
+        header -X-Powered-By
     # Obergrenze für den ganzen Container (Webserver, Queue, Cron): Ausreißer beendet nur den Prozess, supervisord startet neu
     mem_limit: 1200m
     memswap_limit: 1200m

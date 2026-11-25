@@ -82,10 +82,18 @@ class Wissen
     {
         $member = null;
         $gast = !\Yii::$app->has('user') || \Yii::$app->user->isGuest;
+        $aktuell = self::inhalteJetzt($chunks);
         // Schlüssel bleiben erhalten (Position im Index), passend zum Stichwort-Index
-        return array_filter($chunks, function ($c) use (&$member, $gast) {
+        return array_filter($chunks, function ($c) use (&$member, $gast, $aktuell) {
             if (empty($c['space'])) {
                 return true;
+            }
+            // Seit dem nächtlichen Abgleich gelöscht oder nicht mehr öffentlich? Dann gilt der Stand jetzt
+            if ($aktuell !== null && preg_match('/perma\?id=(\d+)/', (string)($c['quelle'] ?? ''), $m)) {
+                if (!isset($aktuell[(int)$m[1]])) {
+                    return false;
+                }
+                $c['oeffentlich'] = !empty($c['oeffentlich']) && $aktuell[(int)$m[1]];
             }
             if (!empty($c['oeffentlich'])) {
                 return !$gast || !empty($c['gaeste']);
@@ -99,6 +107,36 @@ class Wissen
             }
             return isset($member[(int)$c['space']]);
         });
+    }
+
+    /**
+     * Community-Inhalte im Index, die es jetzt noch veröffentlicht gibt (wie im Nachtlauf: state = 1): Content-ID → öffentlich sichtbar (bool).
+     * null, wenn die Datenbank nicht erreichbar ist (dann gilt der Stand des Index).
+     */
+    private static function inhalteJetzt(array $chunks): ?array
+    {
+        $ids = [];
+        foreach ($chunks as $c) {
+            if (!empty($c['space']) && preg_match('/perma\?id=(\d+)/', (string)($c['quelle'] ?? ''), $m)) {
+                $ids[(int)$m[1]] = true;
+            }
+        }
+        if ($ids === []) {
+            return [];
+        }
+        try {
+            $rows = \humhub\modules\content\models\Content::find()->select(['id', 'visibility'])
+                ->where(['id' => array_keys($ids), 'state' => \humhub\modules\content\models\Content::STATE_PUBLISHED])
+                ->asArray()->all();
+        } catch (\Throwable $e) {
+            \Yii::warning('Wissen: Community-Inhalte nicht geprüft: ' . $e->getMessage(), 'ki-assistent');
+            return null;
+        }
+        $aktuell = [];
+        foreach ($rows as $r) {
+            $aktuell[(int)$r['id']] = (int)$r['visibility'] === \humhub\modules\content\models\Content::VISIBILITY_PUBLIC;
+        }
+        return $aktuell;
     }
 
     /** @return array[] je Seite ['rel', 'titel', 'quelle', 'immer', 'text'] direkt aus den Markdown-Dateien */

@@ -348,7 +348,12 @@ class Verein extends ActiveRecord implements ViewableInterface
      */
     public function canView($user = null): bool
     {
-        return !Yii::$app->user->isGuest || AuthHelper::isGuestAccessEnabled();
+        if (Yii::$app->user->isGuest && !AuthHelper::isGuestAccessEnabled()) {
+            return false;
+        }
+        // Vorgeschlagene (noch nicht freigegebene) Einträge: Bilder nur für Verwalter und Antragsteller, wie die Seite
+        return $this->status !== self::STATUS_VORGESCHLAGEN || (!Yii::$app->user->isGuest && ($this->canManage()
+                || VereinVerwalter::find()->where(['verein_id' => $this->id, 'user_id' => Yii::$app->user->id])->exists()));
     }
 
     public function getUrl(bool $scheme = false): string

@@ -16,6 +16,7 @@ return [
     'Uffi macht für diesen Monat Pause – das Kontingent ist aufgebraucht. Ab dem 1. geht es weiter.' => 'Uffi is taking a break for this month – the quota has been used up. It will be back from the 1st.',
     'Ohne Konto ist Uffis Kontingent für diesen Monat aufgebraucht. Mit einem kostenlosen Konto geht es weiter.' => 'Uffi\'s quota for users without an account has been used up for this month. With a free account you can keep going.',
     'Du hast schon viele Fragen gestellt. Bitte versuch es später noch einmal.' => 'You\'ve already asked a lot of questions. Please try again later.',
+    'Du hast in diesem Monat schon sehr viele Fragen gestellt. Ab dem 1. geht es weiter.' => 'You\'ve asked a great many questions this month. You can continue from the 1st.',
     'KI-Assistent' => 'AI assistant',
     'KI-Antworten von {anbieter} – unverbindlich. Persönliche Daten nur für Formulare angeben.' => 'AI answers from {anbieter} – not binding. Only enter personal data for forms.',
     'Mehr' => 'More',

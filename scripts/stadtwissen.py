@@ -762,7 +762,9 @@ def write(rel, title, url, body, always=False, extra=None):
     block = blocked()
     if block:
         body = '\n'.join(l for l in body.split('\n') if not any(b in l.lower() for b in block))
-    path = os.path.join(ROOT, rel)
+    path = os.path.realpath(os.path.join(ROOT, rel))
+    if not path.startswith(os.path.realpath(ROOT) + os.sep) or not path.endswith('.md'):
+        raise ValueError(f'Pfad außerhalb von wissen/: {rel!r}')  # Pfade stammen teils aus Links fremder Seiten
     os.makedirs(os.path.dirname(path), exist_ok=True)
     text = (f'---\ntitel: {title}\nquelle: {url}\n' + ('immer: ja\n' if always else '')
             + ''.join(f'{k}: {v}\n' for k, v in (extra or {}).items()) + f'---\n\n# {title}\n\n{body}\n')

@@ -143,7 +143,7 @@ trait VerwaltungTrait
     {
         $request = Yii::$app->request;
         $logo = $eintrag->getLogo();
-        $newLogo = array_values(array_filter((array)$request->post('fileList', [])));
+        $newLogo = $this->nurBilder((array)$request->post('fileList', []));
         if ($logo && ($newLogo !== [] || $request->post('logoEntfernen'))) {
             $this->bildLoeschen($eintrag, $logo);
             $eintrag->updateAttributes(['logo_guid' => null] + $this->logoZusatz());
@@ -159,10 +159,30 @@ trait VerwaltungTrait
             }
         }
         $free = $this->eintragKlasse()::MAX_BILDER - count($eintrag->getGallery());
-        $new = array_slice(array_values(array_filter((array)$request->post('galerieList', []))), 0, max(0, $free));
+        $new = array_slice($this->nurBilder((array)$request->post('galerieList', [])), 0, max(0, $free));
         if ($new !== []) {
             $eintrag->fileManager->attach($new);
         }
+    }
+
+    /**
+     * Nur eigene, noch nicht angehängte Rasterbilder (Inhalt geprüft, nicht nur die Dateiendung); andere Dateien
+     * würden sonst unsichtbar am Eintrag hängen und wären über file/download abrufbar.
+     * @return string[] GUIDs
+     */
+    private function nurBilder(array $guids): array
+    {
+        $ok = [];
+        foreach (array_filter($guids, 'is_string') as $guid) {
+            $file = File::findOne(['guid' => $guid, 'created_by' => Yii::$app->user->id]);
+            $pfad = $file?->store->get();
+            $mime = $pfad && is_file($pfad) ? (new \finfo(FILEINFO_MIME_TYPE))->file($pfad) : null;
+            if (in_array($mime, ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], true)
+                && str_starts_with((string)$file->mime_type, 'image/') && $file->mime_type !== 'image/svg+xml') {
+                $ok[] = $guid;
+            }
+        }
+        return array_values(array_unique($ok));
     }
 
     /** Bild löschen; Vereine entfernen dabei auch den Bildnachweis */

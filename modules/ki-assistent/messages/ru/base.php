@@ -16,6 +16,7 @@ return [
     'Uffi macht für diesen Monat Pause – das Kontingent ist aufgebraucht. Ab dem 1. geht es weiter.' => 'Uffi берёт паузу до конца месяца – лимит исчерпан. С 1-го числа всё снова заработает.',
     'Ohne Konto ist Uffis Kontingent für diesen Monat aufgebraucht. Mit einem kostenlosen Konto geht es weiter.' => 'Лимит Uffi для пользователей без аккаунта на этот месяц исчерпан. С бесплатным аккаунтом можно продолжить.',
     'Du hast schon viele Fragen gestellt. Bitte versuch es später noch einmal.' => 'Ты уже задал много вопросов. Попробуй ещё раз позже.',
+    'Du hast in diesem Monat schon sehr viele Fragen gestellt. Ab dem 1. geht es weiter.' => 'В этом месяце ты задал очень много вопросов. С 1-го числа можно продолжить.',
     'KI-Assistent' => 'ИИ-ассистент',
     'KI-Antworten von {anbieter} – unverbindlich. Persönliche Daten nur für Formulare angeben.' => 'Ответы ИИ от {anbieter} – без гарантии. Личные данные указывай только для форм.',
     'Mehr' => 'Ещё',

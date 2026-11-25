@@ -122,16 +122,4 @@ class MeldeKontakt extends Model
     {
         return $this->scenario === self::SCENARIO_GAST && $this->website !== '';
     }
-
-    /** Vorbelegung des Telefons aus dem Profil (Handy, sonst privat), falls dort eine Nummer steht */
-    public static function telefonAusProfil(\humhub\modules\user\models\User $user): string
-    {
-        $profile = $user->profile;
-        foreach (['mobile', 'phone_private'] as $feld) {
-            if ($profile->hasAttribute($feld) && trim((string)$profile->$feld) !== '') {
-                return trim((string)$profile->$feld);
-            }
-        }
-        return '';
-    }
 }

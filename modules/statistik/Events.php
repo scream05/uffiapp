@@ -54,8 +54,9 @@ class Events
 (function () {
     try {
         var standalone = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
-        if (!standalone || sessionStorage.getItem('statistikStart')) { return; }
-        sessionStorage.setItem('statistikStart', '1');
+        // Start über das Symbol = Seite ohne Herkunft frisch geladen (ohne Speicherung im Browser, Datenschutz §3)
+        var nav = performance.getEntriesByType ? performance.getEntriesByType('navigation')[0] : null;
+        if (!standalone || document.referrer || (nav && nav.type !== 'navigate')) { return; }
         if (navigator.sendBeacon) { navigator.sendBeacon('$url'); }
         else { fetch('$url', {method: 'POST', keepalive: true, credentials: 'same-origin'}); }
     } catch (e) {}

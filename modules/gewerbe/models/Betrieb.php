@@ -289,7 +289,12 @@ class Betrieb extends ActiveRecord implements ViewableInterface
     /** Wer Logo und Bilder (file/download) sehen darf: wie das Verzeichnis, auch Gäste bei Gastzugang */
     public function canView($user = null): bool
     {
-        return !Yii::$app->user->isGuest || AuthHelper::isGuestAccessEnabled();
+        if (Yii::$app->user->isGuest && !AuthHelper::isGuestAccessEnabled()) {
+            return false;
+        }
+        // Vorgeschlagene (noch nicht freigegebene) Einträge: Bilder nur für Verwalter und Antragsteller, wie die Seite
+        return $this->status !== self::STATUS_VORGESCHLAGEN || (!Yii::$app->user->isGuest && ($this->canManage()
+                || BetriebVerwalter::find()->where(['betrieb_id' => $this->id, 'user_id' => Yii::$app->user->id])->exists()));
     }
 
     public function getUrl(bool $scheme = false): string

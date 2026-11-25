@@ -174,29 +174,46 @@ class Logo
         }
     }
 
-    /** Öffentliche Adresse? (keine Abrufe ins eigene Netz über manipulierte Websites) */
-    private static function oeffentlich(string $url): bool
+    /**
+     * IP-Adressen des Hosts, nur wenn alle öffentlich sind (keine Abrufe ins eigene Netz über manipulierte Websites).
+     * IPv4 und IPv6; der Abruf wird danach auf genau diese Adressen festgelegt (kein DNS-Rebinding).
+     */
+    private static function oeffentlich(string $url): array
     {
         $host = parse_url($url, PHP_URL_HOST);
-        if (!is_string($host) || !preg_match('#^https?://#i', $url)) {
-            return false;
+        if (!is_string($host) || $host === '' || !preg_match('#^https?://#i', $url)) {
+            return [];
         }
-        $ips = gethostbynamel($host) ?: [];
-        foreach ($ips as $ip) {
-            if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
-                return false;
+        $host = trim($host, '[]');
+        if (filter_var($host, FILTER_VALIDATE_IP)) {
+            $ips = [$host];
+        } else {
+            $ips = gethostbynamel($host) ?: [];
+            foreach (@dns_get_record($host, DNS_AAAA) ?: [] as $r) {
+                if (!empty($r['ipv6'])) {
+                    $ips[] = $r['ipv6'];
+                }
             }
         }
-        return $ips !== [];
+        foreach ($ips as $ip) {
+            if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)
+                || preg_match('/^(::ffff:|64:ff9b:|fe[89ab]|f[cd])/i', $ip)) {
+                return [];
+            }
+        }
+        return array_values(array_unique($ips));
     }
 
     /** GET mit Größenbegrenzung; folgt Weiterleitungen nur zu öffentlichen Adressen */
     public static function laden(string $url, int $max, ?string &$endUrl = null, ?int &$status = null): ?string
     {
         for ($i = 0; $i < 5; $i++) {
-            if (!self::oeffentlich($url)) {
+            $ips = self::oeffentlich($url);
+            if ($ips === []) {
                 return null;
             }
+            $p = parse_url($url);
+            $port = $p['port'] ?? (strtolower($p['scheme']) === 'https' ? 443 : 80);
             $ch = curl_init($url);
             $daten = '';
             curl_setopt_array($ch, [
@@ -206,6 +223,7 @@ class Logo
                 CURLOPT_CONNECTTIMEOUT => 8,
                 CURLOPT_USERAGENT => self::UA,
                 CURLOPT_PROTOCOLS => CURLPROTO_HTTP | CURLPROTO_HTTPS,
+                CURLOPT_RESOLVE => [trim($p['host'], '[]') . ':' . $port . ':' . implode(',', array_map(fn($ip) => str_contains($ip, ':') ? "[$ip]" : $ip, $ips))],
                 CURLOPT_WRITEFUNCTION => function ($ch, $chunk) use (&$daten, $max) {
                     $daten .= $chunk;
                     return strlen($daten) > $max ? 0 : strlen($chunk);

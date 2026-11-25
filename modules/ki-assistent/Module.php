@@ -16,10 +16,14 @@ class Module extends \humhub\components\Module
     /** Obergrenze je Konto bzw. (bei Gästen) je Anschluss und Stunde bzw. Tag, gegen Missbrauch der offenen Nutzung */
     public int $hourlyLimit = 20;
     public int $dailyLimit = 60;
+    /** … und je Konto und Monat, damit ein einzelnes Konto nicht das ganze Monatskontingent aufbrauchen kann (Gäste: guestMonthlyLimit) */
+    public int $userMonthlyLimit = 150;
 
     /** Übersetzen auf Klick: neue Übersetzungen je Monat insgesamt und je Konto bzw. Anschluss und Stunde (Treffer aus dem Zwischenspeicher zählen nicht) */
     public int $uebersetzungMonat = 4000;
     public int $uebersetzungStunde = 60;
+    /** Kostenbremse fürs Übersetzen je Monat (Eingabe-Tokens + 5 × Ausgabe-Tokens), unabhängig von der Anzahl */
+    public int $uebersetzungTokenLimit = 6000000;
 
     /** Bewertungen 👍/👎 je Konto bzw. Anschluss und Stunde */
     public int $feedbackHourlyLimit = 10;
@@ -287,13 +291,41 @@ class Module extends \humhub\components\Module
             if ((int)$cache->get($stunde) >= $this->hourlyLimit || (int)$cache->get($tag) >= $this->dailyLimit) {
                 return \Yii::t('KiAssistentModule.base', 'Du hast schon viele Fragen gestellt. Bitte versuch es später noch einmal.');
             }
+            $konten = $gast ? null : $this->kontenMonat();
+            if ($konten !== null && ($konten[\Yii::$app->user->id] ?? 0) >= $this->userMonthlyLimit) {
+                return \Yii::t('KiAssistentModule.base', 'Du hast in diesem Monat schon sehr viele Fragen gestellt. Ab dem 1. geht es weiter.');
+            }
             $cache->set($stunde, (int)$cache->get($stunde) + 1, 3600);
             $cache->set($tag, (int)$cache->get($tag) + 1, 86400);
+            if ($konten !== null) {
+                $konten[\Yii::$app->user->id] = ($konten[\Yii::$app->user->id] ?? 0) + 1;
+                $this->kontenMonat($konten);
+            }
             $this->saveUsage([$requests + 1, $in, $out, $guests + ($gast ? 1 : 0)]);
             return null;
         } finally {
             $mutex->release('ki-assistent-limit');
         }
+    }
+
+    /**
+     * Anfragen je Konto im laufenden Monat (Konto-ID → Anzahl), als Datei in @runtime: übersteht das stündliche
+     * cache/flush-all, Vormonate werden gelöscht. Mit $neu speichern (nur unter der Sperre aus reserve()).
+     */
+    private function kontenMonat(?array $neu = null): array
+    {
+        $dir = \Yii::getAlias('@runtime/ki-assistent');
+        $datei = $dir . '/konten-' . date('Y-m') . '.json';
+        if ($neu !== null) {
+            if (!is_file($datei)) {
+                @mkdir($dir, 0700, true);
+                array_map('unlink', glob($dir . '/konten-*.json') ?: []); // Vormonat
+            }
+            file_put_contents($datei, json_encode($neu), LOCK_EX);
+            return $neu;
+        }
+        $daten = is_file($datei) ? json_decode((string)file_get_contents($datei), true) : [];
+        return is_array($daten) ? array_map('intval', $daten) : [];
     }
 
     /** Prüft die Grenzen für eine neue Übersetzung und zählt sie; null oder Grund der Ablehnung (in der Sprache des Nutzers) */
@@ -307,7 +339,10 @@ class Module extends \humhub\components\Module
             $key = 'uebersetzung-' . date('Y-m');
             $usage = json_decode((string)$this->settings->get($key), true);
             [$anzahl, $in, $out] = array_values(array_map('intval', is_array($usage) ? $usage + [0, 0, 0] : [0, 0, 0]));
-            if ($anzahl >= $this->uebersetzungMonat) {
+            if ($anzahl >= $this->uebersetzungMonat || $in + 5 * $out >= $this->uebersetzungTokenLimit) {
+                if (\Yii::$app->cache->add('ki-ue-pause-gemeldet-' . date('Y-m'), 1, 32 * 86400)) {
+                    \Yii::warning("KI-Übersetzen: Monatsgrenze erreicht ($anzahl Übersetzungen, $in Eingabe- / $out Ausgabe-Tokens)", 'ki-assistent');
+                }
                 return \Yii::t('KiAssistentModule.base', 'Das Übersetzungs-Kontingent für diesen Monat ist aufgebraucht. Ab dem 1. geht es weiter.');
             }
             if ($hintergrund) {

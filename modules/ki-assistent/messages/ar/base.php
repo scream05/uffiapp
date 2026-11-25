@@ -16,6 +16,7 @@ return [
     'Uffi macht für diesen Monat Pause – das Kontingent ist aufgebraucht. Ab dem 1. geht es weiter.' => 'Uffi في استراحة لهذا الشهر – نفدت الحصة. سيعود في اليوم الأول من الشهر القادم.',
     'Ohne Konto ist Uffis Kontingent für diesen Monat aufgebraucht. Mit einem kostenlosen Konto geht es weiter.' => 'نفدت حصة Uffi لهذا الشهر للمستخدمين بدون حساب. يمكنك المتابعة بحساب مجاني.',
     'Du hast schon viele Fragen gestellt. Bitte versuch es später noch einmal.' => 'لقد طرحت أسئلة كثيرة بالفعل. حاول مرة أخرى لاحقًا.',
+    'Du hast in diesem Monat schon sehr viele Fragen gestellt. Ab dem 1. geht es weiter.' => 'لقد طرحت أسئلة كثيرة جدًا هذا الشهر. يمكنك المتابعة ابتداءً من اليوم الأول من الشهر القادم.',
     'KI-Assistent' => 'المساعد الذكي',
     'KI-Antworten von {anbieter} – unverbindlich. Persönliche Daten nur für Formulare angeben.' => 'إجابات ذكاء اصطناعي من {anbieter} – غير ملزمة. أدخل بياناتك الشخصية فقط عند تعبئة النماذج.',
     'Mehr' => 'المزيد',

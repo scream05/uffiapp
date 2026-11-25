@@ -16,6 +16,7 @@ return [
     'Uffi macht für diesen Monat Pause – das Kontingent ist aufgebraucht. Ab dem 1. geht es weiter.' => 'Uffi bu ay mola veriyor – kota doldu. Ayın 1\'inden itibaren devam ediyor.',
     'Ohne Konto ist Uffis Kontingent für diesen Monat aufgebraucht. Mit einem kostenlosen Konto geht es weiter.' => 'Hesabı olmayanlar için Uffi\'nin bu ayki kotası doldu. Ücretsiz bir hesapla devam edebilirsin.',
     'Du hast schon viele Fragen gestellt. Bitte versuch es später noch einmal.' => 'Zaten çok soru sordun. Lütfen daha sonra tekrar dene.',
+    'Du hast in diesem Monat schon sehr viele Fragen gestellt. Ab dem 1. geht es weiter.' => 'Bu ay çok fazla soru sordun. Ayın 1\'inden itibaren devam edebilirsin.',
     'KI-Assistent' => 'Yapay zekâ asistanı',
     'KI-Antworten von {anbieter} – unverbindlich. Persönliche Daten nur für Formulare angeben.' => '{anbieter} yapay zekâ yanıtları – bağlayıcı değildir. Kişisel bilgilerini yalnızca formlar için gir.',
     'Mehr' => 'Daha fazla',

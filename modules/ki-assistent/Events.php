@@ -19,6 +19,16 @@ class Events
         }
     }
 
+    /** Stündlich: ausgefüllte Formular-PDFs löschen, die älter als Formulare::TTL sind (Datenschutzerklärung Abschnitt 10) */
+    public static function onCronHourly($event)
+    {
+        try {
+            components\Formulare::cleanup();
+        } catch (\Throwable $e) {
+            Yii::error($e, 'ki-assistent');
+        }
+    }
+
     public static function onTopMenuInit($event)
     {
         try {
