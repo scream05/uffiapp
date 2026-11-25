@@ -70,8 +70,8 @@ services:
       - HUMHUB_CONFIG__COMPONENTS__DB__USERNAME=${DB_USER}
       - HUMHUB_CONFIG__COMPONENTS__DB__PASSWORD=${DB_PASSWORD}
       - HUMHUB_DOCKER__MERCURE_ENABLE=true
-      # TLS terminiert der Nginx Proxy Manager im LAN: dessen X-Forwarded-* Headern vertrauen
-      - 'HUMHUB_WEB_CONFIG__COMPONENTS__REQUEST__TRUSTED_HOSTS=["192.168.178.0/24"]'
+      # TLS terminiert der Nginx Proxy Manager (feste IP, siehe nächste Zeile): nur dessen X-Forwarded-* Headern vertrauen
+      - 'HUMHUB_WEB_CONFIG__COMPONENTS__REQUEST__TRUSTED_HOSTS=["192.168.178.36/32"]'
       - HUMHUB_WEB_CONFIG__COMPONENTS__REQUEST__SECURE_PORT=443
       # KI-Anbieter für Uffi, Übersetzen, WhatsApp-Auslesen, Stadtrat, Mitteilungsblatt: openai oder claude (in .env umschalten)
       - KI_ANBIETER=${KI_ANBIETER:-claude}
