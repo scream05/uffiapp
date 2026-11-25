@@ -9,6 +9,8 @@
  * saisons        optional: [[von, bis], …] (Y-m-d, null = offen) oder Funktion(Jahr) => [von, bis]; außerhalb geschlossen
  * feiertagZu     true = an gesetzlichen Feiertagen in Bayern geschlossen (bei false wissen wir es nicht)
  * zuAn           optional: jedes Jahr zusätzlich geschlossen, ['MM-TT' => Name]
+ * ausnahmen      optional: einzelne Tage abweichend, ['JJJJ-MM-TT' => [[von, bis], …]] ([] = geschlossen); Hinweis auf den
+ *                Öffnungszeiten-Seiten ab 90 Tage, im Startseiten-Kasten ab 7 Tage vorher; danach wirkungslos (kann stehen bleiben)
  * pruefen        nächtlicher Abgleich mit der Quelle (oeffnungszeiten/pruefen): Datei in wissen/ (stadtwissen.py),
  *                optional Abschnitt von „ab“ bis vor „bis“ (Regex); verglichen werden nur Zeilen mit Zeiten/Tagen/Saison
  *                (oder, falls angegeben, Zeilen passend zu „nur“)
@@ -80,6 +82,7 @@ return [
         ],
         'feiertagZu' => true,
         'zuAn' => ['12-24' => 'Heiligabend', '12-31' => 'Silvester'], // laut Nutzer 24.10.2026
+        'ausnahmen' => ['2026-12-10' => [['13:30', '17:00']]], // kreis-nea.de: „am Donnerstag, 10.12.2026 erst um 13:30 Uhr“
         'hinweis' => 'Gartenabfälle, Reisig und Baumschnitt. Kleine Mengen Grüngut auch an den Containern am Geckenheimer Steig.',
         'quelle' => 'https://www.kreis-nea.de/service-themen/abfall-natur-umwelt/abfallentsorgung/annahmestellen-oeffnungszeiten/wertstoffhoefe.html',
         'pruefen' => ['datei' => 'landkreis/lebenslagen/abfallwirtschaft/annahmestellen-und-oeffnungszeiten/kompostplaetze.md', 'ab' => '/^Kompostplatz Uffenheim$/', 'bis' => '/^(Wertstoffhof|Kompostplatz) |^#{1,2} /'],

@@ -82,10 +82,17 @@ class Zeiten
         return $ort['zeiten'][$wt] ?? [];
     }
 
+    /** Ab so vielen Tagen vorher kündigt der Kasten auf der Startseite eine Ausnahme an (die Seiten mit allen Zeiten: VORLAUF_SEITE) */
+    public const AUSNAHME_VORLAUF = 7;
+    public const VORLAUF_SEITE = 90;
+
     /** Tatsächliche Zeiten an einem Tag als [[von-ts, bis-ts], …] */
     public static function anTag(array $ort, int $ts): array
     {
         $datum = date('Y-m-d', $ts);
+        if (isset($ort['ausnahmen'][$datum])) {
+            return array_map(fn($z) => [strtotime("$datum {$z[0]}"), strtotime("$datum {$z[1]}")], $ort['ausnahmen'][$datum]);
+        }
         if (!self::inSaison($ort, $datum) || (!empty($ort['feiertagZu']) && self::feiertag($datum) !== null)
             || isset($ort['zuAn'][substr($datum, 5)])) {
             return [];
@@ -152,6 +159,33 @@ class Zeiten
                 self::zeitText($zeiten), $sonderHeute && $tag === $wt];
         }
         return $zeilen;
+    }
+
+    /**
+     * Anstehende Ausnahmen (heute bis $vorlauf Tage, Standard AUSNAHME_VORLAUF) als übersetzte Sätze,
+     * z. B. „Do., 10.12.: abweichend 13:30–17:00 Uhr“ bzw. „… geschlossen“
+     * @return string[]
+     */
+    public static function ausnahmeTexte(array $ort, ?int $jetzt = null, int $vorlauf = self::AUSNAHME_VORLAUF): array
+    {
+        $jetzt ??= time();
+        $heute = date('Y-m-d', $jetzt);
+        $grenze = date('Y-m-d', strtotime("+$vorlauf days", $jetzt));
+        $texte = [];
+        $ausnahmen = $ort['ausnahmen'] ?? [];
+        ksort($ausnahmen);
+        foreach ($ausnahmen as $datum => $zeiten) {
+            if ($datum < $heute || $datum > $grenze) {
+                continue;
+            }
+            $ts = strtotime("$datum 12:00");
+            $tag = $datum === $heute ? Yii::t('OeffnungszeitenModule.base', 'Heute')
+                : Yii::t('OeffnungszeitenModule.base', self::KURZ[(int)date('N', $ts)]) . ' ' . date('j.n.', $ts);
+            $texte[] = $zeiten === []
+                ? Yii::t('OeffnungszeitenModule.base', '{tag}: ausnahmsweise geschlossen', ['tag' => $tag])
+                : Yii::t('OeffnungszeitenModule.base', '{tag}: ausnahmsweise {zeiten}', ['tag' => $tag, 'zeiten' => self::zeitText($zeiten)]);
+        }
+        return $texte;
     }
 
     public static function zeitText(array $zeiten): string
@@ -249,6 +283,11 @@ class Zeiten
                 }
                 $teile[] = !empty($ort['feiertagZu']) ? 'an Feiertagen geschlossen' : '';
                 $teile[] = !empty($ort['zuAn']) ? 'außerdem geschlossen: ' . implode(', ', $ort['zuAn']) : '';
+                foreach ($ort['ausnahmen'] ?? [] as $datum => $zeiten) {
+                    if ($datum >= date('Y-m-d')) {
+                        $teile[] = 'Ausnahme am ' . date('d.m.Y', strtotime($datum)) . ': ' . ($zeiten === [] ? 'geschlossen' : self::zeitText($zeiten));
+                    }
+                }
                 $lines[] = '- ' . $ort['name'] . (!empty($ort['adresse']) ? " ({$ort['adresse']})" : '')
                     . ': ' . implode('; ', array_filter($teile))
                     . (!empty($ort['telefon']) ? "; Tel. {$ort['telefon']}" : '')

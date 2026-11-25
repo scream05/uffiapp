@@ -1,4 +1,31 @@
 {
+    "oeffnungszeiten-ausnahmen": {
+        "en": {
+            "titel": "Opening hours: deviating days are now shown",
+            "text": "If a facility has different opening hours on a particular day, this is now shown as a note next to the opening hours, and also in the box on the start page one week in advance. For example, the compost site opens on Thursday, 10 December, only at 1:30 pm.",
+            "quelle": "cf46687da148e49ec1343c369d1fcbf0de725424"
+        },
+        "uk": {
+            "titel": "Öffnungszeiten: abweichende Tage werden angezeigt",
+            "text": "Hat eine Einrichtung an einem Tag ausnahmsweise andere Öffnungszeiten, steht das jetzt als Hinweis bei den Öffnungszeiten und eine Woche vorher auch im Kasten auf der Startseite. Zum Beispiel öffnet der Kompostplatz am Donnerstag, 10. Dezember, erst um 13:30 Uhr.",
+            "quelle": "cf46687da148e49ec1343c369d1fcbf0de725424"
+        },
+        "ar": {
+            "titel": "أوقات الدوام: الأيام المختلفة تُعرض الآن",
+            "text": "إذا كانت منشأة ما تعمل في يوم معين بأوقات دوام مختلفة استثنائياً، فسيظهر ذلك الآن كملاحظة عند أوقات الدوام، وقبل أسبوع أيضاً في المربع الموجود في الصفحة الرئيسية. على سبيل المثال، تفتح ساحة الcompost (ساحة السماد العضوي) يوم الخميس 10 ديسمبر لاحقاً، أي في الساعة 13:30 فقط.",
+            "quelle": "cf46687da148e49ec1343c369d1fcbf0de725424"
+        },
+        "tr": {
+            "titel": "Çalışma saatleri: farklı günler artık gösteriliyor",
+            "text": "Bir tesis belirli bir günde istisnai olarak farklı çalışma saatlerine sahipse, bu artık çalışma saatlerinin yanında bir not olarak gösteriliyor ve bir hafta önceden ana sayfadaki kutuda da yer alıyor. Örneğin Kompostplatz, 10 Aralık Perşembe günü saat 13:30'a kadar açılmayacak.",
+            "quelle": "cf46687da148e49ec1343c369d1fcbf0de725424"
+        },
+        "ru": {
+            "titel": "Öffnungszeiten: abweichende Tage werden angezeigt",
+            "text": "Hat eine Einrichtung an einem Tag ausnahmsweise andere Öffnungszeiten, steht das jetzt als Hinweis bei den Öffnungszeiten und eine Woche vorher auch im Kasten auf der Startseite. Zum Beispiel öffnet der Kompostplatz am Donnerstag, 10. Dezember, erst um 13:30 Uhr.",
+            "quelle": "cf46687da148e49ec1343c369d1fcbf0de725424"
+        }
+    },
     "uffi-mitteilungsblatt-personen": {
         "en": {
             "titel": "Uffi no longer mentions birthdays and obituaries",

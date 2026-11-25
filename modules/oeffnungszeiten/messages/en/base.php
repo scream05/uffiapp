@@ -76,4 +76,7 @@ return [
     'Heiligabend' => 'Christmas Eve',
     'Silvester' => 'New Year\'s Eve',
     'und' => 'and',
+    'Heute' => 'Today',
+    '{tag}: ausnahmsweise geschlossen' => '{tag}: closed (exception)',
+    '{tag}: ausnahmsweise {zeiten}' => '{tag}: exceptionally {zeiten}',
 ];

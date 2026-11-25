@@ -10,6 +10,10 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'oeffnungszeiten-ausnahmen', 'datum' => '2026-11-26', 'art' => 'besser', 'popup' => false,
+        'titel' => 'Öffnungszeiten: abweichende Tage werden angezeigt',
+        'text' => 'Hat eine Einrichtung an einem Tag ausnahmsweise andere Öffnungszeiten, steht das jetzt als Hinweis bei den Öffnungszeiten und eine Woche vorher auch im Kasten auf der Startseite. Zum Beispiel öffnet der Kompostplatz am Donnerstag, 10. Dezember, erst um 13:30 Uhr.',
+        'link' => [null, '/oeffnungszeiten/index']],
     ['id' => 'uffi-mitteilungsblatt-personen', 'datum' => '2026-11-25', 'art' => 'besser', 'popup' => false,
         'titel' => 'Uffi nennt keine Geburtstage und Trauerfälle mehr',
         'text' => 'Uffi kennt das Mitteilungsblatt jetzt ohne Geburtstagslisten, Jubiläen, Geburten, Hochzeiten und Sterbefälle. So kann niemand Uffi gezielt nach Personen ausfragen. Im Mitteilungsblatt selbst stehen diese Angaben weiterhin.'],

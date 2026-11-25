@@ -76,4 +76,7 @@ return [
     'Heiligabend' => 'Noel arifesi',
     'Silvester' => 'Yılbaşı gecesi',
     'und' => 've',
+    'Heute' => 'Bugün',
+    '{tag}: ausnahmsweise geschlossen' => '{tag}: istisnai olarak kapalı',
+    '{tag}: ausnahmsweise {zeiten}' => '{tag}: istisnai olarak {zeiten}',
 ];

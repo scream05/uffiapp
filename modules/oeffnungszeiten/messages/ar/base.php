@@ -76,4 +76,7 @@ return [
     'Heiligabend' => 'ليلة عيد الميلاد',
     'Silvester' => 'ليلة رأس السنة',
     'und' => 'و',
+    'Heute' => 'اليوم',
+    '{tag}: ausnahmsweise geschlossen' => '{tag}: مغلق استثنائيًا',
+    '{tag}: ausnahmsweise {zeiten}' => '{tag}: استثنائيًا {zeiten}',
 ];

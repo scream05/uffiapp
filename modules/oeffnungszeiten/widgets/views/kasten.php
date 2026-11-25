@@ -15,6 +15,7 @@ use humhub\helpers\Html;
     #oez-kasten .oez-offen .oez-status { color: #237032; font-weight: 600; }
     #oez-kasten .oez-bald .oez-status { color: #8a5a00; }
     #oez-kasten .oez-alle { display: inline-block; margin-top: 8px; }
+    #oez-kasten .oez-ausnahme { flex-basis: 100%; margin-inline-start: 17px; font-size: .85em; color: #8a5a00; line-height: 1.3; }
     /* Schmaler Kasten (Handy-Fach): Status einheitlich unter dem Namen */
     #oez-kasten .panel-body { container-type: inline-size; }
     @container (max-width: 380px) {
@@ -31,6 +32,9 @@ use humhub\helpers\Html;
                 <span class="oez-punkt" aria-hidden="true"></span>
                 <span class="oez-name"><?= Html::a(Html::encode(Yii::t('OeffnungszeitenModule.base', $z['ort']['name'])), ['/oeffnungszeiten/index', '#' => 'oez-' . $z['id']]) ?></span>
                 <span class="oez-status"><?= Html::encode($s['text']) ?></span>
+                <?php foreach (\humhub\modules\oeffnungszeiten\components\Zeiten::ausnahmeTexte($z['ort']) as $a): ?>
+                    <span class="oez-ausnahme"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> <?= Html::encode($a) ?></span>
+                <?php endforeach ?>
             </div>
         <?php endforeach ?>
         <?= Html::a(Yii::t('OeffnungszeitenModule.base', 'Alle Öffnungszeiten') . ' <i class="fa fa-angle-right"></i>', ['/oeffnungszeiten/index'], ['class' => 'oez-alle']) ?>

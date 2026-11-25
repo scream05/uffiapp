@@ -28,6 +28,9 @@ $orte = array_intersect_key(Zeiten::modul()->orte(), array_flip(['wertstoffhof',
                         · <?= Yii::t('DesignwahlModule.base', 'Tel.') ?> <?= Html::a(Html::encode($ort['telefon']), 'tel:+49' . ltrim(preg_replace('/\D/', '', $ort['telefon']), '0')) ?>
                     <?php endif ?>
                 </div>
+                <?php foreach (Zeiten::ausnahmeTexte($ort, null, Zeiten::VORLAUF_SEITE) as $a) : ?>
+                    <div class="abfall-zeiten-ausnahme"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> <?= Html::encode($a) ?></div>
+                <?php endforeach ?>
                 <table class="abfall-zeiten-tabelle">
                     <?php foreach (Zeiten::zeilen($ort) as [$tage, $zeit]) : ?>
                         <tr><th><?= Html::encode($tage) ?></th><td><?= Html::encode($zeit) ?></td></tr>
@@ -53,6 +56,7 @@ $orte = array_intersect_key(Zeiten::modul()->orte(), array_flip(['wertstoffhof',
 .abfall-zeiten .abfall-zeiten-tabelle th { font-weight: normal; padding: 2px 16px 2px 0; vertical-align: top; white-space: nowrap; }
 .abfall-zeiten .abfall-zeiten-tabelle td { padding: 2px 0; }
 .abfall-zeiten .abfall-zeiten-quelle { margin: 0; }
+.abfall-zeiten .abfall-zeiten-ausnahme { margin: 6px 0 0; padding: 4px 10px; border-radius: 6px; background: #fbefd6; color: #7a4f00; font-weight: 600; display: inline-block; }
 .abfall-zeiten .abfall-zeiten-status { font-weight: normal; font-size: .85em; color: #6b6b6b; margin-left: 6px; }
 .abfall-zeiten .abfall-zeiten-offen { color: #237032; font-weight: 600; }
 CSS, [], 'abfall-zeiten') ?>

@@ -23,6 +23,7 @@ $feiertag = Zeiten::feiertag(date('Y-m-d'));
     .oez-nw { white-space: nowrap; }
     .oez-ort .oez-tabelle td { padding: 1px 0; }
     .oez-ort .oez-tabelle tr.oez-heute th, .oez-ort .oez-tabelle tr.oez-heute td { font-weight: 600; }
+    .oez-ausnahme { margin: 6px 0 0; padding: 4px 10px; border-radius: 6px; background: #fbefd6; color: #7a4f00; font-weight: 600; display: inline-block; }
     .oez-hinweis { color: var(--hh-text-color-soft, #6b6b6b); font-size: .9em; margin: 4px 0 0; }
 </style>
 <div class="<?= $this->context->contentContainer ? '' : 'container' ?>">
@@ -48,6 +49,9 @@ $feiertag = Zeiten::feiertag(date('Y-m-d'));
                             !empty($ort['telefon']) ? $t('Tel.') . ' ' . Html::a(Html::encode($ort['telefon']), 'tel:+49' . ltrim(preg_replace('/\D/', '', $ort['telefon']), '0')) : '',
                         ])) ?>
                     </div>
+                    <?php foreach (Zeiten::ausnahmeTexte($ort, null, Zeiten::VORLAUF_SEITE) as $a): ?>
+                        <p class="oez-ausnahme"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> <?= Html::encode($a) ?></p>
+                    <?php endforeach ?>
                     <table class="oez-tabelle">
                         <?php foreach (Zeiten::zeilen($ort) as [$tage, $zeit, $gilt]): ?>
                             <tr<?= $gilt && Zeiten::anTag($ort, time()) ? ' class="oez-heute"' : '' ?>>

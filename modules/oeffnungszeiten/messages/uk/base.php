@@ -76,4 +76,7 @@ return [
     'Heiligabend' => 'Святвечір',
     'Silvester' => 'Переддень Нового року',
     'und' => 'та',
+    'Heute' => 'Сьогодні',
+    '{tag}: ausnahmsweise geschlossen' => '{tag}: у виняток зачинено',
+    '{tag}: ausnahmsweise {zeiten}' => '{tag}: у виняток {zeiten}',
 ];
