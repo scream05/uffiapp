@@ -255,8 +255,8 @@ def pruefe_osv():
         # Dienst nur im Docker-Netz bzw. auf 127.0.0.1 erreichbar und verarbeitet nur Text → Info; mit dem nächsten
         # Neubau (docker compose build --pull embeddings) kommen neuere Pakete
         osv([('PyPI', p['name'], p['version']) for p in json.loads(r.stdout)], 'Python-Paket (Embeddings, nur intern)', 'info',
-            ' – Pillow hält fastembed 0.7.3 unter 12 (nur für Bildmodelle, Textsuche nutzt es nicht); beheben = fastembed in '
-            'embeddings/Dockerfile anheben, danach ki-suche-test')
+            ' – beheben = fastembed in embeddings/Dockerfile anheben (fp16-Modell in server.py beachten), '
+            'danach ki-suche-test')
     else:
         fehler.append('pip list im Embedding-Dienst fehlgeschlagen')
 

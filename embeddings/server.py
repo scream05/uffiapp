@@ -14,9 +14,17 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import numpy as np
 from fastembed import TextEmbedding
+from fastembed.common.model_description import ModelSource, PoolingType
 
 MODEL = os.environ.get('EMBED_MODEL', 'jinaai/jina-embeddings-v2-base-de')
-model = TextEmbedding(MODEL, threads=int(os.environ.get('EMBED_THREADS', '2')))
+geladen = MODEL
+if MODEL == 'jinaai/jina-embeddings-v2-base-de':
+    # fastembed ab 0.8 lädt hier das doppelt so große fp32-Modell (~1,1 GB statt ~0,5 GB Speicher). Die fp16-Datei
+    # aus demselben Repo liefert dieselben Vektoren wie bisher (geprüft 25.11.2026: Kosinus 1,0), der Index bleibt gültig.
+    geladen = 'uffi/jina-embeddings-v2-base-de-fp16'
+    TextEmbedding.add_custom_model(model=geladen, pooling=PoolingType.MEAN, normalization=True, dim=768,
+                                   sources=ModelSource(hf=MODEL), model_file='onnx/model_fp16.onnx')
+model = TextEmbedding(geladen, threads=int(os.environ.get('EMBED_THREADS', '2')))
 lock = threading.Lock()  # ein Rechenauftrag zur Zeit, sonst wächst der Speicherbedarf
 DIM = len(next(iter(model.query_embed(['Uffenheim']))))
 
