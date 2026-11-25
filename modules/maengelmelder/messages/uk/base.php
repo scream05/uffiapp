@@ -166,4 +166,6 @@ return [
     'Deine Meldung ist jetzt auf der Karte zu sehen.' => 'Ваше повідомлення тепер видно на карті.',
     'Tipp auf den Knopf und in WhatsApp auf Senden. Damit bestätigst du, dass die angegebene Nummer deine ist – so bekommt niemand Nachrichten, der sie nicht will. Erst danach schreiben wir dir per WhatsApp.' => 'Натисни кнопку, а потім «Надіслати» у WhatsApp. Так ти підтверджуєш, що вказаний номер належить тобі, – і ніхто не отримає небажаних повідомлень. Лише після цього ми писатимемо тобі у WhatsApp.',
     'Bitte unten „Ich bin kein Roboter“ antippen und warten, bis „Überprüft“ erscheint.' => 'Будь ласка, натисни нижче «Я не робот» і зачекай, доки з’явиться «Перевірено».',
+    'Bitte bestätige, dass du diese E-Mail-Adresse bei deiner Meldung angegeben hast.' => 'Будь ласка, підтвердь, що ти вказав(-ла) цю адресу електронної пошти у своєму повідомленні.',
+    'E-Mail-Adresse bestätigen' => 'Підтвердити адресу електронної пошти',
 ];

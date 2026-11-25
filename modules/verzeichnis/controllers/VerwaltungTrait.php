@@ -32,6 +32,9 @@ trait VerwaltungTrait
 
     abstract protected function bestaetigtBenachrichtigung(): string;
 
+    /** Benachrichtigung an jemanden, den ein anderer Verwalter entfernt hat (sonst merkt er es nicht) */
+    abstract protected function entferntBenachrichtigung(): string;
+
     /** Übersetzungskategorie des Moduls */
     abstract protected function kategorie(): string;
 
@@ -79,6 +82,9 @@ trait VerwaltungTrait
                 $this->view->success($this->verwaltungTexte($row->user->displayName)['kannVerwalten']);
             } elseif ($row && in_array($aktion, ['ablehnen', 'entfernen'], true)) {
                 $row->delete();
+                if ($aktion === 'entfernen' && $row->user_id !== Yii::$app->user->id && $row->user) {
+                    $this->entferntBenachrichtigung()::instance()->from(Yii::$app->user->getIdentity())->about($eintrag)->send($row->user);
+                }
                 $this->view->success($aktion === 'ablehnen' ? Yii::t($this->kategorie(), 'Anfrage abgelehnt.') : Yii::t($this->kategorie(), 'Verwalter entfernt.'));
                 if ($row->user_id === Yii::$app->user->id && !$eintrag->canManage()) {
                     return $this->redirect($eintrag->getUrl());

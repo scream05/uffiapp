@@ -10,6 +10,12 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'verwalter-entfernt-hinweis', 'datum' => '2026-11-25', 'art' => 'besser', 'popup' => false,
+        'titel' => 'Hinweis, wenn du als Verwalter entfernt wirst',
+        'text' => 'Verwaltest du einen Verein oder Betrieb und ein anderer Verwalter entfernt dich, bekommst du jetzt eine Benachrichtigung. Bisher hast du davon nichts mitbekommen.'],
+    ['id' => 'maengel-mail-bestaetigen-knopf', 'datum' => '2026-11-25', 'art' => 'besser', 'popup' => false,
+        'titel' => 'Mängelmelder: E-Mail-Adresse per Knopf bestätigen',
+        'text' => 'Wenn du ohne Konto einen Mangel meldest, öffnet der Link in der Bestätigungsmail jetzt eine Seite mit dem Knopf „E-Mail-Adresse bestätigen“. Erst der Knopfdruck bestätigt die Adresse. So kann kein Programm, das Links in Mails automatisch öffnet, eine fremde Adresse bestätigen.'],
     ['id' => 'ki-haekchen-darstellung', 'datum' => '2026-11-23', 'art' => 'behoben', 'popup' => false,
         'titel' => 'Häkchen bei Uffi sauber angeordnet',
         'text' => 'Die beiden Kästchen für Alter und Einverständnis standen im Uffi-Fenster übereinander verrutscht. Jetzt steht jedes Kästchen ordentlich neben seinem Text.'],

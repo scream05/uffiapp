@@ -259,13 +259,17 @@ class MeldungController extends ContentContainerController
                 $ok = true;
             } elseif (strtotime($k->created_at) < time() - $this->module->bestaetigungStunden * 3600) {
                 $abgelaufen = true;
-            } else {
+            } elseif (Yii::$app->request->isPost) {
                 $k->updateAttributes(['mail_bestaetigt' => date('Y-m-d H:i:s')]);
                 Bauhof::vermerk($k->content_id, null, null, 'Meldende Person hat ihre E-Mail-Adresse bestätigt');
                 $ok = true;
+            } else {
+                // Erst per Knopf (POST) bestätigen: Mail-Virenscanner und Link-Vorschauen öffnen Links von selbst und
+                // hätten sonst eine fremd eingetragene Adresse bestätigt
+                $offen = true;
             }
         }
-        return $this->render('bestaetigt', ['ok' => $ok, 'abgelaufen' => $abgelaufen, 'kontakt' => $ok ? $k : null,
+        return $this->render('bestaetigt', ['ok' => $ok, 'abgelaufen' => $abgelaufen, 'offen' => $offen ?? false, 'kontakt' => $ok ? $k : null,
             'space' => $this->contentContainer, 'infos' => $this->module->buergerInfoAktiv()]);
     }
 

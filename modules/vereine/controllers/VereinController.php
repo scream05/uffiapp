@@ -10,6 +10,7 @@ use humhub\modules\vereine\models\VereinVerwalter;
 use humhub\modules\vereine\Module;
 use humhub\modules\vereine\notifications\VerwaltungAngefragt;
 use humhub\modules\vereine\notifications\VerwaltungBestaetigt;
+use humhub\modules\vereine\notifications\VerwaltungEntfernt;
 use humhub\modules\vereine\permissions\ManageVereine;
 use humhub\modules\verzeichnis\controllers\VerwaltungTrait;
 use Yii;
@@ -184,6 +185,11 @@ class VereinController extends ContentContainerController
     protected function bestaetigtBenachrichtigung(): string
     {
         return VerwaltungBestaetigt::class;
+    }
+
+    protected function entferntBenachrichtigung(): string
+    {
+        return VerwaltungEntfernt::class;
     }
 
     protected function kategorie(): string

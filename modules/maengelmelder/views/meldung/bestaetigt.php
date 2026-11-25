@@ -4,6 +4,7 @@
  *
  * @var bool $ok
  * @var bool $abgelaufen
+ * @var bool $offen
  * @var \humhub\modules\maengelmelder\models\MaengelKontakt|null $kontakt
  * @var \humhub\modules\space\models\Space $space
  * @var bool $infos
@@ -21,6 +22,11 @@ use humhub\helpers\Html;
                     ? Yii::t('MaengelmelderModule.base', 'Wir informieren dich per E-Mail über den Bearbeitungsstand deiner Meldung Nr. {nr}. Auf unsere E-Mails kannst du einfach antworten.', ['nr' => (int)$kontakt->content_id])
                     : Yii::t('MaengelmelderModule.base', 'Bei Rückfragen kann sich der Bauhof jetzt per E-Mail bei dir melden.') ?>
             </div>
+        <?php elseif ($offen): ?>
+            <p><?= Yii::t('MaengelmelderModule.base', 'Bitte bestätige, dass du diese E-Mail-Adresse bei deiner Meldung angegeben hast.') ?></p>
+            <?= Html::beginForm('', 'post') ?>
+            <button type="submit" class="btn btn-primary"><i class="fa fa-check"></i> <?= Yii::t('MaengelmelderModule.base', 'E-Mail-Adresse bestätigen') ?></button>
+            <?= Html::endForm() ?>
         <?php elseif ($abgelaufen): ?>
             <div class="alert alert-warning" role="status"><?= Yii::t('MaengelmelderModule.base', 'Dieser Link ist abgelaufen. Deine Meldung ist trotzdem beim Bauhof – nur Infos per E-Mail bekommst du dazu nicht. Bei Fragen: {mail}', ['mail' => Html::mailto('smartcity@buergerliste-uffenheim.de')]) ?></div>
         <?php else: ?>

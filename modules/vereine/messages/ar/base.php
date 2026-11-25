@@ -359,4 +359,6 @@ return [
     'z. B. Jetzt Kurs buchen!' => 'مثلًا: احجز دورة الآن!',
     'z. B. Schwimmen lernen. Vertrauen gewinnen. Gemeinsam wachsen.' => 'مثلًا: تعلّم السباحة. اكسب الثقة. لننمُ معًا.',
     'Bilder kannst du direkt in den Text einfügen. Nur eigene Fotos oder Fotos mit Erlaubnis; bei Personen bitte deren Einverständnis.' => 'يمكنك إدراج الصور مباشرة في النص. صورك الخاصة فقط أو صور بإذن؛ وإذا ظهر أشخاص فبموافقتهم.',
+    'Du verwaltest den Verein {verein} nicht mehr' => 'لم تعد تدير النادي {verein}',
+    '{name} hat dich als Verwalter von {verein} entfernt. Falls das nicht abgesprochen war, melde dich bitte bei uns: {mail}' => 'قام {name} بإزالتك من إدارة {verein}. إذا لم يكن ذلك متفقًا عليه، يرجى التواصل معنا: {mail}',
 ];

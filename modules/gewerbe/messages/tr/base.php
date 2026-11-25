@@ -384,4 +384,6 @@ return [
     'Möchtest du eine Push-Nachricht bekommen, wenn ein Betrieb einen neuen Gutschein veröffentlicht?' => 'Bir işletme yeni bir kupon yayınladığında anlık bildirim almak ister misin?',
     'Push für neue Gutscheine einschalten' => 'Yeni kuponlar için bildirimi aç',
     'Push für neue Gutscheine ausschalten' => 'Yeni kuponlar için bildirimi kapat',
+    'Du verwaltest den Betrieb {betrieb} nicht mehr' => 'Artık {betrieb} işletmesini yönetmiyorsun',
+    '{name} hat dich als Verwalter von {betrieb} entfernt. Falls das nicht abgesprochen war, melde dich bitte bei uns: {mail}' => '{name} seni {betrieb} yöneticiliğinden çıkardı. Bu konuda anlaşılmadıysa lütfen bize yaz: {mail}',
 ];

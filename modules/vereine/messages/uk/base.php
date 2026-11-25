@@ -359,4 +359,6 @@ return [
     'z. B. Jetzt Kurs buchen!' => 'напр. Записатися на курс!',
     'z. B. Schwimmen lernen. Vertrauen gewinnen. Gemeinsam wachsen.' => 'напр. Навчитися плавати. Здобути впевненість. Рости разом.',
     'Bilder kannst du direkt in den Text einfügen. Nur eigene Fotos oder Fotos mit Erlaubnis; bei Personen bitte deren Einverständnis.' => 'Зображення можна вставляти просто в текст. Лише власні фото або фото з дозволом; якщо на фото люди — з їхньої згоди.',
+    'Du verwaltest den Verein {verein} nicht mehr' => 'Ти більше не керуєш об’єднанням {verein}',
+    '{name} hat dich als Verwalter von {verein} entfernt. Falls das nicht abgesprochen war, melde dich bitte bei uns: {mail}' => '{name} вилучив(-ла) тебе з керівників {verein}. Якщо це не було узгоджено, будь ласка, напиши нам: {mail}',
 ];

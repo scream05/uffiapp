@@ -384,4 +384,6 @@ return [
     'Möchtest du eine Push-Nachricht bekommen, wenn ein Betrieb einen neuen Gutschein veröffentlicht?' => 'Бажаєте отримувати push-повідомлення, коли заклад публікує новий купон?',
     'Push für neue Gutscheine einschalten' => 'Увімкнути push для нових купонів',
     'Push für neue Gutscheine ausschalten' => 'Вимкнути push для нових купонів',
+    'Du verwaltest den Betrieb {betrieb} nicht mehr' => 'Ти більше не керуєш підприємством {betrieb}',
+    '{name} hat dich als Verwalter von {betrieb} entfernt. Falls das nicht abgesprochen war, melde dich bitte bei uns: {mail}' => '{name} вилучив(-ла) тебе з керівників {betrieb}. Якщо це не було узгоджено, будь ласка, напиши нам: {mail}',
 ];

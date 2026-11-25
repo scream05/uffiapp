@@ -380,6 +380,14 @@ class SetupController extends Controller
                     ['beitrag' => $b, 'name' => 'Max Muster', 'link' => 'https://…', 'kontaktMail' => Yii::$app->getModule($id)->kontaktMail]));
             }
         }
+        // Verwalter entfernt (Glocke/Mail an die entfernte Person)
+        foreach (['vereine' => [\humhub\modules\vereine\models\Verein::class, \humhub\modules\vereine\notifications\VerwaltungEntfernt::class],
+                     'gewerbe' => [\humhub\modules\gewerbe\models\Betrieb::class, \humhub\modules\gewerbe\notifications\VerwaltungEntfernt::class]] as $id => [$modell, $klasse]) {
+            if (class_exists($klasse) && ($e = $modell::find()->orderBy(['id' => SORT_ASC])->one()) !== null) {
+                $n = $klasse::instance()->from(User::findOne(1))->about($e);
+                $zeige("$id: Verwalter entfernt", $n->getMailSubject() . "\n" . strip_tags($n->html()));
+            }
+        }
         // Gutschein-Aufsteller: Karten in der Sprache $sprache, Hinweise oben auf Deutsch (Sprache des Betriebs)
         if (class_exists(\humhub\modules\gewerbe\models\Betrieb::class)
             && ($b = \humhub\modules\gewerbe\models\Betrieb::find()->where(['not', ['theke_nummer' => null]])->one()) !== null) {

@@ -1,4 +1,58 @@
 {
+    "verwalter-entfernt-hinweis": {
+        "en": {
+            "titel": "Notice when you are removed as an administrator",
+            "text": "If you manage a club or business and another administrator removes you, you will now get a notification. Until now, you wouldn't have noticed it.",
+            "quelle": "97c10584430bee8a54638b52dafb130671379a93"
+        },
+        "uk": {
+            "titel": "Повідомлення, якщо тебе видалили з адміністраторів",
+            "text": "Якщо ти адмініструєш клуб або заклад, а інший адміністратор тебе видаляє, тепер ти отримаєш сповіщення. Раніше ти нічого про це не дізнавався.",
+            "quelle": "97c10584430bee8a54638b52dafb130671379a93"
+        },
+        "ar": {
+            "titel": "تنبيه عند إزالتك كمسؤول",
+            "text": "إذا كنت تدير جمعية أو نشاطاً تجارياً وقام مسؤول آخر بإزالتك، ستصلك الآن إشعار بذلك. حتى الآن لم تكن تعرف شيئاً عن ذلك.",
+            "quelle": "97c10584430bee8a54638b52dafb130671379a93"
+        },
+        "tr": {
+            "titel": "Bir yönetici olarak kaldırıldığında uyarı",
+            "text": "Bir derneği veya işletmeyi yönetiyorsan ve başka bir yönetici seni kaldırırsa, artık bir bildirim alacaksın. Şimdiye kadar bundan haberin olmuyordu.",
+            "quelle": "97c10584430bee8a54638b52dafb130671379a93"
+        },
+        "ru": {
+            "titel": "Hinweis, wenn du als Verwalter entfernt wirst",
+            "text": "Verwaltest du einen Verein oder Betrieb und ein anderer Verwalter entfernt dich, bekommst du jetzt eine Benachrichtigung. Bisher hast du davon nichts mitbekommen.",
+            "quelle": "97c10584430bee8a54638b52dafb130671379a93"
+        }
+    },
+    "maengel-mail-bestaetigen-knopf": {
+        "en": {
+            "titel": "Defect reporter: confirm email address with a button",
+            "text": "If you report a defect without an account, the link in the confirmation email now opens a page with a \"Confirm email address\" button. Only pressing the button confirms the address. This way, no program that automatically opens links in emails can confirm someone else's address.",
+            "quelle": "b5de625b28c75df2cb5c92434f241cd16d6d12e3"
+        },
+        "uk": {
+            "titel": "Mängelmelder: E-Mail-Adresse per Knopf bestätigen",
+            "text": "Wenn du ohne Konto einen Mangel meldest, öffnet der Link in der Bestätigungsmail jetzt eine Seite mit dem Knopf „E-Mail-Adresse bestätigen“. Erst der Knopfdruck bestätigt die Adresse. So kann kein Programm, das Links in Mails automatisch öffnet, eine fremde Adresse bestätigen.",
+            "quelle": "b5de625b28c75df2cb5c92434f241cd16d6d12e3"
+        },
+        "ar": {
+            "titel": "معيب المشاكل: تأكيد عنوان البريد الإلكتروني بزر",
+            "text": "إذا أبلغت عن مشكلة دون حساب، فإن الرابط في رسالة التأكيد يفتح الآن صفحة فيها زر \"تأكيد عنوان البريد الإلكتروني\". لا يتم تأكيد العنوان إلا بالضغط على الزر. وبهذا لا يستطيع أي برنامج يفتح الروابط في الرسائل تلقائياً أن يؤكد عنواناً غريباً.",
+            "quelle": "b5de625b28c75df2cb5c92434f241cd16d6d12e3"
+        },
+        "tr": {
+            "titel": "Mängelmelder: E-Mail-Adresse per Knopf bestätigen",
+            "text": "Wenn du ohne Konto einen Mangel meldest, öffnet der Link in der Bestätigungsmail jetzt eine Seite mit dem Knopf „E-Mail-Adresse bestätigen“. Erst der Knopfdruck bestätigt die Adresse. So kann kein Programm, das Links in Mails automatisch öffnet, eine fremde Adresse bestätigen.",
+            "quelle": "b5de625b28c75df2cb5c92434f241cd16d6d12e3"
+        },
+        "ru": {
+            "titel": "Mängelmelder: E-Mail-Adresse per Knopf bestätigen",
+            "text": "Wenn du ohne Konto einen Mangel meldest, öffnet der Link in der Bestätigungsmail jetzt eine Seite mit dem Knopf „E-Mail-Adresse bestätigen“. Erst der Knopfdruck bestätigt die Adresse. So kann kein Programm, das Links in Mails automatisch öffnet, eine fremde Adresse bestätigen.",
+            "quelle": "b5de625b28c75df2cb5c92434f241cd16d6d12e3"
+        }
+    },
     "ki-haekchen-darstellung": {
         "en": {
             "titel": "Checkboxes in Uffi neatly aligned",

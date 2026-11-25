@@ -101,7 +101,7 @@ class Module extends ContentContainerModule
 
     public function getNotifications()
     {
-        return [notifications\VerwaltungAngefragt::class, notifications\VerwaltungBestaetigt::class,
+        return [notifications\VerwaltungAngefragt::class, notifications\VerwaltungBestaetigt::class, notifications\VerwaltungEntfernt::class,
             notifications\BeitragEingereicht::class, notifications\BeitragFreigegeben::class,
             notifications\GutscheinNeu::class, notifications\GutscheinPausiert::class, notifications\GutscheinFuerAlle::class];
     }

@@ -9,6 +9,7 @@ use humhub\modules\gewerbe\models\BetriebVerwalter;
 use humhub\modules\gewerbe\Module;
 use humhub\modules\gewerbe\notifications\VerwaltungAngefragt;
 use humhub\modules\gewerbe\notifications\VerwaltungBestaetigt;
+use humhub\modules\gewerbe\notifications\VerwaltungEntfernt;
 use humhub\modules\gewerbe\permissions\ManageGewerbe;
 use humhub\modules\verzeichnis\controllers\VerwaltungTrait;
 use Yii;
@@ -194,6 +195,11 @@ class BetriebController extends ContentContainerController
     protected function bestaetigtBenachrichtigung(): string
     {
         return VerwaltungBestaetigt::class;
+    }
+
+    protected function entferntBenachrichtigung(): string
+    {
+        return VerwaltungEntfernt::class;
     }
 
     protected function kategorie(): string

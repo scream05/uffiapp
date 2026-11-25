@@ -384,4 +384,6 @@ return [
     'Möchtest du eine Push-Nachricht bekommen, wenn ein Betrieb einen neuen Gutschein veröffentlicht?' => 'هل تريد تلقي إشعار فوري عندما ينشر أحد المتاجر قسيمة جديدة؟',
     'Push für neue Gutscheine einschalten' => 'تفعيل الإشعارات للقسائم الجديدة',
     'Push für neue Gutscheine ausschalten' => 'إيقاف الإشعارات للقسائم الجديدة',
+    'Du verwaltest den Betrieb {betrieb} nicht mehr' => 'لم تعد تدير المنشأة {betrieb}',
+    '{name} hat dich als Verwalter von {betrieb} entfernt. Falls das nicht abgesprochen war, melde dich bitte bei uns: {mail}' => 'قام {name} بإزالتك من إدارة {betrieb}. إذا لم يكن ذلك متفقًا عليه، يرجى التواصل معنا: {mail}',
 ];

@@ -359,4 +359,6 @@ return [
     'z. B. Jetzt Kurs buchen!' => 'e.g. Book a course now!',
     'z. B. Schwimmen lernen. Vertrauen gewinnen. Gemeinsam wachsen.' => 'e.g. Learn to swim. Gain confidence. Grow together.',
     'Bilder kannst du direkt in den Text einfügen. Nur eigene Fotos oder Fotos mit Erlaubnis; bei Personen bitte deren Einverständnis.' => 'You can insert images directly into the text. Only your own photos or photos with permission; if people are shown, please get their consent.',
+    'Du verwaltest den Verein {verein} nicht mehr' => 'You no longer manage the club {verein}',
+    '{name} hat dich als Verwalter von {verein} entfernt. Falls das nicht abgesprochen war, melde dich bitte bei uns: {mail}' => '{name} has removed you as a manager of {verein}. If this was not agreed, please contact us: {mail}',
 ];

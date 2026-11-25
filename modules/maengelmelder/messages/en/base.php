@@ -166,4 +166,6 @@ return [
     'Deine Meldung ist jetzt auf der Karte zu sehen.' => 'Your report can now be seen on the map.',
     'Tipp auf den Knopf und in WhatsApp auf Senden. Damit bestätigst du, dass die angegebene Nummer deine ist – so bekommt niemand Nachrichten, der sie nicht will. Erst danach schreiben wir dir per WhatsApp.' => 'Tap the button and then Send in WhatsApp. This confirms that the number you entered is yours – so nobody gets messages they don’t want. Only then will we message you on WhatsApp.',
     'Bitte unten „Ich bin kein Roboter“ antippen und warten, bis „Überprüft“ erscheint.' => 'Please tap “I\'m not a robot” below and wait until “Verified” appears.',
+    'Bitte bestätige, dass du diese E-Mail-Adresse bei deiner Meldung angegeben hast.' => 'Please confirm that you entered this email address with your report.',
+    'E-Mail-Adresse bestätigen' => 'Confirm email address',
 ];

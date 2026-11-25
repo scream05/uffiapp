@@ -359,4 +359,6 @@ return [
     'z. B. Jetzt Kurs buchen!' => 'ör. Hemen kursa kaydol!',
     'z. B. Schwimmen lernen. Vertrauen gewinnen. Gemeinsam wachsen.' => 'ör. Yüzmeyi öğren. Güven kazan. Birlikte büyü.',
     'Bilder kannst du direkt in den Text einfügen. Nur eigene Fotos oder Fotos mit Erlaubnis; bei Personen bitte deren Einverständnis.' => 'Resimleri doğrudan metne ekleyebilirsin. Yalnızca kendi fotoğrafların veya izinli fotoğraflar; kişiler varsa lütfen onaylarını al.',
+    'Du verwaltest den Verein {verein} nicht mehr' => 'Artık {verein} derneğini yönetmiyorsun',
+    '{name} hat dich als Verwalter von {verein} entfernt. Falls das nicht abgesprochen war, melde dich bitte bei uns: {mail}' => '{name} seni {verein} yöneticiliğinden çıkardı. Bu konuda anlaşılmadıysa lütfen bize yaz: {mail}',
 ];
