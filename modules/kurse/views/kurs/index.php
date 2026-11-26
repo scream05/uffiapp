@@ -31,8 +31,30 @@ echo $this->render('_stil');
                 <?php if (!$v['kurse']): ?>
                     <p class="text-muted"><?= Yii::t('KurseModule.base', 'Noch keine Kurse angelegt.') ?></p>
                 <?php endif ?>
-                <?php foreach ($v['kurse'] as $kurs): ?>
-                    <?= $this->render('_karte', ['kurs' => $kurs, 'mitVerein' => false]) ?>
+                <?php
+                // Nach Jahr des ersten Kurstags gruppieren (neuestes oben); laufende Vorjahreskurse zählen zum aktuellen Jahr
+                $heuer = (int)date('Y');
+                $jahre = [];
+                foreach ($v['kurse'] as $kurs) {
+                    $j = (int)substr($kurs->beginn, 0, 4);
+                    $jahre[$kurs->istVorbei() ? $j : max($heuer, $j)][] = $kurs;
+                }
+                krsort($jahre);
+                // Offen: aktuelles Jahr, sonst das nächste Jahr mit Kursen, sonst das jüngste
+                $zukunft = array_filter(array_keys($jahre), fn($j) => $j >= $heuer);
+                $offen = $zukunft ? min($zukunft) : array_key_first($jahre);
+                ?>
+                <?php foreach ($jahre as $jahr => $liste): ?>
+                    <?php usort($liste, fn($a, $b) => strcmp($a->beginn . $a->zeit_von, $b->beginn . $b->zeit_von)); ?>
+                    <details class="kurs-jahr"<?= $jahr === $offen ? ' open' : '' ?>>
+                        <summary><span class="kurs-jahr-zahl"><?= $jahr ?></span>
+                            <span class="kurs-jahr-anzahl"><?= Yii::t('KurseModule.base', '{n, plural, =1{1 Kurs} other{# Kurse}}', ['n' => count($liste)]) ?></span></summary>
+                        <div class="kurs-jahr-liste">
+                            <?php foreach ($liste as $kurs): ?>
+                                <?= $this->render('_karte', ['kurs' => $kurs, 'mitVerein' => false]) ?>
+                            <?php endforeach ?>
+                        </div>
+                    </details>
                 <?php endforeach ?>
             <?php endforeach ?>
         </div>

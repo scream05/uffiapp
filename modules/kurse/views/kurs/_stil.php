@@ -10,4 +10,15 @@
     .kurs-zeile form { display: inline; }
     .kurs-belegung { height: 8px; border-radius: 4px; background: rgba(0,0,0,.08); overflow: hidden; margin: 6px 0 2px; }
     .kurs-belegung > div { height: 100%; background: var(--bs-primary, #446e88); }
+    .kurs-jahr { margin: 0 0 10px; }
+    .kurs-jahr > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 9px 14px;
+        border-radius: 10px; background: color-mix(in srgb, var(--bs-primary, #446e88) 10%, transparent); font-weight: 700; user-select: none; }
+    .kurs-jahr > summary::-webkit-details-marker { display: none; }
+    .kurs-jahr > summary::after { content: ''; margin-inline-start: auto; width: 9px; height: 9px; border-right: 2px solid currentColor;
+        border-bottom: 2px solid currentColor; transform: rotate(45deg); transition: transform .2s; margin-top: -4px; }
+    .kurs-jahr[open] > summary::after { transform: rotate(-135deg); margin-top: 4px; }
+    .kurs-jahr > summary:hover { background: color-mix(in srgb, var(--bs-primary, #446e88) 18%, transparent); }
+    .kurs-jahr-zahl { font-size: 1.1em; }
+    .kurs-jahr-anzahl { font-weight: 400; opacity: .7; font-size: .95em; }
+    .kurs-jahr-liste { margin-top: 10px; }
 </style>

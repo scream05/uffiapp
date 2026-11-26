@@ -41,7 +41,7 @@ class KursController extends ContentContainerController
         foreach ($eigene as $verein) {
             $verwaltung[] = [
                 'verein' => $verein,
-                'kurse' => Kurs::find()->where(['verein_id' => $verein->id])->orderBy(['beginn' => SORT_DESC])->limit(30)->all(),
+                'kurse' => Kurs::find()->where(['verein_id' => $verein->id])->orderBy(['beginn' => SORT_DESC])->limit(500)->all(),
             ];
         }
         return $this->render('index', [
