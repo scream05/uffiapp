@@ -1258,6 +1258,43 @@ class SetupController extends Controller
         return ExitCode::OK;
     }
 
+    /**
+     * Hochgeladenes Foto unter derselben guid verkleinern (längste Seite max. $max px, JPEG, ohne Metadaten);
+     * Verweise (file-guid:…, Logo) bleiben gültig, Vorschauvarianten erzeugt HumHub neu. Original als Kopie in $sicherung:
+     * setup/bild-verkleinern <guid> [max=1400] [qualitaet=82] [sicherung=/tmp]
+     */
+    public function actionBildVerkleinern($guid, $max = 1400, $qualitaet = 82, $sicherung = '/tmp')
+    {
+        $file = \humhub\modules\file\models\File::findOne(['guid' => $guid]);
+        if ($file === null || !$file->store->has() || !in_array($file->mime_type, ['image/jpeg', 'image/png', 'image/webp'], true)) {
+            $this->stderr("Datei fehlt oder ist kein JPEG/PNG/WebP\n");
+            return ExitCode::DATAERR;
+        }
+        $inhalt = $file->store->getContent();
+        $vorher = strlen($inhalt);
+        file_put_contents(rtrim($sicherung, '/') . "/$guid-" . basename($file->file_name), $inhalt);
+        $im = new \Imagick();
+        $im->readImageBlob($inhalt);
+        $im->autoOrient();
+        if (max($im->getImageWidth(), $im->getImageHeight()) > (int)$max) {
+            $im->thumbnailImage((int)$max, (int)$max, true);
+        }
+        $im->stripImage();
+        $im->setImageFormat('jpeg');
+        $im->setImageCompressionQuality((int)$qualitaet);
+        $im->setInterlaceScheme(\Imagick::INTERLACE_JPEG);
+        $data = $im->getImagesBlob();
+        if (strlen($data) >= $vorher) {
+            $this->stdout("Nicht kleiner geworden ($vorher Byte), unverändert\n");
+            return ExitCode::OK;
+        }
+        $file->mime_type = 'image/jpeg';
+        $file->updateAttributes(['mime_type' => 'image/jpeg']);
+        $file->setStoredFileContent($data, true);
+        $this->stdout(sprintf("%s: %d → %d Byte, %dx%d\n", $guid, $vorher, strlen($data), $im->getImageWidth(), $im->getImageHeight()));
+        return ExitCode::OK;
+    }
+
     /** Neue Entwürfe dieses Laufs (für eine Benachrichtigung an die Admins) */
     private array $neueEntwuerfe = [];
 
