@@ -378,7 +378,7 @@ return [
     'Voraussichtlicher Beginn' => 'Орієнтовний початок',
     'Beginn: {text}' => 'Початок: {text}',
     'steht noch nicht fest' => 'ще не визначено',
-    'Steht der Beginn noch nicht fest: ungefähres Datum, nur für Sortierung und Jahr.' => 'Якщо початок ще не визначено: приблизна дата, лише для сортування та року.',
+    'Leer lassen, wenn der Beginn noch nicht feststeht. Mit Haken unten: ungefähres Datum, nur für Sortierung und Jahr.' => 'Залиш порожнім, якщо початок ще не визначено. З позначкою нижче: приблизна дата, лише для сортування та року.',
     'z. B. voraussichtlich im Januar 2027' => 'напр., орієнтовно в січні 2027',
     'Wird statt des Datums angezeigt. Erinnerungsmails vor Kursbeginn gibt es erst, wenn du den Haken entfernst und das echte Datum einträgst.' => 'Показується замість дати. Нагадування перед початком курсу надсилаються лише після того, як ти знімеш позначку й введеш справжню дату.',
     '{tag}: Bitte die Uhrzeit als hh:mm angeben.' => '{tag}: Вкажи час у форматі гг:хх.',

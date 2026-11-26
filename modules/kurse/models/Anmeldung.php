@@ -233,7 +233,7 @@ class Anmeldung extends ActiveRecord
         if (!$this->kind_geburtsdatum || !$this->kurs) {
             return null;
         }
-        $d = (new \DateTime($this->kind_geburtsdatum))->diff(new \DateTime($this->kurs->beginn));
+        $d = (new \DateTime($this->kind_geburtsdatum))->diff(new \DateTime($this->kurs->beginn ?: 'today'));
         return $d->y + $d->m / 12;
     }
 

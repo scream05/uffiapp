@@ -36,7 +36,7 @@ $dt = fn($v) => $v ? str_replace(' ', 'T', substr($v, 0, 16)) : '';
         <h4><?= Yii::t('KurseModule.base', 'Ort und Termine') ?></h4>
         <?= $f->field($kurs, 'ort')->textInput(['maxlength' => 255, 'placeholder' => Yii::t('KurseModule.base', 'z. B. Hallenbad Uffenheim')]) ?>
         <div class="row">
-            <div class="col-6 col-md-3"><?= $f->field($kurs, 'beginn')->input('date')->hint(Html::encode(Yii::t('KurseModule.base', 'Steht der Beginn noch nicht fest: ungefähres Datum, nur für Sortierung und Jahr.'))) ?></div>
+            <div class="col-6 col-md-3"><?= $f->field($kurs, 'beginn')->input('date')->hint(Html::encode(Yii::t('KurseModule.base', 'Leer lassen, wenn der Beginn noch nicht feststeht. Mit Haken unten: ungefähres Datum, nur für Sortierung und Jahr.'))) ?></div>
             <div class="col-6 col-md-3"><?= $f->field($kurs, 'ende')->input('date')->hint(Html::encode(Yii::t('KurseModule.base', 'leer = aus Einheiten und Kurstagen berechnet'))) ?></div>
             <div class="col-4 col-md-2"><?= $f->field($kurs, 'zeit_von')->input('time', ['value' => $kurs->zeit_von ? substr($kurs->zeit_von, 0, 5) : '']) ?></div>
             <div class="col-4 col-md-2"><?= $f->field($kurs, 'zeit_bis')->input('time', ['value' => $kurs->zeit_bis ? substr($kurs->zeit_bis, 0, 5) : '']) ?></div>

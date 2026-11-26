@@ -1201,14 +1201,14 @@ class SetupController extends Controller
     }
 
     /**
-     * Titel- oder Teambild einer Vereinsseite aus einer Datei im Container setzen (ersetzt ein vorhandenes):
-     * setup/verein-bild <verein_id> titelbild|teambild <pfad> ["Bildbeschreibung"]
+     * Logo, Titel- oder Teambild einer Vereinsseite aus einer Datei im Container setzen (ersetzt ein vorhandenes;
+     * das alte bleibt, wenn es im Vorstellungstext steht): setup/verein-bild <verein_id> logo|titelbild|teambild <pfad> ["Bildbeschreibung"] [quelle]
      */
-    public function actionVereinBild($id, $art, $pfad, $beschreibung = '')
+    public function actionVereinBild($id, $art, $pfad, $beschreibung = '', $quelle = '')
     {
         $verein = \humhub\modules\vereine\models\Verein::findOne((int)$id);
-        if ($verein === null || !in_array($art, ['titelbild', 'teambild'], true) || !is_file($pfad)) {
-            $this->stderr("Verein, Art (titelbild|teambild) oder Datei fehlt\n");
+        if ($verein === null || !in_array($art, ['logo', 'titelbild', 'teambild'], true) || !is_file($pfad)) {
+            $this->stderr("Verein, Art (logo|titelbild|teambild) oder Datei fehlt\n");
             return ExitCode::DATAERR;
         }
         $mime = (new \finfo(FILEINFO_MIME_TYPE))->file($pfad);
@@ -1217,16 +1217,19 @@ class SetupController extends Controller
             return ExitCode::DATAERR;
         }
         Yii::$app->user->switchIdentity(User::find()->joinWith('groups')->where(['group.is_admin_group' => 1])->one());
-        $alt = $art === 'titelbild' ? $verein->getTitelbild() : $verein->getTeambild();
+        $alt = ['logo' => $verein->getLogo(), 'titelbild' => $verein->getTitelbild(), 'teambild' => $verein->getTeambild()][$art];
         $data = file_get_contents($pfad);
         $file = new \humhub\modules\file\models\File(['file_name' => basename($pfad), 'mime_type' => $mime, 'size' => strlen($data),
             'title' => mb_substr($beschreibung, 0, 250) ?: null]);
         $file->save();
         $file->setStoredFileContent($data);
         $verein->fileManager->attach($file);
-        $verein->updateAttributes([$art . '_guid' => $file->guid]);
-        $alt?->delete();
-        $this->stdout("$art gesetzt: {$file->guid}" . ($alt ? ", altes Bild gelöscht" : '') . "\n");
+        $verein->updateAttributes([$art . '_guid' => $file->guid] + ($art === 'logo' && $quelle !== '' ? ['logo_quelle' => $quelle] : []));
+        $imText = $alt && str_contains((string)$verein->beschreibung, 'file-guid:' . $alt->guid);
+        if ($alt && !$imText) {
+            $alt->delete();
+        }
+        $this->stdout("$art gesetzt: {$file->guid}" . ($alt ? ($imText ? ', altes Bild bleibt (steht im Text)' : ', altes Bild gelöscht') : '') . "\n");
         return ExitCode::OK;
     }
 

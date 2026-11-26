@@ -378,7 +378,7 @@ return [
     'Voraussichtlicher Beginn' => 'Tahmini başlangıç',
     'Beginn: {text}' => 'Başlangıç: {text}',
     'steht noch nicht fest' => 'henüz belli değil',
-    'Steht der Beginn noch nicht fest: ungefähres Datum, nur für Sortierung und Jahr.' => 'Başlangıç henüz belli değilse: yaklaşık tarih, yalnızca sıralama ve yıl için.',
+    'Leer lassen, wenn der Beginn noch nicht feststeht. Mit Haken unten: ungefähres Datum, nur für Sortierung und Jahr.' => 'Başlangıç henüz belli değilse boş bırak. Aşağıdaki kutu işaretliyse: yaklaşık tarih, yalnızca sıralama ve yıl için.',
     'z. B. voraussichtlich im Januar 2027' => 'örn. muhtemelen Ocak 2027\'de',
     'Wird statt des Datums angezeigt. Erinnerungsmails vor Kursbeginn gibt es erst, wenn du den Haken entfernst und das echte Datum einträgst.' => 'Tarih yerine gösterilir. Kurs başlamadan önceki hatırlatma e-postaları ancak işareti kaldırıp gerçek tarihi girdiğinde gönderilir.',
     '{tag}: Bitte die Uhrzeit als hh:mm angeben.' => '{tag}: Lütfen saati ss:dd biçiminde gir.',

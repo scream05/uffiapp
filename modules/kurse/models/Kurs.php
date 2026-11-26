@@ -18,7 +18,7 @@ use yii\helpers\Url;
  * @property string|null $niveau
  * @property string|null $beschreibung
  * @property string $ort
- * @property string $beginn bei beginn_offen nur ungefähr (Sortierung/Jahr), wird nicht angezeigt
+ * @property string|null $beginn bei beginn_offen nur ungefähr (Sortierung/Jahr) oder leer, wird nicht angezeigt
  * @property bool $beginn_offen
  * @property string|null $beginn_text z. B. „voraussichtlich im Januar 2027“
  * @property string|null $ende
@@ -65,11 +65,13 @@ class Kurs extends ActiveRecord
     public function rules()
     {
         return [
-            [['titel', 'ort', 'beginn', 'plaetze', 'kontakt_email'], 'required'],
+            [['titel', 'ort', 'plaetze', 'kontakt_email'], 'required'],
             [['titel'], 'string', 'max' => 150],
             [['beginn_text'], 'string', 'max' => 100],
             [['beginn_offen'], 'boolean'],
-            ['beginn_text', 'required', 'when' => fn($m) => (bool)$m->beginn_offen, 'whenClient' => "function(){return \$('#kurs-beginn_offen').is(':checked');}",
+            // Text Pflicht bei Haken + ungefährem Datum; ganz ohne Datum zeigt die Seite „steht noch nicht fest“
+            ['beginn_text', 'required', 'when' => fn($m) => (bool)$m->beginn_offen && (bool)$m->beginn,
+                'whenClient' => "function(){return \$('#kurs-beginn_offen').is(':checked') && \$('#kurs-beginn').val() !== '';}",
                 'message' => Yii::t('KurseModule.base', 'Bitte kurz beschreiben, wann der Kurs voraussichtlich beginnt.')],
             [['niveau', 'kontoinhaber'], 'string', 'max' => 100],
             [['ort', 'termine_hinweis'], 'string', 'max' => 255],
@@ -79,7 +81,7 @@ class Kurs extends ActiveRecord
             ['wochentageListe', 'each', 'rule' => ['in', 'range' => [1, 2, 3, 4, 5, 6, 7]]],
             ['wochentageListe', 'validateWochentage'],
             ['tageszeitenListe', 'validateTageszeiten'],
-            ['ende', 'compare', 'compareAttribute' => 'beginn', 'operator' => '>=', 'type' => 'date', 'skipOnEmpty' => true,
+            ['ende', 'compare', 'compareAttribute' => 'beginn', 'operator' => '>=', 'type' => 'date', 'skipOnEmpty' => true, 'when' => fn($m) => (bool)$m->beginn, 'whenClient' => "function(){return \$('#kurs-beginn').val() !== '';}",
                 'message' => Yii::t('KurseModule.base', 'Das Ende darf nicht vor dem Beginn liegen.')],
             [['zeit_von', 'zeit_bis'], 'match', 'pattern' => '/^\d{2}:\d{2}(:\d{2})?$/'],
             [['plaetze'], 'integer', 'min' => 1, 'max' => 500],
@@ -102,6 +104,15 @@ class Kurs extends ActiveRecord
                 'preis_nichtmitglied', 'zahlungsfrist_tage', 'erinnerung_tage', 'niveau', 'beginn_text', 'termine_hinweis', 'kontoinhaber',
                 'beschreibung', 'bedingungen'], 'default', 'value' => null],
         ];
+    }
+
+    public function beforeValidate()
+    {
+        if ($this->beginn === '' || $this->beginn === null) {
+            $this->beginn = null;
+            $this->beginn_offen = 1;
+        }
+        return parent::beforeValidate();
     }
 
     /** Erster und letzter Kurstag müssen auf einen angekreuzten Kurstag fallen */
@@ -386,6 +397,9 @@ class Kurs extends ActiveRecord
     {
         if ($this->ende) {
             return $this->ende;
+        }
+        if (!$this->beginn) {
+            return ''; // Beginn steht noch nicht fest
         }
         $tage = $this->getWochentageListe();
         if ($tage && $this->einheiten > 1) {
