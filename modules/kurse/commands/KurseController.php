@@ -269,6 +269,20 @@ class KurseController extends Controller
         Dienst::platzGeben($hand, false);
         $pruefe($hand->status === 'platz' && $kurs->zaehle('platz') === 3, 'Platz geben über die Platzzahl hinaus');
 
+        // Verwalter bearbeitet die Anmeldung: alle Angaben änderbar, Status bleibt, keine Mail
+        $mailsVorher = count(glob(Yii::getAlias(Yii::$app->mailer->fileTransportPath) . '/*.eml'));
+        $b = Anmeldung::findOne($hand->id);
+        $b->scenario = Anmeldung::SCENARIO_BEARBEITEN;
+        $b->load(['Anmeldung' => ['kind_vorname' => 'Emilia', 'kind_geburtsdatum' => date('Y-m-d', strtotime('-6 years')),
+            'email' => 'papier@example.invalid', 'mitglied' => 1, 'betrag' => '60', 'bezahlt_am' => date('Y-m-d'), 'notiz' => 'geändert']]);
+        $ok = $b->save();
+        $b->refresh();
+        $pruefe($ok && $b->kind_vorname === 'Emilia' && $b->email === 'papier@example.invalid' && (int)$b->mitglied === 1
+            && (float)$b->betrag === 60.0 && $b->bezahlt_am === date('Y-m-d') && $b->status === 'platz', 'Bearbeiten: Angaben geändert, Status bleibt Platz');
+        $pruefe(count(glob(Yii::getAlias(Yii::$app->mailer->fileTransportPath) . '/*.eml')) === $mailsVorher, 'Bearbeiten verschickt keine Mail');
+        $b->load(['Anmeldung' => ['bezahlt_am' => '', 'betrag' => '-5']]);
+        $pruefe(!$b->validate(['betrag']), 'Bearbeiten: negativer Betrag abgelehnt');
+
         $kurs->plaetze = 4;
         $kurs->save();
         $pruefe(Dienst::nachruecken($kurs) === [], 'Nachrücken ohne Warteliste: nichts');

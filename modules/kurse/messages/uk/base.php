@@ -385,4 +385,12 @@ return [
     '{tag}: Bitte auch die Anfangszeit angeben.' => '{tag}: Вкажи також час початку.',
     '{tag}: Das Ende muss nach dem Anfang liegen.' => '{tag}: Кінець має бути пізніше за початок.',
     'An welchen Tagen findet der Kurs jede Woche statt? Uhrzeit je Tag nur ausfüllen, wenn sie von der Uhrzeit oben abweicht. Keine Tage angekreuzt = einmal pro Woche am Wochentag des Beginns.' => 'У які дні щотижня проходить курс? Час для окремого дня заповнюй лише тоді, коли він відрізняється від часу вище. Жоден день не позначено = раз на тиждень у день тижня початку курсу.',
+    'Anmeldung bearbeiten: {kind}' => 'Редагувати реєстрацію: {kind}',
+    'Hier änderst du die Angaben dieser Anmeldung. Die Eltern bekommen dabei keine Mail, Platz bzw. Wartelisten-Position bleiben unverändert. Mails an eine geänderte Adresse gehen erst bei der nächsten Nachricht dorthin.' => 'Тут ти змінюєш дані цієї реєстрації. Батьки не отримають листа, місце або позиція в листі очікування не змінюються. Листи на змінену адресу надходитимуть лише з наступним повідомленням.',
+    'Kursgebühr (€)' => 'Плата за курс (€)',
+    'Bezahlt am (leer = offen)' => 'Оплачено (порожньо = не оплачено)',
+    'Laut Kurs: Mitglieder {mitglied}, Nichtmitglieder {nicht}' => 'За курсом: члени {mitglied}, не члени {nicht}',
+    'Speichern (ohne Mail)' => 'Зберегти (без листа)',
+    'Änderungen bei {kind} gespeichert. Es wurde keine Mail verschickt.' => 'Зміни для {kind} збережено. Лист не надіслано.',
+    'Diese Anmeldung wurde bereits anonymisiert.' => 'Цю реєстрацію вже анонімізовано.',
 ];

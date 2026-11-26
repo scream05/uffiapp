@@ -385,4 +385,12 @@ return [
     '{tag}: Bitte auch die Anfangszeit angeben.' => '{tag}: Lütfen başlangıç saatini de gir.',
     '{tag}: Das Ende muss nach dem Anfang liegen.' => '{tag}: Bitiş, başlangıçtan sonra olmalı.',
     'An welchen Tagen findet der Kurs jede Woche statt? Uhrzeit je Tag nur ausfüllen, wenn sie von der Uhrzeit oben abweicht. Keine Tage angekreuzt = einmal pro Woche am Wochentag des Beginns.' => 'Kurs her hafta hangi günlerde yapılıyor? Günlük saati yalnızca yukarıdaki saatten farklıysa doldur. Hiçbir gün işaretli değil = başlangıç gününün haftanın gününde haftada bir kez.',
+    'Anmeldung bearbeiten: {kind}' => 'Kaydı düzenle: {kind}',
+    'Hier änderst du die Angaben dieser Anmeldung. Die Eltern bekommen dabei keine Mail, Platz bzw. Wartelisten-Position bleiben unverändert. Mails an eine geänderte Adresse gehen erst bei der nächsten Nachricht dorthin.' => 'Burada bu kaydın bilgilerini değiştirebilirsin. Ebeveynlere e-posta gönderilmez, yer veya bekleme listesindeki sıra değişmez. Değiştirilen adrese e-postalar ancak bir sonraki mesajla gider.',
+    'Kursgebühr (€)' => 'Kurs ücreti (€)',
+    'Bezahlt am (leer = offen)' => 'Ödeme tarihi (boş = ödenmedi)',
+    'Laut Kurs: Mitglieder {mitglied}, Nichtmitglieder {nicht}' => 'Kursa göre: üyeler {mitglied}, üye olmayanlar {nicht}',
+    'Speichern (ohne Mail)' => 'Kaydet (e-postasız)',
+    'Änderungen bei {kind} gespeichert. Es wurde keine Mail verschickt.' => '{kind} için değişiklikler kaydedildi. E-posta gönderilmedi.',
+    'Diese Anmeldung wurde bereits anonymisiert.' => 'Bu kayıt zaten anonimleştirildi.',
 ];

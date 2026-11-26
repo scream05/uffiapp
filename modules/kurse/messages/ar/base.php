@@ -385,4 +385,12 @@ return [
     '{tag}: Bitte auch die Anfangszeit angeben.' => '{tag}: يُرجى إدخال وقت البدء أيضًا.',
     '{tag}: Das Ende muss nach dem Anfang liegen.' => '{tag}: يجب أن يكون الانتهاء بعد البدء.',
     'An welchen Tagen findet der Kurs jede Woche statt? Uhrzeit je Tag nur ausfüllen, wenn sie von der Uhrzeit oben abweicht. Keine Tage angekreuzt = einmal pro Woche am Wochentag des Beginns.' => 'في أي أيام تُقام الدورة كل أسبوع؟ املأ الوقت لكل يوم فقط إذا كان يختلف عن الوقت أعلاه. لم يُحدَّد أي يوم = مرة واحدة أسبوعيًا في يوم بدء الدورة.',
+    'Anmeldung bearbeiten: {kind}' => 'تعديل التسجيل: {kind}',
+    'Hier änderst du die Angaben dieser Anmeldung. Die Eltern bekommen dabei keine Mail, Platz bzw. Wartelisten-Position bleiben unverändert. Mails an eine geänderte Adresse gehen erst bei der nächsten Nachricht dorthin.' => 'هنا يمكنك تغيير بيانات هذا التسجيل. لن يتلقى الوالدان أي بريد إلكتروني، ويبقى المكان أو الترتيب في قائمة الانتظار دون تغيير. لا تُرسل الرسائل إلى العنوان الجديد إلا مع الرسالة التالية.',
+    'Kursgebühr (€)' => 'رسوم الدورة (€)',
+    'Bezahlt am (leer = offen)' => 'تاريخ الدفع (فارغ = غير مدفوع)',
+    'Laut Kurs: Mitglieder {mitglied}, Nichtmitglieder {nicht}' => 'حسب الدورة: الأعضاء {mitglied}، غير الأعضاء {nicht}',
+    'Speichern (ohne Mail)' => 'حفظ (بدون بريد إلكتروني)',
+    'Änderungen bei {kind} gespeichert. Es wurde keine Mail verschickt.' => 'تم حفظ التغييرات لـ {kind}. لم يُرسل أي بريد إلكتروني.',
+    'Diese Anmeldung wurde bereits anonymisiert.' => 'تمت إزالة البيانات الشخصية من هذا التسجيل بالفعل.',
 ];

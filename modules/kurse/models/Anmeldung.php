@@ -53,6 +53,8 @@ class Anmeldung extends ActiveRecord
 
     public const SCENARIO_ELTERN = 'eltern';
     public const SCENARIO_HAND = 'hand';
+    /** Verwalter ändert eine bestehende Anmeldung (ohne Mail, Status bleibt) */
+    public const SCENARIO_BEARBEITEN = 'bearbeiten';
 
     /** Pflicht-Häkchen im Formular */
     public $bedingungen_ok;
@@ -73,6 +75,7 @@ class Anmeldung extends ActiveRecord
             self::SCENARIO_DEFAULT => $felder,
             self::SCENARIO_ELTERN => array_merge($felder, ['bedingungen_ok', 'datenschutz_ok', 'webseite']),
             self::SCENARIO_HAND => array_merge($felder, ['notiz']),
+            self::SCENARIO_BEARBEITEN => array_merge($felder, ['notiz', 'betrag', 'bezahlt_am']),
         ];
     }
 
@@ -101,7 +104,9 @@ class Anmeldung extends ActiveRecord
             [['bedingungen_ok', 'datenschutz_ok'], 'required', 'requiredValue' => 1, 'on' => self::SCENARIO_ELTERN,
                 'message' => Yii::t('KurseModule.base', 'Bitte bestätigen.')],
             ['webseite', 'compare', 'compareValue' => '', 'on' => self::SCENARIO_ELTERN, 'message' => Yii::t('KurseModule.base', 'Bitte dieses Feld leer lassen.')],
-            [['kind_geburtsdatum', 'email', 'telefon', 'notfall_telefon', 'schwimmstand', 'notiz'], 'default', 'value' => null],
+            ['betrag', 'number', 'min' => 0, 'max' => 9999, 'on' => self::SCENARIO_BEARBEITEN],
+            ['bezahlt_am', 'date', 'format' => 'php:Y-m-d', 'on' => self::SCENARIO_BEARBEITEN],
+            [['kind_geburtsdatum', 'email', 'telefon', 'notfall_telefon', 'schwimmstand', 'notiz', 'betrag', 'bezahlt_am'], 'default', 'value' => null],
         ];
     }
 
@@ -159,6 +164,8 @@ class Anmeldung extends ActiveRecord
             'mitglied' => Yii::t('KurseModule.base', 'Das Kind ist Mitglied im Verein'),
             'zahlart' => Yii::t('KurseModule.base', 'Zahlart'),
             'notiz' => Yii::t('KurseModule.base', 'Interne Notiz'),
+            'betrag' => Yii::t('KurseModule.base', 'Kursgebühr (€)'),
+            'bezahlt_am' => Yii::t('KurseModule.base', 'Bezahlt am (leer = offen)'),
         ];
     }
 

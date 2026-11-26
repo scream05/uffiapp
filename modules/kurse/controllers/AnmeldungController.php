@@ -24,7 +24,7 @@ class AnmeldungController extends ContentContainerController
 {
     protected function getAccessRules()
     {
-        return [['login' => ['hand', 'bezahlt', 'platz', 'abmelden', 'notiz']]];
+        return [['login' => ['hand', 'bearbeiten', 'bezahlt', 'platz', 'abmelden', 'notiz']]];
     }
 
     public function beforeAction($action)
@@ -109,6 +109,24 @@ class AnmeldungController extends ContentContainerController
             return $this->redirect($kurs->createUrl('/kurse/kurs/teilnehmer', ['id' => $kurs->id, 'liste' => $a->status]));
         }
         return $this->render('hand', ['a' => $a, 'kurs' => $kurs]);
+    }
+
+    /** Alle Angaben einer Anmeldung ändern – ohne Mail an die Eltern; Status und Platz bleiben unverändert */
+    public function actionBearbeiten($id)
+    {
+        $a = Anmeldung::findOne((int)$id);
+        if (!$a || !Module::kannVerwalten($a->kurs->verein_id)) {
+            throw new ForbiddenHttpException();
+        }
+        if ($a->anonymisiert_am) {
+            throw new NotFoundHttpException(Yii::t('KurseModule.base', 'Diese Anmeldung wurde bereits anonymisiert.'));
+        }
+        $a->scenario = Anmeldung::SCENARIO_BEARBEITEN;
+        if ($a->load(Yii::$app->request->post()) && $a->save()) {
+            $this->view->success(Yii::t('KurseModule.base', 'Änderungen bei {kind} gespeichert. Es wurde keine Mail verschickt.', ['kind' => $a->getKindName()]));
+            return $this->zurueck($a);
+        }
+        return $this->render('bearbeiten', ['a' => $a, 'kurs' => $a->kurs]);
     }
 
     public function actionBezahlt($id)

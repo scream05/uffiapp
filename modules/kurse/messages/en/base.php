@@ -385,4 +385,12 @@ return [
     '{tag}: Bitte auch die Anfangszeit angeben.' => '{tag}: Please also enter the start time.',
     '{tag}: Das Ende muss nach dem Anfang liegen.' => '{tag}: The end must be after the start.',
     'An welchen Tagen findet der Kurs jede Woche statt? Uhrzeit je Tag nur ausfüllen, wenn sie von der Uhrzeit oben abweicht. Keine Tage angekreuzt = einmal pro Woche am Wochentag des Beginns.' => 'On which days does the course take place each week? Only fill in a time per day if it differs from the time above. No days ticked = once a week on the weekday of the start date.',
+    'Anmeldung bearbeiten: {kind}' => 'Edit registration: {kind}',
+    'Hier änderst du die Angaben dieser Anmeldung. Die Eltern bekommen dabei keine Mail, Platz bzw. Wartelisten-Position bleiben unverändert. Mails an eine geänderte Adresse gehen erst bei der nächsten Nachricht dorthin.' => 'Here you can change the details of this registration. The parents will not receive an email, and the place or waiting list position stays the same. Emails only go to a changed address with the next message.',
+    'Kursgebühr (€)' => 'Course fee (€)',
+    'Bezahlt am (leer = offen)' => 'Paid on (empty = open)',
+    'Laut Kurs: Mitglieder {mitglied}, Nichtmitglieder {nicht}' => 'According to the course: members {mitglied}, non-members {nicht}',
+    'Speichern (ohne Mail)' => 'Save (no email)',
+    'Änderungen bei {kind} gespeichert. Es wurde keine Mail verschickt.' => 'Changes for {kind} saved. No email was sent.',
+    'Diese Anmeldung wurde bereits anonymisiert.' => 'This registration has already been anonymised.',
 ];

@@ -92,6 +92,9 @@ echo $this->render('_stil');
                             . ($a->status === Anmeldung::STATUS_PLATZ ? ' ' . Yii::t('KurseModule.base', 'Der Platz geht an die Warteliste.') : '')
                             . ($a->email && $a->bestaetigt_am ? ' ' . Yii::t('KurseModule.base', 'Die Eltern bekommen eine Mail.') : '')) ?>
                     <?php endif ?>
+                    <?php if (!$a->anonymisiert_am): ?>
+                        <?= Html::a('<i class="fa fa-pencil"></i> ' . Html::encode(Yii::t('KurseModule.base', 'Bearbeiten')), $space->createUrl('/kurse/anmeldung/bearbeiten', ['id' => $a->id]), ['class' => 'btn btn-sm btn-light']) ?>
+                    <?php endif ?>
                     <details class="d-inline-block"><summary class="btn btn-sm btn-light"><?= Yii::t('KurseModule.base', 'Notiz') ?></summary>
                         <?= Html::beginForm($space->createUrl('/kurse/anmeldung/notiz', ['id' => $a->id]), 'post', ['class' => 'mt-1 d-flex gap-1']) ?>
                         <?= Html::textInput('notiz', $a->notiz, ['class' => 'form-control form-control-sm', 'maxlength' => 1000, 'placeholder' => Yii::t('KurseModule.base', 'nur für Kursverwalter sichtbar')]) ?>

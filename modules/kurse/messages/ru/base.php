@@ -385,4 +385,12 @@ return [
     '{tag}: Bitte auch die Anfangszeit angeben.' => '{tag}: Укажи также время начала.',
     '{tag}: Das Ende muss nach dem Anfang liegen.' => '{tag}: Окончание должно быть позже начала.',
     'An welchen Tagen findet der Kurs jede Woche statt? Uhrzeit je Tag nur ausfüllen, wenn sie von der Uhrzeit oben abweicht. Keine Tage angekreuzt = einmal pro Woche am Wochentag des Beginns.' => 'В какие дни каждую неделю проходит курс? Время для отдельного дня заполняй, только если оно отличается от времени выше. Ни один день не отмечен = раз в неделю в день недели начала курса.',
+    'Anmeldung bearbeiten: {kind}' => 'Редактировать регистрацию: {kind}',
+    'Hier änderst du die Angaben dieser Anmeldung. Die Eltern bekommen dabei keine Mail, Platz bzw. Wartelisten-Position bleiben unverändert. Mails an eine geänderte Adresse gehen erst bei der nächsten Nachricht dorthin.' => 'Здесь ты изменяешь данные этой регистрации. Родители не получат письма, место или позиция в листе ожидания не меняются. Письма на изменённый адрес будут приходить только со следующим сообщением.',
+    'Kursgebühr (€)' => 'Плата за курс (€)',
+    'Bezahlt am (leer = offen)' => 'Оплачено (пусто = не оплачено)',
+    'Laut Kurs: Mitglieder {mitglied}, Nichtmitglieder {nicht}' => 'По курсу: члены {mitglied}, не члены {nicht}',
+    'Speichern (ohne Mail)' => 'Сохранить (без письма)',
+    'Änderungen bei {kind} gespeichert. Es wurde keine Mail verschickt.' => 'Изменения для {kind} сохранены. Письмо не отправлено.',
+    'Diese Anmeldung wurde bereits anonymisiert.' => 'Эта регистрация уже анонимизирована.',
 ];
