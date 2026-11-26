@@ -378,7 +378,7 @@ return [
     'Voraussichtlicher Beginn' => 'Expected start',
     'Beginn: {text}' => 'Start: {text}',
     'steht noch nicht fest' => 'not fixed yet',
-    'Leer lassen, wenn der Beginn noch nicht feststeht. Mit Haken unten: ungefähres Datum, nur für Sortierung und Jahr.' => 'Leave empty if the start is not fixed yet. With the box below ticked: approximate date, only used for sorting and the year.',
+    'Steht der Beginn noch nicht fest: ungefähres Datum, nur für Sortierung und Jahr.' => 'If the start is not fixed yet: approximate date, only used for sorting and the year.',
     'z. B. voraussichtlich im Januar 2027' => 'e.g. probably in January 2027',
     'Wird statt des Datums angezeigt. Erinnerungsmails vor Kursbeginn gibt es erst, wenn du den Haken entfernst und das echte Datum einträgst.' => 'Shown instead of the date. Reminder emails before the start are only sent once you untick the box and enter the real date.',
     '{tag}: Bitte die Uhrzeit als hh:mm angeben.' => '{tag}: Please enter the time as hh:mm.',
@@ -393,4 +393,5 @@ return [
     'Speichern (ohne Mail)' => 'Save (no email)',
     'Änderungen bei {kind} gespeichert. Es wurde keine Mail verschickt.' => 'Changes for {kind} saved. No email was sent.',
     'Diese Anmeldung wurde bereits anonymisiert.' => 'This registration has already been anonymised.',
+    'Maximale Teilnehmerzahl' => 'Maximum number of participants',
 ];

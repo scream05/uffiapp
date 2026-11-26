@@ -378,7 +378,7 @@ return [
     'Voraussichtlicher Beginn' => 'Ориентировочное начало',
     'Beginn: {text}' => 'Начало: {text}',
     'steht noch nicht fest' => 'ещё не определено',
-    'Leer lassen, wenn der Beginn noch nicht feststeht. Mit Haken unten: ungefähres Datum, nur für Sortierung und Jahr.' => 'Оставь пустым, если начало ещё не определено. С отметкой ниже: примерная дата, только для сортировки и года.',
+    'Steht der Beginn noch nicht fest: ungefähres Datum, nur für Sortierung und Jahr.' => 'Если начало ещё не определено: примерная дата, только для сортировки и года.',
     'z. B. voraussichtlich im Januar 2027' => 'напр. ориентировочно в январе 2027',
     'Wird statt des Datums angezeigt. Erinnerungsmails vor Kursbeginn gibt es erst, wenn du den Haken entfernst und das echte Datum einträgst.' => 'Показывается вместо даты. Напоминания перед началом курса отправляются только после того, как ты снимешь отметку и введёшь настоящую дату.',
     '{tag}: Bitte die Uhrzeit als hh:mm angeben.' => '{tag}: Укажи время в формате чч:мм.',
@@ -393,4 +393,5 @@ return [
     'Speichern (ohne Mail)' => 'Сохранить (без письма)',
     'Änderungen bei {kind} gespeichert. Es wurde keine Mail verschickt.' => 'Изменения для {kind} сохранены. Письмо не отправлено.',
     'Diese Anmeldung wurde bereits anonymisiert.' => 'Эта регистрация уже анонимизирована.',
+    'Maximale Teilnehmerzahl' => 'Максимальное число участников',
 ];

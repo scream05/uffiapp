@@ -378,7 +378,7 @@ return [
     'Voraussichtlicher Beginn' => 'Tahmini başlangıç',
     'Beginn: {text}' => 'Başlangıç: {text}',
     'steht noch nicht fest' => 'henüz belli değil',
-    'Leer lassen, wenn der Beginn noch nicht feststeht. Mit Haken unten: ungefähres Datum, nur für Sortierung und Jahr.' => 'Başlangıç henüz belli değilse boş bırak. Aşağıdaki kutu işaretliyse: yaklaşık tarih, yalnızca sıralama ve yıl için.',
+    'Steht der Beginn noch nicht fest: ungefähres Datum, nur für Sortierung und Jahr.' => 'Başlangıç henüz belli değilse: yaklaşık tarih, yalnızca sıralama ve yıl için.',
     'z. B. voraussichtlich im Januar 2027' => 'örn. muhtemelen Ocak 2027\'de',
     'Wird statt des Datums angezeigt. Erinnerungsmails vor Kursbeginn gibt es erst, wenn du den Haken entfernst und das echte Datum einträgst.' => 'Tarih yerine gösterilir. Kurs başlamadan önceki hatırlatma e-postaları ancak işareti kaldırıp gerçek tarihi girdiğinde gönderilir.',
     '{tag}: Bitte die Uhrzeit als hh:mm angeben.' => '{tag}: Lütfen saati ss:dd biçiminde gir.',
@@ -393,4 +393,5 @@ return [
     'Speichern (ohne Mail)' => 'Kaydet (e-postasız)',
     'Änderungen bei {kind} gespeichert. Es wurde keine Mail verschickt.' => '{kind} için değişiklikler kaydedildi. E-posta gönderilmedi.',
     'Diese Anmeldung wurde bereits anonymisiert.' => 'Bu kayıt zaten anonimleştirildi.',
+    'Maximale Teilnehmerzahl' => 'Azami katılımcı sayısı',
 ];

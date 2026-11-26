@@ -143,8 +143,8 @@ class KurseController extends Controller
         $grenze = date('Y-m-d', strtotime("-$tage days"));
         $n = 0;
         foreach (Kurs::find()->all() as $kurs) {
-            // Ohne festen Beginn gibt es kein Kursende: nichts löschen
-            if ($kurs->beginn_offen || $kurs->getEndeDatum() === '' || $kurs->getEndeDatum() >= $grenze) {
+            // Beginn steht noch nicht fest (Datum nur ungefähr): kein verlässliches Kursende, nichts löschen
+            if ($kurs->beginn_offen || $kurs->getEndeDatum() >= $grenze) {
                 continue;
             }
             $n += Anmeldung::updateAll([
@@ -221,16 +221,6 @@ class KurseController extends Controller
         $pruefe(str_starts_with($ko->getTermineText(), 'Beginn: voraussichtlich im Januar 2027 · Kurstage'), 'Anzeige: ' . $ko->getTermineText());
         $ko->beginn = '2020-01-01';
         $pruefe(!$ko->hatBegonnen() && !$ko->istVorbei(), 'offener Beginn zählt nie als begonnen/vorbei');
-        // Erster Kurstag leer: kein Pflichtfeld, gilt automatisch als offen, Text freiwillig
-        $kl = new Kurs(['titel' => 'x', 'ort' => 'x', 'plaetze' => 1, 'kontakt_email' => 'a@example.invalid', 'beginn' => '', 'einheiten' => 12,
-            'ende' => '2027-03-01']);
-        $kl->setWochentageListe(['1']);
-        $kl->validate();
-        $pruefe(!$kl->hasErrors('beginn') && !$kl->hasErrors('beginn_text') && !$kl->hasErrors('ende') && $kl->beginn === null && (int)$kl->beginn_offen === 1,
-            'Erster Kurstag leer erlaubt → Beginn offen' . ($kl->hasErrors() ? ' ' . json_encode($kl->getErrors()) : ''));
-        $kl->ende = null;
-        $pruefe($kl->getEndeDatum() === '' && !$kl->istVorbei() && !$kl->hatBegonnen() && str_starts_with($kl->getTermineText(), 'Beginn: steht noch nicht fest'),
-            'ohne Datum: kein Ende, nicht vorbei, Anzeige: ' . $kl->getTermineText());
         Yii::$app->language = $sprache;
         Yii::$app->formatter->locale = $locale;
         $neu = function (string $vorname, string $geb, bool $mitglied = false) use ($kurs) {

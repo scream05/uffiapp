@@ -378,7 +378,7 @@ return [
     'Voraussichtlicher Beginn' => 'موعد البدء المتوقع',
     'Beginn: {text}' => 'البدء: {text}',
     'steht noch nicht fest' => 'لم يُحدَّد بعد',
-    'Leer lassen, wenn der Beginn noch nicht feststeht. Mit Haken unten: ungefähres Datum, nur für Sortierung und Jahr.' => 'اتركه فارغًا إذا لم يُحدَّد موعد البدء بعد. مع تحديد الخانة أدناه: تاريخ تقريبي، للترتيب والسنة فقط.',
+    'Steht der Beginn noch nicht fest: ungefähres Datum, nur für Sortierung und Jahr.' => 'إذا لم يُحدَّد موعد البدء بعد: تاريخ تقريبي، للترتيب والسنة فقط.',
     'z. B. voraussichtlich im Januar 2027' => 'مثلًا على الأرجح في يناير 2027',
     'Wird statt des Datums angezeigt. Erinnerungsmails vor Kursbeginn gibt es erst, wenn du den Haken entfernst und das echte Datum einträgst.' => 'يُعرض بدلًا من التاريخ. لا تُرسل رسائل التذكير قبل بدء الدورة إلا بعد إزالة العلامة وإدخال التاريخ الفعلي.',
     '{tag}: Bitte die Uhrzeit als hh:mm angeben.' => '{tag}: يُرجى إدخال الوقت بصيغة سس:دد.',
@@ -393,4 +393,5 @@ return [
     'Speichern (ohne Mail)' => 'حفظ (بدون بريد إلكتروني)',
     'Änderungen bei {kind} gespeichert. Es wurde keine Mail verschickt.' => 'تم حفظ التغييرات لـ {kind}. لم يُرسل أي بريد إلكتروني.',
     'Diese Anmeldung wurde bereits anonymisiert.' => 'تمت إزالة البيانات الشخصية من هذا التسجيل بالفعل.',
+    'Maximale Teilnehmerzahl' => 'الحد الأقصى لعدد المشاركين',
 ];
