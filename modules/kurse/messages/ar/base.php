@@ -367,4 +367,10 @@ return [
     'Sprache wählen' => 'اختر اللغة',
     'Einige Texte des Vereins werden gerade automatisch übersetzt. Lade die Seite in einer Minute neu.' => 'تتم الآن ترجمة بعض نصوص النادي تلقائيًا. أعد تحميل الصفحة بعد دقيقة.',
     'Die Texte des Vereins wurden automatisch übersetzt. Maßgeblich ist die deutsche Fassung.' => 'تُرجمت نصوص النادي تلقائيًا. النسخة الألمانية هي المعتمدة.',
+    'Kurstage' => 'أيام الدورة',
+    'Kurstage: {tage}' => 'أيام الدورة: {tage}',
+    'leer = aus Einheiten und Kurstagen berechnet' => 'فارغ = يُحسب من عدد الحصص وأيام الدورة',
+    'z. B. nicht in den Ferien' => 'مثلًا ما عدا أيام العطل المدرسية',
+    'An welchen Tagen findet der Kurs jede Woche statt? Gleiche Uhrzeit an allen Tagen. Leer = einmal pro Woche am Wochentag des Beginns.' => 'في أي أيام تُقام الدورة كل أسبوع؟ نفس الوقت في جميع الأيام. فارغ = مرة واحدة أسبوعيًا في يوم بدء الدورة.',
+    '{feld} ist ein {wochentag}. Bitte diesen Tag mit ankreuzen oder das Datum anpassen.' => '{feld} يوافق يوم {wochentag}. يُرجى تحديد هذا اليوم أيضًا أو تغيير التاريخ.',
 ];

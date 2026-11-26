@@ -367,4 +367,10 @@ return [
     'Sprache wählen' => 'Choose language',
     'Einige Texte des Vereins werden gerade automatisch übersetzt. Lade die Seite in einer Minute neu.' => 'Some of the club’s texts are being translated automatically right now. Reload the page in a minute.',
     'Die Texte des Vereins wurden automatisch übersetzt. Maßgeblich ist die deutsche Fassung.' => 'The club’s texts were translated automatically. The German version is authoritative.',
+    'Kurstage' => 'Course days',
+    'Kurstage: {tage}' => 'Course days: {tage}',
+    'leer = aus Einheiten und Kurstagen berechnet' => 'empty = calculated from sessions and course days',
+    'z. B. nicht in den Ferien' => 'e.g. not during school holidays',
+    'An welchen Tagen findet der Kurs jede Woche statt? Gleiche Uhrzeit an allen Tagen. Leer = einmal pro Woche am Wochentag des Beginns.' => 'On which days does the course take place each week? Same time on all days. Empty = once a week on the weekday of the start date.',
+    '{feld} ist ein {wochentag}. Bitte diesen Tag mit ankreuzen oder das Datum anpassen.' => '{feld} is a {wochentag}. Please tick this day as well or change the date.',
 ];

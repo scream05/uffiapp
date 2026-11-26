@@ -367,4 +367,10 @@ return [
     'Sprache wählen' => 'Dil seç',
     'Einige Texte des Vereins werden gerade automatisch übersetzt. Lade die Seite in einer Minute neu.' => 'Kulübün bazı metinleri şu anda otomatik olarak çevriliyor. Sayfayı bir dakika sonra yeniden yükle.',
     'Die Texte des Vereins wurden automatisch übersetzt. Maßgeblich ist die deutsche Fassung.' => 'Kulübün metinleri otomatik olarak çevrildi. Geçerli olan Almanca metindir.',
+    'Kurstage' => 'Kurs günleri',
+    'Kurstage: {tage}' => 'Kurs günleri: {tage}',
+    'leer = aus Einheiten und Kurstagen berechnet' => 'boş = ders sayısı ve kurs günlerinden hesaplanır',
+    'z. B. nicht in den Ferien' => 'örn. tatillerde yok',
+    'An welchen Tagen findet der Kurs jede Woche statt? Gleiche Uhrzeit an allen Tagen. Leer = einmal pro Woche am Wochentag des Beginns.' => 'Kurs her hafta hangi günlerde yapılıyor? Tüm günlerde aynı saat. Boş = başlangıç gününün haftanın gününde haftada bir kez.',
+    '{feld} ist ein {wochentag}. Bitte diesen Tag mit ankreuzen oder das Datum anpassen.' => '{feld} bir {wochentag} gününe denk geliyor. Lütfen bu günü de işaretle veya tarihi değiştir.',
 ];

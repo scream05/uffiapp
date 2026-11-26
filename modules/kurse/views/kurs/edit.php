@@ -4,6 +4,7 @@
  */
 
 use humhub\helpers\Html;
+use humhub\modules\kurse\models\Kurs;
 use humhub\widgets\form\ActiveForm;
 
 $space = $this->context->contentContainer;
@@ -36,12 +37,13 @@ $dt = fn($v) => $v ? str_replace(' ', 'T', substr($v, 0, 16)) : '';
         <?= $f->field($kurs, 'ort')->textInput(['maxlength' => 255, 'placeholder' => Yii::t('KurseModule.base', 'z. B. Hallenbad Uffenheim')]) ?>
         <div class="row">
             <div class="col-6 col-md-3"><?= $f->field($kurs, 'beginn')->input('date') ?></div>
-            <div class="col-6 col-md-3"><?= $f->field($kurs, 'ende')->input('date')->hint(Html::encode(Yii::t('KurseModule.base', 'leer = aus Einheiten berechnet (wöchentlich)'))) ?></div>
+            <div class="col-6 col-md-3"><?= $f->field($kurs, 'ende')->input('date')->hint(Html::encode(Yii::t('KurseModule.base', 'leer = aus Einheiten und Kurstagen berechnet'))) ?></div>
             <div class="col-4 col-md-2"><?= $f->field($kurs, 'zeit_von')->input('time', ['value' => $kurs->zeit_von ? substr($kurs->zeit_von, 0, 5) : '']) ?></div>
             <div class="col-4 col-md-2"><?= $f->field($kurs, 'zeit_bis')->input('time', ['value' => $kurs->zeit_bis ? substr($kurs->zeit_bis, 0, 5) : '']) ?></div>
             <div class="col-4 col-md-2"><?= $f->field($kurs, 'einheiten')->input('number', ['min' => 1]) ?></div>
         </div>
-        <?= $f->field($kurs, 'termine_hinweis')->textInput(['maxlength' => 255, 'placeholder' => Yii::t('KurseModule.base', 'z. B. immer dienstags, nicht in den Ferien')]) ?>
+        <?= $f->field($kurs, 'wochentageListe')->inline()->checkboxList(Kurs::wochentagNamen(), ['value' => $kurs->getWochentageListe()])->hint(Html::encode(Yii::t('KurseModule.base', 'An welchen Tagen findet der Kurs jede Woche statt? Gleiche Uhrzeit an allen Tagen. Leer = einmal pro Woche am Wochentag des Beginns.'))) ?>
+        <?= $f->field($kurs, 'termine_hinweis')->textInput(['maxlength' => 255, 'placeholder' => Yii::t('KurseModule.base', 'z. B. nicht in den Ferien')]) ?>
 
         <h4><?= Yii::t('KurseModule.base', 'Anmeldung') ?></h4>
         <div class="row">

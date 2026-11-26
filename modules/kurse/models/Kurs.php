@@ -19,6 +19,7 @@ use yii\helpers\Url;
  * @property string $ort
  * @property string $beginn
  * @property string|null $ende
+ * @property string|null $wochentage ISO-Wochentage kommagetrennt, z. B. „1,6“
  * @property string|null $zeit_von
  * @property string|null $zeit_bis
  * @property string|null $termine_hinweis
@@ -67,6 +68,8 @@ class Kurs extends ActiveRecord
             [['beschreibung', 'bedingungen'], 'string', 'max' => 10000],
             [['titel', 'niveau', 'ort', 'termine_hinweis', 'kontoinhaber', 'iban', 'kontakt_email', 'beschreibung', 'bedingungen'], 'trim'],
             [['beginn', 'ende'], 'date', 'format' => 'php:Y-m-d'],
+            ['wochentageListe', 'each', 'rule' => ['in', 'range' => [1, 2, 3, 4, 5, 6, 7]]],
+            ['wochentageListe', 'validateWochentage'],
             ['ende', 'compare', 'compareAttribute' => 'beginn', 'operator' => '>=', 'type' => 'date', 'skipOnEmpty' => true,
                 'message' => Yii::t('KurseModule.base', 'Das Ende darf nicht vor dem Beginn liegen.')],
             [['zeit_von', 'zeit_bis'], 'match', 'pattern' => '/^\d{2}:\d{2}(:\d{2})?$/'],
@@ -90,6 +93,61 @@ class Kurs extends ActiveRecord
                 'preis_nichtmitglied', 'zahlungsfrist_tage', 'erinnerung_tage', 'niveau', 'termine_hinweis', 'kontoinhaber',
                 'beschreibung', 'bedingungen'], 'default', 'value' => null],
         ];
+    }
+
+    /** Erster und letzter Kurstag müssen auf einen angekreuzten Kurstag fallen */
+    public function validateWochentage()
+    {
+        $tage = $this->getWochentageListe();
+        if (!$tage) {
+            return;
+        }
+        foreach (['beginn', 'ende'] as $feld) {
+            if ($this->$feld && !$this->hasErrors($feld) && !in_array((int)date('N', strtotime($this->$feld)), $tage, true)) {
+                $this->addError('wochentageListe', Yii::t('KurseModule.base', '{feld} ist ein {wochentag}. Bitte diesen Tag mit ankreuzen oder das Datum anpassen.', [
+                    'feld' => $this->getAttributeLabel($feld), 'wochentag' => Yii::$app->formatter->asDate($this->$feld, 'EEEE')]));
+            }
+        }
+    }
+
+    /** Kurstage als Zahlen 1 (Mo) … 7 (So), sortiert */
+    public function getWochentageListe(): array
+    {
+        $tage = array_map('intval', array_filter(explode(',', (string)$this->wochentage), 'strlen'));
+        $tage = array_values(array_unique(array_filter($tage, fn($t) => $t >= 1 && $t <= 7)));
+        sort($tage);
+        return $tage;
+    }
+
+    /** Aus dem Formular (checkboxList, leer = '') */
+    public function setWochentageListe($werte): void
+    {
+        $tage = array_map('intval', is_array($werte) ? $werte : []);
+        $tage = array_values(array_unique(array_filter($tage, fn($t) => $t >= 1 && $t <= 7)));
+        sort($tage);
+        $this->wochentage = $tage ? implode(',', $tage) : null;
+    }
+
+    /** Auswahl für das Formular: 1 => „Montag“ … 7 => „Sonntag“ in der Sprache der Oberfläche */
+    public static function wochentagNamen(string $format = 'EEEE'): array
+    {
+        $namen = [];
+        for ($t = 1; $t <= 7; $t++) {
+            // 2024-01-01 war ein Montag
+            $namen[$t] = Yii::$app->formatter->asDate('2024-01-0' . $t, $format);
+        }
+        return $namen;
+    }
+
+    /** z. B. „Mo. + Sa.“, leer wenn keine Kurstage angegeben */
+    public function getWochentageText(): ?string
+    {
+        $tage = $this->getWochentageListe();
+        if (!$tage) {
+            return null;
+        }
+        $namen = self::wochentagNamen('EEE');
+        return implode(' + ', array_map(fn($t) => $namen[$t], $tage));
     }
 
     public function validateZahlart()
@@ -138,6 +196,7 @@ class Kurs extends ActiveRecord
             'zeit_bis' => Yii::t('KurseModule.base', 'bis'),
             'termine_hinweis' => Yii::t('KurseModule.base', 'Hinweis zu den Terminen'),
             'einheiten' => Yii::t('KurseModule.base', 'Anzahl der Einheiten'),
+            'wochentageListe' => Yii::t('KurseModule.base', 'Kurstage'),
             'alter_min' => Yii::t('KurseModule.base', 'Mindestalter (Jahre)'),
             'alter_max' => Yii::t('KurseModule.base', 'Höchstalter (Jahre)'),
             'plaetze' => Yii::t('KurseModule.base', 'Plätze'),
@@ -236,11 +295,23 @@ class Kurs extends ActiveRecord
         return $s === '' ? '' : '<span class="kurs-symbol" aria-hidden="true">' . $s . '</span> ';
     }
 
-    /** Letzter Kurstag (angegeben oder aus Beginn + Einheiten geschätzt, wöchentlich) */
+    /** Letzter Kurstag (angegeben oder aus Beginn + Einheiten geschätzt: an den Kurstagen, sonst wöchentlich) */
     public function getEndeDatum(): string
     {
         if ($this->ende) {
             return $this->ende;
+        }
+        $tage = $this->getWochentageListe();
+        if ($tage && $this->einheiten > 1) {
+            $tag = strtotime($this->beginn);
+            $rest = (int)$this->einheiten - (in_array((int)date('N', $tag), $tage, true) ? 1 : 0);
+            for ($i = 0; $rest > 0 && $i < 3000; $i++) {
+                $tag = strtotime('+1 day', $tag);
+                if (in_array((int)date('N', $tag), $tage, true)) {
+                    $rest--;
+                }
+            }
+            return date('Y-m-d', $tag);
         }
         $wochen = max(0, (int)$this->einheiten - 1);
         return date('Y-m-d', strtotime($this->beginn . " +$wochen weeks"));
@@ -390,6 +461,9 @@ class Kurs extends ActiveRecord
         $teile = [$this->ende
             ? Yii::t('KurseModule.base', '{beginn} bis {ende}', ['beginn' => self::tagUndDatum($this->beginn), 'ende' => self::tagUndDatum($this->ende)])
             : self::tagUndDatum($this->beginn)];
+        if ($w = $this->getWochentageText()) {
+            $teile[] = Yii::t('KurseModule.base', 'Kurstage: {tage}', ['tage' => $w]);
+        }
         if ($z = $this->getZeitText()) {
             $teile[] = $z;
         }

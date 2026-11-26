@@ -180,6 +180,26 @@ class KurseController extends Controller
             return ExitCode::DATAERR;
         }
         $this->stdout("Testkurs {$kurs->id}\n");
+        // Kurstage: Montag + Samstag, 12 Einheiten ab Montag 11.01.2027 → 6 Wochen, letzter Termin Samstag 20.02.2027
+        $sprache = Yii::$app->language;
+        Yii::$app->language = 'de';
+        $locale = Yii::$app->formatter->locale;
+        Yii::$app->formatter->locale = 'de-DE';
+        $kt = new Kurs(['titel' => 'x', 'beginn' => '2027-01-11', 'einheiten' => 12]);
+        $kt->load(['Kurs' => ['wochentageListe' => ['6', '1']]]);
+        $pruefe($kt->wochentage === '1,6' && $kt->getWochentageListe() === [1, 6], 'Kurstage gespeichert als 1,6');
+        $pruefe($kt->getEndeDatum() === '2027-02-20', 'Ende aus Kurstagen berechnet: ' . $kt->getEndeDatum());
+        $pruefe(str_contains($kt->getTermineText(), 'Kurstage: Mo. + Sa.'), 'Anzeige: ' . $kt->getTermineText());
+        $kt->validate(['wochentageListe']);
+        $pruefe(!$kt->hasErrors(), 'Beginn Montag passt zu Mo + Sa');
+        $kt->beginn = '2027-01-12';
+        $kt->validate(['wochentageListe']);
+        $pruefe($kt->hasErrors('wochentageListe'), 'Beginn Dienstag passt nicht zu Mo + Sa');
+        $kt->setWochentageListe('');
+        $kt->beginn = '2027-01-11';
+        $pruefe($kt->wochentage === null && $kt->getEndeDatum() === '2027-03-29', 'ohne Kurstage wöchentlich wie bisher');
+        Yii::$app->language = $sprache;
+        Yii::$app->formatter->locale = $locale;
         $neu = function (string $vorname, string $geb, bool $mitglied = false) use ($kurs) {
             $a = new Anmeldung(['kurs_id' => $kurs->id, 'scenario' => Anmeldung::SCENARIO_ELTERN]);
             $a->populateRelation('kurs', $kurs);

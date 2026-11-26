@@ -367,4 +367,10 @@ return [
     'Sprache wählen' => 'Выбрать язык',
     'Einige Texte des Vereins werden gerade automatisch übersetzt. Lade die Seite in einer Minute neu.' => 'Некоторые тексты клуба сейчас автоматически переводятся. Обнови страницу через минуту.',
     'Die Texte des Vereins wurden automatisch übersetzt. Maßgeblich ist die deutsche Fassung.' => 'Тексты клуба переведены автоматически. Действующей является немецкая версия.',
+    'Kurstage' => 'Дни занятий',
+    'Kurstage: {tage}' => 'Дни занятий: {tage}',
+    'leer = aus Einheiten und Kurstagen berechnet' => 'пусто = рассчитать по числу занятий и дням занятий',
+    'z. B. nicht in den Ferien' => 'напр. кроме каникул',
+    'An welchen Tagen findet der Kurs jede Woche statt? Gleiche Uhrzeit an allen Tagen. Leer = einmal pro Woche am Wochentag des Beginns.' => 'В какие дни каждую неделю проходит курс? Одинаковое время во все дни. Пусто = раз в неделю в день недели начала курса.',
+    '{feld} ist ein {wochentag}. Bitte diesen Tag mit ankreuzen oder das Datum anpassen.' => '{feld} приходится на {wochentag}. Отметь также этот день или измени дату.',
 ];
