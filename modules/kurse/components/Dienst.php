@@ -545,7 +545,7 @@ class Dienst
     }
 
     /**
-     * Mail im Stil der App (HumHub-Layout, Knopf über designwahl). Absendername: Verein über die Plattform,
+     * Mail im Stil der App (HumHub-Layout, Knopf über designwahl). Absendername: nur der Verein (Adresse der Plattform),
      * Antworten gehen an die Kontakt-E-Mail des Kurses. Wird aus den mail…-Methoden innerhalb von inSprache aufgerufen,
      * damit auch der Mailrahmen (Layout) in der Sprache der Eltern erscheint.
      */
@@ -567,9 +567,10 @@ class Dienst
             $mailer = Yii::$app->mailer;
             $html = $mailer->render('@humhub/views/mail/TextOnly', ['message' => $html], $mailer->htmlLayout);
             $absender = Yii::$app->settings->get('mailerSystemEmailAddress');
-            $name = Yii::$app->settings->get('mailerSystemEmailName');
+            // Absendername nur der Verein (Adresse bleibt die der Plattform, sonst DMARC-Spam);
+            // Antworten gehen per Reply-To an die Kontakt-E-Mail des Kurses (Pflichtfeld)
             $mail = $mailer->compose()
-                ->setFrom([$absender => mb_substr(Yii::t('KurseModule.base', '{verein} über {plattform}', ['verein' => $a->kurs->verein->name, 'plattform' => $name]), 0, 120)])
+                ->setFrom([$absender => mb_substr($a->kurs->verein->name, 0, 120)])
                 ->setTo($a->email)
                 ->setReplyTo($a->kurs->kontakt_email)
                 ->setSubject($betreff);

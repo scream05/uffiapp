@@ -358,7 +358,6 @@ return [
     '{n, plural, =1{1 Kurs} other{# Kurse}}' => '{n, plural, one{1 course} other{# courses}}',
     '{n} auf der Warteliste' => '{n} on the waiting list',
     '{titel} (Kopie)' => '{titel} (copy)',
-    '{verein} über {plattform}' => '{verein} via {plattform}',
     '{von} Uhr' => '{von}',
     '{von}–{bis} Uhr' => '{von}–{bis}',
     '{wochentag}, {datum}' => '{wochentag}, {datum}',

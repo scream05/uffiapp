@@ -358,7 +358,6 @@ return [
     '{n, plural, =1{1 Kurs} other{# Kurse}}' => '{n, plural, =1{1 kurs} other{# kurs}}',
     '{n} auf der Warteliste' => 'Bekleme listesinde: {n}',
     '{titel} (Kopie)' => '{titel} (kopya)',
-    '{verein} über {plattform}' => '{verein} ({plattform} üzerinden)',
     '{von} Uhr' => 'saat {von}',
     '{von}–{bis} Uhr' => '{von}–{bis}',
     '{wochentag}, {datum}' => '{wochentag}, {datum}',

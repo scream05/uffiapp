@@ -358,7 +358,6 @@ return [
     '{n, plural, =1{1 Kurs} other{# Kurse}}' => '{n, plural, zero{لا دورات} one{دورة واحدة} two{دورتان} few{# دورات} many{# دورة} other{# دورة}}',
     '{n} auf der Warteliste' => '{n} في قائمة الانتظار',
     '{titel} (Kopie)' => '{titel} (نسخة)',
-    '{verein} über {plattform}' => '{verein} عبر {plattform}',
     '{von} Uhr' => '{von}',
     '{von}–{bis} Uhr' => '{von}–{bis}',
     '{wochentag}, {datum}' => '{wochentag}، {datum}',

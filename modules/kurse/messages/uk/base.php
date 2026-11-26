@@ -358,7 +358,6 @@ return [
     '{n, plural, =1{1 Kurs} other{# Kurse}}' => '{n, plural, one{# курс} few{# курси} many{# курсів} other{# курсу}}',
     '{n} auf der Warteliste' => 'у списку очікування: {n}',
     '{titel} (Kopie)' => '{titel} (копія)',
-    '{verein} über {plattform}' => '{verein} через {plattform}',
     '{von} Uhr' => '{von}',
     '{von}–{bis} Uhr' => '{von}–{bis}',
     '{wochentag}, {datum}' => '{wochentag}, {datum}',
