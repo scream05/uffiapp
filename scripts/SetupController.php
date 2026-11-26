@@ -1230,6 +1230,34 @@ class SetupController extends Controller
         return ExitCode::OK;
     }
 
+    /**
+     * Bild für den Vorstellungstext an einen Verein hängen und die file-guid ausgeben (Einbau als
+     * ![alt>](file-guid:<guid>) – „>“ rechts, „<“ links neben dem Text):
+     * setup/verein-textbild <verein_id> <pfad> ["Bildbeschreibung"]
+     */
+    public function actionVereinTextbild($id, $pfad, $beschreibung = '')
+    {
+        $verein = \humhub\modules\vereine\models\Verein::findOne((int)$id);
+        if ($verein === null || !is_file($pfad)) {
+            $this->stderr("Verein oder Datei fehlt\n");
+            return ExitCode::DATAERR;
+        }
+        $mime = (new \finfo(FILEINFO_MIME_TYPE))->file($pfad);
+        if (!in_array($mime, ['image/jpeg', 'image/png', 'image/webp'], true)) {
+            $this->stderr("Kein JPEG/PNG/WebP: $mime\n");
+            return ExitCode::DATAERR;
+        }
+        Yii::$app->user->switchIdentity(User::find()->joinWith('groups')->where(['group.is_admin_group' => 1])->one());
+        $data = file_get_contents($pfad);
+        $file = new \humhub\modules\file\models\File(['file_name' => basename($pfad), 'mime_type' => $mime, 'size' => strlen($data),
+            'title' => mb_substr($beschreibung, 0, 250) ?: null]);
+        $file->save();
+        $file->setStoredFileContent($data);
+        $verein->fileManager->attach($file);
+        $this->stdout($file->guid . "\n");
+        return ExitCode::OK;
+    }
+
     /** Neue Entwürfe dieses Laufs (für eine Benachrichtigung an die Admins) */
     private array $neueEntwuerfe = [];
 

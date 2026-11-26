@@ -68,6 +68,7 @@ $module = Yii::$app->getModule('vereine');
                 /* Bild links/rechts im Editor (HumHub float-start/-end): Text daneben, am Handy volle Breite */
                 .verein-text img.float-start { width: 45%; margin: 4px 18px 10px 0; }
                 .verein-text img.float-end { width: 45%; margin: 4px 0 10px 18px; }
+                .verein-text img.float-start, .verein-text img.float-end, .verein-text h1, .verein-text h2, .verein-text h3 { clear: both; }
                 .verein-text::after { content: ''; display: block; clear: both; }
                 @media (max-width: 575px) { .verein-text img.float-start, .verein-text img.float-end { float: none !important; width: 100%; margin: 6px 0; } }
             </style>

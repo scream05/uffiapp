@@ -84,6 +84,8 @@ $social = $verein->getSocialList();
     .vorstellung img { border-radius: 14px; margin: 6px 0; }
     .vorstellung img.float-start { float: left; width: 45%; margin: 4px 22px 12px 0; }
     .vorstellung img.float-end { float: right; width: 45%; margin: 4px 0 12px 22px; }
+    /* Mehrere Bilder nacheinander: jedes beginnt unter dem vorigen, damit kein Text zwischen zwei Bildern eingeklemmt wird */
+    .vorstellung img.float-start, .vorstellung img.float-end, .vorstellung h1, .vorstellung h2, .vorstellung h3 { clear: both; }
     [dir=rtl] .vorstellung img.float-start { float: right; margin: 4px 0 12px 22px; }
     [dir=rtl] .vorstellung img.float-end { float: left; margin: 4px 22px 12px 0; }
     @media (max-width: 600px) { .vorstellung img.float-start, .vorstellung img.float-end { float: none; width: 100%; margin: 8px 0; } }
