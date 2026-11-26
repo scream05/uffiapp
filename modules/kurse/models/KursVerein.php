@@ -15,6 +15,7 @@ use yii\helpers\Url;
  * @property bool $seite_aktiv false = nur Vorschau für Admins/Kursverwalter
  * @property string|null $farbe Hauptfarbe der Seite (#rrggbb)
  * @property string|null $impressum_url Impressum des Vereins für die eigene Seite (leer = Impressum der Plattform)
+ * @property string|null $mitglied_url Aufnahmeantrag / „Mitglied werden“-Seite des Vereins (leer = kein Hinweis)
  */
 class KursVerein extends ActiveRecord
 {
@@ -40,6 +41,40 @@ class KursVerein extends ActiveRecord
     public static function cacheLeeren(): void
     {
         self::$cache = [];
+    }
+
+    public function rules()
+    {
+        return [
+            [['mitglied_url', 'impressum_url'], 'trim'],
+            [['mitglied_url', 'impressum_url'], 'default', 'value' => null],
+            ['mitglied_url', 'string', 'max' => 500],
+            ['impressum_url', 'string', 'max' => 255],
+            [['mitglied_url', 'impressum_url'], 'url', 'validSchemes' => ['https'],
+                'message' => \Yii::t('KurseModule.base', 'Bitte eine vollständige Adresse mit https:// angeben.')],
+        ];
+    }
+
+    public function attributeLabels()
+    {
+        return [
+            'mitglied_url' => \Yii::t('KurseModule.base', 'Link zum Aufnahmeantrag (Mitglied werden)'),
+            'impressum_url' => \Yii::t('KurseModule.base', 'Link zum Impressum des Vereins'),
+        ];
+    }
+
+    /** Link zum Aufnahmeantrag eines Vereins oder null */
+    public static function mitgliedUrl(int $vereinId): ?string
+    {
+        $url = self::fuer($vereinId)?->mitglied_url;
+        return $url !== null && $url !== '' ? $url : null;
+    }
+
+    /** Linktext „Aufnahmeantrag“ bzw. „Aufnahmeantrag (PDF)“ */
+    public static function mitgliedLinkText(string $url): string
+    {
+        $pdf = str_ends_with(strtolower((string)parse_url($url, PHP_URL_PATH)), '.pdf');
+        return $pdf ? \Yii::t('KurseModule.base', 'Aufnahmeantrag (PDF)') : \Yii::t('KurseModule.base', 'Aufnahmeantrag');
     }
 
     public static function gueltigerSlug(string $slug): bool

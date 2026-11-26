@@ -192,6 +192,7 @@ $social = $verein->getSocialList();
                     <?php if ($verein->telefon): ?><li>📞 <?= Html::a(Html::encode($verein->telefon), 'tel:' . preg_replace('/[^0-9+]/', '', $verein->telefon)) ?></li><?php endif ?>
                     <?php if ($verein->treffpunkt): ?><li>📍 <?= Html::encode(Inhalt::t($verein->treffpunkt)) ?></li><?php endif ?>
                     <?php if ($website !== ''): ?><li>🌐 <?= Html::a(Html::encode(preg_replace('#^https?://(www\.)?|/$#', '', $website)), $website, ['rel' => 'noopener']) ?></li><?php endif ?>
+                    <?php if ($mUrl = \humhub\modules\kurse\models\KursVerein::mitgliedUrl($verein->id)): ?><li>📝 <?= Yii::t('KurseModule.base', 'Mitglied werden: {link}', ['link' => Html::a(Html::encode(\humhub\modules\kurse\models\KursVerein::mitgliedLinkText($mUrl)), $mUrl, ['rel' => 'noopener', 'target' => '_blank'])]) ?></li><?php endif ?>
                     <?php foreach ($social as $link): ?><li>🔗 <?= Html::a(Html::encode($link['typ']), $link['url'], ['rel' => 'noopener nofollow']) ?></li><?php endforeach ?>
                 </ul>
             </div>

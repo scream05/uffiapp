@@ -26,7 +26,8 @@ $zahlarten = $kurs->hatPreis() ? $kurs->zahlarten() : [];
             <div class="col-md-4"><?= $f->field($a, 'kind_geburtsdatum')->input('date', ['max' => date('Y-m-d')]) ?></div>
         </div>
         <?= $f->field($a, 'schwimmstand')->textarea(['rows' => 2, 'maxlength' => 1000, 'placeholder' => Yii::t('KurseModule.base', 'z. B. wassergewöhnt, taucht schon, schwimmt mit Schwimmflügeln …')])->hint(Html::encode(Yii::t('KurseModule.base', 'freiwillig – hilft der Kursleitung bei der Einteilung'))) ?>
-        <?= $f->field($a, 'mitglied')->checkbox() ?>
+        <?php $mUrl = \humhub\modules\kurse\models\KursVerein::mitgliedUrl($kurs->verein_id) ?>
+        <?= $f->field($a, 'mitglied')->checkbox()->hint($mUrl ? Yii::t('KurseModule.base', 'Noch kein Mitglied? {link}', ['link' => Html::a(Html::encode(\humhub\modules\kurse\models\KursVerein::mitgliedLinkText($mUrl)), $mUrl, ['rel' => 'noopener', 'target' => '_blank'])]) : null) ?>
 
         <h4><?= Yii::t('KurseModule.base', 'Erziehungsberechtigte/r') ?></h4>
         <?= $f->field($a, 'eltern_name')->textInput(['maxlength' => 150, 'autocomplete' => 'name']) ?>

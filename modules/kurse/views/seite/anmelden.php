@@ -54,6 +54,9 @@ $haken = function (string $attr, string $label) use ($a) {
             <?= $feld('schwimmstand', Html::activeTextarea($a, 'schwimmstand', $opt('schwimmstand', ['rows' => 2, 'maxlength' => 1000,
                 'placeholder' => Yii::t('KurseModule.base', 'z. B. wassergewöhnt, taucht schon, schwimmt mit Schwimmflügeln …')])), Html::encode(Yii::t('KurseModule.base', 'hilft der Kursleitung bei der Einteilung')), false) ?>
             <?= $haken('mitglied', Html::encode($a->getAttributeLabel('mitglied'))) ?>
+            <?php if ($mUrl = \humhub\modules\kurse\models\KursVerein::mitgliedUrl($kurs->verein_id)): ?>
+                <p class="grau klein" style="margin-top:-6px"><?= Yii::t('KurseModule.base', 'Noch kein Mitglied? {link}', ['link' => Html::a(Html::encode(\humhub\modules\kurse\models\KursVerein::mitgliedLinkText($mUrl)), $mUrl, ['rel' => 'noopener', 'target' => '_blank'])]) ?></p>
+            <?php endif ?>
         </fieldset>
 
         <fieldset>

@@ -20,7 +20,10 @@ echo $this->render('_stil');
             <?php foreach ($verwaltung as $v): ?>
                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-2 mb-2">
                     <h4 class="m-0"><?= Html::encode($v['verein']->name) ?></h4>
-                    <?= Html::a('<i class="fa fa-plus"></i> ' . Html::encode(Yii::t('KurseModule.base', 'Neuer Kurs')), $space->createUrl('/kurse/kurs/create', ['verein' => $v['verein']->id]), ['class' => 'btn btn-primary btn-sm']) ?>
+                    <div class="d-flex gap-2">
+                        <?= Html::a('<i class="fa fa-cog"></i> ' . Html::encode(Yii::t('KurseModule.base', 'Einstellungen')), $space->createUrl('/kurse/kurs/einstellungen', ['verein' => $v['verein']->id]), ['class' => 'btn btn-light btn-sm']) ?>
+                        <?= Html::a('<i class="fa fa-plus"></i> ' . Html::encode(Yii::t('KurseModule.base', 'Neuer Kurs')), $space->createUrl('/kurse/kurs/create', ['verein' => $v['verein']->id]), ['class' => 'btn btn-primary btn-sm']) ?>
+                    </div>
                 </div>
                 <?php $seite = \humhub\modules\kurse\models\KursVerein::fuer($v['verein']->id); ?>
                 <?php if ($seite && $seite->hatSeite()): ?>

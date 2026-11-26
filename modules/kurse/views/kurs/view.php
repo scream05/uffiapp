@@ -58,6 +58,9 @@ echo $this->render('_stil');
             <?php if ($alter = $kurs->getAlterText()): ?><dt><?= Yii::t('KurseModule.base', 'Alter') ?></dt><dd><?= Yii::t('KurseModule.base', '{alter} (am ersten Kurstag)', ['alter' => Html::encode($alter)]) ?></dd><?php endif ?>
             <dt><?= Yii::t('KurseModule.base', 'Kosten') ?></dt><dd><?= Html::encode($kurs->getPreisText()) ?><?php if ($kurs->hatPreis()): ?><br><span class="text-muted"><?= Yii::t('KurseModule.base', 'Zahlung: {zahlarten}', ['zahlarten' => Html::encode(implode(' ' . Yii::t('KurseModule.base', 'oder') . ' ', $kurs->zahlarten()))]) ?></span><?php endif ?></dd>
             <dt><?= Yii::t('KurseModule.base', 'Plätze') ?></dt><dd><?= $kurs->plaetze ?><?= $kurs->nur_mitglieder ? ' · ' . Yii::t('KurseModule.base', 'nur für Vereinsmitglieder') : '' ?></dd>
+            <?php if ($mUrl = \humhub\modules\kurse\models\KursVerein::mitgliedUrl($kurs->verein_id)): ?>
+                <dt><?= Yii::t('KurseModule.base', 'Mitglied werden') ?></dt><dd><?= Html::a(Html::encode(\humhub\modules\kurse\models\KursVerein::mitgliedLinkText($mUrl)), $mUrl, ['rel' => 'noopener', 'target' => '_blank']) ?></dd>
+            <?php endif ?>
             <?php if ($kurs->anmeldung_ab || $kurs->anmeldung_bis): ?>
                 <dt><?= Yii::t('KurseModule.base', 'Anmeldung') ?></dt><dd><?= $kurs->anmeldung_ab ? Html::encode(Yii::t('KurseModule.base', 'ab {zeitpunkt}', ['zeitpunkt' => Kurs::datumZeit($kurs->anmeldung_ab)])) : '' ?>
                     <?= $kurs->anmeldung_bis ? Html::encode(Yii::t('KurseModule.base', 'bis {zeitpunkt}', ['zeitpunkt' => Kurs::datumZeit($kurs->anmeldung_bis)])) : '' ?></dd>

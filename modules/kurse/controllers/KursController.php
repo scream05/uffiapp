@@ -22,7 +22,7 @@ class KursController extends ContentContainerController
 {
     protected function getAccessRules()
     {
-        return [['login' => ['create', 'edit', 'kopieren', 'loeschen', 'veroeffentlichen', 'absagen', 'teilnehmer', 'export', 'rundmail', 'freigabe']]];
+        return [['login' => ['create', 'edit', 'kopieren', 'loeschen', 'veroeffentlichen', 'absagen', 'teilnehmer', 'export', 'rundmail', 'freigabe', 'einstellungen']]];
     }
 
     public function beforeAction($action)
@@ -257,6 +257,25 @@ class KursController extends ContentContainerController
             'alle' => [Anmeldung::STATUS_PLATZ, Anmeldung::STATUS_WARTELISTE],
             default => [Anmeldung::STATUS_PLATZ],
         };
+    }
+
+    /** Verwalter: Einstellungen des Vereins (Link zum Aufnahmeantrag, Impressum) */
+    public function actionEinstellungen($verein)
+    {
+        $verein = Verein::findOne((int)$verein);
+        if (!$verein || !Module::kannVerwalten($verein->id)) {
+            throw new ForbiddenHttpException(Yii::t('KurseModule.base', 'Kurse dieses Vereins darfst du nicht verwalten.'));
+        }
+        $kv = KursVerein::findOne($verein->id);
+        if (!$kv) {
+            throw new NotFoundHttpException();
+        }
+        if ($kv->load(Yii::$app->request->post()) && $kv->save(true, ['mitglied_url', 'impressum_url'])) {
+            KursVerein::cacheLeeren();
+            $this->view->saved();
+            return $this->redirect($this->contentContainer->createUrl('/kurse/kurs/index'));
+        }
+        return $this->render('einstellungen', ['kv' => $kv, 'verein' => $verein]);
     }
 
     /** Admin: Verein für das Kursmodul freischalten oder sperren */
