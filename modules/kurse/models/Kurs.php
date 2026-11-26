@@ -197,6 +197,26 @@ class Kurs extends ActiveRecord
         return $this->warteliste_max === null || $this->zaehle(Anmeldung::STATUS_WARTELISTE) < $this->warteliste_max;
     }
 
+    /** Kleines Symbol vor dem Kurstitel zur Unterscheidung (Schlüsselwort im deutschen Titel), sonst leer */
+    public function getSymbol(): string
+    {
+        $t = mb_strtolower((string)$this->titel);
+        if (str_contains($t, 'seeräuber')) {
+            return '🦜';
+        }
+        if (str_contains($t, 'pirat')) {
+            return '🏴‍☠️';
+        }
+        return '';
+    }
+
+    /** Symbol als HTML vor dem Titel (für Screenreader ausgeblendet) */
+    public function getSymbolHtml(): string
+    {
+        $s = $this->getSymbol();
+        return $s === '' ? '' : '<span class="kurs-symbol" aria-hidden="true">' . $s . '</span> ';
+    }
+
     /** Letzter Kurstag (angegeben oder aus Beginn + Einheiten geschätzt, wöchentlich) */
     public function getEndeDatum(): string
     {

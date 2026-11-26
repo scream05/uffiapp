@@ -11,7 +11,7 @@ use humhub\helpers\Html;
 ?>
 <a href="<?= Html::encode($kurs->getUrl()) ?>" class="kurs-karte">
     <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap">
-        <strong class="kurs-karte-titel"><?= Html::encode($kurs->titel) ?></strong>
+        <strong class="kurs-karte-titel"><?= $kurs->getSymbolHtml() ?><?= Html::encode($kurs->titel) ?></strong>
         <span class="badge text-bg-<?= $farbe ?>"><?= Html::encode($label) ?></span>
     </div>
     <?php if (!empty($mitVerein)): ?>

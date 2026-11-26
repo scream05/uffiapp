@@ -21,7 +21,7 @@ echo $this->render('_stil');
         <p><?= Html::a('<i class="fa fa-arrow-left"></i> ' . Html::encode(Yii::t('KurseModule.base', 'Alle Kurse')), $space->createUrl('/kurse/kurs/index')) ?></p>
         <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
             <div>
-                <h1 style="margin:0 0 4px;font-size:1.5em"><?= Html::encode($kurs->titel) ?></h1>
+                <h1 style="margin:0 0 4px;font-size:1.5em"><?= $kurs->getSymbolHtml() ?><?= Html::encode($kurs->titel) ?></h1>
                 <span class="text-muted"><?= Html::a(Html::encode($kurs->verein->name), $kurs->verein->getUrl()) ?><?= $kurs->niveau ? ' · ' . Html::encode($kurs->niveau) : '' ?></span>
             </div>
             <span class="badge text-bg-<?= $farbe ?>" style="font-size:.9em"><?= Html::encode($label) ?></span>

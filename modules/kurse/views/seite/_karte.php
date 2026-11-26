@@ -13,7 +13,7 @@ $entwurf = $kurs->status === Kurs::STATUS_ENTWURF;
 ?>
 <article class="karte kurs-karte">
     <div class="kurs-karte-kopf">
-        <h3><a href="<?= Html::encode($kurs->elternUrl('kurs')) ?>"><?= Html::encode(Inhalt::t($kurs->titel)) ?></a></h3>
+        <h3><a href="<?= Html::encode($kurs->elternUrl('kurs')) ?>"><?= $kurs->getSymbolHtml() ?><?= Html::encode(Inhalt::t($kurs->titel)) ?></a></h3>
         <span class="marke-status s-<?= $entwurf ? 'default' : $farbe ?>"><?= Html::encode($entwurf ? Yii::t('KurseModule.base', 'Entwurf – nur für Kursverwalter') : $label) ?></span>
     </div>
     <?php if ($kurs->niveau): ?><p class="grau klein kurs-niveau"><?= Html::encode(Inhalt::t($kurs->niveau)) ?></p><?php endif ?>

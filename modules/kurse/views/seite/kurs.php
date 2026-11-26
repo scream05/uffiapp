@@ -19,7 +19,7 @@ $seite = $this->context->seite;
     <div class="karte">
         <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start">
             <div>
-                <h1 style="margin:0 0 4px;font-size:1.8em"><?= Html::encode(Inhalt::t($kurs->titel)) ?></h1>
+                <h1 style="margin:0 0 4px;font-size:1.8em"><?= $kurs->getSymbolHtml() ?><?= Html::encode(Inhalt::t($kurs->titel)) ?></h1>
                 <?php if ($kurs->niveau): ?><p class="grau" style="margin:0"><?= Html::encode(Inhalt::t($kurs->niveau)) ?></p><?php endif ?>
             </div>
             <span class="marke-status s-<?= $kurs->status === Kurs::STATUS_ENTWURF ? 'default' : $farbe ?>"><?= Html::encode($kurs->status === Kurs::STATUS_ENTWURF ? Yii::t('KurseModule.base', 'Entwurf') : $label) ?></span>
