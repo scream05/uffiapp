@@ -381,4 +381,8 @@ return [
     'Steht der Beginn noch nicht fest: ungefähres Datum, nur für Sortierung und Jahr.' => 'If the start is not fixed yet: approximate date, only used for sorting and the year.',
     'z. B. voraussichtlich im Januar 2027' => 'e.g. probably in January 2027',
     'Wird statt des Datums angezeigt. Erinnerungsmails vor Kursbeginn gibt es erst, wenn du den Haken entfernst und das echte Datum einträgst.' => 'Shown instead of the date. Reminder emails before the start are only sent once you untick the box and enter the real date.',
+    '{tag}: Bitte die Uhrzeit als hh:mm angeben.' => '{tag}: Please enter the time as hh:mm.',
+    '{tag}: Bitte auch die Anfangszeit angeben.' => '{tag}: Please also enter the start time.',
+    '{tag}: Das Ende muss nach dem Anfang liegen.' => '{tag}: The end must be after the start.',
+    'An welchen Tagen findet der Kurs jede Woche statt? Uhrzeit je Tag nur ausfüllen, wenn sie von der Uhrzeit oben abweicht. Keine Tage angekreuzt = einmal pro Woche am Wochentag des Beginns.' => 'On which days does the course take place each week? Only fill in a time per day if it differs from the time above. No days ticked = once a week on the weekday of the start date.',
 ];

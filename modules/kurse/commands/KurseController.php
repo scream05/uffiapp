@@ -199,6 +199,17 @@ class KurseController extends Controller
         $kt->setWochentageListe('');
         $kt->beginn = '2027-01-11';
         $pruefe($kt->wochentage === null && $kt->getEndeDatum() === '2027-03-29', 'ohne Kurstage wöchentlich wie bisher');
+        // Abweichende Uhrzeit je Kurstag
+        $kz = new Kurs(['titel' => 'x', 'beginn' => '2027-01-11', 'einheiten' => 12, 'zeit_von' => '16:00', 'zeit_bis' => '16:45']);
+        $kz->load(['Kurs' => ['wochentageListe' => ['1', '6'], 'tageszeitenListe' => [
+            1 => ['von' => '', 'bis' => ''], 6 => ['von' => '11:15', 'bis' => '12:00'], 3 => ['von' => '09:00', 'bis' => '10:00']]]]);
+        $pruefe($kz->getTageszeitenListe() === [6 => ['von' => '11:15', 'bis' => '12:00']], 'nur angekreuzte Tage mit Uhrzeit gespeichert');
+        $pruefe(str_contains($kz->getTermineText(), 'Kurstage: Mo. 16:00–16:45 Uhr + Sa. 11:15–12:00 Uhr · 12 Einheiten'), 'Anzeige: ' . $kz->getTermineText());
+        $kz->setTageszeitenListe([6 => ['von' => '12:00', 'bis' => '11:00']]);
+        $kz->validate(['tageszeitenListe']);
+        $pruefe($kz->hasErrors('tageszeitenListe'), 'Ende vor Anfang abgelehnt');
+        $kz->setTageszeitenListe([]);
+        $pruefe(str_contains($kz->getTermineText(), 'Kurstage: Mo. + Sa. · 16:00–16:45 Uhr'), 'ohne abweichende Zeiten wie bisher');
         // Beginn steht noch nicht fest
         $ko = new Kurs(['titel' => 'x', 'ort' => 'x', 'plaetze' => 1, 'kontakt_email' => 'a@example.invalid', 'beginn' => '2027-01-12',
             'einheiten' => 12, 'beginn_offen' => 1, 'beginn_text' => '']);

@@ -23,6 +23,7 @@ use yii\helpers\Url;
  * @property string|null $beginn_text z. B. „voraussichtlich im Januar 2027“
  * @property string|null $ende
  * @property string|null $wochentage ISO-Wochentage kommagetrennt, z. B. „1,6“
+ * @property string|null $tageszeiten JSON: abweichende Uhrzeit je Kurstag, z. B. {"6":{"von":"11:15","bis":"12:00"}}
  * @property string|null $zeit_von
  * @property string|null $zeit_bis
  * @property string|null $termine_hinweis
@@ -77,6 +78,7 @@ class Kurs extends ActiveRecord
             [['beginn', 'ende'], 'date', 'format' => 'php:Y-m-d'],
             ['wochentageListe', 'each', 'rule' => ['in', 'range' => [1, 2, 3, 4, 5, 6, 7]]],
             ['wochentageListe', 'validateWochentage'],
+            ['tageszeitenListe', 'validateTageszeiten'],
             ['ende', 'compare', 'compareAttribute' => 'beginn', 'operator' => '>=', 'type' => 'date', 'skipOnEmpty' => true,
                 'message' => Yii::t('KurseModule.base', 'Das Ende darf nicht vor dem Beginn liegen.')],
             [['zeit_von', 'zeit_bis'], 'match', 'pattern' => '/^\d{2}:\d{2}(:\d{2})?$/'],
@@ -117,6 +119,71 @@ class Kurs extends ActiveRecord
         }
     }
 
+    /** Uhrzeiten je Kurstag prüfen: Format hh:mm, Ende nach Beginn, „bis“ nur mit „von“ */
+    public function validateTageszeiten()
+    {
+        $namen = self::wochentagNamen();
+        foreach ($this->getTageszeitenListe() as $tag => $z) {
+            foreach (['von', 'bis'] as $k) {
+                if ($z[$k] !== '' && !preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $z[$k])) {
+                    $this->addError('tageszeitenListe', Yii::t('KurseModule.base', '{tag}: Bitte die Uhrzeit als hh:mm angeben.', ['tag' => $namen[$tag]]));
+                    continue 2;
+                }
+            }
+            if ($z['von'] === '' && $z['bis'] !== '') {
+                $this->addError('tageszeitenListe', Yii::t('KurseModule.base', '{tag}: Bitte auch die Anfangszeit angeben.', ['tag' => $namen[$tag]]));
+            } elseif ($z['bis'] !== '' && $z['bis'] <= $z['von']) {
+                $this->addError('tageszeitenListe', Yii::t('KurseModule.base', '{tag}: Das Ende muss nach dem Anfang liegen.', ['tag' => $namen[$tag]]));
+            }
+        }
+    }
+
+    /**
+     * Abweichende Uhrzeiten je Kurstag: [6 => ['von' => '11:15', 'bis' => '12:00'], …].
+     * Nur angekreuzte Kurstage, nur Tage mit wenigstens einer Angabe.
+     */
+    public function getTageszeitenListe(): array
+    {
+        $daten = json_decode((string)$this->tageszeiten, true);
+        if (!is_array($daten)) {
+            return [];
+        }
+        $tage = $this->getWochentageListe();
+        $liste = [];
+        foreach ($daten as $tag => $z) {
+            $tag = (int)$tag;
+            if (!in_array($tag, $tage, true) || !is_array($z)) {
+                continue;
+            }
+            $von = substr(trim((string)($z['von'] ?? '')), 0, 5);
+            $bis = substr(trim((string)($z['bis'] ?? '')), 0, 5);
+            if ($von !== '' || $bis !== '') {
+                $liste[$tag] = ['von' => $von, 'bis' => $bis];
+            }
+        }
+        ksort($liste);
+        return $liste;
+    }
+
+    /** Aus dem Formular: Kurs[tageszeitenListe][6][von] … (Tage ohne Haken werden beim Lesen ignoriert) */
+    public function setTageszeitenListe($werte): void
+    {
+        $daten = [];
+        foreach (is_array($werte) ? $werte : [] as $tag => $z) {
+            $tag = (int)$tag;
+            if ($tag < 1 || $tag > 7 || !is_array($z)) {
+                continue;
+            }
+            $von = trim((string)($z['von'] ?? ''));
+            $bis = trim((string)($z['bis'] ?? ''));
+            if ($von !== '' || $bis !== '') {
+                $daten[$tag] = ['von' => $von, 'bis' => $bis];
+            }
+        }
+        ksort($daten);
+        $this->tageszeiten = $daten ? json_encode($daten) : null;
+    }
+
     /** Kurstage als Zahlen 1 (Mo) … 7 (So), sortiert */
     public function getWochentageListe(): array
     {
@@ -154,7 +221,17 @@ class Kurs extends ActiveRecord
             return null;
         }
         $namen = self::wochentagNamen('EEE');
-        return implode(' + ', array_map(fn($t) => $namen[$t], $tage));
+        $zeiten = $this->getTageszeitenListe();
+        if (!$zeiten) {
+            return implode(' + ', array_map(fn($t) => $namen[$t], $tage));
+        }
+        // Abweichende Uhrzeiten: jeder Tag mit seiner Zeit (sonst die allgemeine Uhrzeit des Kurses)
+        return implode(' + ', array_map(function ($t) use ($namen, $zeiten) {
+            $z = isset($zeiten[$t]) && $zeiten[$t]['von'] !== ''
+                ? self::zeitText($zeiten[$t]['von'], $zeiten[$t]['bis'])
+                : $this->getZeitText();
+            return $z ? $namen[$t] . ' ' . $z : $namen[$t];
+        }, $tage));
     }
 
     public function validateZahlart()
@@ -462,12 +539,15 @@ class Kurs extends ActiveRecord
 
     public function getZeitText(): ?string
     {
-        if (!$this->zeit_von) {
-            return null;
-        }
-        return $this->zeit_bis
-            ? Yii::t('KurseModule.base', '{von}–{bis} Uhr', ['von' => substr($this->zeit_von, 0, 5), 'bis' => substr($this->zeit_bis, 0, 5)])
-            : Yii::t('KurseModule.base', '{von} Uhr', ['von' => substr($this->zeit_von, 0, 5)]);
+        return $this->zeit_von ? self::zeitText($this->zeit_von, $this->zeit_bis) : null;
+    }
+
+    /** „16:00–16:45 Uhr“ bzw. „16:00 Uhr“ */
+    public static function zeitText(string $von, ?string $bis): string
+    {
+        return $bis
+            ? Yii::t('KurseModule.base', '{von}–{bis} Uhr', ['von' => substr($von, 0, 5), 'bis' => substr($bis, 0, 5)])
+            : Yii::t('KurseModule.base', '{von} Uhr', ['von' => substr($von, 0, 5)]);
     }
 
     /** z. B. „Dienstag, 13.01.2027 · 15:00–15:45 Uhr · 10 Einheiten“ (Format der aktuellen Sprache) */
@@ -481,7 +561,8 @@ class Kurs extends ActiveRecord
         if ($w = $this->getWochentageText()) {
             $teile[] = Yii::t('KurseModule.base', 'Kurstage: {tage}', ['tage' => $w]);
         }
-        if ($z = $this->getZeitText()) {
+        // Bei abweichenden Uhrzeiten je Tag steht die Zeit schon bei den Kurstagen
+        if (!$this->getTageszeitenListe() && ($z = $this->getZeitText())) {
             $teile[] = $z;
         }
         if ($this->einheiten) {

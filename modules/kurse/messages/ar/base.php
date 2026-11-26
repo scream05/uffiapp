@@ -381,4 +381,8 @@ return [
     'Steht der Beginn noch nicht fest: ungefähres Datum, nur für Sortierung und Jahr.' => 'إذا لم يُحدَّد موعد البدء بعد: تاريخ تقريبي، للترتيب والسنة فقط.',
     'z. B. voraussichtlich im Januar 2027' => 'مثلًا على الأرجح في يناير 2027',
     'Wird statt des Datums angezeigt. Erinnerungsmails vor Kursbeginn gibt es erst, wenn du den Haken entfernst und das echte Datum einträgst.' => 'يُعرض بدلًا من التاريخ. لا تُرسل رسائل التذكير قبل بدء الدورة إلا بعد إزالة العلامة وإدخال التاريخ الفعلي.',
+    '{tag}: Bitte die Uhrzeit als hh:mm angeben.' => '{tag}: يُرجى إدخال الوقت بصيغة سس:دد.',
+    '{tag}: Bitte auch die Anfangszeit angeben.' => '{tag}: يُرجى إدخال وقت البدء أيضًا.',
+    '{tag}: Das Ende muss nach dem Anfang liegen.' => '{tag}: يجب أن يكون الانتهاء بعد البدء.',
+    'An welchen Tagen findet der Kurs jede Woche statt? Uhrzeit je Tag nur ausfüllen, wenn sie von der Uhrzeit oben abweicht. Keine Tage angekreuzt = einmal pro Woche am Wochentag des Beginns.' => 'في أي أيام تُقام الدورة كل أسبوع؟ املأ الوقت لكل يوم فقط إذا كان يختلف عن الوقت أعلاه. لم يُحدَّد أي يوم = مرة واحدة أسبوعيًا في يوم بدء الدورة.',
 ];

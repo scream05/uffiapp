@@ -52,7 +52,45 @@ $dt = fn($v) => $v ? str_replace(' ', 'T', substr($v, 0, 16)) : '';
                 $('#kurs-beginn_offen').on('change', function () { $('#kurs-beginn-text-feld').toggle(this.checked); });
             });
         </script>
-        <?= $f->field($kurs, 'wochentageListe')->inline()->checkboxList(Kurs::wochentagNamen(), ['value' => $kurs->getWochentageListe()])->hint(Html::encode(Yii::t('KurseModule.base', 'An welchen Tagen findet der Kurs jede Woche statt? Gleiche Uhrzeit an allen Tagen. Leer = einmal pro Woche am Wochentag des Beginns.'))) ?>
+        <?php
+        // Kurstage mit optional abweichender Uhrzeit je Tag (leer = Uhrzeit von/bis oben)
+        $kurstage = $kurs->getWochentageListe();
+        $roheZeiten = json_decode((string)$kurs->tageszeiten, true) ?: [];
+        $fehlerTage = $kurs->hasErrors('wochentageListe') || $kurs->hasErrors('tageszeitenListe');
+        ?>
+        <div class="mb-3 kurs-kurstage<?= $fehlerTage ? ' has-error' : '' ?>">
+            <label class="form-label"><?= Html::encode($kurs->getAttributeLabel('wochentageListe')) ?></label>
+            <?= Html::hiddenInput(Html::getInputName($kurs, 'wochentageListe'), '') ?>
+            <?php foreach (Kurs::wochentagNamen() as $nr => $name): ?>
+                <?php $an = in_array($nr, $kurstage, true); $z = $roheZeiten[$nr] ?? []; ?>
+                <div class="kurs-kurstag">
+                    <label class="kurs-kurstag-name">
+                        <?= Html::checkbox(Html::getInputName($kurs, 'wochentageListe') . '[]', $an, ['value' => $nr, 'class' => 'kurs-kurstag-haken']) ?>
+                        <?= Html::encode($name) ?>
+                    </label>
+                    <span class="kurs-kurstag-zeit"<?= $an ? '' : ' style="display:none"' ?>>
+                        <?= Html::input('time', Html::getInputName($kurs, 'tageszeitenListe') . "[$nr][von]", substr((string)($z['von'] ?? ''), 0, 5), ['class' => 'form-control form-control-sm', 'aria-label' => $name . ' ' . $kurs->getAttributeLabel('zeit_von')]) ?>
+                        <span>–</span>
+                        <?= Html::input('time', Html::getInputName($kurs, 'tageszeitenListe') . "[$nr][bis]", substr((string)($z['bis'] ?? ''), 0, 5), ['class' => 'form-control form-control-sm', 'aria-label' => $name . ' ' . $kurs->getAttributeLabel('zeit_bis')]) ?>
+                    </span>
+                </div>
+            <?php endforeach ?>
+            <?php foreach (array_merge($kurs->getErrors('wochentageListe'), $kurs->getErrors('tageszeitenListe')) as $fehler): ?>
+                <div class="invalid-feedback d-block"><?= Html::encode($fehler) ?></div>
+            <?php endforeach ?>
+            <div class="form-text"><?= Html::encode(Yii::t('KurseModule.base', 'An welchen Tagen findet der Kurs jede Woche statt? Uhrzeit je Tag nur ausfüllen, wenn sie von der Uhrzeit oben abweicht. Keine Tage angekreuzt = einmal pro Woche am Wochentag des Beginns.')) ?></div>
+        </div>
+        <style <?= Html::nonce() ?>>
+            .kurs-kurstag { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; min-height: 36px; }
+            .kurs-kurstag-name { min-width: 120px; margin: 0; display: flex; align-items: center; gap: 8px; }
+            .kurs-kurstag-zeit { display: inline-flex; align-items: center; gap: 6px; }
+            .kurs-kurstag-zeit input { width: 7.5em; }
+        </style>
+        <script <?= Html::nonce() ?>>
+            $(function () {
+                $('.kurs-kurstag-haken').on('change', function () { $(this).closest('.kurs-kurstag').find('.kurs-kurstag-zeit').toggle(this.checked); });
+            });
+        </script>
         <?= $f->field($kurs, 'termine_hinweis')->textInput(['maxlength' => 255, 'placeholder' => Yii::t('KurseModule.base', 'z. B. nicht in den Ferien')]) ?>
 
         <h4><?= Yii::t('KurseModule.base', 'Anmeldung') ?></h4>

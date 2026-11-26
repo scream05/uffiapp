@@ -381,4 +381,8 @@ return [
     'Steht der Beginn noch nicht fest: ungefähres Datum, nur für Sortierung und Jahr.' => 'Başlangıç henüz belli değilse: yaklaşık tarih, yalnızca sıralama ve yıl için.',
     'z. B. voraussichtlich im Januar 2027' => 'örn. muhtemelen Ocak 2027\'de',
     'Wird statt des Datums angezeigt. Erinnerungsmails vor Kursbeginn gibt es erst, wenn du den Haken entfernst und das echte Datum einträgst.' => 'Tarih yerine gösterilir. Kurs başlamadan önceki hatırlatma e-postaları ancak işareti kaldırıp gerçek tarihi girdiğinde gönderilir.',
+    '{tag}: Bitte die Uhrzeit als hh:mm angeben.' => '{tag}: Lütfen saati ss:dd biçiminde gir.',
+    '{tag}: Bitte auch die Anfangszeit angeben.' => '{tag}: Lütfen başlangıç saatini de gir.',
+    '{tag}: Das Ende muss nach dem Anfang liegen.' => '{tag}: Bitiş, başlangıçtan sonra olmalı.',
+    'An welchen Tagen findet der Kurs jede Woche statt? Uhrzeit je Tag nur ausfüllen, wenn sie von der Uhrzeit oben abweicht. Keine Tage angekreuzt = einmal pro Woche am Wochentag des Beginns.' => 'Kurs her hafta hangi günlerde yapılıyor? Günlük saati yalnızca yukarıdaki saatten farklıysa doldur. Hiçbir gün işaretli değil = başlangıç gününün haftanın gününde haftada bir kez.',
 ];

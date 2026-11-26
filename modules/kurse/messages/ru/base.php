@@ -381,4 +381,8 @@ return [
     'Steht der Beginn noch nicht fest: ungefähres Datum, nur für Sortierung und Jahr.' => 'Если начало ещё не определено: примерная дата, только для сортировки и года.',
     'z. B. voraussichtlich im Januar 2027' => 'напр. ориентировочно в январе 2027',
     'Wird statt des Datums angezeigt. Erinnerungsmails vor Kursbeginn gibt es erst, wenn du den Haken entfernst und das echte Datum einträgst.' => 'Показывается вместо даты. Напоминания перед началом курса отправляются только после того, как ты снимешь отметку и введёшь настоящую дату.',
+    '{tag}: Bitte die Uhrzeit als hh:mm angeben.' => '{tag}: Укажи время в формате чч:мм.',
+    '{tag}: Bitte auch die Anfangszeit angeben.' => '{tag}: Укажи также время начала.',
+    '{tag}: Das Ende muss nach dem Anfang liegen.' => '{tag}: Окончание должно быть позже начала.',
+    'An welchen Tagen findet der Kurs jede Woche statt? Uhrzeit je Tag nur ausfüllen, wenn sie von der Uhrzeit oben abweicht. Keine Tage angekreuzt = einmal pro Woche am Wochentag des Beginns.' => 'В какие дни каждую неделю проходит курс? Время для отдельного дня заполняй, только если оно отличается от времени выше. Ни один день не отмечен = раз в неделю в день недели начала курса.',
 ];
