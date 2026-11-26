@@ -207,6 +207,9 @@ class Kurs extends ActiveRecord
         if (str_contains($t, 'pirat')) {
             return '🏴‍☠️';
         }
+        if (str_contains($t, 'anfänger')) {
+            return '🐠';
+        }
         return '';
     }
 
