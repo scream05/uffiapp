@@ -124,7 +124,7 @@ class Inhalt
             $roh[] = $p['funktion'] ?? '';
         }
         $kurse = Kurs::find()->where(['verein_id' => $verein->id])
-            ->andWhere(['>=', 'COALESCE(ende, beginn)', date('Y-m-d')])->all();
+            ->andWhere(['or', ['beginn_offen' => 1], ['>=', 'COALESCE(ende, beginn)', date('Y-m-d')]])->all();
         foreach ($kurse as $kurs) {
             array_push($roh, $kurs->titel, $kurs->beginn_text, $kurs->niveau, $kurs->ort, $kurs->termine_hinweis, $kurs->beschreibung,
                 $kurs->bedingungen, $kurs->absage_grund);

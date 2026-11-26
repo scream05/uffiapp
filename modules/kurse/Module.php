@@ -102,7 +102,7 @@ class Module extends ContentContainerModule
     {
         $q = Kurs::find()->innerJoin('kurs_verein kv', 'kv.verein_id = kurs.verein_id')
             ->where(['kurs.status' => [Kurs::STATUS_OFFEN, Kurs::STATUS_ABGESAGT]])
-            ->andWhere(['>=', 'COALESCE(kurs.ende, kurs.beginn)', date('Y-m-d')])
+            ->andWhere(['or', ['kurs.beginn_offen' => 1], ['>=', 'COALESCE(kurs.ende, kurs.beginn)', date('Y-m-d')]])
             ->orderBy(['kurs.beginn' => SORT_ASC, 'kurs.zeit_von' => SORT_ASC]);
         if ($vereinId !== null) {
             $q->andWhere(['kurs.verein_id' => $vereinId]);

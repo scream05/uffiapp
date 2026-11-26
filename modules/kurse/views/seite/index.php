@@ -19,7 +19,7 @@ $verein = $c->verein;
 if (Module::kannVerwalten($verein->id)) {
     // Vorschau für Kursverwalter: Entwürfe mit anzeigen
     $entwuerfe = Kurs::find()->where(['verein_id' => $verein->id, 'status' => Kurs::STATUS_ENTWURF])
-        ->andWhere(['>=', 'COALESCE(ende, beginn)', date('Y-m-d')])->orderBy(['beginn' => SORT_ASC])->all();
+        ->andWhere(['or', ['beginn_offen' => 1], ['>=', 'COALESCE(ende, beginn)', date('Y-m-d')]])->orderBy(['beginn' => SORT_ASC])->all();
     $kurse = array_merge($kurse, $entwuerfe);
     usort($kurse, fn($a, $b) => strcmp($a->beginn . $a->zeit_von, $b->beginn . $b->zeit_von));
 }
