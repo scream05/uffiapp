@@ -4,6 +4,7 @@ namespace humhub\modules\kurse\models;
 
 use humhub\components\ActiveRecord;
 use humhub\modules\vereine\models\Verein;
+use humhub\modules\kurse\components\Inhalt;
 use Yii;
 use yii\helpers\Url;
 
@@ -17,7 +18,9 @@ use yii\helpers\Url;
  * @property string|null $niveau
  * @property string|null $beschreibung
  * @property string $ort
- * @property string $beginn
+ * @property string $beginn bei beginn_offen nur ungefähr (Sortierung/Jahr), wird nicht angezeigt
+ * @property bool $beginn_offen
+ * @property string|null $beginn_text z. B. „voraussichtlich im Januar 2027“
  * @property string|null $ende
  * @property string|null $wochentage ISO-Wochentage kommagetrennt, z. B. „1,6“
  * @property string|null $zeit_von
@@ -63,10 +66,14 @@ class Kurs extends ActiveRecord
         return [
             [['titel', 'ort', 'beginn', 'plaetze', 'kontakt_email'], 'required'],
             [['titel'], 'string', 'max' => 150],
+            [['beginn_text'], 'string', 'max' => 100],
+            [['beginn_offen'], 'boolean'],
+            ['beginn_text', 'required', 'when' => fn($m) => (bool)$m->beginn_offen, 'whenClient' => "function(){return \$('#kurs-beginn_offen').is(':checked');}",
+                'message' => Yii::t('KurseModule.base', 'Bitte kurz beschreiben, wann der Kurs voraussichtlich beginnt.')],
             [['niveau', 'kontoinhaber'], 'string', 'max' => 100],
             [['ort', 'termine_hinweis'], 'string', 'max' => 255],
             [['beschreibung', 'bedingungen'], 'string', 'max' => 10000],
-            [['titel', 'niveau', 'ort', 'termine_hinweis', 'kontoinhaber', 'iban', 'kontakt_email', 'beschreibung', 'bedingungen'], 'trim'],
+            [['titel', 'beginn_text', 'niveau', 'ort', 'termine_hinweis', 'kontoinhaber', 'iban', 'kontakt_email', 'beschreibung', 'bedingungen'], 'trim'],
             [['beginn', 'ende'], 'date', 'format' => 'php:Y-m-d'],
             ['wochentageListe', 'each', 'rule' => ['in', 'range' => [1, 2, 3, 4, 5, 6, 7]]],
             ['wochentageListe', 'validateWochentage'],
@@ -90,7 +97,7 @@ class Kurs extends ActiveRecord
             [['anmeldung_ab', 'anmeldung_bis'], 'filter', 'filter' => fn($v) => $v ? str_replace('T', ' ', substr($v, 0, 16)) . ':00' : null],
             [['anmeldung_ab', 'anmeldung_bis'], 'date', 'format' => 'php:Y-m-d H:i:s'],
             [['ende', 'zeit_von', 'zeit_bis', 'einheiten', 'alter_min', 'alter_max', 'warteliste_max', 'preis_mitglied',
-                'preis_nichtmitglied', 'zahlungsfrist_tage', 'erinnerung_tage', 'niveau', 'termine_hinweis', 'kontoinhaber',
+                'preis_nichtmitglied', 'zahlungsfrist_tage', 'erinnerung_tage', 'niveau', 'beginn_text', 'termine_hinweis', 'kontoinhaber',
                 'beschreibung', 'bedingungen'], 'default', 'value' => null],
         ];
     }
@@ -102,7 +109,7 @@ class Kurs extends ActiveRecord
         if (!$tage) {
             return;
         }
-        foreach (['beginn', 'ende'] as $feld) {
+        foreach ($this->beginn_offen ? ['ende'] : ['beginn', 'ende'] as $feld) {
             if ($this->$feld && !$this->hasErrors($feld) && !in_array((int)date('N', strtotime($this->$feld)), $tage, true)) {
                 $this->addError('wochentageListe', Yii::t('KurseModule.base', '{feld} ist ein {wochentag}. Bitte diesen Tag mit ankreuzen oder das Datum anpassen.', [
                     'feld' => $this->getAttributeLabel($feld), 'wochentag' => Yii::$app->formatter->asDate($this->$feld, 'EEEE')]));
@@ -196,6 +203,8 @@ class Kurs extends ActiveRecord
             'zeit_bis' => Yii::t('KurseModule.base', 'bis'),
             'termine_hinweis' => Yii::t('KurseModule.base', 'Hinweis zu den Terminen'),
             'einheiten' => Yii::t('KurseModule.base', 'Anzahl der Einheiten'),
+            'beginn_offen' => Yii::t('KurseModule.base', 'Kursbeginn steht noch nicht fest'),
+            'beginn_text' => Yii::t('KurseModule.base', 'Voraussichtlicher Beginn'),
             'wochentageListe' => Yii::t('KurseModule.base', 'Kurstage'),
             'alter_min' => Yii::t('KurseModule.base', 'Mindestalter (Jahre)'),
             'alter_max' => Yii::t('KurseModule.base', 'Höchstalter (Jahre)'),
@@ -319,11 +328,17 @@ class Kurs extends ActiveRecord
 
     public function istVorbei(): bool
     {
+        if ($this->beginn_offen) {
+            return false;
+        }
         return $this->getEndeDatum() < date('Y-m-d');
     }
 
     public function hatBegonnen(): bool
     {
+        if ($this->beginn_offen) {
+            return false;
+        }
         return $this->beginn <= date('Y-m-d');
     }
 
@@ -458,9 +473,11 @@ class Kurs extends ActiveRecord
     /** z. B. „Dienstag, 13.01.2027 · 15:00–15:45 Uhr · 10 Einheiten“ (Format der aktuellen Sprache) */
     public function getTermineText(): string
     {
-        $teile = [$this->ende
+        $teile = [$this->beginn_offen
+            ? Yii::t('KurseModule.base', 'Beginn: {text}', ['text' => trim(Inhalt::t($this->beginn_text)) ?: Yii::t('KurseModule.base', 'steht noch nicht fest')])
+            : ($this->ende
             ? Yii::t('KurseModule.base', '{beginn} bis {ende}', ['beginn' => self::tagUndDatum($this->beginn), 'ende' => self::tagUndDatum($this->ende)])
-            : self::tagUndDatum($this->beginn)];
+            : self::tagUndDatum($this->beginn))];
         if ($w = $this->getWochentageText()) {
             $teile[] = Yii::t('KurseModule.base', 'Kurstage: {tage}', ['tage' => $w]);
         }

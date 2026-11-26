@@ -271,7 +271,7 @@ class Anmeldung extends ActiveRecord
         }
         $frist = date('Y-m-d', strtotime($this->platz_am . ' +' . $this->kurs->zahlungsfrist_tage . ' days'));
         // nie nach dem ersten Kurstag
-        return min($frist, $this->kurs->beginn);
+        return $this->kurs->beginn_offen ? $frist : min($frist, $this->kurs->beginn);
     }
 
     public function getStatusText(): string

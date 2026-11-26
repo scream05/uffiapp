@@ -489,7 +489,7 @@ class Dienst
     {
         return $a->inSprache(function () use ($a, $grund) {
             $text = self::anrede($a) . "\n\n"
-                . Yii::t('KurseModule.base', 'leider müssen wir den Kurs „{kurs}“ (Beginn {datum}) absagen.', ['kurs' => $a->kurs->titel, 'datum' => Kurs::datum($a->kurs->beginn)]) . "\n\n"
+                . Yii::t('KurseModule.base', 'leider müssen wir den Kurs „{kurs}“ (Beginn {datum}) absagen.', ['kurs' => $a->kurs->titel, 'datum' => $a->kurs->beginn_offen ? (string)$a->kurs->beginn_text : Kurs::datum($a->kurs->beginn)]) . "\n\n"
                 . ($grund !== '' ? $grund . "\n\n" : '')
                 . ($a->bezahlt_am ? Yii::t('KurseModule.base', 'Die bereits bezahlte Kursgebühr bekommst du zurück – wir melden uns dazu bei dir.') . "\n\n" : '')
                 . Yii::t('KurseModule.base', 'Bei Fragen antworte einfach auf diese Mail.') . "\n\n" . self::gruss($a);

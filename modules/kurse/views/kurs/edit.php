@@ -36,12 +36,22 @@ $dt = fn($v) => $v ? str_replace(' ', 'T', substr($v, 0, 16)) : '';
         <h4><?= Yii::t('KurseModule.base', 'Ort und Termine') ?></h4>
         <?= $f->field($kurs, 'ort')->textInput(['maxlength' => 255, 'placeholder' => Yii::t('KurseModule.base', 'z. B. Hallenbad Uffenheim')]) ?>
         <div class="row">
-            <div class="col-6 col-md-3"><?= $f->field($kurs, 'beginn')->input('date') ?></div>
+            <div class="col-6 col-md-3"><?= $f->field($kurs, 'beginn')->input('date')->hint(Html::encode(Yii::t('KurseModule.base', 'Steht der Beginn noch nicht fest: ungefähres Datum, nur für Sortierung und Jahr.'))) ?></div>
             <div class="col-6 col-md-3"><?= $f->field($kurs, 'ende')->input('date')->hint(Html::encode(Yii::t('KurseModule.base', 'leer = aus Einheiten und Kurstagen berechnet'))) ?></div>
             <div class="col-4 col-md-2"><?= $f->field($kurs, 'zeit_von')->input('time', ['value' => $kurs->zeit_von ? substr($kurs->zeit_von, 0, 5) : '']) ?></div>
             <div class="col-4 col-md-2"><?= $f->field($kurs, 'zeit_bis')->input('time', ['value' => $kurs->zeit_bis ? substr($kurs->zeit_bis, 0, 5) : '']) ?></div>
             <div class="col-4 col-md-2"><?= $f->field($kurs, 'einheiten')->input('number', ['min' => 1]) ?></div>
         </div>
+        <?= $f->field($kurs, 'beginn_offen')->checkbox() ?>
+        <div id="kurs-beginn-text-feld"<?= $kurs->beginn_offen ? '' : ' style="display:none"' ?>>
+            <?= $f->field($kurs, 'beginn_text')->textInput(['maxlength' => 100, 'placeholder' => Yii::t('KurseModule.base', 'z. B. voraussichtlich im Januar 2027')])
+                ->hint(Html::encode(Yii::t('KurseModule.base', 'Wird statt des Datums angezeigt. Erinnerungsmails vor Kursbeginn gibt es erst, wenn du den Haken entfernst und das echte Datum einträgst.'))) ?>
+        </div>
+        <script <?= Html::nonce() ?>>
+            $(function () {
+                $('#kurs-beginn_offen').on('change', function () { $('#kurs-beginn-text-feld').toggle(this.checked); });
+            });
+        </script>
         <?= $f->field($kurs, 'wochentageListe')->inline()->checkboxList(Kurs::wochentagNamen(), ['value' => $kurs->getWochentageListe()])->hint(Html::encode(Yii::t('KurseModule.base', 'An welchen Tagen findet der Kurs jede Woche statt? Gleiche Uhrzeit an allen Tagen. Leer = einmal pro Woche am Wochentag des Beginns.'))) ?>
         <?= $f->field($kurs, 'termine_hinweis')->textInput(['maxlength' => 255, 'placeholder' => Yii::t('KurseModule.base', 'z. B. nicht in den Ferien')]) ?>
 

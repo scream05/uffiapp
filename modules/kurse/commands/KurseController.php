@@ -89,7 +89,8 @@ class KurseController extends Controller
         $stunde = (int)date('G');
         if ($stunde >= $module->mailAbStunde && $stunde < $module->mailBisStunde) {
             $heute = date('Y-m-d');
-            foreach (Kurs::find()->where(['status' => Kurs::STATUS_OFFEN])->andWhere(['not', ['erinnerung_tage' => null]])
+            // Bei offenem Beginn ist das Datum nur ungefähr → keine Erinnerung
+            foreach (Kurs::find()->where(['status' => Kurs::STATUS_OFFEN, 'beginn_offen' => 0])->andWhere(['not', ['erinnerung_tage' => null]])
                          ->andWhere(['>=', 'beginn', $heute])->all() as $kurs) {
                 if (date('Y-m-d', strtotime($kurs->beginn . ' -' . $kurs->erinnerung_tage . ' days')) > $heute) {
                     continue;
@@ -198,6 +199,16 @@ class KurseController extends Controller
         $kt->setWochentageListe('');
         $kt->beginn = '2027-01-11';
         $pruefe($kt->wochentage === null && $kt->getEndeDatum() === '2027-03-29', 'ohne Kurstage wöchentlich wie bisher');
+        // Beginn steht noch nicht fest
+        $ko = new Kurs(['titel' => 'x', 'ort' => 'x', 'plaetze' => 1, 'kontakt_email' => 'a@example.invalid', 'beginn' => '2027-01-12',
+            'einheiten' => 12, 'beginn_offen' => 1, 'beginn_text' => '']);
+        $ko->setWochentageListe(['1', '6']);
+        $ko->validate(['beginn_text', 'wochentageListe']);
+        $pruefe($ko->hasErrors('beginn_text') && !$ko->hasErrors('wochentageListe'), 'offener Beginn: Text Pflicht, Wochentag des ungefähren Datums egal');
+        $ko->beginn_text = 'voraussichtlich im Januar 2027';
+        $pruefe(str_starts_with($ko->getTermineText(), 'Beginn: voraussichtlich im Januar 2027 · Kurstage'), 'Anzeige: ' . $ko->getTermineText());
+        $ko->beginn = '2020-01-01';
+        $pruefe(!$ko->hatBegonnen() && !$ko->istVorbei(), 'offener Beginn zählt nie als begonnen/vorbei');
         Yii::$app->language = $sprache;
         Yii::$app->formatter->locale = $locale;
         $neu = function (string $vorname, string $geb, bool $mitglied = false) use ($kurs) {

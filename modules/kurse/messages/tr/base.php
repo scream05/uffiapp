@@ -373,4 +373,12 @@ return [
     'z. B. nicht in den Ferien' => 'örn. tatillerde yok',
     'An welchen Tagen findet der Kurs jede Woche statt? Gleiche Uhrzeit an allen Tagen. Leer = einmal pro Woche am Wochentag des Beginns.' => 'Kurs her hafta hangi günlerde yapılıyor? Tüm günlerde aynı saat. Boş = başlangıç gününün haftanın gününde haftada bir kez.',
     '{feld} ist ein {wochentag}. Bitte diesen Tag mit ankreuzen oder das Datum anpassen.' => '{feld} bir {wochentag} gününe denk geliyor. Lütfen bu günü de işaretle veya tarihi değiştir.',
+    'Bitte kurz beschreiben, wann der Kurs voraussichtlich beginnt.' => 'Lütfen kursun yaklaşık ne zaman başlayacağını kısaca yaz.',
+    'Kursbeginn steht noch nicht fest' => 'Başlangıç tarihi henüz belli değil',
+    'Voraussichtlicher Beginn' => 'Tahmini başlangıç',
+    'Beginn: {text}' => 'Başlangıç: {text}',
+    'steht noch nicht fest' => 'henüz belli değil',
+    'Steht der Beginn noch nicht fest: ungefähres Datum, nur für Sortierung und Jahr.' => 'Başlangıç henüz belli değilse: yaklaşık tarih, yalnızca sıralama ve yıl için.',
+    'z. B. voraussichtlich im Januar 2027' => 'örn. muhtemelen Ocak 2027\'de',
+    'Wird statt des Datums angezeigt. Erinnerungsmails vor Kursbeginn gibt es erst, wenn du den Haken entfernst und das echte Datum einträgst.' => 'Tarih yerine gösterilir. Kurs başlamadan önceki hatırlatma e-postaları ancak işareti kaldırıp gerçek tarihi girdiğinde gönderilir.',
 ];

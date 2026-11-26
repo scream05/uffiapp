@@ -373,4 +373,12 @@ return [
     'z. B. nicht in den Ferien' => 'مثلًا ما عدا أيام العطل المدرسية',
     'An welchen Tagen findet der Kurs jede Woche statt? Gleiche Uhrzeit an allen Tagen. Leer = einmal pro Woche am Wochentag des Beginns.' => 'في أي أيام تُقام الدورة كل أسبوع؟ نفس الوقت في جميع الأيام. فارغ = مرة واحدة أسبوعيًا في يوم بدء الدورة.',
     '{feld} ist ein {wochentag}. Bitte diesen Tag mit ankreuzen oder das Datum anpassen.' => '{feld} يوافق يوم {wochentag}. يُرجى تحديد هذا اليوم أيضًا أو تغيير التاريخ.',
+    'Bitte kurz beschreiben, wann der Kurs voraussichtlich beginnt.' => 'يُرجى وصف موعد البدء المتوقع للدورة باختصار.',
+    'Kursbeginn steht noch nicht fest' => 'موعد بدء الدورة لم يُحدَّد بعد',
+    'Voraussichtlicher Beginn' => 'موعد البدء المتوقع',
+    'Beginn: {text}' => 'البدء: {text}',
+    'steht noch nicht fest' => 'لم يُحدَّد بعد',
+    'Steht der Beginn noch nicht fest: ungefähres Datum, nur für Sortierung und Jahr.' => 'إذا لم يُحدَّد موعد البدء بعد: تاريخ تقريبي، للترتيب والسنة فقط.',
+    'z. B. voraussichtlich im Januar 2027' => 'مثلًا على الأرجح في يناير 2027',
+    'Wird statt des Datums angezeigt. Erinnerungsmails vor Kursbeginn gibt es erst, wenn du den Haken entfernst und das echte Datum einträgst.' => 'يُعرض بدلًا من التاريخ. لا تُرسل رسائل التذكير قبل بدء الدورة إلا بعد إزالة العلامة وإدخال التاريخ الفعلي.',
 ];

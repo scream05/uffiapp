@@ -373,4 +373,12 @@ return [
     'z. B. nicht in den Ferien' => 'e.g. not during school holidays',
     'An welchen Tagen findet der Kurs jede Woche statt? Gleiche Uhrzeit an allen Tagen. Leer = einmal pro Woche am Wochentag des Beginns.' => 'On which days does the course take place each week? Same time on all days. Empty = once a week on the weekday of the start date.',
     '{feld} ist ein {wochentag}. Bitte diesen Tag mit ankreuzen oder das Datum anpassen.' => '{feld} is a {wochentag}. Please tick this day as well or change the date.',
+    'Bitte kurz beschreiben, wann der Kurs voraussichtlich beginnt.' => 'Please briefly describe when the course is expected to start.',
+    'Kursbeginn steht noch nicht fest' => 'Start date not fixed yet',
+    'Voraussichtlicher Beginn' => 'Expected start',
+    'Beginn: {text}' => 'Start: {text}',
+    'steht noch nicht fest' => 'not fixed yet',
+    'Steht der Beginn noch nicht fest: ungefähres Datum, nur für Sortierung und Jahr.' => 'If the start is not fixed yet: approximate date, only used for sorting and the year.',
+    'z. B. voraussichtlich im Januar 2027' => 'e.g. probably in January 2027',
+    'Wird statt des Datums angezeigt. Erinnerungsmails vor Kursbeginn gibt es erst, wenn du den Haken entfernst und das echte Datum einträgst.' => 'Shown instead of the date. Reminder emails before the start are only sent once you untick the box and enter the real date.',
 ];

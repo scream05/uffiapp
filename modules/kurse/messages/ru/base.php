@@ -373,4 +373,12 @@ return [
     'z. B. nicht in den Ferien' => 'напр. кроме каникул',
     'An welchen Tagen findet der Kurs jede Woche statt? Gleiche Uhrzeit an allen Tagen. Leer = einmal pro Woche am Wochentag des Beginns.' => 'В какие дни каждую неделю проходит курс? Одинаковое время во все дни. Пусто = раз в неделю в день недели начала курса.',
     '{feld} ist ein {wochentag}. Bitte diesen Tag mit ankreuzen oder das Datum anpassen.' => '{feld} приходится на {wochentag}. Отметь также этот день или измени дату.',
+    'Bitte kurz beschreiben, wann der Kurs voraussichtlich beginnt.' => 'Коротко опиши, когда примерно начнётся курс.',
+    'Kursbeginn steht noch nicht fest' => 'Дата начала ещё не определена',
+    'Voraussichtlicher Beginn' => 'Ориентировочное начало',
+    'Beginn: {text}' => 'Начало: {text}',
+    'steht noch nicht fest' => 'ещё не определено',
+    'Steht der Beginn noch nicht fest: ungefähres Datum, nur für Sortierung und Jahr.' => 'Если начало ещё не определено: примерная дата, только для сортировки и года.',
+    'z. B. voraussichtlich im Januar 2027' => 'напр. ориентировочно в январе 2027',
+    'Wird statt des Datums angezeigt. Erinnerungsmails vor Kursbeginn gibt es erst, wenn du den Haken entfernst und das echte Datum einträgst.' => 'Показывается вместо даты. Напоминания перед началом курса отправляются только после того, как ты снимешь отметку и введёшь настоящую дату.',
 ];
