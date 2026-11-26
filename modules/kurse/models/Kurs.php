@@ -197,10 +197,23 @@ class Kurs extends ActiveRecord
         return $this->warteliste_max === null || $this->zaehle(Anmeldung::STATUS_WARTELISTE) < $this->warteliste_max;
     }
 
+    /** Seepferdchen (eigene Zeichnung, es gibt kein Seepferdchen-Emoji), Höhe wie ein Emoji */
+    public const SEEPFERDCHEN_SVG = '<svg viewBox="8 0 48 64" style="height:1.2em;width:auto;vertical-align:-0.25em" focusable="false">'
+        . '<path d="M26 50 C22 56 24 62 31 62 C37 62 38 55 33 54" fill="none" stroke="#e8890c" stroke-width="5" stroke-linecap="round"/>'
+        . '<path d="M23 30 C16 28 12 35 17 40 L24 39 Z" fill="#ffd36b" stroke="#c96f0a" stroke-width="1.8" stroke-linejoin="round"/>'
+        . '<path d="M26 4 C31 3 35 6 35 10 L47 13 C51 14 51 20 47 20 L37 21 C36 23 37 25 40 28 C46 34 46 44 39 49 C35 52 30 52 26 53 C23 48 23 45 25 41 C27 37 25 33 22 30 C17 26 16 18 19 12 C21 8 22 5 26 4 Z" fill="#f7a823" stroke="#c96f0a" stroke-width="2.2" stroke-linejoin="round"/>'
+        . '<path d="M22 7 L19 2 L25 4.5 M29 3.5 L31 0.5 L33 6" fill="#f7a823" stroke="#c96f0a" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>'
+        . '<path d="M37 31 L42 30 M39 36 L44 36 M38 42 L43 43 M34 47 L37 50" fill="none" stroke="#c96f0a" stroke-width="1.6" stroke-linecap="round"/>'
+        . '<circle cx="30" cy="13" r="3.4" fill="#fff" stroke="#c96f0a" stroke-width="1.2"/>'
+        . '<circle cx="31" cy="13" r="1.7" fill="#2a2a2a"/></svg>';
+
     /** Kleines Symbol vor dem Kurstitel zur Unterscheidung (Schlüsselwort im deutschen Titel), sonst leer */
     public function getSymbol(): string
     {
         $t = mb_strtolower((string)$this->titel);
+        if (str_contains($t, 'seepferd')) {
+            return 'seepferdchen'; // kein Emoji vorhanden → eigenes SVG, siehe getSymbolHtml()
+        }
         if (str_contains($t, 'seeräuber')) {
             return '🦜';
         }
@@ -217,6 +230,9 @@ class Kurs extends ActiveRecord
     public function getSymbolHtml(): string
     {
         $s = $this->getSymbol();
+        if ($s === 'seepferdchen') {
+            $s = self::SEEPFERDCHEN_SVG;
+        }
         return $s === '' ? '' : '<span class="kurs-symbol" aria-hidden="true">' . $s . '</span> ';
     }
 
