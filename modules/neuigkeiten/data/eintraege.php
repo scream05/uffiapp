@@ -10,6 +10,10 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'kurse', 'datum' => '2026-11-26', 'art' => 'neu', 'popup' => true,
+        'titel' => 'Kurse von Vereinen online buchen',
+        'text' => 'Vereine können ihre Kurse jetzt hier anbieten, den Anfang machen die Schwimmkurse der SBU Abteilung Schwimmen. Du siehst freie Plätze, meldest dein Kind direkt an und kommst bei vollen Kursen auf die Warteliste. Ein Konto brauchst du dafür nicht. Möchte dein Verein auch Kurse anbieten, melde dich bei uns.',
+        'link' => ['vereine-and-ehrenamt', '/kurse/kurs/index']],
     ['id' => 'oeffnungszeiten-ausnahmen', 'datum' => '2026-11-26', 'art' => 'besser', 'popup' => false,
         'titel' => 'Öffnungszeiten: abweichende Tage werden angezeigt',
         'text' => 'Hat eine Einrichtung an einem Tag ausnahmsweise andere Öffnungszeiten, steht das jetzt als Hinweis bei den Öffnungszeiten und eine Woche vorher auch im Kasten auf der Startseite. Zum Beispiel öffnet der Kompostplatz am Donnerstag, 10. Dezember, erst um 13:30 Uhr.',
