@@ -150,9 +150,9 @@ $logo = $isNew ? null : $verein->getLogo();
         </div>
 
         <?php $gallery = $isNew ? [] : $verein->getGallery(); $credits = $isNew ? [] : $verein->getBildnachweise(); ?>
-        <?php if ($gallery): /* Bilder gehören jetzt in die Vorstellung; bisherige bleiben sichtbar und lassen sich entfernen */ ?>
-            <div class="form-group">
-                <label><?= Yii::t('VereineModule.base', 'Bisherige Bilder') ?></label>
+        <div class="form-group">
+            <label><?= Yii::t('VereineModule.base', 'Bilder') ?></label>
+            <?php if ($gallery): ?>
                 <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px">
                     <?php foreach ($gallery as $file): ?>
                         <label style="font-weight:normal;width:140px">
@@ -162,9 +162,23 @@ $logo = $isNew ? null : $verein->getLogo();
                         </label>
                     <?php endforeach ?>
                 </div>
-                <p class="help-block"><?= Yii::t('VereineModule.base', 'Diese Bilder erscheinen unter der Vorstellung. Neue Bilder fügst du direkt in den Vorstellungstext ein.') ?></p>
-            </div>
-        <?php endif ?>
+            <?php endif ?>
+            <?php if (count($gallery) < Verein::MAX_BILDER): ?>
+                <?= UploadButton::widget([
+                    'id' => 'verein-galerie',
+                    'submitName' => 'galerieList[]',
+                    'label' => Yii::t('VereineModule.base', 'Bilder hinzufügen'),
+                    'tooltip' => false,
+                    'cssButtonClass' => 'btn-light',
+                    'progress' => '#verein-galerie-progress',
+                    'preview' => '#verein-galerie-preview',
+                    'max' => Verein::MAX_BILDER - count($gallery),
+                ]) ?>
+                <?= UploadProgress::widget(['id' => 'verein-galerie-progress']) ?>
+                <?= FilePreview::widget(['id' => 'verein-galerie-preview', 'edit' => true, 'options' => ['style' => 'margin-top:10px']]) ?>
+            <?php endif ?>
+            <p class="help-block"><?= Yii::t('VereineModule.base', 'Bis zu {n} Bilder, z. B. Vereinsheim, Training, Feste. Nur eigene Fotos oder Fotos mit Erlaubnis; bei Personen bitte deren Einverständnis.', ['n' => Verein::MAX_BILDER]) ?></p>
+        </div>
 
         <?php if (!$isNew && Module::canManageAll()): ?>
             <div class="form-group" style="padding:10px 14px;border:1px dashed var(--bs-border-color, #ccc);border-radius:10px">

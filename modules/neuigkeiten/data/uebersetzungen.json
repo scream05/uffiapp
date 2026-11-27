@@ -2,28 +2,28 @@
     "vereinsseite-formular-zeilen": {
         "en": {
             "titel": "Edit your club page more easily",
-            "text": "When editing your club page, you can now add contact persons and links one at a time with \"hinzufügen\" and remove them with the ×, instead of filling in empty rows. Pictures go directly into the presentation.",
-            "quelle": "ba5c1375cb977d2a85a63c22c55d113f7392f69d"
+            "text": "When editing your club page, you can now add contact persons and links one by one with \"hinzufügen\" and remove them with the ×, instead of filling in empty lines.",
+            "quelle": "44b69dcfac23e2987e049f5da9fa9f70e5065b1f"
         },
         "uk": {
-            "titel": "Сторінку клубу редагувати простіше",
-            "text": "Коли ти редагуєш сторінку свого клубу, контактних осіб і посилання тепер додаєш окремо кнопкою „додати“ і видаляєш їх хрестиком ×, замість того щоб заповнювати порожні рядки. Зображення вставляєш безпосередньо в розділ «Представлення».",
-            "quelle": "ba5c1375cb977d2a85a63c22c55d113f7392f69d"
+            "titel": "Vereinsseite einfacher bearbeiten",
+            "text": "Beim Bearbeiten deiner Vereinsseite fügst du Ansprechpartner und Links jetzt mit „hinzufügen“ einzeln hinzu und entfernst sie mit dem ×, statt leere Zeilen auszufüllen.",
+            "quelle": "44b69dcfac23e2987e049f5da9fa9f70e5065b1f"
         },
         "ar": {
-            "titel": "تحرير صفحة النادي بسهولة أكبر",
-            "text": "عند تحرير صفحة ناديك، يمكنك الآن إضافة جهات الاتصال والروابط واحدة تلو الأخرى بالضغط على „hinzufügen“، وإزالتها بالضغط على ×، بدلاً من ملء أسطر فارغة. وتضيف الصور مباشرةً في قسم التعريف.",
-            "quelle": "ba5c1375cb977d2a85a63c22c55d113f7392f69d"
+            "titel": "تحرير صفحة النادي بشكل أسهل",
+            "text": "عند تحرير صفحة ناديك، يمكنك الآن إضافة جهات الاتصال والروابط واحدة تلو الأخرى بالضغط على „hinzufügen“، وحذفها بالضغط على ×، بدلاً من ملء أسطر فارغة.",
+            "quelle": "44b69dcfac23e2987e049f5da9fa9f70e5065b1f"
         },
         "tr": {
-            "titel": "Vereinsseiten bequemer bearbeiten",
-            "text": "Beim Bearbeiten deiner Vereinsseite fügst du Ansprechpartner und Links jetzt mit „hinzufügen“ einzeln hinzu und entfernst sie mit dem ×, statt leere Zeilen auszufüllen. Bilder setzt du direkt in die Vorstellung ein.",
-            "quelle": "ba5c1375cb977d2a85a63c22c55d113f7392f69d"
+            "titel": "Vereinsseite daha kolay düzenle",
+            "text": "Vereinsseitenni düzenlerken artık Ansprechpartner ve bağlantıları „hinzufügen“ ile tek tek ekleyebilir, × ile kaldırabilirsin. Boş satırları doldurmak gerekmez.",
+            "quelle": "44b69dcfac23e2987e049f5da9fa9f70e5065b1f"
         },
         "ru": {
-            "titel": "Страница клуба стала удобнее в редактировании",
-            "text": "Когда ты редактируешь страницу своего клуба, контактных лиц и ссылки теперь добавляются по одной кнопкой «добавить», а удаляются крестиком ×, так что заполнять пустые строки больше не нужно. Фотографии вставляются прямо в описание.",
-            "quelle": "ba5c1375cb977d2a85a63c22c55d113f7392f69d"
+            "titel": "Vereinsseite einfacher bearbeiten",
+            "text": "Beim Bearbeiten deiner Vereinsseite fügst du Ansprechpartner und Links jetzt mit „hinzufügen“ einzeln hinzu und entfernst sie mit dem ×, statt leere Zeilen auszufüllen.",
+            "quelle": "44b69dcfac23e2987e049f5da9fa9f70e5065b1f"
         }
     },
     "kurse": {
