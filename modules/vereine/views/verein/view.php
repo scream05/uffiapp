@@ -24,7 +24,7 @@ $module = Yii::$app->getModule('vereine');
 <div class="panel panel-default">
     <div class="panel-body">
         <p><?= Html::a('<i class="fa fa-arrow-left"></i> ' . Yii::t('VereineModule.base', 'Vereinsverzeichnis'), $space->createUrl('/vereine/verein/index')) ?></p>
-        <?php $titelbild = $verein->getTitelbild(); ?>
+        <?php $titelbild = $verein->hatHomepage() ? $verein->getTitelbild() : null; ?>
         <?php if ($titelbild): ?>
             <?= Html::img($titelbild->getUrl(), ['alt' => '', 'class' => 'verein-titelbild']) ?>
         <?php endif ?>
@@ -35,7 +35,7 @@ $module = Yii::$app->getModule('vereine');
                 <span class="text-muted"><?= Html::encode($module->kategorieLabel($verein->kategorie)) ?> · <?= Html::encode($module->ortLabel($verein->ortsteil)) ?></span>
             </div>
         </div>
-        <?= $this->render('_titelbereich', ['verein' => $verein]) ?>
+        <?= $verein->hatHomepage() ? $this->render('_titelbereich', ['verein' => $verein]) : '' ?>
 
         <?php if ($canManage): ?>
             <div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:6px">
@@ -75,7 +75,7 @@ $module = Yii::$app->getModule('vereine');
             <div class="verein-text" style="margin-top:16px" data-uebersetzbar="verein:<?= $verein->id ?>"><?= RichText::output($verein->beschreibung) ?></div>
         <?php endif ?>
 
-        <?= $this->render('_team', ['verein' => $verein]) ?>
+        <?= $verein->hatHomepage() ? $this->render('_team', ['verein' => $verein]) : '' ?>
 
         <?php $gallery = $verein->getGallery(); $credits = $verein->getBildnachweise(); ?>
         <?php if ($gallery): ?>

@@ -47,40 +47,85 @@ $logo = $isNew ? null : $verein->getLogo();
         </div>
 
         <?php
-        $apRows = array_values($verein->apRows);
-        for ($i = count($apRows); $i < min(Verein::MAX_ANSPRECHPARTNER, count($apRows) + 2); $i++) {
-            $apRows[] = ['funktion' => '', 'name' => '', 'email' => '', 'telefon' => ''];
-        }
+        $apRows = array_values($verein->apRows) ?: [['funktion' => '', 'name' => '', 'email' => '', 'telefon' => '']];
         $socialRows = array_values($verein->socialRows);
-        for ($i = count($socialRows); $i < min(Verein::MAX_SOCIAL, count($socialRows) + 1); $i++) {
-            $socialRows[] = ['typ' => '', 'url' => ''];
-        }
+        // Eine Zeile je Ansprechpartner bzw. Link; weitere per Knopf (Vorlage im <template>), Entfernen per ×
+        $apZeile = fn($i, array $row) => '<div class="verein-zeile verein-ap-zeile">'
+            . '<div class="verein-zeile-felder">'
+            . Html::textInput("Verein[apRows][$i][funktion]", $row['funktion'] ?? '', ['class' => 'form-control', 'placeholder' => Yii::t('VereineModule.base', 'Funktion, z. B. Jugendleiter'), 'aria-label' => Yii::t('VereineModule.base', 'Funktion')])
+            . Html::textInput("Verein[apRows][$i][name]", $row['name'] ?? '', ['class' => 'form-control', 'placeholder' => Yii::t('VereineModule.base', 'Name'), 'aria-label' => Yii::t('VereineModule.base', 'Name')])
+            . Html::textInput("Verein[apRows][$i][email]", $row['email'] ?? '', ['class' => 'form-control', 'type' => 'email', 'placeholder' => Yii::t('VereineModule.base', 'E-Mail (optional)'), 'aria-label' => Yii::t('VereineModule.base', 'E-Mail')])
+            . Html::textInput("Verein[apRows][$i][telefon]", $row['telefon'] ?? '', ['class' => 'form-control', 'type' => 'tel', 'placeholder' => Yii::t('VereineModule.base', 'Telefon (optional)'), 'aria-label' => Yii::t('VereineModule.base', 'Telefon')])
+            . '</div>'
+            . Html::button('<i class="fa fa-times"></i>', ['class' => 'btn btn-light verein-zeile-weg', 'title' => Yii::t('VereineModule.base', 'Ansprechpartner entfernen'), 'aria-label' => Yii::t('VereineModule.base', 'Ansprechpartner entfernen')])
+            . '</div>';
+        $linkZeile = fn($i, array $row) => '<div class="verein-zeile verein-link-zeile">'
+            . '<div class="verein-zeile-felder">'
+            . Html::textInput("Verein[socialRows][$i][typ]", $row['typ'] ?? '', ['class' => 'form-control', 'placeholder' => Yii::t('VereineModule.base', 'z. B. Instagram'), 'aria-label' => Yii::t('VereineModule.base', 'Art')])
+            . Html::textInput("Verein[socialRows][$i][url]", $row['url'] ?? '', ['class' => 'form-control', 'placeholder' => 'https://…', 'aria-label' => Yii::t('VereineModule.base', 'Adresse')])
+            . '</div>'
+            . Html::button('<i class="fa fa-times"></i>', ['class' => 'btn btn-light verein-zeile-weg', 'title' => Yii::t('VereineModule.base', 'Link entfernen'), 'aria-label' => Yii::t('VereineModule.base', 'Link entfernen')])
+            . '</div>';
         ?>
-        <div class="form-group">
+        <style <?= Html::nonce() ?>>
+            .verein-zeile { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 8px; }
+            .verein-zeile-felder { flex: 1; display: grid; gap: 6px; }
+            .verein-ap-zeile .verein-zeile-felder { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+            .verein-link-zeile .verein-zeile-felder { grid-template-columns: minmax(0, 1fr) minmax(0, 3fr); }
+            @media (max-width: 767px) {
+                .verein-zeile { padding-bottom: 8px; border-bottom: 1px solid var(--bs-border-color, #ddd); }
+                .verein-ap-zeile .verein-zeile-felder { grid-template-columns: 1fr 1fr; }
+                .verein-link-zeile .verein-zeile-felder { grid-template-columns: 1fr; }
+            }
+        </style>
+        <div class="form-group verein-liste" data-max="<?= Verein::MAX_ANSPRECHPARTNER ?>">
             <label><?= Yii::t('VereineModule.base', 'Ansprechpartner') ?></label>
-            <p class="help-block" style="margin-top:0"><?= Yii::t('VereineModule.base', 'Nur Personen, die damit einverstanden sind, auf der Vereinsseite genannt zu werden. Leere Zeilen werden ignoriert.') ?></p>
-            <?php foreach ($apRows as $i => $row): ?>
-                <div class="row verein-ap-row" style="margin-bottom:6px">
-                    <div class="col-sm-3"><?= Html::textInput("Verein[apRows][$i][funktion]", $row['funktion'] ?? '', ['class' => 'form-control', 'placeholder' => Yii::t('VereineModule.base', 'Funktion, z. B. Jugendleiter'), 'aria-label' => Yii::t('VereineModule.base', 'Funktion')]) ?></div>
-                    <div class="col-sm-3"><?= Html::textInput("Verein[apRows][$i][name]", $row['name'] ?? '', ['class' => 'form-control', 'placeholder' => Yii::t('VereineModule.base', 'Name'), 'aria-label' => Yii::t('VereineModule.base', 'Name')]) ?></div>
-                    <div class="col-sm-3"><?= Html::textInput("Verein[apRows][$i][email]", $row['email'] ?? '', ['class' => 'form-control', 'type' => 'email', 'placeholder' => Yii::t('VereineModule.base', 'E-Mail (optional)'), 'aria-label' => Yii::t('VereineModule.base', 'E-Mail')]) ?></div>
-                    <div class="col-sm-3"><?= Html::textInput("Verein[apRows][$i][telefon]", $row['telefon'] ?? '', ['class' => 'form-control', 'type' => 'tel', 'placeholder' => Yii::t('VereineModule.base', 'Telefon (optional)'), 'aria-label' => Yii::t('VereineModule.base', 'Telefon')]) ?></div>
-                </div>
-            <?php endforeach ?>
+            <p class="help-block" style="margin-top:0"><?= Yii::t('VereineModule.base', 'Nur Personen, die damit einverstanden sind, auf der Vereinsseite genannt zu werden.') ?></p>
+            <?= Html::hiddenInput('Verein[apRows][_]', '') /* damit auch „alle entfernt“ ankommt */ ?>
+            <div class="verein-zeilen" data-next="<?= count($apRows) ?>">
+                <?php foreach ($apRows as $i => $row): ?><?= $apZeile($i, $row) ?><?php endforeach ?>
+            </div>
+            <template><?= $apZeile('__i__', []) ?></template>
+            <?= Html::button('<i class="fa fa-plus"></i> ' . Yii::t('VereineModule.base', 'Ansprechpartner hinzufügen'), ['class' => 'btn btn-light btn-sm verein-zeile-dazu']) ?>
             <?= Html::error($verein, 'apRows', ['class' => 'text-danger']) ?>
-            <?php if (count($apRows) < Verein::MAX_ANSPRECHPARTNER): ?><p class="help-block"><?= Yii::t('VereineModule.base', 'Mehr Zeilen erscheinen nach dem Speichern.') ?></p><?php endif ?>
         </div>
 
-        <div class="form-group">
+        <div class="form-group verein-liste" data-max="<?= Verein::MAX_SOCIAL ?>">
             <label><?= Yii::t('VereineModule.base', 'Social Media / weitere Links') ?></label>
-            <?php foreach ($socialRows as $i => $row): ?>
-                <div class="row" style="margin-bottom:6px">
-                    <div class="col-sm-3"><?= Html::textInput("Verein[socialRows][$i][typ]", $row['typ'] ?? '', ['class' => 'form-control', 'placeholder' => Yii::t('VereineModule.base', 'z. B. Instagram'), 'aria-label' => Yii::t('VereineModule.base', 'Art')]) ?></div>
-                    <div class="col-sm-9"><?= Html::textInput("Verein[socialRows][$i][url]", $row['url'] ?? '', ['class' => 'form-control', 'placeholder' => 'https://…', 'aria-label' => Yii::t('VereineModule.base', 'Adresse')]) ?></div>
-                </div>
-            <?php endforeach ?>
+            <?= Html::hiddenInput('Verein[socialRows][_]', '') ?>
+            <div class="verein-zeilen" data-next="<?= count($socialRows) ?>">
+                <?php foreach ($socialRows as $i => $row): ?><?= $linkZeile($i, $row) ?><?php endforeach ?>
+            </div>
+            <template><?= $linkZeile('__i__', []) ?></template>
+            <?= Html::button('<i class="fa fa-plus"></i> ' . Yii::t('VereineModule.base', 'Link hinzufügen'), ['class' => 'btn btn-light btn-sm verein-zeile-dazu']) ?>
             <?= Html::error($verein, 'socialRows', ['class' => 'text-danger']) ?>
         </div>
+        <script <?= Html::nonce() ?>>
+            (function () {
+                document.querySelectorAll('#verein-form .verein-liste').forEach(function (liste) {
+                    var zeilen = liste.querySelector('.verein-zeilen');
+                    var dazu = liste.querySelector('.verein-zeile-dazu');
+                    var max = parseInt(liste.dataset.max, 10);
+                    var pruefen = function () { dazu.style.display = zeilen.children.length >= max ? 'none' : ''; };
+                    dazu.addEventListener('click', function () {
+                        var nr = parseInt(zeilen.dataset.next, 10);
+                        zeilen.dataset.next = nr + 1;
+                        zeilen.insertAdjacentHTML('beforeend', liste.querySelector('template').innerHTML.replace(/__i__/g, nr));
+                        zeilen.lastElementChild.querySelector('input').focus();
+                        pruefen();
+                    });
+                    zeilen.addEventListener('click', function (e) {
+                        var weg = e.target.closest('.verein-zeile-weg');
+                        if (weg) {
+                            weg.closest('.verein-zeile').remove();
+                            pruefen();
+                            dazu.focus();
+                        }
+                    });
+                    pruefen();
+                });
+            })();
+        </script>
 
         <div class="form-group">
             <label><?= Yii::t('VereineModule.base', 'Logo') ?></label>
@@ -105,9 +150,9 @@ $logo = $isNew ? null : $verein->getLogo();
         </div>
 
         <?php $gallery = $isNew ? [] : $verein->getGallery(); $credits = $isNew ? [] : $verein->getBildnachweise(); ?>
-        <div class="form-group">
-            <label><?= Yii::t('VereineModule.base', 'Bilder') ?></label>
-            <?php if ($gallery): ?>
+        <?php if ($gallery): /* Bilder gehören jetzt in die Vorstellung; bisherige bleiben sichtbar und lassen sich entfernen */ ?>
+            <div class="form-group">
+                <label><?= Yii::t('VereineModule.base', 'Bisherige Bilder') ?></label>
                 <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px">
                     <?php foreach ($gallery as $file): ?>
                         <label style="font-weight:normal;width:140px">
@@ -117,25 +162,20 @@ $logo = $isNew ? null : $verein->getLogo();
                         </label>
                     <?php endforeach ?>
                 </div>
-            <?php endif ?>
-            <?php if (count($gallery) < Verein::MAX_BILDER): ?>
-                <?= UploadButton::widget([
-                    'id' => 'verein-galerie',
-                    'submitName' => 'galerieList[]',
-                    'label' => Yii::t('VereineModule.base', 'Bilder hinzufügen'),
-                    'tooltip' => false,
-                    'cssButtonClass' => 'btn-light',
-                    'progress' => '#verein-galerie-progress',
-                    'preview' => '#verein-galerie-preview',
-                    'max' => Verein::MAX_BILDER - count($gallery),
-                ]) ?>
-                <?= UploadProgress::widget(['id' => 'verein-galerie-progress']) ?>
-                <?= FilePreview::widget(['id' => 'verein-galerie-preview', 'edit' => true, 'options' => ['style' => 'margin-top:10px']]) ?>
-            <?php endif ?>
-            <p class="help-block"><?= Yii::t('VereineModule.base', 'Bis zu {n} Bilder, z. B. Vereinsheim, Training, Feste. Nur eigene Fotos oder Fotos mit Erlaubnis; bei Personen bitte deren Einverständnis.', ['n' => Verein::MAX_BILDER]) ?></p>
-        </div>
+                <p class="help-block"><?= Yii::t('VereineModule.base', 'Diese Bilder erscheinen unter der Vorstellung. Neue Bilder fügst du direkt in den Vorstellungstext ein.') ?></p>
+            </div>
+        <?php endif ?>
 
-        <?php if (!$isNew): ?>
+        <?php if (!$isNew && Module::canManageAll()): ?>
+            <div class="form-group" style="padding:10px 14px;border:1px dashed var(--bs-border-color, #ccc);border-radius:10px">
+                <?= Html::hiddenInput('homepageAktiv', '0') ?>
+                <label style="font-weight:normal;margin:0"><?= Html::checkbox('homepageAktiv', $verein->hatHomepage(), ['value' => '1']) ?>
+                    <strong><?= Yii::t('VereineModule.base', '„Vereinsseite als Homepage gestalten“ freischalten') ?></strong>
+                    <span class="text-muted"><?= Yii::t('VereineModule.base', '(nur Administratoren; nach dem Speichern erscheint bzw. verschwindet der Bereich, Inhalte bleiben erhalten)') ?></span></label>
+            </div>
+        <?php endif ?>
+
+        <?php if (!$isNew && $verein->hatHomepage()): ?>
         <?php
         $titelbild = $verein->getTitelbild();
         $teambild = $verein->getTeambild();

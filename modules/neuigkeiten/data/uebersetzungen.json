@@ -1,4 +1,58 @@
 {
+    "vereinsseite-formular-zeilen": {
+        "en": {
+            "titel": "Edit your club page more easily",
+            "text": "When editing your club page, you can now add contact persons and links one at a time with \"hinzufügen\" and remove them with the ×, instead of filling in empty rows. Pictures go directly into the presentation.",
+            "quelle": "ba5c1375cb977d2a85a63c22c55d113f7392f69d"
+        },
+        "uk": {
+            "titel": "Сторінку клубу редагувати простіше",
+            "text": "Коли ти редагуєш сторінку свого клубу, контактних осіб і посилання тепер додаєш окремо кнопкою „додати“ і видаляєш їх хрестиком ×, замість того щоб заповнювати порожні рядки. Зображення вставляєш безпосередньо в розділ «Представлення».",
+            "quelle": "ba5c1375cb977d2a85a63c22c55d113f7392f69d"
+        },
+        "ar": {
+            "titel": "تحرير صفحة النادي بسهولة أكبر",
+            "text": "عند تحرير صفحة ناديك، يمكنك الآن إضافة جهات الاتصال والروابط واحدة تلو الأخرى بالضغط على „hinzufügen“، وإزالتها بالضغط على ×، بدلاً من ملء أسطر فارغة. وتضيف الصور مباشرةً في قسم التعريف.",
+            "quelle": "ba5c1375cb977d2a85a63c22c55d113f7392f69d"
+        },
+        "tr": {
+            "titel": "Vereinsseiten bequemer bearbeiten",
+            "text": "Beim Bearbeiten deiner Vereinsseite fügst du Ansprechpartner und Links jetzt mit „hinzufügen“ einzeln hinzu und entfernst sie mit dem ×, statt leere Zeilen auszufüllen. Bilder setzt du direkt in die Vorstellung ein.",
+            "quelle": "ba5c1375cb977d2a85a63c22c55d113f7392f69d"
+        },
+        "ru": {
+            "titel": "Страница клуба стала удобнее в редактировании",
+            "text": "Когда ты редактируешь страницу своего клуба, контактных лиц и ссылки теперь добавляются по одной кнопкой «добавить», а удаляются крестиком ×, так что заполнять пустые строки больше не нужно. Фотографии вставляются прямо в описание.",
+            "quelle": "ba5c1375cb977d2a85a63c22c55d113f7392f69d"
+        }
+    },
+    "kurse": {
+        "en": {
+            "titel": "Book club courses online",
+            "text": "Clubs can now offer their courses here, starting with the swimming lessons of the SBU swimming department. You can see free spots, register your child directly, and join the waiting list if a course is full. You don't need an account for this. If your club would also like to offer courses, get in touch with us.",
+            "quelle": "8296574edb450337679a9b3a9b691fb1795246a9"
+        },
+        "uk": {
+            "titel": "Курси клубів тепер можна бронювати онлайн",
+            "text": "Клуби можуть пропонувати свої курси тут, а першими з'явилися курси плавання відділу плавання SBU. Ти бачиш вільні місця, записуєш дитину безпосередньо і потрапляєш до списку очікування, якщо курс заповнений. Для цього не потрібен обліковий запис. Якщо твій клуб також хоче пропонувати курси, напиши нам.",
+            "quelle": "8296574edb450337679a9b3a9b691fb1795246a9"
+        },
+        "ar": {
+            "titel": "حجز دورات الأندية عبر الإنترنت",
+            "text": "يمكن للأندية الآن عرض دوراتها هنا، وتبدأ هذه الخطوة بدورات السباحة التابعة لقسم السباحة في SBU. ترى الأماكن الشاغرة، وتسجّل طفلك مباشرةً، وإذا كانت الدورة مكتملة تنضم إلى قائمة الانتظار. ولا تحتاج إلى حساب لذلك. وإذا أردت أن يقدم ناديك دورات أيضاً، فتواصل معنا.",
+            "quelle": "8296574edb450337679a9b3a9b691fb1795246a9"
+        },
+        "tr": {
+            "titel": "Vereinskurse jetzt online buchen",
+            "text": "Vereine können ihre Kurse jetzt hier anbieten, den Anfang machen die Schwimmkurse der SBU Abteilung Schwimmen. Du siehst freie Plätze, meldest dein Kind direkt an und kommst bei vollen Kursen auf die Warteliste. Ein Konto brauchst du dafür nicht. Möchte dein Verein auch Kurse anbieten, melde dich bei uns.",
+            "quelle": "8296574edb450337679a9b3a9b691fb1795246a9"
+        },
+        "ru": {
+            "titel": "Записаться на курсы клубов онлайн",
+            "text": "Клубы теперь могут предлагать здесь свои курсы, и первыми появились курсы плавания от отдела плавания SBU. Ты видишь свободные места, сразу записываешь своего ребёнка и при заполненном курсе попадаешь в лист ожидания. Для этого не нужна учётная запись. Если твой клуб тоже хочет предлагать курсы, напиши нам.",
+            "quelle": "8296574edb450337679a9b3a9b691fb1795246a9"
+        }
+    },
     "oeffnungszeiten-ausnahmen": {
         "en": {
             "titel": "Opening hours: deviating days are now shown",

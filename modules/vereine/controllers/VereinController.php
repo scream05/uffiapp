@@ -126,7 +126,15 @@ class VereinController extends ContentContainerController
         if (!$verein->canManage()) {
             throw new ForbiddenHttpException(Yii::t('VereineModule.base', 'Nur Verwalter dieses Vereins können die Seite bearbeiten.'));
         }
-        if ($verein->load(Yii::$app->request->post())) {
+        $post = Yii::$app->request->post();
+        // „Vereinsseite als Homepage gestalten“ schalten nur Admins frei; ohne Freischaltung bleiben die Felder unverändert
+        if (Module::canManageAll() && isset($post['homepageAktiv'])) {
+            $verein->homepage_aktiv = $post['homepageAktiv'] ? 1 : 0;
+        }
+        if (!$verein->hatHomepage() && isset($post['Verein'])) {
+            $post['Verein'] = array_diff_key($post['Verein'], array_flip(Verein::HOMEPAGE_FELDER));
+        }
+        if ($verein->load($post)) {
             // Umbenennen nur durch Admins (der Name ist das Erkennungsmerkmal im Verzeichnis)
             if (!Module::canManageAll()) {
                 $verein->name = $verein->getOldAttribute('name');
@@ -223,6 +231,9 @@ class VereinController extends ContentContainerController
     protected function saveImages($verein): void
     {
         $this->saveImagesVerzeichnis($verein);
+        if (!$verein->hatHomepage()) {
+            return;
+        }
         $request = Yii::$app->request;
         foreach (['titelbild' => $verein->getTitelbild(), 'teambild' => $verein->getTeambild()] as $art => $alt) {
             $neu = array_values(array_filter((array)$request->post($art . 'List', [])));

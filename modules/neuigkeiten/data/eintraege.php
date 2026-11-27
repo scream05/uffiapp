@@ -10,6 +10,9 @@
  * link   optional [Space-URL oder null, Route] für den Knopf „Ansehen“
  */
 return [
+    ['id' => 'vereinsseite-formular-zeilen', 'datum' => '2026-11-27', 'art' => 'besser', 'popup' => false,
+        'titel' => 'Vereinsseite einfacher bearbeiten',
+        'text' => 'Beim Bearbeiten deiner Vereinsseite fügst du Ansprechpartner und Links jetzt mit „hinzufügen“ einzeln hinzu und entfernst sie mit dem ×, statt leere Zeilen auszufüllen. Bilder setzt du direkt in die Vorstellung ein.'],
     ['id' => 'kurse', 'datum' => '2026-11-26', 'art' => 'neu', 'popup' => true,
         'titel' => 'Kurse von Vereinen online buchen',
         'text' => 'Vereine können ihre Kurse jetzt hier anbieten, den Anfang machen die Schwimmkurse der SBU Abteilung Schwimmen. Du siehst freie Plätze, meldest dein Kind direkt an und kommst bei vollen Kursen auf die Warteliste. Ein Konto brauchst du dafür nicht. Möchte dein Verein auch Kurse anbieten, melde dich bei uns.',

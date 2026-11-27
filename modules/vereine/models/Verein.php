@@ -48,7 +48,8 @@ use yii\helpers\Url;
  * @property string|null $knopf_untertext
  * @property string|null $team_text
  * @property string|null $team JSON [{titel, mitglieder: [{name, funktion}]}]
- * @property string|null $teambild_guid wo, z. B. „beim Schützengau Uffenheim“
+ * @property string|null $teambild_guid
+ * @property int $homepage_aktiv „Vereinsseite als Homepage gestalten“ freigeschaltet (nur Admins, seit 27.11.2026)
  */
 class Verein extends ActiveRecord implements ViewableInterface
 {
@@ -62,6 +63,9 @@ class Verein extends ActiveRecord implements ViewableInterface
     public const MAX_TEAMS = 4;
     public const MAX_TEAM_PERSONEN = 20;
     public const MAX_STICHWOERTER = 6;
+
+    /** Felder des Bereichs „Vereinsseite als Homepage gestalten“ (nur bei homepage_aktiv bearbeitbar und sichtbar) */
+    public const HOMEPAGE_FELDER = ['slogan', 'untertitel', 'stichwoerter', 'knopf_text', 'knopf_untertext', 'team_text', 'teamRows'];
 
     /** Formularzeilen für Ansprechpartner und Social-Media-Links (werden als JSON gespeichert) */
     public array $apRows = [];
@@ -141,7 +145,7 @@ class Verein extends ActiveRecord implements ViewableInterface
     public function validateAnsprechpartner()
     {
         $rows = [];
-        foreach (array_slice((array)$this->apRows, 0, self::MAX_ANSPRECHPARTNER) as $row) {
+        foreach (array_slice(array_filter((array)$this->apRows, 'is_array'), 0, self::MAX_ANSPRECHPARTNER) as $row) {
             $row = array_map(fn($v) => mb_substr(trim((string)$v), 0, 150), array_intersect_key((array)$row,
                 array_flip(['funktion', 'name', 'email', 'telefon'])) + ['funktion' => '', 'name' => '', 'email' => '', 'telefon' => '']);
             if ($row['funktion'] === '' && $row['name'] === '' && $row['email'] === '' && $row['telefon'] === '') {
@@ -190,18 +194,21 @@ class Verein extends ActiveRecord implements ViewableInterface
     public function validateSocial()
     {
         $rows = [];
-        foreach (array_slice((array)$this->socialRows, 0, self::MAX_SOCIAL) as $row) {
+        $formular = []; // bei Fehlern bleiben auch ungültige Zeilen im Formular stehen
+        foreach (array_slice(array_filter((array)$this->socialRows, 'is_array'), 0, self::MAX_SOCIAL) as $row) {
             $url = trim((string)($row['url'] ?? ''));
+            $typ = mb_substr(trim((string)($row['typ'] ?? '')), 0, 30);
             if ($url === '') {
                 continue;
             }
             if (!preg_match('#^https://[^\s"<>]{4,300}$#', $url)) {
                 $this->addError('socialRows', Yii::t('VereineModule.base', 'Bitte vollständige Adressen mit https:// angeben: {wert}', ['wert' => $url]));
+                $formular[] = ['typ' => $typ, 'url' => $url];
                 continue;
             }
-            $rows[] = ['typ' => mb_substr(trim((string)($row['typ'] ?? '')), 0, 30) ?: self::socialType($url), 'url' => $url];
+            $rows[] = $formular[] = ['typ' => $typ ?: self::socialType($url), 'url' => $url];
         }
-        $this->socialRows = $rows;
+        $this->socialRows = $formular;
         $this->social = $rows ? json_encode($rows, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : null;
     }
 
@@ -243,10 +250,16 @@ class Verein extends ActiveRecord implements ViewableInterface
         return array_slice(array_values(array_filter(array_map('trim', explode(',', (string)$this->stichwoerter)))), 0, self::MAX_STICHWOERTER);
     }
 
+    /** Darf der Verein seine Seite als Homepage gestalten (Titelbereich, Team)? Freischaltung durch Admins */
+    public function hatHomepage(): bool
+    {
+        return (bool)$this->homepage_aktiv;
+    }
+
     /** Hat die Seite einen Titelbereich (Bild oder Slogan)? */
     public function hatTitelbereich(): bool
     {
-        return $this->getTitelbild() !== null || trim((string)$this->slogan) !== '';
+        return $this->hatHomepage() && ($this->getTitelbild() !== null || trim((string)$this->slogan) !== '');
     }
 
     public function getQuellenList(): array
